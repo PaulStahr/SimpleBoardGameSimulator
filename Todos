@@ -4,3 +4,5 @@
 -Grafische Oberfläche für Hauptmenü implementieren
 -Client Verbindung implementieren
 -Zip exporter implementieren
+-Grafische Oberfläche für laufendes Spiel implementieren
+-Ein ingame broadcasting chat (kann das Action system als Nachrichten missbrauchen)
