@@ -140,12 +140,24 @@ public class GameIO {
     	
 	}
 	
+
+	public static void saveObjectInstance(ObjectInstance object, OutputStream output) {
+		//Speichere die ObjectInstanz
+	}
+	
 	public static GameInstance readGame(InputStream in) throws IOException, JDOMException
 	{
 		ZipInputStream stream = new ZipInputStream(in);
 		GameInstance result = readGame(stream);
 		in.close();
 		return result;
+	}
+
+	public static void editGameInstance(ZipInputStream stream, GameInstance game, Object source)
+	{
+		//Editiere nur das was in dem Stream steht
+		//rufe dabei die update funktion des games auf, um über die änderungen mitzuteilen
+		//Rufe dabei auch die update Methode auf 
 	}
 	
 	public static GameInstance readGame(ZipInputStream stream) throws IOException, JDOMException
@@ -240,4 +252,5 @@ public class GameIO {
     		}
 	   	}
 	}
+
 }
