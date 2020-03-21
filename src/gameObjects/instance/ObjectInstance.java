@@ -1,5 +1,6 @@
 package gameObjects.instance;
 import java.awt.Image;
+import java.util.ArrayList;
 
 import gameObjects.definition.GameObject;
 import main.Player;
@@ -10,6 +11,7 @@ public class ObjectInstance {
 	public final int id;
 	public Player inHand = null;
 	public Player owner = null;
+	public final ArrayList<String> groups = new ArrayList<>();
 	
 	public ObjectInstance(GameObject go, int id)
 	{
