@@ -1,8 +1,9 @@
--Hashfunktionen implementieren
--Testserver aufsetzen
--Testserver implementieren
--Grafische Oberfläche für Hauptmenü implementieren
--Client Verbindung implementieren
--Zip exporter implementieren
--Grafische Oberfläche für laufendes Spiel implementieren
+-Hashfunktionen implementieren -> Paul
+-Testserver aufsetzen -> Florian
+-Testserver implementieren -> Paul
+-Client Verbindung implementieren -> Paul
+-Zip exporter implementieren -> Rike
+-Grafische Oberfläche für laufendes Spiel implementieren -> Florian
+-Grafische Oberflaeche fuer Serverloppy -> Hanno
 -Ein ingame broadcasting chat (kann das Action system als Nachrichten missbrauchen)
+
