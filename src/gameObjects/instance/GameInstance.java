@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import gameObjects.GameAction;
+import gameObjects.GameObjectInstanceEditAction;
+import gameObjects.definition.GameObject;
 import main.Player;
 
 public class GameInstance {
@@ -15,6 +17,12 @@ public class GameInstance {
 	public final ArrayList<ObjectInstance> objects = new ArrayList<>();
 	public final ArrayList<Player> players = new ArrayList<>();
 	public final ArrayList<GameAction> actions = new ArrayList<>();
+	public final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
+	
+	public static interface GameChangeListener
+	{
+		public void changeUpdate(GameAction action);
+	}
 	
 	public GameInstance(Game game)
 	{
@@ -60,5 +68,12 @@ public class GameInstance {
 		result ^= hidden ? 0xB : 0;
 		result ^= game.hashCode();
 		return result;
+	}
+
+	public void update(GameAction action) {
+		for (int i = 0; i < changeListener.size(); ++i)
+		{
+			changeListener.get(i).changeUpdate(action);
+		}
 	}
 }

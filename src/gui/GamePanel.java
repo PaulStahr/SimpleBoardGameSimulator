@@ -10,11 +10,15 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
 
+import gameObjects.GameAction;
+import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import main.Player;
 
-public class GamePanel extends JPanel implements MouseListener, MouseMotionListener{
+public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener{
 	/**
 	 * 
 	 */
@@ -25,12 +29,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	int pressedYPos = -1;
 	int objOrigPosX = -1;
 	int objOrigPosY = -1;
+	Player player;
 	
 	public GamePanel(GameInstance gameInstance)
 	{
 		this.gameInstance = gameInstance;
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		gameInstance.changeListener.add(this);
 	}
 	
 	@Override
@@ -89,9 +95,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void mouseDragged(MouseEvent arg0) {
 		activeObject.state.posX = objOrigPosX - pressedXPos + arg0.getX();
 		activeObject.state.posY = objOrigPosX - pressedXPos + arg0.getY();
+		gameInstance.update(new GameObjectInstanceEditAction(player, activeObject));
 		repaint();
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {}
+
+	@Override
+	public void changeUpdate(GameAction action) {
+		if (action instanceof GameObjectInstanceEditAction)
+		{
+			repaint();
+		}
+	}
 }
