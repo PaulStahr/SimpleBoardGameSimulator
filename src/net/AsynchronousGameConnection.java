@@ -11,7 +11,8 @@ import java.util.Scanner;
 
 import gameObjects.GameAction;
 import gameObjects.GameObjectInstanceEditAction;
-import gameObjects.UserMessageAction;
+import gameObjects.UserSoundMessageAction;
+import gameObjects.UsertextMessageAction;
 import gameObjects.definition.GameObject;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -31,9 +32,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 
 	@Override
 	public void changeUpdate(GameAction action) {
-		synchronized(ga)
+		if (action.source != id)
 		{
-			ga.add(action);
+			synchronized(ga)
+			{
+				ga.add(action);
+			}
 		}
 	}
 	
@@ -155,8 +159,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    {
 					    if (action instanceof GameObjectInstanceEditAction)
 				 		{
-					    	writer.print("action " );
+					    	writer.print("action edit " );
 					    	writer.print(id);
+					    	writer.print(' ');
+					    	writer.print(action.source);
 					    	writer.print(' ');
 					    	writer.print(((GameObjectInstanceEditAction) action).player.id);
 					    	writer.print(' ');
@@ -164,10 +170,23 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					    	writer.flush();
 					 		GameIO.saveObjectInstance(((GameObjectInstanceEditAction)action).object, output);
 				 		}
-					    else if (action instanceof UserMessageAction)
+					    else if (action instanceof UsertextMessageAction)
 					    {
-					    	writer.print("action message");
-					    	writer.print(((UserMessageAction) action).message);
+					    	writer.print("action message ");
+					    	writer.print(action.source);
+					    	writer.print(' ');
+					    	writer.print(((UsertextMessageAction) action).player);
+					    	writer.print(' ');
+					    	writer.print(((UsertextMessageAction) action).message);
+					    }
+					    else if (action instanceof UserSoundMessageAction)
+					    {
+					    	writer.print("action message ");
+					    	writer.print(action.source);
+					    	writer.print(' ');
+					    	writer.print(((UsertextMessageAction) action).player);
+					    	writer.print(' ');
+					    	writer.print(((UsertextMessageAction) action).message);
 					    }
 					}
 				    catch ( Exception e ) {
@@ -209,18 +228,31 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						int id = Integer.parseInt(split.get(2));
 						String type = split.get(3);	
 					}
-					else if (line.startsWith("action"))
+					else if (line.startsWith("action edit"))
 					{
 						StringUtils.split(line, ' ', split);
-						int sourceId = Integer.parseInt(split.get(1));
-						int playerId = Integer.parseInt(split.get(2));
-						int objectId = Integer.parseInt(split.get(3));
+						int sourceId = Integer.parseInt(split.get(2));
 						if (sourceId != id)
 						{
-							GameIO.editObjectInstance(gi.getObjectInstance(objectId), input);
+							int playerId = Integer.parseInt(split.get(3));
+							int objectId = Integer.parseInt(split.get(4));
+							if (sourceId != id)
+							{
+								GameIO.editObjectInstance(gi.getObjectInstance(objectId), input);
+							}
+							gi.update(new GameObjectInstanceEditAction(sourceId, gi.getPlayer(playerId), gi.getObjectInstance(objectId)));
 						}
 					}
-					
+					else if (line.startsWith("action message"))
+					{
+						StringUtils.split(line, ' ', split);
+						int sourceId = Integer.parseInt(split.get(2));
+						if (sourceId != id)
+						{
+							int playerId = Integer.parseInt(split.get(3));
+							gi.update(new UsertextMessageAction(sourceId, playerId, split.get(4)));
+						}
+					}
 					split.clear();
 					
 				    line = in.nextLine();

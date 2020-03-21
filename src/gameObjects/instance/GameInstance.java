@@ -29,6 +29,18 @@ public class GameInstance {
 		this.game = game;
 	}
 	
+	public Player getPlayer(int id)
+	{
+		for (int i = 0; i < players.size(); ++i)
+		{
+			if (players.get(i).id == id)
+			{
+				return players.get(i);
+			}
+		}
+		return null;
+	}
+	
 	public Player getPlayer(String name)
 	{
 		for (int i = 0; i < players.size(); ++i)

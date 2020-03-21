@@ -1,10 +1,10 @@
 package gameObjects;
 
 public abstract class GameAction {
-	public GameAction(Object source)
+	public final int source;
+	public GameAction(int source)
 	{
-		
+		this.source = source;
 	}
 	
-	Object source;
 }

@@ -31,6 +31,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	int objOrigPosX = -1;
 	int objOrigPosY = -1;
 	Player player;
+	int id = (int)System.nanoTime();
 
 
 
@@ -122,7 +123,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if(SwingUtilities.isLeftMouseButton(arg0)) {
 			activeObject.state.posX = objOrigPosX - pressedXPos + arg0.getX();
 			activeObject.state.posY = objOrigPosX - pressedXPos + arg0.getY();
-			gameInstance.update(new GameObjectInstanceEditAction(this, player, activeObject));
+			gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
 		}
 	}
 
