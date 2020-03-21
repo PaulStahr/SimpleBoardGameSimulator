@@ -48,7 +48,6 @@ public class GameIO {
         //put something into buffer
         outBuffer.flush();
         zipOutStream.closeEntry();
-      
         Document doc = new Document();
     	Element root = new Element("scene");
     	doc.addContent(root);

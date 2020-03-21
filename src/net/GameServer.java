@@ -63,9 +63,12 @@ public class GameServer {
 					    		{
 					    			out.write(gameInstances.get(i).name);
 					    		}
+					    		out.close();
 			    			}
-			    			case "game":
+			    			case "player":
 			    			{
+			    				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+			    				
 			    			}
 			    		}
 			    	}
