@@ -1,6 +1,8 @@
 package net;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -42,7 +44,9 @@ public class GameServer {
 		{
 		    Scanner in;
 			try {
-				in = new Scanner( client.getInputStream() );
+				InputStream input = client.getInputStream();
+				OutputStream output = client.getOutputStream();
+				in = new Scanner( input);
 				String line = in.nextLine();
 				ArrayList<String> split = new ArrayList<>();
 				StringUtils.split(line, ' ', split);
@@ -60,7 +64,7 @@ public class GameServer {
 			    		{
 			    			case "gameinstances": 
 			    			{
-					    	    PrintWriter out = new PrintWriter( client.getOutputStream(), true );
+					    	    PrintWriter out = new PrintWriter( output, true );
 					    		for (int i = 0; i < gameInstances.size(); ++i)
 					    		{
 					    			out.write(gameInstances.get(i).name);
@@ -69,7 +73,7 @@ public class GameServer {
 			    			}
 			    			case "player":
 			    			{
-			    				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+			    				PrintWriter out = new PrintWriter(output, true);
 			    				String gameinstanceName = split.get(2);
 			    				GameInstance gi = getGameInstance(gameinstanceName);
 			    				for (int i = 0; i < gi.players.size(); ++i)
@@ -109,21 +113,21 @@ public class GameServer {
 			    			case "gameinstance":
 			    			{
 			    				GameInstance gi = getGameInstance(split.get(2));
-			    				GameIO.saveGame(gi, client.getOutputStream());
+			    				GameIO.saveGame(gi, output);
 			    				break;
 			    			}
 			    			case "gameobject":
 			    			{
 			    				GameInstance gi = getGameInstance(split.get(2));
 			    				GameObject go = gi.game.getObject(split.get(3));
-			    				//GameIO.saveGameObject(go, client.getOutputStream());
+			    				//GameIO.saveGameObject(go, output);
 			    				break;
 			    			}
 			    			case "gameobjectinstance":
 			    			{
 			    				GameInstance gi = getGameInstance(split.get(2));
 			    				ObjectInstance oi = gi.getObjectInstance(Integer.parseInt(split.get(2)));
-			    				//GameIO.saveGameObjectInstance(go, client.getOutputStream());
+			    				//GameIO.saveGameObjectInstance(go, output);
 			    				break;
 			    			}
 			    		}
@@ -135,6 +139,12 @@ public class GameServer {
 			    		{
 			    			gi.players.add(new Player("player", id));
 			    		}
+			    	}
+			    	case "connect":
+			    	{
+			    		GameInstance gi = getGameInstance(split.get(1));
+			    		AsynchronousGameConnection asc = new AsynchronousGameConnection(gi, input, output);
+			    		asc.start();
 			    	}
 			    }
 			} catch (IOException e) {
