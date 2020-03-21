@@ -1,5 +1,6 @@
 package gameObjects.instance;
 
+import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectCard;
 
@@ -16,10 +17,12 @@ public class ObjectActionMenu {
     public JMenuItem menuItem = new JMenuItem("Flip Card");
 
     public ObjectInstance gameObject;
+    public GameInstance gameInstance;
 
-    public ObjectActionMenu(ObjectInstance gameObject)
+    public ObjectActionMenu(ObjectInstance gameObject, GameInstance gameInstance)
     {
         this.gameObject = gameObject;
+        this.gameInstance = gameInstance;
 
         menuItem.setMnemonic(KeyEvent.VK_P);
         menuItem.getAccessibleContext().setAccessibleDescription(
@@ -27,6 +30,7 @@ public class ObjectActionMenu {
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	((GameObjectCard.CardState)gameObject.state).side = !((GameObjectCard.CardState)gameObject.state).side;
+            	gameInstance.update(new GameObjectInstanceEditAction(null, gameObject));
             }
         });
         popup.add(menuItem);

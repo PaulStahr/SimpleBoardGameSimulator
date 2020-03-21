@@ -12,6 +12,7 @@ import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
 
 import gameObjects.GameAction;
 //import gameObjects.GameObjectInstanceEditAction;
+import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import main.Player;
@@ -82,7 +83,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 			}
 			/*Show popup menu of active object*/
-			activeObject.newObjectActionMenu().showPopup(arg0);
+			activeObject.newObjectActionMenu(gameInstance).showPopup(arg0);
 		}
 	}
 
@@ -134,11 +135,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void changeUpdate(GameAction action) {
-		/*
 		if (action instanceof GameObjectInstanceEditAction)
 		{
 			repaint();
 		}
-		*/
 	}
 }

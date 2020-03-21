@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import gameObjects.GameAction;
-//import gameObjects.GameObjectInstanceEditAction;
+import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import main.Player;
 
