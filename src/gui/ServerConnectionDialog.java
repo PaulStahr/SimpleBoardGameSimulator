@@ -16,6 +16,7 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 	JTextField textFieldName = new JTextField();
 	JButton buttonConnect = new JButton();
 	JButton buttonCancel = new JButton();
+	JButton buttonStartServer = new JButton();
 	public ServerConnectionDialog()
 	{
 		GroupLayout layout = new GroupLayout(getContentPane());
@@ -25,15 +26,16 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 		layout.createParallelGroup().addGroup(
 		layout.createSequentialGroup().addComponent(labelAddress).addComponent(textFieldAddress)).addGroup(
 		layout.createSequentialGroup().addComponent(labelName).addComponent(textFieldName)).addGroup(
-		layout.createSequentialGroup().addComponent(buttonConnect).addComponent(buttonCancel)));
+		layout.createSequentialGroup().addComponent(buttonConnect).addComponent(buttonCancel).addComponent(buttonStartServer)));
 		
 		layout.setVerticalGroup(
 		layout.createSequentialGroup().addGroup(
 		layout.createParallelGroup().addComponent(labelAddress).addComponent(textFieldAddress)).addGroup(
 		layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName)).addGroup(
-		layout.createParallelGroup().addComponent(buttonConnect).addComponent(buttonCancel)));
+		layout.createParallelGroup().addComponent(buttonConnect).addComponent(buttonCancel).addComponent(buttonStartServer)));
 		setSize(1000, 500);
 		buttonConnect.addActionListener(this);
+		buttonStartServer.addActionListener(this);
 	}
 
 	@Override
@@ -42,6 +44,11 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 		if (source == buttonConnect)
 		{
 			
+		}
+		else if (source == buttonStartServer)
+		{
+			ServerControlWindow scw = new ServerControlWindow();
+			scw.setVisible(true);
 		}
 	}
 	

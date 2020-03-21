@@ -7,7 +7,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import gameObjects.definition.GameObject;
 import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectInstance;
 import io.GameIO;
 import main.DataHandler;
 import main.Player;
@@ -63,9 +65,18 @@ public class GameServer {
 					    		{
 					    			out.write(gameInstances.get(i).name);
 					    		}
+					    		out.close();
 			    			}
-			    			case "game":
+			    			case "player":
 			    			{
+			    				PrintWriter out = new PrintWriter(client.getOutputStream(), true);
+			    				String gameinstanceName = split.get(2);
+			    				GameInstance gi = getGameInstance(gameinstanceName);
+			    				for (int i = 0; i < gi.players.size(); ++i)
+			    				{
+			    					out.write(gi.players.get(i).name);
+			    				}
+			    				out.close();
 			    			}
 			    		}
 			    	}
@@ -84,6 +95,8 @@ public class GameServer {
 			    				break;
 			    			case "gameobject":
 			    				break;
+			    			case "gameobjectinstance":
+			    				break;
 			    			case "player":
 			    				break;
 			    			
@@ -95,9 +108,23 @@ public class GameServer {
 			    		{
 			    			case "gameinstance":
 			    			{
-			    				
 			    				GameInstance gi = getGameInstance(split.get(2));
 			    				GameIO.saveGame(gi, client.getOutputStream());
+			    				break;
+			    			}
+			    			case "gameobject":
+			    			{
+			    				GameInstance gi = getGameInstance(split.get(2));
+			    				GameObject go = gi.game.getObject(split.get(3));
+			    				//GameIO.saveGameObject(go, client.getOutputStream());
+			    				break;
+			    			}
+			    			case "gameobjectinstance":
+			    			{
+			    				GameInstance gi = getGameInstance(split.get(2));
+			    				ObjectInstance oi = gi.getObjectInstance(Integer.parseInt(split.get(2)));
+			    				//GameIO.saveGameObjectInstance(go, client.getOutputStream());
+			    				break;
 			    			}
 			    		}
 			    	}
@@ -117,9 +144,9 @@ public class GameServer {
 		}	
 	}
 
-	public void main( String[] args ) throws IOException
+	public void startGameServer(int port) throws IOException
     {
-	    ServerSocket server = new ServerSocket( 3141 );
+	    ServerSocket server = new ServerSocket( port );
 	    while ( true )
 	    {
 	    	Socket client = null;

@@ -49,7 +49,10 @@ public class GameIO {
 	    /*final ZipOutputStream zipOutStream = new ZipOutputStream(os);
         final OutputStreamWriter writer = new OutputStreamWriter(zipOutStream, Charset.forName("UTF-16"));
         final BufferedWriter outBuffer = new BufferedWriter(writer);
-
+        zipOutStream.putNextEntry(new ZipEntry("Info"));
+        //put something into buffer
+        outBuffer.flush();
+        zipOutStream.closeEntry();
         Document doc = new Document();
     	Element root = new Element("scene");
     	doc.addContent(root);

@@ -21,8 +21,44 @@ public class GameInstance {
 		this.game = game;
 	}
 	
+	public Player getPlayer(String name)
+	{
+		for (int i = 0; i < players.size(); ++i)
+		{
+			if (players.get(i).name.equals(name))
+			{
+				return players.get(i);
+			}
+		}
+		return null;
+	}
+	
+	public ObjectInstance getObjectInstance(int id)
+	{
+		for (int i = 0; i < objects.size(); ++i)
+		{
+			if (objects.get(i).id == id)
+			{
+				return objects.get(i);
+			}
+		}
+		return null;
+	}
+	
 	public int getHash()
-	{//TODO
-		return 0;
+	{
+		int result = 0;
+		for (int i = 0; i < objects.size(); ++i)
+		{
+			result ^= objects.get(i).hashCode();
+		}
+		for (int i = 0; i < players.size(); ++i)
+		{
+			result ^= players.get(i).hashCode();
+		}
+		result ^= name.hashCode();
+		result ^= hidden ? 0xB : 0;
+		result ^= game.hashCode();
+		return result;
 	}
 }
