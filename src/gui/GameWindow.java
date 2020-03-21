@@ -3,7 +3,7 @@ import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 
-import main.GameInstance;
+import gameObjects.instance.GameInstance;
 
 public class GameWindow extends JFrame{
 	GameInstance gi;

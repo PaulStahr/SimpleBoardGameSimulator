@@ -1,7 +1,7 @@
-package gameObjects;
+package gameObjects.definition;
 import java.awt.image.BufferedImage;
 
-import main.ObjectState;
+import gameObjects.instance.ObjectState;
 
 public abstract class GameObject {
 	int size;
@@ -15,4 +15,9 @@ public abstract class GameObject {
 	public abstract BufferedImage getLook(ObjectState state);
 
 	public abstract ObjectState newObjectState();
+	
+	public int hashCode()
+	{
+		return size + id.hashCode();
+	}
 }

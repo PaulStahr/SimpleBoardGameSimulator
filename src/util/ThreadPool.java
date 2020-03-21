@@ -30,26 +30,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class threadPool {
-	private static final Logger logger = LoggerFactory.getLogger(threadPool.class);
+public class ThreadPool {
+	private static final Logger logger = LoggerFactory.getLogger(ThreadPool.class);
 	private final ArrayDeque<RunnableObject> toRun = new ArrayDeque<RunnableObject>();
 	private final int timeout;
 	private volatile int waiting, total;
 	private int freeIds[];
 	private int maxThreads;
 	
-	public threadPool(int timeout, int maxThreads) {
+	public ThreadPool(int timeout, int maxThreads) {
 		this.timeout = timeout;
 		this.maxThreads = maxThreads;
 		freeIds = new int[maxThreads];
 		ArrayUtil.iota(freeIds);
 	}
 	
-	public threadPool(int timeout) {
+	public ThreadPool(int timeout) {
 		this(timeout, Runtime.getRuntime().availableProcessors());
 	}
 	
-	public threadPool() {
+	public ThreadPool() {
 		this(1000);
 	}
 	

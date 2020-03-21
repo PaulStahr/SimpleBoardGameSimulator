@@ -1,8 +1,8 @@
-package gameObjects;
+package gameObjects.definition;
 
 import java.awt.image.BufferedImage;
 
-import main.ObjectState;
+import gameObjects.instance.ObjectState;
 
 public class GameObjectCard extends GameObject{
 	BufferedImage upsideLook;
@@ -24,8 +24,14 @@ public class GameObjectCard extends GameObject{
 		return new CardState();
 	}
 	
-	class CardState  extends ObjectState
+	public static class CardState  extends ObjectState
 	{
-		boolean side;
+		public boolean side;
+		
+		@Override
+		public int hashCode()
+		{
+			return super.hashCode() ^ (side ? 0xF00BA : 0);
+		}
 	}
 }

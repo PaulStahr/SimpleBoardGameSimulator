@@ -1,10 +1,11 @@
-package main;
+package gameObjects.instance;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import gameObjects.GameObject;
+import gameObjects.definition.GameObject;
 
 public class Game {
 	public Image background;
@@ -19,5 +20,16 @@ public class Game {
 			}
 		}
 		return null;
+	}
+	
+	@Override
+	public int hashCode()
+	{
+		int result = 0;
+		for (int i = 0; i < objects.size(); ++i)
+		{
+			result += objects.get(i).hashCode();
+		}
+		return result;
 	}
 }

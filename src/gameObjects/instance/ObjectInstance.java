@@ -1,7 +1,8 @@
-package main;
+package gameObjects.instance;
 import java.awt.Image;
 
-import gameObjects.GameObject;
+import gameObjects.definition.GameObject;
+import main.Player;
 
 public class ObjectInstance {
 	public final ObjectState state;
@@ -26,4 +27,8 @@ public class ObjectInstance {
 		return 0;
 	}
 	
+	public int hashCode()
+	{
+		return go.hashCode() + state.hashCode() + id + (inHand == null ? 0 : inHand.hashCode()) + (owner == null ? 0 : owner.hashCode());
+	}
 }

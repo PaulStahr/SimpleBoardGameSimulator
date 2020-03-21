@@ -11,8 +11,8 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
-import main.GameInstance;
-import main.ObjectInstance;
+import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectInstance;
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener{
 	/**

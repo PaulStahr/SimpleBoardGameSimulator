@@ -17,12 +17,18 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
-import gameObjects.GameObjectCard;
-import main.Game;
-import main.GameInstance;
-import main.ObjectInstance;
+import gameObjects.definition.GameObjectCard;
+import gameObjects.instance.Game;
+import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectInstance;
+import main.Player;
 
 public class GameIO {
+	public Player readPlayer(ZipInputStream stream)
+	{
+		return null;
+	}
+	
 	public static void saveGame(Game game, OutputStream os) 
 	{
 		

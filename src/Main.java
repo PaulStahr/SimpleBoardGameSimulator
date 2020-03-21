@@ -4,10 +4,9 @@ import java.io.IOException;
 
 import org.jdom2.JDOMException;
 
+import gameObjects.instance.GameInstance;
 import gui.GameWindow;
 import io.GameIO;
-import main.Game;
-import main.GameInstance;
 
 public class Main {
     public static final void main (String args[]){
