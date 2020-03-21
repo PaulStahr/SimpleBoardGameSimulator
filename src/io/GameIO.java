@@ -29,7 +29,12 @@ public class GameIO {
 		return null;
 	}
 	
-	public static void saveGame(Game game, OutputStream os) 
+	public static void saveGame(GameInstance gi, OutputStream os) 
+	{
+		
+	}
+	
+	public static void saveGame(Game gi, OutputStream os) 
 	{
 		
 	}
