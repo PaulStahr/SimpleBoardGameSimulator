@@ -1,10 +1,13 @@
 package main;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import org.jdom2.JDOMException;
 
+import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gui.GameWindow;
 import gui.ServerConnectionDialog;
@@ -22,6 +25,9 @@ public class Main {
 	    	
 			ServerConnectionDialog scd = new ServerConnectionDialog();
 			scd.setVisible(true);
+			FileOutputStream fos = new FileOutputStream("output.zip");
+			GameIO.saveGame(game.game, fos);
+			fos.close();
     	} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

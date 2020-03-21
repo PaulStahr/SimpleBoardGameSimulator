@@ -11,6 +11,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -21,7 +23,10 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
+import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectCard;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
@@ -39,9 +44,9 @@ public class GameIO {
 		
 	}
 	
-	public static void saveGame(Game gi, OutputStream os) 
+	public static void saveGame(Game gi, OutputStream os) throws IOException
 	{
-	    final ZipOutputStream zipOutStream = new ZipOutputStream(os);
+	    /*final ZipOutputStream zipOutStream = new ZipOutputStream(os);
         final OutputStreamWriter writer = new OutputStreamWriter(zipOutStream, Charset.forName("UTF-16"));
         final BufferedWriter outBuffer = new BufferedWriter(writer);
 
@@ -52,7 +57,83 @@ public class GameIO {
     	Element elem = new Element("Bla");
     	elem.setAttribute("Hallo", "Die Daten");
     	elem.setText("Der Text in der Node");
-    	root.addContent(elem);
+    	root.addContent(elem);*/
+		
+		final ZipOutputStream zipOutputStream = new ZipOutputStream(os);
+		try
+		{
+		    Iterator<Entry<String, BufferedImage>> it = gi.images.entrySet().iterator();
+		    while (it.hasNext()) {
+		    	HashMap.Entry<String, BufferedImage> pair = it.next();
+		        System.out.println(pair.getKey() + " = " + pair.getValue());
+		    
+			    ZipEntry imageZipOutput = new ZipEntry(pair.getKey());
+			    zipOutputStream.putNextEntry(imageZipOutput);
+
+			    if (pair.getKey().endsWith(".jpg"))
+			    {
+			    	ImageIO.write(pair.getValue(), "jpg", zipOutputStream);
+			    }
+			    else if (pair.getKey().endsWith(".png"))
+			    {
+			    	ImageIO.write(pair.getValue(), "png", zipOutputStream);
+			    }
+			    zipOutputStream.closeEntry();
+		    }
+		    
+		    Document doc = new Document();
+	    	Element root = new Element("xml");
+	    	doc.addContent(root);
+	    	
+	    	Iterator<GameObject> gameIt = gi.objects.iterator();
+	        while (gameIt.hasNext()) {
+	        	GameObject entry = gameIt.next();
+	        	Element elem = new Element("object");
+	        	if (entry instanceof GameObjectCard)
+	        	{
+	        		elem.setAttribute("type", "card");
+	        		elem.setAttribute("id", entry.id);
+	        		elem.setAttribute("front", entry.id);
+	        		elem.setAttribute("back", entry.id);
+	        	}
+	        	elem.setAttribute("Hallo", "Die Daten");
+	        	elem.setText("Der Text in der Node");
+	        	root.addContent(elem);
+	        }
+	    	
+	    	ZipEntry xmlZipOutput = new ZipEntry("game.xml");
+	    	zipOutputStream.putNextEntry(xmlZipOutput);
+	    	new XMLOutputter(Format.getPrettyFormat()).output(doc, zipOutputStream);
+	    	zipOutputStream.closeEntry();
+	    	
+	    	
+	    	/*for (Element elem : root.getChildren())
+	    	{
+	    		String name = elem.getName();
+	    		if (name.equals("object"))
+	    		{
+	    			switch(elem.getAttributeValue("type"))
+	    			{
+	    				case "card":
+	    				{
+	    					game.objects.add(new GameObjectCard(elem.getAttributeValue("id"), images.get(elem.getAttributeValue("front")), images.get(elem.getAttributeValue("back"))));
+	    					break;
+	    				}
+	    			}
+	    		}
+	    		else if (name.equals("background"))
+	    		{
+	    			System.out.println(elem.getValue());
+	    			game.background = images.get(elem.getValue());
+	    		}
+	    		System.out.println(name);
+		   	}*/
+
+		}
+		finally
+		{
+			zipOutputStream.close();
+		}
     	
 	}
 	
