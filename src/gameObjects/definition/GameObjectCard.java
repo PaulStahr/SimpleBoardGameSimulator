@@ -1,7 +1,11 @@
 package gameObjects.definition;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
+import gameObjects.instance.ObjectActionMenu;
 import gameObjects.instance.ObjectState;
 
 public class GameObjectCard extends GameObject{
@@ -23,7 +27,7 @@ public class GameObjectCard extends GameObject{
 	{
 		return new CardState();
 	}
-	
+
 	public static class CardState  extends ObjectState
 	{
 		public boolean side;
@@ -32,6 +36,19 @@ public class GameObjectCard extends GameObject{
 		public int hashCode()
 		{
 			return super.hashCode() ^ (side ? 0xF00BA : 0);
+		}
+	}
+
+	@Override
+	public ObjectActionMenu newObjectActionMenu(){
+		return new CardActionMenu(this);
+	}
+
+	public static class CardActionMenu extends ObjectActionMenu
+	{
+
+		public CardActionMenu(GameObject gameObject) {
+			super(gameObject);
 		}
 	}
 }

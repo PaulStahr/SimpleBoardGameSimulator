@@ -2,18 +2,16 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
 
 import gameObjects.GameAction;
-import gameObjects.GameObjectInstanceEditAction;
+//import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import main.Player;
@@ -27,10 +25,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	ObjectInstance activeObject = null;
 	int pressedXPos = -1;
 	int pressedYPos = -1;
+	int clickedXPos = -1;
+	int clickedYPos = -1;
 	int objOrigPosX = -1;
 	int objOrigPosY = -1;
 	Player player;
-	
+
+
+
 	public GamePanel(GameInstance gameInstance)
 	{
 		this.gameInstance = gameInstance;
@@ -60,7 +62,29 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 
 	@Override
-	public void mouseClicked(MouseEvent arg0) {}
+	public void mouseClicked(MouseEvent arg0) {
+
+		/* Right Mouse Click on Object */
+		if(SwingUtilities.isRightMouseButton(arg0))
+		{
+			clickedXPos = arg0.getX();
+			clickedYPos = arg0.getY();
+			int distance = Integer.MAX_VALUE;
+			for (int i = 0;i<gameInstance.objects.size(); ++i)
+			{
+				ObjectInstance oi = gameInstance.objects.get(i);
+				int xDiff = pressedXPos - oi.state.posX, yDiff = pressedYPos - oi.state.posY;
+				int dist = xDiff * xDiff + yDiff * yDiff;
+				if (dist < distance)
+				{
+					activeObject = oi;
+					distance = dist;
+				}
+			}
+			/*Show popup menu of active object*/
+			activeObject.go.newObjectActionMenu().showPopup(arg0);
+		}
+	}
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {}
@@ -93,20 +117,28 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
-		activeObject.state.posX = objOrigPosX - pressedXPos + arg0.getX();
-		activeObject.state.posY = objOrigPosX - pressedXPos + arg0.getY();
-		gameInstance.update(new GameObjectInstanceEditAction(player, activeObject));
-		repaint();
+		/* Drag only when left mouse down */
+		if(SwingUtilities.isLeftMouseButton(arg0)) {
+			activeObject.state.posX = objOrigPosX - pressedXPos + arg0.getX();
+			activeObject.state.posY = objOrigPosX - pressedXPos + arg0.getY();
+//		gameInstance.update(new GameObjectInstanceEditAction(player, activeObject));
+			repaint();
+		}
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {}
 
+
+
+
 	@Override
 	public void changeUpdate(GameAction action) {
+		/*
 		if (action instanceof GameObjectInstanceEditAction)
 		{
 			repaint();
 		}
+		*/
 	}
 }
