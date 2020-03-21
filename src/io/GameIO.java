@@ -1,14 +1,19 @@
 package io;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 
@@ -36,7 +41,19 @@ public class GameIO {
 	
 	public static void saveGame(Game gi, OutputStream os) 
 	{
-		
+	    final ZipOutputStream zipOutStream = new ZipOutputStream(os);
+        final OutputStreamWriter writer = new OutputStreamWriter(zipOutStream, Charset.forName("UTF-16"));
+        final BufferedWriter outBuffer = new BufferedWriter(writer);
+
+        Document doc = new Document();
+    	Element root = new Element("scene");
+    	doc.addContent(root);
+    	
+    	Element elem = new Element("Bla");
+    	elem.setAttribute("Hallo", "Die Daten");
+    	elem.setText("Der Text in der Node");
+    	root.addContent(elem);
+    	
 	}
 	
 	public static GameInstance readGame(InputStream in) throws IOException, JDOMException
