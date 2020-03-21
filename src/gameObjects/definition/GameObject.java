@@ -1,13 +1,14 @@
 package gameObjects.definition;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
-import gameObjects.instance.ObjectActionMenu;
 import gameObjects.instance.ObjectState;
 
 public abstract class GameObject {
-	int size;
+	int drawSize;
 	public String id;
-	
+	public final ArrayList<String> groups = new ArrayList<>();
+
 	public GameObject(String id)
 	{
 		this.id = id;
@@ -19,6 +20,6 @@ public abstract class GameObject {
 
 	public int hashCode()
 	{
-		return size + id.hashCode();
+		return drawSize ^ id.hashCode();
 	}
 }

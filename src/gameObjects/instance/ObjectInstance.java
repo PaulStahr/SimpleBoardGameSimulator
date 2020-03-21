@@ -10,8 +10,6 @@ public class ObjectInstance {
 	public final GameObject go;
 	public final int id;
 	public Player inHand = null;
-	public Player owner = null;
-	public final ArrayList<String> groups = new ArrayList<>();
 	
 	public ObjectInstance(GameObject go, int id)
 	{
@@ -24,14 +22,19 @@ public class ObjectInstance {
 	{
 		return go.getLook(state);
 	}
+	
+	public Player owner()
+	{
+		return state.owner;
+	}
 
-	public double getRotation() {
-		return 0;
+	public int getRotation() {
+		return state.rotation;
 	}
 	
 	public int hashCode()
 	{
-		return go.hashCode() + state.hashCode() + id + (inHand == null ? 0 : inHand.hashCode()) + (owner == null ? 0 : owner.hashCode());
+		return go.hashCode() + state.hashCode() + id + (inHand == null ? 0 : inHand.hashCode()) + (state.owner == null ? 0 : state.owner.hashCode());
 	}
 	
 	public ObjectActionMenu newObjectActionMenu(GameInstance gameInstance){
