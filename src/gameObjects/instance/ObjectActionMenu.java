@@ -1,6 +1,7 @@
 package gameObjects.instance;
 
 import gameObjects.definition.GameObject;
+import gameObjects.definition.GameObjectCard;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -14,9 +15,9 @@ public class ObjectActionMenu {
 
     public JMenuItem menuItem = new JMenuItem("Flip Card");
 
-    public GameObject gameObject;
+    public ObjectInstance gameObject;
 
-    public ObjectActionMenu(GameObject gameObject)
+    public ObjectActionMenu(ObjectInstance gameObject)
     {
         this.gameObject = gameObject;
 
@@ -25,7 +26,7 @@ public class ObjectActionMenu {
                 "Flip Card");
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                gameObject.getLook(gameObject.newObjectState());
+            	((GameObjectCard.CardState)gameObject.state).side = !((GameObjectCard.CardState)gameObject.state).side;
             }
         });
         popup.add(menuItem);

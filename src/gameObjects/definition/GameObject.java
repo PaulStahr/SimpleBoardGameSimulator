@@ -17,8 +17,6 @@ public abstract class GameObject {
 
 	public abstract ObjectState newObjectState();
 
-	public abstract ObjectActionMenu newObjectActionMenu();
-	
 	public int hashCode()
 	{
 		return size + id.hashCode();
