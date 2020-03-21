@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.jdom2.JDOMException;
 
 import gui.GameWindow;
-import io.GameReader;
+import io.GameIO;
 import main.Game;
 import main.GameInstance;
 
@@ -14,7 +14,7 @@ public class Main {
     	FileInputStream fis;
 		try {
 			fis = new FileInputStream("SchreckenDesTempels.zip");
-			GameInstance game = GameReader.readGame(fis);
+			GameInstance game = GameIO.readGame(fis);
 	    	fis.close();
 	    	GameWindow gw = new GameWindow(game);
 	    	gw.setVisible(true);

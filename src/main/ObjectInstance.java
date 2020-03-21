@@ -7,6 +7,8 @@ public class ObjectInstance {
 	public final ObjectState state;
 	public final GameObject go;
 	public final int id;
+	public Player inHand = null;
+	public Player owner = null;
 	
 	public ObjectInstance(GameObject go, int id)
 	{

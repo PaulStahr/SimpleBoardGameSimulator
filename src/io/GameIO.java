@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -21,8 +22,11 @@ import main.Game;
 import main.GameInstance;
 import main.ObjectInstance;
 
-public class GameReader {
-	
+public class GameIO {
+	public static void saveGame(Game game, OutputStream os) 
+	{
+		
+	}
 	
 	public static GameInstance readGame(InputStream in) throws IOException, JDOMException
 	{
@@ -34,7 +38,8 @@ public class GameReader {
 	
 	public static GameInstance readGame(ZipInputStream stream) throws IOException, JDOMException
 	{
-		HashMap<String, BufferedImage> images = new HashMap<>();
+		Game game = new Game();
+		HashMap<String, BufferedImage> images = game.images;
 		ByteArrayOutputStream gameBuffer = new ByteArrayOutputStream();
 		ByteArrayOutputStream gameInstanceBuffer = new ByteArrayOutputStream();
 		try
@@ -76,8 +81,7 @@ public class GameReader {
 		Document doc = new SAXBuilder().build(new ByteArrayInputStream(gameBuffer.toByteArray()));
     	Element root = doc.getRootElement();
     	
-    	Game game = new Game();
-
+    
     	for (Element elem : root.getChildren())
     	{
     		String name = elem.getName();
