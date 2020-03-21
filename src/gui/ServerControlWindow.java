@@ -14,7 +14,7 @@ public class ServerControlWindow extends JFrame implements ActionListener, Runna
 	private final JButton buttonStart = new JButton("Start");
 	private final JButton buttonStop = new JButton("Stop");
 	private Thread th;
-	private GameServer gs = new GameServer();
+	private GameServer gs = new GameServer(1234);
 	public ServerControlWindow()
 	{
 		GroupLayout layout = new GroupLayout(getContentPane());
@@ -46,7 +46,7 @@ public class ServerControlWindow extends JFrame implements ActionListener, Runna
 	@Override
 	public void run() {
 		try {
-			gs.startGameServer(1234);
+			gs.start();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

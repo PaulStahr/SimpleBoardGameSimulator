@@ -27,6 +27,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	OutputStream output;
 	ArrayDeque<GameAction> ga = new ArrayDeque<>();
 	ArrayDeque<String> queuedCommands = new ArrayDeque<>();
+	private final int id = (int)System.nanoTime();
 
 	@Override
 	public void changeUpdate(GameAction action) {
@@ -40,9 +41,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	{
 		this.gi = gi;
 		gi.changeListener.add(this);
+		this.input = input;
+		this.output = output;
 	}
 	
-	void start()
+	public void start()
 	{
 		if (outputThread == null)
 		{
@@ -66,75 +69,77 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				{
 					command = queuedCommands.size() == 0 ? null : queuedCommands.pop();
 				}
-				StringUtils.split(command, ' ', split);
-				switch (split.get(1))
-			    {
-			    	case "list":
-			    	{
-			    		switch (split.get(2))
-			    		{
-			    			case "player":
-			    			{
-			    				writer.write("write list player");
-			    				for (int i = 0; i < gi.players.size(); ++i)
-			    				{
-			    					writer.write(gi.players.get(i).name);
-			    				}
-			    				writer.flush();
-			    			}
-			    		}
-			    	}
-			    	case "hash":
-			    	{
-		    			writer.write("write hash ");
-		    			writer.write(gi.hashCode());
-			    	}
-			    	case "push":
-			    	{
-			    		switch (split.get(1))
-			    		{
-			    			case "gameinstance":
-			    				break;
-			    			case "gameobject":
-			    				break;
-			    			case "gameobjectinstance":
-			    				break;
-			    			case "player":
-			    				break;
-			    			
-			    		}
-			    	}
-			    	case "read":
-			    	{
-			    		switch(split.get(1))
-			    		{
-			    			case "gameinstance":
-			    			{
-			    				writer.print("write zip");
-			    				writer.flush();
-			    				GameIO.saveGame(gi, output);
-			    				break;
-			    			}
-			    			case "gameobject":
-			    			{
-			    				writer.print("write zip");
-			    				writer.flush();
-			    				GameObject go = gi.game.getObject(split.get(3));
-			    				//GameIO.saveObjectInstance(go, output);
-			    				break;
-			    			}
-			    			case "gameobjectinstance":
-			    			{
-			    				writer.print("write zip");
-			    				writer.flush();
-			    				ObjectInstance oi = gi.getObjectInstance(Integer.parseInt(split.get(1)));
-			    				GameIO.saveObjectInstance(oi, output);
-			    				break;
-			    			}
-			    		}
-			    	}
-			    }
-		  
+				if (command != null)
+				{
+					StringUtils.split(command, ' ', split);
+					switch (split.get(1))
+				    {
+				    	case "list":
+				    	{
+				    		switch (split.get(2))
+				    		{
+				    			case "player":
+				    			{
+				    				writer.write("write list player");
+				    				for (int i = 0; i < gi.players.size(); ++i)
+				    				{
+				    					writer.write(gi.players.get(i).name);
+				    				}
+				    				writer.flush();
+				    			}
+				    		}
+				    	}
+				    	case "hash":
+				    	{
+			    			writer.write("write hash ");
+			    			writer.write(gi.hashCode());
+				    	}
+				    	case "push":
+				    	{
+				    		switch (split.get(1))
+				    		{
+				    			case "gameinstance":
+				    				break;
+				    			case "gameobject":
+				    				break;
+				    			case "gameobjectinstance":
+				    				break;
+				    			case "player":
+				    				break;
+				    			
+				    		}
+				    	}
+				    	case "read":
+				    	{
+				    		switch(split.get(1))
+				    		{
+				    			case "gameinstance":
+				    			{
+				    				writer.print("write zip");
+				    				writer.flush();
+				    				GameIO.saveGame(gi, output);
+				    				break;
+				    			}
+				    			case "gameobject":
+				    			{
+				    				writer.print("write zip");
+				    				writer.flush();
+				    				GameObject go = gi.game.getObject(split.get(3));
+				    				//GameIO.saveObjectInstance(go, output);
+				    				break;
+				    			}
+				    			case "gameobjectinstance":
+				    			{
+				    				writer.print("write zip");
+				    				writer.flush();
+				    				ObjectInstance oi = gi.getObjectInstance(Integer.parseInt(split.get(1)));
+				    				GameIO.saveObjectInstance(oi, output);
+				    				break;
+				    			}
+				    		}
+				    	}
+				    }
+				}
 				split.clear();
 				
 				GameAction action;
@@ -144,13 +149,18 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}
 				Socket server = null;
 				
-			    try
-			    {
-					if (action != null)
-					{
+				if (action != null)
+				{
+				    try
+				    {
 					    if (action instanceof GameObjectInstanceEditAction)
 				 		{
-					    	writer.print("action zip");
+					    	writer.print("action " );
+					    	writer.print(id);
+					    	writer.print(' ');
+					    	writer.print(((GameObjectInstanceEditAction) action).player.id);
+					    	writer.print(' ');
+					    	writer.print(((GameObjectInstanceEditAction) action).object.id);
 					    	writer.flush();
 					 		GameIO.saveObjectInstance(((GameObjectInstanceEditAction)action).object, output);
 				 		}
@@ -160,22 +170,20 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					    	writer.print(((UserMessageAction) action).message);
 					    }
 					}
-					
+				    catch ( Exception e ) {
+				    	e.printStackTrace();
+				    }
+				    finally {
+				    	if ( server != null )
+				    	{
+				    		try { server.close(); } catch ( IOException e ) { }
+				    	}
+				    }
 					//server = new Socket( address, port);
 					
 					//Scanner in  = new Scanner( server.getInputStream() );
 					//PrintWriter out = new PrintWriter( server.getOutputStream(), true );
 				
-			    }
-			  
-			    catch ( Exception e ) {
-			    	e.printStackTrace();
-			    }
-			    finally {
-			    	if ( server != null )
-			    	{
-			    		try { server.close(); } catch ( IOException e ) { }
-			    	}
 			    }
 			}
 		}
@@ -185,6 +193,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 			while (true)
 			{
 				try {
+					Thread.sleep(100);
 					String line = in.nextLine();
 					if (line.startsWith("read"))
 					{
@@ -196,9 +205,20 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					else if (line.startsWith("write"))
 					{
 						StringUtils.split(line, ' ', split);
-						String player = split.get(0);
-						int id = Integer.parseInt(split.get(1));
-						String type = split.get(2);	
+						String player = split.get(1);
+						int id = Integer.parseInt(split.get(2));
+						String type = split.get(3);	
+					}
+					else if (line.startsWith("action"))
+					{
+						StringUtils.split(line, ' ', split);
+						int sourceId = Integer.parseInt(split.get(1));
+						int playerId = Integer.parseInt(split.get(2));
+						int objectId = Integer.parseInt(split.get(3));
+						if (sourceId != id)
+						{
+							GameIO.editObjectInstance(gi.getObjectInstance(objectId), input);
+						}
 					}
 					
 					split.clear();

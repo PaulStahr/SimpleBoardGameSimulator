@@ -122,8 +122,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if(SwingUtilities.isLeftMouseButton(arg0)) {
 			activeObject.state.posX = objOrigPosX - pressedXPos + arg0.getX();
 			activeObject.state.posY = objOrigPosX - pressedXPos + arg0.getY();
-//		gameInstance.update(new GameObjectInstanceEditAction(player, activeObject));
-			repaint();
+			gameInstance.update(new GameObjectInstanceEditAction(this, player, activeObject));
 		}
 	}
 

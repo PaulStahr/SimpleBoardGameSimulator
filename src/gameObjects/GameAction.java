@@ -1,6 +1,6 @@
 package gameObjects;
 
-public class GameAction {
+public abstract class GameAction {
 	public GameAction(Object source)
 	{
 		

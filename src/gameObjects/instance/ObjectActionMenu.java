@@ -30,7 +30,7 @@ public class ObjectActionMenu {
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	((GameObjectCard.CardState)gameObject.state).side = !((GameObjectCard.CardState)gameObject.state).side;
-            	gameInstance.update(new GameObjectInstanceEditAction(null, gameObject));
+            	gameInstance.update(new GameObjectInstanceEditAction(null, null, gameObject));
             }
         });
         popup.add(menuItem);

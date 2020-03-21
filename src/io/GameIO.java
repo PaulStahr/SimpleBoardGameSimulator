@@ -160,6 +160,16 @@ public class GameIO {
 		//Rufe dabei auch die update Methode auf 
 	}
 	
+	public static void editObjectInstance(ObjectInstance objectInstance, InputStream input) throws IOException {
+		ZipInputStream zipStream = new ZipInputStream(input);
+		editObjectInstance(objectInstance, zipStream);
+		zipStream.close();
+	}
+	
+	public static void editObjectInstance(ObjectInstance objectInstance, ZipInputStream in) {
+		
+	}
+	
 	public static GameInstance readGame(ZipInputStream stream) throws IOException, JDOMException
 	{
 		Game game = new Game();
@@ -253,4 +263,5 @@ public class GameIO {
 	   	}
 	}
 
+	
 }

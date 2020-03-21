@@ -17,8 +17,16 @@ import main.DataHandler;
 import main.Player;
 import util.StringUtils;
 
-public class GameServer {
+public class GameServer implements Runnable {
+	private int port;
+
+	public GameServer(int port)
+	{
+		this.port = port;
+	}
+	
 	public final ArrayList<GameInstance> gameInstances = new ArrayList<>();
+	private Thread th;
 	
 	private GameInstance getGameInstance(String name)
 	{
@@ -151,29 +159,41 @@ public class GameServer {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 			}
+			try { client.close(); } catch ( IOException e ) { }
 		}	
+    }
+	
+	public void run()
+	{
+		ServerSocket server;
+		try {
+			server = new ServerSocket( port );
+			while ( true )
+		    {
+		    	Socket client = null;
+		    	try
+		    	{
+		    		client = server.accept();
+		    		DataHandler.tp.run(new ConnectionHandle(client), "Server Connection");
+		    	}
+		    	catch ( IOException e ) {
+		    		e.printStackTrace();
+		    		client.close();
+		    	}
+		    }
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+	    
 	}
 
-	public void startGameServer(int port) throws IOException
+	public void start() throws IOException
     {
-	    ServerSocket server = new ServerSocket( port );
-	    while ( true )
-	    {
-	    	Socket client = null;
-	    	try
-	    	{
-	    		client = server.accept();
-	    		DataHandler.tp.run(new ConnectionHandle(client), "Server Connection");
-	    	}
-	    	catch ( IOException e ) {
-	    		e.printStackTrace();
-	    	}
-	    	finally {
-	    		if ( client != null )
-	    		{
-	    			try { client.close(); } catch ( IOException e ) { }
-	    		}
-	      }
-	  }
+		 if (th == null)
+		 {
+			 th = new Thread(this);
+			 th.start();
+		 }
     }
 }
