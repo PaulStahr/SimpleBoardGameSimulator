@@ -31,7 +31,7 @@ public class Main {
 			ServerConnectionDialog scd = new ServerConnectionDialog();
 			scd.setVisible(true);
 			FileOutputStream fos = new FileOutputStream("output.zip");
-			GameIO.saveGame(game, fos);
+			GameIO.saveSnapshot(game, fos);
 			fos.close();
     	} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

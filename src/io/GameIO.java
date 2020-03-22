@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,9 +29,11 @@ import org.jdom2.output.XMLOutputter;
 
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectCard;
+import gameObjects.definition.GameObjectCard.CardState;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.ObjectState;
 import main.Player;
 
 public class GameIO {
@@ -50,7 +53,6 @@ public class GameIO {
 		    Iterator<Entry<String, BufferedImage>> it = game.images.entrySet().iterator();
 		    while (it.hasNext()) {
 		    	HashMap.Entry<String, BufferedImage> pair = it.next();
-		        System.out.println(pair.getKey() + " = " + pair.getValue());
 		    
 			    ZipEntry imageZipOutput = new ZipEntry(pair.getKey());
 			    zipOutputStream.putNextEntry(imageZipOutput);
@@ -138,7 +140,6 @@ public class GameIO {
 	    	zipOutputStream.putNextEntry(xmlZipOutput);
 	    	new XMLOutputter(Format.getPrettyFormat()).output(doc_inst, zipOutputStream);
 	    	zipOutputStream.closeEntry();
-
 		}
 		finally
 		{
@@ -235,12 +236,55 @@ public class GameIO {
 		}
 	}
 		
-	public static void saveObjectState(ObjectInstance object, OutputStream output) {
-		//Speichere die ObjectState
+	public static void saveObjectState(ObjectState object, OutputStream output) {
+		Document doc_game = new Document();
+    	Element root_game = new Element("xml");
+    	doc_game.addContent(root_game);
+    	
+    	Element elem = new Element("object_state");
+		elem.setAttribute("x", Integer.toString(object.posX));
+		elem.setAttribute("y", Integer.toString(object.posY));
+		elem.setAttribute("r", Integer.toString(object.rotation));
+		if(object.owner != null)
+		{
+			elem.setAttribute("owner_id", Integer.toString(object.owner.id));
+		}
+		
+		if (object instanceof CardState)
+    	{
+			elem.setAttribute("side", Boolean.toString(((CardState)object).side));
+    	}
+    	/* An Paul: geht das?? Ich weiß nicht, wie ich doc_game in Bytes
+    	 * umwandeln kann, damit ich output.write() nehmen kann.
+    	 */
+		PrintWriter p = new PrintWriter(output);
+		p.print(doc_game);
+
 	}
 	
 	public static void saveObjectInstance(ObjectInstance object, OutputStream output) {
-		//Speichere die ObjectInstanz
+		/*Document doc_game = new Document();
+    	Element root_game = new Element("xml");
+    	doc_game.addContent(root_game);
+    	
+    	Element elem = new Element("object_state");
+		elem.setAttribute("x", Integer.toString(object.posX));
+		elem.setAttribute("y", Integer.toString(object.posY));
+		elem.setAttribute("r", Integer.toString(object.rotation));
+		if(object.owner != null)
+		{
+			elem.setAttribute("owner_id", Integer.toString(object.owner.id));
+		}
+		
+		if (object instanceof CardState)
+    	{
+			elem.setAttribute("side", Boolean.toString(((CardState)object).side));
+    	}*/
+    	/* An Paul: geht das?? Ich weiß nicht, wie ich doc_game in Bytes
+    	 * umwandeln kann, damit ich output.write() nehmen kann.
+    	 */
+		/*PrintWriter p = new PrintWriter(output);
+		p.print(doc_game);*/
 	}
 	
 	public static GameInstance readGame(InputStream in) throws IOException, JDOMException
@@ -254,7 +298,7 @@ public class GameIO {
 	public static void editGameInstance(ZipInputStream stream, GameInstance game, Object source)
 	{
 		//Editiere nur das was in dem Stream steht
-		//rufe dabei die update funktion des games auf, um über die änderungen mitzuteilen
+		//rufe dabei die update funktion des games auf, um ﾃｼber die ﾃ､nderungen mitzuteilen
 		//Rufe dabei auch die update Methode auf 
 	}
 	
