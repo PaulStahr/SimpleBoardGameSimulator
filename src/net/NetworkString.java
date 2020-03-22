@@ -10,4 +10,5 @@ public class NetworkString {
 	public static final String GAME_INSTANCE = "gameinstance";
 	public static final String CREATE = "create";
 	public static final String MESSAGE = "message";
+	public static final String READ = "read";
 }

@@ -1,17 +1,14 @@
 ## Inspiration
-We are a group of friends who like playing board games together. But in the moment this is not possible. 
-Some of the simple and famous games are maybe possible over Skype. 
-For some of them, there might be even an online version. 
+We are a group of friends who like playing board games together. Because of the Corona virus this is currently not possible. 
+Some simple games may be playable ove skype and some of them, there are even an online versions. 
 But for most of them (especially some of our favorite) it gets hard to play them for various reasons, 
-e.g. you have to play them fast or they are not so famous.
+e.g. you have to play them fast or they are not so famous. So we thought how we could make it possible to play these games together.
 ## What it does
-It creates a shared virtual desk on which everyone can do simple manipulations of objects (moving them arround, flipping cards, etc)... . 
-New games can be defined by a simple xml file and are automatically distributed to friends which want to play with you. 
-Everyone who can forward network traffic can create his own server, there is no registration needed.
-If this does sound super difficult, it is not ;) We will provide a step by step explanation. 
-The only restriction is that some networks do not allow this, for example many company networks. But your network at home should work fine.
+We have began to write a java application which creates a shared virtual desk on which everyone can do simple manipulations of objects (moving them arround, flipping cards, ...). 
+Custom games can be defined in a simple format, without programmin skills and are automatically distributed to friends who connect together with you to a game session. 
+You can set up your own server, when you want to and your provider allows you port forwarding. If this does sound super difficult for the end-user, it is not ;) We will provide a step by step explanation how to handle this program. 
 ## How we built it
-
+We built it as a java-application, where every client has a view of the desk and can connect to other running instances of this program so either directly to somebody else or to a server working as a hub which distributes every change to all connected clients. 
 ## Challenges we ran into
 Apart from normal programming issues, it is surprisingly difficult to describe the parts of a game. 
 E.g. we started cards (with two sides) and dices (with 6 sides) and figures (with one side). We thought that makes totally sense in a 2D game.
@@ -19,12 +16,11 @@ However, one person asked "But what if we have to lay the figure down as you do 
 - "But if it has two sides, it is like a card?" - "But it is a figure, not a card!"
 Long story short: It is quite challenging to think of all the things you can do with different components of the game.
 ## Accomplishments that we are proud of
-Starting from nothing with this project and having the first working version after two days. Even if it's not very well documented yet, etc.
-Besides, as we told friends about this, many were really enthusiastic and some joined in to help.
-So now we have a cool group pushing this project forward.
+Starting from nothing with this project with different people we have already the first running prototype. Of course most of the functionality but its really cool to working together on this project is so productive.
+Besides, as we told friends about this, many were really enthusiastic and some joined in to help. So now we have a cool group pushing this project forward.
 It seems like people are really missing playing board games.
 ## What we learned
-Basically what you can learn in this short period of time was to work in a team.
+We learned to work together on a shader software project. Because of the short timeline we had to discuss a lot how we implement different parts and be carefull to not break somebody elses code.
 ## What's next for Simple Board Game Simulator
 Make it as easy to use. 
 If we can make some grandparents play a board game with their grandchildren without putting the grandparents at risk, that would be great.

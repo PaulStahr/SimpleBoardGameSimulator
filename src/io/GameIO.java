@@ -302,6 +302,37 @@ public class GameIO {
 		
 	}
 	
+	public static void editObjectStateFromStream(ObjectState objectState, GameInstance gi, InputStream input) throws IOException, JDOMException
+	{
+		Document doc = new SAXBuilder().build(input);
+    	Element root = doc.getRootElement();
+    	
+    	for (Element elem : root.getChildren())
+    	{
+			objectState.posX = Integer.parseInt(elem.getAttributeValue("x"));
+			objectState.posY = Integer.parseInt(elem.getAttributeValue("y"));
+			objectState.rotation = Integer.parseInt(elem.getAttributeValue("r"));
+			
+			if (elem.getAttribute("owner_id") != null)
+			{
+				int owner_id = Integer.parseInt(elem.getAttributeValue("owner_id"));
+				Iterator<Player> playerIt = gi.players.iterator();
+		        while (playerIt.hasNext()) {
+		        	Player player = playerIt.next();
+		            if (player.id == owner_id) 
+		            {
+		            	objectState.owner = player;
+		            }
+		        }
+			}
+			
+			if (objectState instanceof CardState && elem.getAttribute("side") != null)
+	    	{
+				((CardState)objectState).side = Boolean.parseBoolean(elem.getAttributeValue("side"));
+	    	}
+	   	}
+	}
+	
 	public static GameInstance readSnapshotFromZip(ZipInputStream stream) throws IOException, JDOMException
 	{
 		Game game = new Game();
