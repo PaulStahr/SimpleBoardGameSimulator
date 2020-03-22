@@ -11,10 +11,10 @@ public class Game {
 	public Image background;
 	public ArrayList<GameObject> objects = new ArrayList<>();
 	public final HashMap<String, BufferedImage> images = new HashMap<>();
-	public GameObject getObject(String id) {
+	public GameObject getObject(String uniqueName) {
 		for (int i = 0; i < objects.size(); ++i)
 		{
-			if (objects.get(i).id.equals(id))
+			if (objects.get(i).uniqueName.equals(uniqueName))
 			{
 				return objects.get(i);
 			}

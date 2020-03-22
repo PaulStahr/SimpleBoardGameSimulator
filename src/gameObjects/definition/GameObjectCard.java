@@ -13,8 +13,8 @@ import gameObjects.instance.ObjectState;
 public class GameObjectCard extends GameObject{
 	BufferedImage upsideLook;
 	BufferedImage downsideLook;
-	public GameObjectCard(String id, BufferedImage front, BufferedImage back) {
-		super(id);
+	public GameObjectCard(String uniqueName, BufferedImage front, BufferedImage back) {
+		super(uniqueName);
 		this.upsideLook = front;
 		this.downsideLook = back;
 	}

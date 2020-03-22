@@ -6,12 +6,12 @@ import gameObjects.instance.ObjectState;
 
 public abstract class GameObject {
 	int drawSize;
-	public String id;
+	public String uniqueName;
 	public final ArrayList<String> groups = new ArrayList<>();
 
-	public GameObject(String id)
+	public GameObject(String uniqueName)
 	{
-		this.id = id;
+		this.uniqueName = uniqueName;
 	}
 	
 	public abstract BufferedImage getLook(ObjectState state);
@@ -20,6 +20,6 @@ public abstract class GameObject {
 
 	public int hashCode()
 	{
-		return drawSize ^ id.hashCode();
+		return drawSize ^ uniqueName.hashCode();
 	}
 }

@@ -95,9 +95,9 @@ public class GameIO {
 	        	if (entry instanceof GameObjectCard)
 	        	{
 	        		elem.setAttribute("type", "card");
-	        		elem.setAttribute("id", entry.id);
-	        		elem.setAttribute("front", entry.id);
-	        		elem.setAttribute("back", entry.id);
+	        		elem.setAttribute("id", entry.uniqueName);
+	        		elem.setAttribute("front", entry.uniqueName);
+	        		elem.setAttribute("back", entry.uniqueName);
 	        	}
 	        	elem.setAttribute("Hallo", "Die Daten");
 	        	elem.setText("Der Text in der Node");
@@ -225,7 +225,7 @@ public class GameIO {
     			{
     				case "card":
     				{
-    					game.objects.add(new GameObjectCard(elem.getAttributeValue("id"), images.get(elem.getAttributeValue("front")), images.get(elem.getAttributeValue("back"))));
+    					game.objects.add(new GameObjectCard(elem.getAttributeValue("unique_name"), images.get(elem.getAttributeValue("front")), images.get(elem.getAttributeValue("back"))));
     					break;
     				}
     			}
@@ -253,8 +253,8 @@ public class GameIO {
     		System.out.println("name" + name);
     		if (name.equals("object"))
     		{
-    			String typeId = elem.getAttributeValue("type");
-    			ObjectInstance oi = new ObjectInstance(gi.game.getObject(typeId), Integer.parseInt(elem.getAttributeValue("id")));
+    			String uniqueName = elem.getAttributeValue("unique_name");
+    			ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue("id")));
     			oi.state.posX = Integer.parseInt(elem.getAttributeValue("x"));
     			oi.state.posY = Integer.parseInt(elem.getAttributeValue("y"));
     			oi.state.rotation = Integer.parseInt(elem.getAttributeValue("r"));
