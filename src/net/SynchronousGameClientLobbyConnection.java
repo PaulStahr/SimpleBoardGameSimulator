@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import gameObjects.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import io.GameIO;
 import util.StringUtils;
@@ -22,6 +23,23 @@ public class SynchronousGameClientLobbyConnection {
 		this.port = port;
 	}
 	
+	public UsertextMessageAction getUserMessage(int index) throws IOException
+	{
+		Socket server = new Socket( address, port);
+	    PrintWriter out = new PrintWriter( server.getOutputStream(), true );
+	    out.write(NetworkString.PULL);
+	    out.write(' ');
+	    out.write(NetworkString.MESSAGE);
+	    out.write(' ');
+	    out.print(index);
+	    out.flush();
+	    Scanner scanner = new Scanner(server.getInputStream());
+	    UsertextMessageAction result = new UsertextMessageAction(scanner.nextInt(), scanner.nextInt(), scanner.next());
+	    scanner.close();
+	    server.close();
+	    return result;
+	}
+	
 	public int getGameSessionHash(String gameInstanceName) throws IOException
 	{
 		Socket server = new Socket( address, port);
@@ -34,6 +52,7 @@ public class SynchronousGameClientLobbyConnection {
 	    out.flush();
 	    Scanner scanner = new Scanner(server.getInputStream());
 	    int result = scanner.nextInt();
+	    scanner.close();
 	    server.close();
 	    return result;
 	}
@@ -90,6 +109,7 @@ public class SynchronousGameClientLobbyConnection {
 	    Scanner in = new Scanner(server.getInputStream());
 	    String answer = in.nextLine();
 	    StringUtils.split(answer, ' ', result);		
+	    in.close();
 	    server.close();
 	}
 }
