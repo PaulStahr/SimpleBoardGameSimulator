@@ -39,12 +39,14 @@ public class GameIO {
 		return null;
 	}
 	
-	public static void saveGame(GameInstance gi, OutputStream os) throws IOException
+	public static void saveSnapshot(GameInstance gi, OutputStream os) throws IOException
 	{
-		final ZipOutputStream zipOutputStream = new ZipOutputStream(os);
+		ZipOutputStream zipOutputStream = null;
 		try
 		{
+			zipOutputStream = new ZipOutputStream(os);
 			Game game = gi.game;
+			// Save all images
 		    Iterator<Entry<String, BufferedImage>> it = game.images.entrySet().iterator();
 		    while (it.hasNext()) {
 		    	HashMap.Entry<String, BufferedImage> pair = it.next();
@@ -64,6 +66,7 @@ public class GameIO {
 			    zipOutputStream.closeEntry();
 		    }
 		    
+		    // save game.xml
 		    Document doc_game = new Document();
 	    	Element root_game = new Element("xml");
 	    	doc_game.addContent(root_game);
@@ -113,7 +116,8 @@ public class GameIO {
 	    	zipOutputStream.putNextEntry(gameZipOutput);
 	    	new XMLOutputter(Format.getPrettyFormat()).output(doc_game, zipOutputStream);
 	    	zipOutputStream.closeEntry();
-	    	
+
+		    // save game_instance.xml
 	    	Document doc_inst = new Document();
 	    	Element root_inst = new Element("xml");
 	    	doc_inst.addContent(root_inst);
@@ -138,16 +142,103 @@ public class GameIO {
 		}
 		finally
 		{
-			zipOutputStream.close();
+			if (zipOutputStream != null)
+			{
+				zipOutputStream.close();
+			}
 		}
 	}
 	
-	public static void saveGame(Game game, OutputStream os)
-	{		
-		    	
+	public static void saveGame(Game game, OutputStream os) throws IOException
+	{	
+		ZipOutputStream zipOutputStream = null;
+		try
+		{
+			zipOutputStream = new ZipOutputStream(os);
+			
+			// Save all images
+		    Iterator<Entry<String, BufferedImage>> it = game.images.entrySet().iterator();
+		    while (it.hasNext()) {
+		    	HashMap.Entry<String, BufferedImage> pair = it.next();
+		        System.out.println(pair.getKey() + " = " + pair.getValue());
+		    
+			    ZipEntry imageZipOutput = new ZipEntry(pair.getKey());
+			    zipOutputStream.putNextEntry(imageZipOutput);
+
+			    if (pair.getKey().endsWith(".jpg"))
+			    {
+			    	ImageIO.write(pair.getValue(), "jpg", zipOutputStream);
+			    }
+			    else if (pair.getKey().endsWith(".png"))
+			    {
+			    	ImageIO.write(pair.getValue(), "png", zipOutputStream);
+			    }
+			    zipOutputStream.closeEntry();
+		    }
+		    
+			Document doc_game = new Document();
+	    	Element root_game = new Element("xml");
+	    	doc_game.addContent(root_game);
+	    	
+	    	Iterator<GameObject> gameIt = game.objects.iterator();
+	        while (gameIt.hasNext()) {
+	        	GameObject entry = gameIt.next();
+	        	Element elem = new Element("object");
+	        	if (entry instanceof GameObjectCard)
+	        	{
+	        		GameObjectCard card = (GameObjectCard) entry;
+	        		elem.setAttribute("type", "card");
+	        		elem.setAttribute("unique_name", card.uniqueName);
+	        		for (String key : game.images.keySet())
+	        		{
+	        			if(game.images.get(key).equals(card.getUpsideLook())) 
+	        			{
+	        				elem.setAttribute("front", key);
+	        				break;
+	        	        }
+	        		}
+	        		
+	        		for (String key : game.images.keySet())
+	        		{
+	        			if(game.images.get(key).equals(card.getDownsideLook())) 
+	        			{
+	        				elem.setAttribute("back", key);
+	        				break;
+	        	        }
+	        		}
+	        	}
+	        	root_game.addContent(elem);
+	        }
+	        
+	        Element elem_back = new Element("background");
+	        for (String key : game.images.keySet())
+			{
+				if(game.images.get(key).equals(game.background)) 
+				{
+					elem_back.setText(key);
+					break;
+		        }
+			}
+	        root_game.addContent(elem_back);
+	    	
+	        ZipEntry gameZipOutput = new ZipEntry("game.xml");
+	    	zipOutputStream.putNextEntry(gameZipOutput);
+	    	new XMLOutputter(Format.getPrettyFormat()).output(doc_game, zipOutputStream);
+	    	zipOutputStream.closeEntry();
+		}
+		finally
+		{
+			if (zipOutputStream != null)
+			{
+				zipOutputStream.close();
+			}
+		}
+	}
+		
+	public static void saveObjectState(ObjectInstance object, OutputStream output) {
+		//Speichere die ObjectState
 	}
 	
-
 	public static void saveObjectInstance(ObjectInstance object, OutputStream output) {
 		//Speichere die ObjectInstanz
 	}

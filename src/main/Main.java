@@ -70,7 +70,7 @@ public class Main {
 	    	gw1.setVisible(true);
 	    	gw2.setVisible(true);
 	    	FileOutputStream fos = new FileOutputStream("output.zip");
-			GameIO.saveGame(game0, fos);
+			GameIO.saveSnapshot(game0, fos);
 			fos.close();
     	} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
