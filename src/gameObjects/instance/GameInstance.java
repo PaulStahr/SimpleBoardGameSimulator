@@ -1,15 +1,13 @@
 package gameObjects.instance;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.HashMap;
-
+import gameObjects.ColumnTypes;
 import gameObjects.GameAction;
-import gameObjects.GameObjectInstanceEditAction;
-import gameObjects.definition.GameObject;
+import gameObjects.ObjectColumnType;
 import main.Player;
 
 public class GameInstance {
+	public static final ColumnTypes TYPES = new ColumnTypes(new ObjectColumnType[]{ObjectColumnType.ID}, new ObjectColumnType[]{ObjectColumnType.ID});
 	public Game game;
 	public String password;
 	public String name;
@@ -87,5 +85,10 @@ public class GameInstance {
 		{
 			changeListener.get(i).changeUpdate(action);
 		}
+	}
+
+	public Object getValue(ObjectColumnType col) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
