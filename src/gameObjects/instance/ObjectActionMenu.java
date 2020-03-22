@@ -39,7 +39,7 @@ public class ObjectActionMenu {
         flipItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ((GameObjectCard.CardState)gameObjectInstance.state).side = !((GameObjectCard.CardState)gameObjectInstance.state).side;
-                gameInstance.update(new GameObjectInstanceEditAction(0, null, gameObjectInstance));
+                gameInstance.update(new GameObjectInstanceEditAction(-1, null, gameObjectInstance));
             }
         });
 
@@ -55,7 +55,7 @@ public class ObjectActionMenu {
                     gameObjectInstance.inHand = player;
                 }
 
-                gameInstance.update(new GameObjectInstanceEditAction(0, null, gameObjectInstance));
+                gameInstance.update(new GameObjectInstanceEditAction(-1, null, gameObjectInstance));
             }
         });
 
