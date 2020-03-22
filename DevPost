@@ -1,0 +1,14 @@
+## Inspiration
+Usually I meet with a few friends to play some board games. But in the moment this is not possible. Some of the games are maybe possible over skype, but for most of them it gets hard to play them very fast.
+## What it does
+It creates a shared virtual desk on which everyone can do simple manipulations of objects (moving them arround, flipping cards, etc)... . New games can be defined by a simple xml file and are automatically distributed to friends which want to play with you.
+## How we built it
+
+## Challenges we ran into
+
+## Accomplishments that we are proud of
+
+## What we learned
+
+## What's next for Simpe Board Game Simulator
+
