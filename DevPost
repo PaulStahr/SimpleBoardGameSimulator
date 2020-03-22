@@ -1,7 +1,11 @@
 ## Inspiration
 Usually I meet with a few friends to play some board games. But in the moment this is not possible. Some of the games are maybe possible over skype, but for most of them it gets hard to play them very fast.
 ## What it does
+<<<<<<< HEAD
 It creates a shared virtual desk on which everyone can do simple manipulations of objects (moving them arround, flipping cards, etc)... . New games can be defined by a simple xml file and are automatically distributed to friends which want to play with you. Everyone who can forward network traffic can create his own server, there is no registration needed.
+=======
+It creates a shared virtual desk on which everyone can do simple manipulations of objects (moving them arround, flipping cards, etc)... . New games can be defined by a simple xml file and are automatically distributed to friends which want to play with you.
+>>>>>>> e03d51fffddcdd98440c81e754d29ca37b54df2f
 ## How we built it
 
 ## Challenges we ran into
