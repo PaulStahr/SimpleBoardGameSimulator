@@ -10,7 +10,10 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.jdom2.JDOMException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import gameObjects.UsertextMessageAction;
 import gameObjects.definition.GameObject;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
@@ -22,6 +25,7 @@ import main.Player;
 import util.StringUtils;
 
 public class GameServer implements Runnable {
+	private static final Logger logger = LoggerFactory.getLogger(GameServer.class);
 	private int port;
 
 	public GameServer(int port)
@@ -30,6 +34,7 @@ public class GameServer implements Runnable {
 	}
 	
 	public final ArrayList<GameInstance> gameInstances = new ArrayList<>();
+	public final ArrayList<UsertextMessageAction> userMessageChatHistory = new ArrayList<>();
 	private Thread th;
 	
 	private GameInstance getGameInstance(String name)
@@ -72,7 +77,7 @@ public class GameServer implements Runnable {
 			    	{
 			    		switch (split.get(1))
 			    		{
-			    			case "gameinstances": 
+			    			case NetworkString.GAME_INSTANCE: 
 			    			{
 					    	    PrintWriter out = new PrintWriter( output, true );
 					    		for (int i = 0; i < gameInstances.size(); ++i)
@@ -148,6 +153,8 @@ public class GameServer implements Runnable {
 								}
 			    				
 			    				break;
+			    			case NetworkString.MESSAGE:
+			    				userMessageChatHistory.add(new UsertextMessageAction(Integer.parseInt(split.get(2)), Integer.parseInt(split.get(3)), split.get(4)));
 			    			case "gameobject":
 			    				break;
 			    			case "gameobjectinstance":
@@ -161,11 +168,26 @@ public class GameServer implements Runnable {
 			    	{
 			    		switch(split.get(1))
 			    		{
-			    			case "gameinstance":
+			    			case NetworkString.GAME_INSTANCE:
 			    			{
 			    				GameInstance gi = getGameInstance(split.get(2));
 			    				GameIO.saveGame(gi, output);
 			    				break;
+			    			}
+			    			case NetworkString.MESSAGE:
+			    			{
+			    				int index = Integer.parseInt(split.get(2));
+			    				if (index < userMessageChatHistory.size())
+			    				{
+				    				UsertextMessageAction message = userMessageChatHistory.get(index);
+				    				PrintWriter printer = new PrintWriter(output);
+				    				printer.print(message.source);
+				    				printer.print(' ');
+				    				printer.print(message.player);
+				    				printer.print(' ');
+				    				printer.print(message.message);
+				    				printer.close();
+			    				}
 			    			}
 			    			case "gameobject":
 			    			{
@@ -201,8 +223,7 @@ public class GameServer implements Runnable {
 			    	}
 			    }
 			} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				logger.error("Networking error", e);
 			}
 			try { client.close(); } catch ( IOException e ) { }
 		}	
@@ -223,14 +244,17 @@ public class GameServer implements Runnable {
 		    	}
 		    	catch ( IOException e ) {
 		    		e.printStackTrace();
-		    		client.close();
+		    		
 		    	}
+		    	if (client != null)
+	    		{
+	    			client.close();
+	    		}
 		    }
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-	    
 	}
 
 	public void start() throws IOException
