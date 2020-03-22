@@ -31,7 +31,7 @@ public class Main {
 			ServerConnectionDialog scd = new ServerConnectionDialog();
 			scd.setVisible(true);
 			FileOutputStream fos = new FileOutputStream("output.zip");
-			GameIO.saveGame(game.game, fos);
+			GameIO.saveGame(game, fos);
 			fos.close();
     	} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -69,6 +69,9 @@ public class Main {
 	    	gw0.setVisible(true);
 	    	gw1.setVisible(true);
 	    	gw2.setVisible(true);
+	    	FileOutputStream fos = new FileOutputStream("output.zip");
+			GameIO.saveGame(game0, fos);
+			fos.close();
     	} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

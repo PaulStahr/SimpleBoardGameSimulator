@@ -39,33 +39,13 @@ public class GameIO {
 		return null;
 	}
 	
-	public static void saveGame(GameInstance gi, OutputStream os) 
+	public static void saveGame(GameInstance gi, OutputStream os) throws IOException
 	{
-		
-	}
-	
-	public static void saveGame(Game gi, OutputStream os) throws IOException
-	{
-	    /*final ZipOutputStream zipOutStream = new ZipOutputStream(os);
-        final OutputStreamWriter writer = new OutputStreamWriter(zipOutStream, Charset.forName("UTF-16"));
-        final BufferedWriter outBuffer = new BufferedWriter(writer);
-        zipOutStream.putNextEntry(new ZipEntry("Info"));
-        //put something into buffer
-        outBuffer.flush();
-        zipOutStream.closeEntry();
-        Document doc = new Document();
-    	Element root = new Element("scene");
-    	doc.addContent(root);
-    	
-    	Element elem = new Element("Bla");
-    	elem.setAttribute("Hallo", "Die Daten");
-    	elem.setText("Der Text in der Node");
-    	root.addContent(elem);*/
-		
 		final ZipOutputStream zipOutputStream = new ZipOutputStream(os);
 		try
 		{
-		    Iterator<Entry<String, BufferedImage>> it = gi.images.entrySet().iterator();
+			Game game = gi.game;
+		    Iterator<Entry<String, BufferedImage>> it = game.images.entrySet().iterator();
 		    while (it.hasNext()) {
 		    	HashMap.Entry<String, BufferedImage> pair = it.next();
 		        System.out.println(pair.getKey() + " = " + pair.getValue());
@@ -84,60 +64,87 @@ public class GameIO {
 			    zipOutputStream.closeEntry();
 		    }
 		    
-		    Document doc = new Document();
-	    	Element root = new Element("xml");
-	    	doc.addContent(root);
+		    Document doc_game = new Document();
+	    	Element root_game = new Element("xml");
+	    	doc_game.addContent(root_game);
 	    	
-	    	Iterator<GameObject> gameIt = gi.objects.iterator();
+	    	Iterator<GameObject> gameIt = game.objects.iterator();
 	        while (gameIt.hasNext()) {
 	        	GameObject entry = gameIt.next();
 	        	Element elem = new Element("object");
 	        	if (entry instanceof GameObjectCard)
 	        	{
+	        		GameObjectCard card = (GameObjectCard) entry;
 	        		elem.setAttribute("type", "card");
-	        		elem.setAttribute("id", entry.uniqueName);
-	        		elem.setAttribute("front", entry.uniqueName);
-	        		elem.setAttribute("back", entry.uniqueName);
+	        		elem.setAttribute("unique_name", card.uniqueName);
+	        		for (String key : game.images.keySet())
+	        		{
+	        			if(game.images.get(key).equals(card.getUpsideLook())) 
+	        			{
+	        				elem.setAttribute("front", key);
+	        				break;
+	        	        }
+	        		}
+	        		
+	        		for (String key : game.images.keySet())
+	        		{
+	        			if(game.images.get(key).equals(card.getDownsideLook())) 
+	        			{
+	        				elem.setAttribute("back", key);
+	        				break;
+	        	        }
+	        		}
 	        	}
-	        	elem.setAttribute("Hallo", "Die Daten");
-	        	elem.setText("Der Text in der Node");
-	        	root.addContent(elem);
+	        	root_game.addContent(elem);
 	        }
+	        
+	        Element elem_back = new Element("background");
+	        for (String key : game.images.keySet())
+    		{
+    			if(game.images.get(key).equals(game.background)) 
+    			{
+    				elem_back.setText(key);
+    				break;
+    	        }
+    		}
+	        root_game.addContent(elem_back);
 	    	
-	    	ZipEntry xmlZipOutput = new ZipEntry("game.xml");
-	    	zipOutputStream.putNextEntry(xmlZipOutput);
-	    	new XMLOutputter(Format.getPrettyFormat()).output(doc, zipOutputStream);
+	    	ZipEntry gameZipOutput = new ZipEntry("game.xml");
+	    	zipOutputStream.putNextEntry(gameZipOutput);
+	    	new XMLOutputter(Format.getPrettyFormat()).output(doc_game, zipOutputStream);
 	    	zipOutputStream.closeEntry();
 	    	
+	    	Document doc_inst = new Document();
+	    	Element root_inst = new Element("xml");
+	    	doc_inst.addContent(root_inst);
 	    	
-	    	/*for (Element elem : root.getChildren())
-	    	{
-	    		String name = elem.getName();
-	    		if (name.equals("object"))
-	    		{
-	    			switch(elem.getAttributeValue("type"))
-	    			{
-	    				case "card":
-	    				{
-	    					game.objects.add(new GameObjectCard(elem.getAttributeValue("id"), images.get(elem.getAttributeValue("front")), images.get(elem.getAttributeValue("back"))));
-	    					break;
-	    				}
-	    			}
-	    		}
-	    		else if (name.equals("background"))
-	    		{
-	    			System.out.println(elem.getValue());
-	    			game.background = images.get(elem.getValue());
-	    		}
-	    		System.out.println(name);
-		   	}*/
+	    	Iterator<ObjectInstance> instIt = gi.objects.iterator();
+	        while (instIt.hasNext()) {
+	        	ObjectInstance entry = instIt.next();
+	        	Element elem = new Element("object");
+        		elem.setAttribute("unique_name", entry.go.uniqueName);
+        		elem.setAttribute("id", Integer.toString(entry.id));
+        		elem.setAttribute("x", Integer.toString(entry.state.posX));
+        		elem.setAttribute("y", Integer.toString(entry.state.posY));
+        		elem.setAttribute("r", Integer.toString(entry.state.rotation));
+        		root_inst.addContent(elem);
+        	}
+	    	
+	    	ZipEntry xmlZipOutput = new ZipEntry("game_instance.xml");
+	    	zipOutputStream.putNextEntry(xmlZipOutput);
+	    	new XMLOutputter(Format.getPrettyFormat()).output(doc_inst, zipOutputStream);
+	    	zipOutputStream.closeEntry();
 
 		}
 		finally
 		{
 			zipOutputStream.close();
 		}
-    	
+	}
+	
+	public static void saveGame(Game game, OutputStream os) throws IOException
+	{		
+		    	
 	}
 	
 
