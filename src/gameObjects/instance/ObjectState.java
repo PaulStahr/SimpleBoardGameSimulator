@@ -9,8 +9,8 @@ public class ObjectState {
 	public int owner_id = -1;
 
 	/*stacking objects on top of each other*/
-	public ObjectInstance aboveInstance = null;
-	public ObjectInstance belowInstance = null;
+	public int aboveInstanceId = -1;
+	public int belowInstanceId = -1;
 	
 	public int hashCode()
 	{

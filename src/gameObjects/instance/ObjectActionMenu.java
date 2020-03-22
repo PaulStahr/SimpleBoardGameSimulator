@@ -4,12 +4,15 @@ import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectCard;
 import main.Player;
+import util.data.IntegerArrayList;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.util.Collections;
+import java.util.List;
 
 public class ObjectActionMenu {
     /*Popup menu for object actions*/
@@ -17,6 +20,7 @@ public class ObjectActionMenu {
 
     public JMenuItem flipItem = new JMenuItem("Flip Card");
     public JMenuItem discardRecordItem = new JMenuItem("");
+    public JMenuItem shuffleCardItem = new JMenuItem("Shuffle Cards");
 
     public ObjectInstance gameObjectInstance;
     public GameInstance gameInstance;
@@ -59,8 +63,43 @@ public class ObjectActionMenu {
             }
         });
 
+        shuffleCardItem.getAccessibleContext().setAccessibleDescription("ShuffleCards");
+        shuffleCardItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                /*Shuffle objects on a stack*/
+                IntegerArrayList objectStack = new IntegerArrayList();
+                objectStack.add(gameObjectInstance.id);
+                ObjectInstance currentObjectInstance = gameObjectInstance;
+                while (currentObjectInstance.state.belowInstanceId != -1)
+                {
+                    objectStack.add(currentObjectInstance.state.belowInstanceId);
+                    currentObjectInstance =  gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+                }
+                Collections.shuffle(objectStack);
+                for (int i = 0; i < objectStack.size(); i++)
+                {
+                    ObjectInstance currentObject = gameInstance.objects.get(objectStack.get(i));
+                    if (i==0 && i<objectStack.size()-1){
+                        currentObject.state.belowInstanceId = -1;
+                        currentObject.state.aboveInstanceId = gameInstance.objects.get(i+1).id;
+                    }
+                    else if(i==objectStack.size()-1){
+                        currentObject.state.belowInstanceId = gameInstance.objects.get(i-1).id;
+                        currentObject.state.aboveInstanceId = -1;
+                    }
+                    else{
+                        currentObject.state.belowInstanceId = gameInstance.objects.get(i-1).id;
+                        currentObject.state.aboveInstanceId = gameInstance.objects.get(i+1).id;
+                    }
+                    gameInstance.update(new GameObjectInstanceEditAction(-1, player, gameObjectInstance));
+                }
+
+            }
+        });
+
         popup.add(flipItem);
         popup.add(discardRecordItem);
+        popup.add(shuffleCardItem);
     }
 
 

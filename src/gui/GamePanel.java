@@ -49,7 +49,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			System.out.println(i);
 			ObjectInstance oi = gameInstance.objects.get(i);
-			if(oi.state.aboveInstance == null && oi != activeObject) {
+			if(oi.state.aboveInstanceId == -1 && oi != activeObject) {
 				double rotationRequired = Math.toRadians(oi.getRotation());
 				BufferedImage img = oi.go.getLook(oi.state);
 				double locationX = img.getWidth() / 2;
@@ -63,7 +63,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if(activeObject != null) {
 			for (int i = 0; i < gameInstance.objects.size(); ++i) {
 				ObjectInstance oi = gameInstance.objects.get(i);
-				if(oi == activeObject)
+				if(oi == activeObject && oi.state.aboveInstanceId == -1)
 				{
 					double rotationRequired = Math.toRadians(oi.getRotation());
 					BufferedImage img = oi.go.getLook(oi.state);
@@ -84,7 +84,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-
 		/* Right Mouse Click on Object */
 		if(SwingUtilities.isRightMouseButton(arg0))
 		{
@@ -111,7 +110,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
-		if (activeObject != null) {
+		if (activeObject != null && SwingUtilities.isLeftMouseButton(arg0)) {
 			Boolean hasReleased = false;
 			for (int i = 0; i < gameInstance.objects.size(); ++i) {
 				if(!hasReleased) {
@@ -121,8 +120,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					int dist = xDiff * xDiff + yDiff * yDiff;
 					if (dist < maxInaccuracy * maxInaccuracy && oi != activeObject) {
 						ObjectInstance topElement = getTopElement(oi);
-						topElement.state.aboveInstance = activeObject;
-						activeObject.state.belowInstance = topElement;
+						topElement.state.aboveInstanceId = activeObject.id;
+						activeObject.state.belowInstanceId = topElement.id;
 						activeObject.state.posX = topElement.state.posX;
 						activeObject.state.posY = topElement.state.posY;
 						gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
@@ -141,10 +140,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if(SwingUtilities.isLeftMouseButton(arg0)) {
 			if(activeObject != null) {
 				/*Remove top card*/
-				if(activeObject.state.belowInstance != null) {
-					activeObject.state.belowInstance.state.aboveInstance = null;
+				if(activeObject.state.belowInstanceId != -1) {
+					gameInstance.objects.get(activeObject.state.belowInstanceId).state.aboveInstanceId = -1;
 				}
-				activeObject.state.belowInstance = null;
+				activeObject.state.belowInstanceId = -1;
 
 				activeObject.state.posX = objOrigPosX - pressedXPos + arg0.getX();
 				activeObject.state.posY = objOrigPosX - pressedXPos + arg0.getY();
@@ -211,16 +210,16 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public ObjectInstance getTopElement(ObjectInstance objectInstance){
 		ObjectInstance currentTop = objectInstance;
-		while (currentTop.state.aboveInstance != null){
-			currentTop = currentTop.state.aboveInstance;
+		while (currentTop.state.aboveInstanceId != -1){
+			currentTop = gameInstance.objects.get(currentTop.state.aboveInstanceId);
 		}
 		return currentTop;
 	}
 
 	public ObjectInstance getBottomElement(ObjectInstance objectInstance){
 		ObjectInstance currentBottom = objectInstance;
-		while (currentBottom.state.belowInstance != null){
-			currentBottom = currentBottom.state.aboveInstance;
+		while (currentBottom.state.belowInstanceId != -1){
+			currentBottom = gameInstance.objects.get(currentBottom.state.aboveInstanceId);
 		}
 		return currentBottom;
 	}
