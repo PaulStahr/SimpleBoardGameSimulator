@@ -5,5 +5,4 @@
 -Zip exporter implementieren -> Rike
 -Grafische Oberfläche für laufendes Spiel implementieren -> Florian
 -Grafische Oberflaeche fuer Serverloppy -> Hanno
--Ein ingame broadcasting chat (kann das Action system als Nachrichten missbrauchen)
-
+-Ein ingame broadcasting chat (kann das Action system fuer Nachrichten nutzen)
