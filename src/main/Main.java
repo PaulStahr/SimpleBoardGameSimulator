@@ -23,7 +23,7 @@ public class Main {
     	FileInputStream fis;
 		try {
 			fis = new FileInputStream("Doppelkopf.zip");
-			GameInstance game = GameIO.readGame(fis);
+			GameInstance game = GameIO.readSnapshotFromStream(fis);
 	    	fis.close();
 	    	GameWindow gw = new GameWindow(game);
 	    	gw.setVisible(true);
@@ -31,7 +31,7 @@ public class Main {
 			ServerConnectionDialog scd = new ServerConnectionDialog();
 			scd.setVisible(true);
 			FileOutputStream fos = new FileOutputStream("output.zip");
-			GameIO.saveSnapshot(game, fos);
+			GameIO.saveSnapshotToZip(game, fos);
 			fos.close();
     	} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -49,10 +49,10 @@ public class Main {
     {
     	try {
     		FileInputStream fis = new FileInputStream("Doppelkopf.zip");
-    		GameInstance game0 = GameIO.readGame(fis);
+    		GameInstance game0 = GameIO.readSnapshotFromStream(fis);
         	fis.close();
         	fis = new FileInputStream("Doppelkopf.zip");
-        	GameInstance game1 = GameIO.readGame(fis);
+        	GameInstance game1 = GameIO.readSnapshotFromStream(fis);
 	    	fis.close();
 	    	GameServer server = new GameServer(1234);
 	    	server.gameInstances.add(game0);
@@ -70,7 +70,7 @@ public class Main {
 	    	gw1.setVisible(true);
 	    	gw2.setVisible(true);
 	    	FileOutputStream fos = new FileOutputStream("output.zip");
-			GameIO.saveSnapshot(game0, fos);
+			GameIO.saveSnapshotToZip(game0, fos);
 			fos.close();
     	} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block

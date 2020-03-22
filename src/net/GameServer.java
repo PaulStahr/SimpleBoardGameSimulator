@@ -142,7 +142,7 @@ public class GameServer implements Runnable {
 			    		{
 			    			case NetworkString.GAME_INSTANCE:
 								try {
-									GameInstance gi = GameIO.readGame(input);
+									GameInstance gi = GameIO.readSnapshotFromStream(input);
 									synchronized(gameInstances)
 				    				{
 				    					gameInstances.add(gi);
@@ -171,7 +171,7 @@ public class GameServer implements Runnable {
 			    			case NetworkString.GAME_INSTANCE:
 			    			{
 			    				GameInstance gi = getGameInstance(split.get(2));
-			    				GameIO.saveSnapshot(gi, output);
+			    				GameIO.saveSnapshotToZip(gi, output);
 			    				break;
 			    			}
 			    			case NetworkString.MESSAGE:

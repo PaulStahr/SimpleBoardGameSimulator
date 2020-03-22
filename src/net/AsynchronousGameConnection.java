@@ -122,7 +122,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    				writer.print("write zip");
 				    				writer.flush();
 				    				try {
-										GameIO.saveSnapshot(gi, output);
+										GameIO.saveSnapshotToZip(gi, output);
 									} catch (IOException e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
@@ -142,7 +142,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    				writer.print("write zip");
 				    				writer.flush();
 				    				ObjectInstance oi = gi.getObjectInstance(Integer.parseInt(split.get(1)));
-				    				GameIO.saveObjectInstance(oi, output);
+				    				GameIO.writeObjectInstanceToStream(oi, output);
 				    				break;
 				    			}
 				    		}
@@ -173,7 +173,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					    	writer.print(' ');
 					    	writer.print(((GameObjectInstanceEditAction) action).object.id);
 					    	writer.flush();
-					 		GameIO.saveObjectInstance(((GameObjectInstanceEditAction)action).object, output);
+					 		GameIO.writeObjectInstanceToStream(((GameObjectInstanceEditAction)action).object, output);
 				 		}
 					    else if (action instanceof UsertextMessageAction)
 					    {
@@ -243,7 +243,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 							int objectId = Integer.parseInt(split.get(4));
 							if (sourceId != id)
 							{
-								GameIO.editObjectInstance(gi.getObjectInstance(objectId), input);
+								GameIO.editObjectInstanceFromStream(gi.getObjectInstance(objectId), input);
 							}
 							gi.update(new GameObjectInstanceEditAction(sourceId, gi.getPlayer(playerId), gi.getObjectInstance(objectId)));
 						}

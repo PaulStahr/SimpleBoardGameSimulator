@@ -42,7 +42,7 @@ public class GameIO {
 		return null;
 	}
 	
-	public static void saveSnapshot(GameInstance gi, OutputStream os) throws IOException
+	public static void saveSnapshotToZip(GameInstance gi, OutputStream os) throws IOException
 	{
 		ZipOutputStream zipOutputStream = null;
 		try
@@ -150,7 +150,7 @@ public class GameIO {
 		}
 	}
 	
-	public static void saveGame(Game game, OutputStream os) throws IOException
+	public static void saveGameToZip(Game game, OutputStream os) throws IOException
 	{	
 		ZipOutputStream zipOutputStream = null;
 		try
@@ -236,7 +236,8 @@ public class GameIO {
 		}
 	}
 		
-	public static void saveObjectState(ObjectState object, OutputStream output) {
+	public static void writeObjectStateToStream(ObjectState object, OutputStream output) throws IOException
+	{
 		Document doc = new Document();
     	Element root = new Element("xml");
     	doc.addContent(root);
@@ -254,15 +255,14 @@ public class GameIO {
     	{
 			elem.setAttribute("side", Boolean.toString(((CardState)object).side));
     	}
-    	/* An Paul: geht das?? Ich weiß nicht, wie ich doc_game in Bytes
-    	 * umwandeln kann, damit ich output.write() nehmen kann.
-    	 */
-		PrintWriter p = new PrintWriter(output);
-		p.print(doc);
+
+		new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
 
 	}
 	
-	public static void saveObjectInstance(ObjectInstance object, OutputStream output) {
+	/* This function is not ready! */
+	public static void writeObjectInstanceToStream(ObjectInstance object, OutputStream output) throws IOException
+	{
 		Document doc = new Document();
     	Element root = new Element("xml");
     	doc.addContent(root);
@@ -273,39 +273,36 @@ public class GameIO {
 		elem.setAttribute("scale", Double.toString(object.scale));
 		elem.setAttribute("width", Integer.toString(object.width));
 		elem.setAttribute("height", Integer.toString(object.height));
-    	/* An Paul: geht das?? Ich weiß nicht, wie ich doc_game in Bytes
-    	 * umwandeln kann, damit ich output.write() nehmen kann.
-    	 */
-		PrintWriter p = new PrintWriter(output);
-		p.print(doc);
+
+		new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
 	}
 	
-	public static GameInstance readGame(InputStream in) throws IOException, JDOMException
+	public static GameInstance readSnapshotFromStream(InputStream in) throws IOException, JDOMException
 	{
 		ZipInputStream stream = new ZipInputStream(in);
-		GameInstance result = readGame(stream);
+		GameInstance result = readSnapshotFromZip(stream);
 		in.close();
 		return result;
 	}
 
-	public static void editGameInstance(ZipInputStream stream, GameInstance game, Object source)
+	public static void editGameInstanceFromZip(ZipInputStream stream, GameInstance game, Object source)
 	{
 		//Editiere nur das was in dem Stream steht
 		//rufe dabei die update funktion des games auf, um ﾃｼber die ﾃ､nderungen mitzuteilen
 		//Rufe dabei auch die update Methode auf 
 	}
 	
-	public static void editObjectInstance(ObjectInstance objectInstance, InputStream input) throws IOException {
+	public static void editObjectInstanceFromStream(ObjectInstance objectInstance, InputStream input) throws IOException {
 		ZipInputStream zipStream = new ZipInputStream(input);
-		editObjectInstance(objectInstance, zipStream);
+		editObjectInstanceFromZip(objectInstance, zipStream);
 		zipStream.close();
 	}
 	
-	public static void editObjectInstance(ObjectInstance objectInstance, ZipInputStream in) {
+	public static void editObjectInstanceFromZip(ObjectInstance objectInstance, ZipInputStream in) {
 		
 	}
 	
-	public static GameInstance readGame(ZipInputStream stream) throws IOException, JDOMException
+	public static GameInstance readSnapshotFromZip(ZipInputStream stream) throws IOException, JDOMException
 	{
 		Game game = new Game();
 		HashMap<String, BufferedImage> images = game.images;
@@ -373,11 +370,11 @@ public class GameIO {
     		//System.out.println(name);
 	   	}
     	GameInstance result = new GameInstance(game);
-    	readGameInstance(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
+    	readGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
     	return result;
 	}
 	
-	public static void readGameInstance(InputStream is, GameInstance gi) throws JDOMException, IOException
+	public static void readGameInstanceFromStream(InputStream is, GameInstance gi) throws JDOMException, IOException
 	{
 		Document doc = new SAXBuilder().build(is);
     	Element root = doc.getRootElement();
