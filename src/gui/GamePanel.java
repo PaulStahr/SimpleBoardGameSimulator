@@ -120,11 +120,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					int dist = xDiff * xDiff + yDiff * yDiff;
 					if (dist < maxInaccuracy * maxInaccuracy && oi != activeObject) {
 						ObjectInstance topElement = getTopElement(oi);
-						topElement.state.aboveInstanceId = activeObject.id;
-						activeObject.state.belowInstanceId = topElement.id;
-						activeObject.state.posX = topElement.state.posX;
-						activeObject.state.posY = topElement.state.posY;
-						gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
+						if (topElement != activeObject) {
+							topElement.state.aboveInstanceId = activeObject.id;
+							activeObject.state.belowInstanceId = topElement.id;
+							activeObject.state.posX = topElement.state.posX;
+							activeObject.state.posY = topElement.state.posY;
+							gameInstance.update(new GameObjectInstanceEditAction(id, player, topElement));
+							gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
+						}
 						hasReleased = true;
 					}
 				}
@@ -139,6 +142,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		/* Drag only when left mouse down */
 		if(SwingUtilities.isLeftMouseButton(arg0)) {
 			if(activeObject != null) {
+
 				/*Remove top card*/
 				if(activeObject.state.belowInstanceId != -1) {
 					gameInstance.objects.get(activeObject.state.belowInstanceId).state.aboveInstanceId = -1;
@@ -175,8 +179,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		Boolean topObjectFound = false;
 		for (int i = 0;i<gameInstance.objects.size(); ++i)
 		{
-
-				ObjectInstance oi = gameInstance.objects.get(i);
+			ObjectInstance oi = gameInstance.objects.get(i);
 			if(!topObjectFound && oi != activeObject) {
 				int xDiff = pressedXPos - oi.state.posX, yDiff = pressedYPos - oi.state.posY;
 				int dist = xDiff * xDiff + yDiff * yDiff;
@@ -209,9 +212,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 
 	public ObjectInstance getTopElement(ObjectInstance objectInstance){
+		ObjectInstance startElement = objectInstance;
 		ObjectInstance currentTop = objectInstance;
 		while (currentTop.state.aboveInstanceId != -1){
 			currentTop = gameInstance.objects.get(currentTop.state.aboveInstanceId);
+			if (startElement == currentTop)
+			{
+				throw new RuntimeException();
+			}
 		}
 		return currentTop;
 	}
