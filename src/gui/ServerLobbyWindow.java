@@ -2,9 +2,11 @@ package gui;
 
 import javax.swing.JFrame;
 
+import net.SynchronousGameClientLobbyConnection;
+import net.ServerConnection;
+
 public class ServerLobbyWindow extends JFrame{
-	public final String address;
-	public final int port;
+	public final SynchronousGameClientLobbyConnection client;
 	
 	/*TODOS here:
 	show a list of the current running games
@@ -13,10 +15,9 @@ public class ServerLobbyWindow extends JFrame{
 	Connect to an existing game session
 	*/
 	
-	public ServerLobbyWindow(String address, int port)
+	public ServerLobbyWindow(SynchronousGameClientLobbyConnection client)
 	{
-		this.address = address;
-		this.port = port;
+		this.client = client;
 	}
 	
 	
