@@ -27,7 +27,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	int pressedYPos = -1;
 	int objOrigPosX = -1;
 	int objOrigPosY = -1;
-	Player player;
+	public Player player;
 	public final int id = (int)System.nanoTime();
 
 	int maxInaccuracy = 20;

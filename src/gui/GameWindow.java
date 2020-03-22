@@ -7,7 +7,7 @@ import gameObjects.instance.GameInstance;
 
 public class GameWindow extends JFrame{
 	GameInstance gi;
-	GamePanel gamePanel;
+	public GamePanel gamePanel;
 
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	

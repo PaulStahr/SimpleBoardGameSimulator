@@ -91,4 +91,13 @@ public class GameInstance {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	public String[] getPlayerNames() {
+		String names[] = new String[players.size()];
+		for (int i = 0; i < players.size(); ++i)
+		{
+			names[i] = players.get(i).name;
+		}
+		return names;
+	}
 }

@@ -239,8 +239,7 @@ public class GameIO {
 	public static void writeObjectStateToStream(ObjectState object, OutputStream output) throws IOException
 	{
 		Document doc = new Document();
-    	Element root = new Element("xml");
-    	doc.addContent(root);
+    	//Element root = new Element("xml");
     	
     	Element elem = new Element("object_state");
 		elem.setAttribute("x", Integer.toString(object.posX));
@@ -252,8 +251,9 @@ public class GameIO {
     	{
 			elem.setAttribute("side", Boolean.toString(((CardState)object).side));
     	}
-
-		new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
+		//root.addContent(elem);
+		doc.addContent(elem);
+    	new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
 
 	}
 
@@ -302,10 +302,10 @@ public class GameIO {
 	public static void editObjectStateFromStream(ObjectState objectState, InputStream input) throws IOException, JDOMException
 	{
 		Document doc = new SAXBuilder().build(input);
-    	Element root = doc.getRootElement();
+    	Element elem = doc.getRootElement();
     	
-    	for (Element elem : root.getChildren())
-    	{
+    	//for (Element elem : root.getChildren())
+    	//{
 			objectState.posX = Integer.parseInt(elem.getAttributeValue("x"));
 			objectState.posY = Integer.parseInt(elem.getAttributeValue("y"));
 			objectState.rotation = Integer.parseInt(elem.getAttributeValue("r"));
@@ -319,7 +319,7 @@ public class GameIO {
 	    	{
 				((CardState)objectState).side = Boolean.parseBoolean(elem.getAttributeValue("side"));
 	    	}
-	   	}
+	   //	}
 	}
 
 	public static GameInstance readSnapshotFromZip(ZipInputStream stream) throws IOException, JDOMException

@@ -226,6 +226,7 @@ public class GameServer implements Runnable {
 				logger.error("Networking error", e);
 			}
 			try { client.close(); } catch ( IOException e ) { }
+			client = null;
 		}	
     }
 	
