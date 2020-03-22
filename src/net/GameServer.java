@@ -9,9 +9,13 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import org.jdom2.JDOMException;
+
 import gameObjects.definition.GameObject;
+import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.GameInstance.GameChangeListener;
 import io.GameIO;
 import main.DataHandler;
 import main.Player;
@@ -58,15 +62,13 @@ public class GameServer implements Runnable {
 				String line = in.nextLine();
 				ArrayList<String> split = new ArrayList<>();
 				StringUtils.split(line, ' ', split);
-				String player = split.get(0);
-				int id = Integer.parseInt(split.get(1));
 				split.clear();
 				
 			    line = in.nextLine();
 			    StringUtils.split(line, ' ', split);
 			    switch (split.get(0))
 			    {
-			    	case "list":
+			    	case NetworkString.LIST:
 			    	{
 			    		switch (split.get(1))
 			    		{
@@ -76,10 +78,11 @@ public class GameServer implements Runnable {
 					    		for (int i = 0; i < gameInstances.size(); ++i)
 					    		{
 					    			out.write(gameInstances.get(i).name);
+					    			out.write(' ');
 					    		}
 					    		out.close();
 			    			}
-			    			case "player":
+			    			case NetworkString.PLAYER:
 			    			{
 			    				PrintWriter out = new PrintWriter(output, true);
 			    				String gameinstanceName = split.get(2);
@@ -92,18 +95,32 @@ public class GameServer implements Runnable {
 			    			}
 			    		}
 			    	}
-			    	case "hash":
+			    	case NetworkString.HASH:
 			    	{
 			    		switch (split.get(1))
 			    		{
-			    			
+			    			case NetworkString.GAME_INSTANCE:
+			    			{
+			    				GameInstance gi = getGameInstance(split.get(2));
+			    				PrintWriter out = new PrintWriter(output, true);
+			    				out.write(gi.hashCode());
+			    				out.flush();
+			    				break;
+			    			}
 			    		}
 			    	}
-			    	case "push":
+			    	case NetworkString.CREATE:
 			    	{
 			    		switch (split.get(1))
 			    		{
-			    			case "gameinstance":
+			    			case NetworkString.GAME_INSTANCE:
+								GameInstance gi = new GameInstance(new Game());
+								gi.name = split.get(2);
+								synchronized(gameInstances)
+			    				{
+			    					gameInstances.add(gi);
+			    				}
+							
 			    				break;
 			    			case "gameobject":
 			    				break;
@@ -114,7 +131,33 @@ public class GameServer implements Runnable {
 			    			
 			    		}
 			    	}
-			    	case "pull":
+			    	case NetworkString.PUSH:
+			    	{
+			    		switch (split.get(1))
+			    		{
+			    			case NetworkString.GAME_INSTANCE:
+								try {
+									GameInstance gi = GameIO.readGame(input);
+									synchronized(gameInstances)
+				    				{
+				    					gameInstances.add(gi);
+				    				}
+								} catch (JDOMException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+			    				
+			    				break;
+			    			case "gameobject":
+			    				break;
+			    			case "gameobjectinstance":
+			    				break;
+			    			case "player":
+			    				break;
+			    			
+			    		}
+			    	}
+			    	case NetworkString.PULL:
 			    	{
 			    		switch(split.get(1))
 			    		{
@@ -142,13 +185,15 @@ public class GameServer implements Runnable {
 			    	}
 			    	case "join":
 			    	{
-			    		GameInstance gi = getGameInstance(split.get(1));
-			    		if (gi.password != null || gi.password.equals(split.get(2)))
+			    		String player = split.get(2);
+						int id = Integer.parseInt(split.get(3));
+						GameInstance gi = getGameInstance(split.get(4));
+			    		if (gi.password != null || gi.password.equals(split.get(5)))
 			    		{
-			    			gi.players.add(new Player("player", id));
+			    			gi.players.add(new Player(player, id));
 			    		}
 			    	}
-			    	case "connect":
+			    	case NetworkString.CONNECT:
 			    	{
 			    		GameInstance gi = getGameInstance(split.get(1));
 			    		AsynchronousGameConnection asc = new AsynchronousGameConnection(gi, input, output);
