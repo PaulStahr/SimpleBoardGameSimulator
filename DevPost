@@ -14,7 +14,7 @@ The only restriction is that some networks do not allow this, for example many c
 
 ## Challenges we ran into
 Apart from normal programming issues, it is surprisingly difficult to describe the parts of a game. 
-E.g. we started cards (with to sides) and dices (with 6 sides) and figures (with one side). We thought that makes totally sense in a 2D game.
+E.g. we started cards (with two sides) and dices (with 6 sides) and figures (with one side). We thought that makes totally sense in a 2D game.
 However, one person asked "But what if we have to lay the figure down as you do in many games? Than it should have to sides. Or phases. Or whatever."
 - "But if it has two sides, it is like a card?" - "But it is a figure, not a card!"
 Long story short: It is quite challenging to think of all the things you can do with different components of the game.
