@@ -16,9 +16,7 @@ public class ObjectInstance {
 	public int width;
 	public int height;
 
-	/*stacking objects on top of each other*/
-	public ObjectInstance topInstance = null;
-	public ObjectInstance botttomInstance = null;
+
 	
 	public ObjectInstance(GameObject go, int id)
 	{

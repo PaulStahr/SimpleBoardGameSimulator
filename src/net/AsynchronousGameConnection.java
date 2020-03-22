@@ -142,8 +142,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    				writer.print("write zip");
 				    				writer.flush();
 				    				ObjectInstance oi = gi.getObjectInstance(Integer.parseInt(split.get(1)));
-				    				GameIO.writeObjectInstanceToStream(oi, output);
-				    				break;
+									try {
+										GameIO.writeObjectInstanceToStream(oi, output);
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+									break;
 				    			}
 				    		}
 				    	}

@@ -8,7 +8,6 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 
 import javax.swing.*;
-import javax.swing.plaf.basic.BasicInternalFrameTitlePane.MoveAction;
 
 import gameObjects.GameAction;
 //import gameObjects.GameObjectInstanceEditAction;
@@ -50,15 +49,35 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			System.out.println(i);
 			ObjectInstance oi = gameInstance.objects.get(i);
-			double rotationRequired = Math.toRadians (oi.getRotation());
-			BufferedImage img = oi.go.getLook(oi.state);
-			double locationX = img.getWidth() / 2;
-			double locationY = img.getHeight() / 2;
-			AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX, locationY);
-			tx.scale(oi.scale, oi.scale);
-			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-			g.drawImage(op.filter(img, null), oi.state.posX, oi.state.posY, null);
+			if(oi.state.aboveInstance == null && oi != activeObject) {
+				double rotationRequired = Math.toRadians(oi.getRotation());
+				BufferedImage img = oi.go.getLook(oi.state);
+				double locationX = img.getWidth() / 2;
+				double locationY = img.getHeight() / 2;
+				AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX, locationY);
+				tx.scale(oi.scale, oi.scale);
+				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+				g.drawImage(op.filter(img, null), oi.state.posX, oi.state.posY, null);
+			}
 		}
+		if(activeObject != null) {
+			for (int i = 0; i < gameInstance.objects.size(); ++i) {
+				ObjectInstance oi = gameInstance.objects.get(i);
+				if(oi == activeObject)
+				{
+					double rotationRequired = Math.toRadians(oi.getRotation());
+					BufferedImage img = oi.go.getLook(oi.state);
+					double locationX = img.getWidth() / 2;
+					double locationY = img.getHeight() / 2;
+					AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX, locationY);
+					tx.scale(oi.scale, oi.scale);
+					AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+					g.drawImage(op.filter(img, null), oi.state.posX, oi.state.posY, null);
+				}
+			}
+		}
+
+
 	}
 
 
@@ -100,11 +119,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				int dist = xDiff * xDiff + yDiff * yDiff;
 				if (dist < maxInaccuracy * maxInaccuracy && oi != activeObject) {
 					ObjectInstance currentTop = oi;
-					while (currentTop.topInstance != null) {
-						currentTop = oi.topInstance;
+					while (currentTop.state.aboveInstance != null) {
+						currentTop = oi.state.aboveInstance;
 					}
-					currentTop.topInstance = activeObject;
-					activeObject.botttomInstance = currentTop;
+					currentTop.state.aboveInstance = activeObject;
+					activeObject.state.belowInstance = currentTop;
 					activeObject.state.posX = currentTop.state.posX;
 					activeObject.state.posY = currentTop.state.posY;
 					gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
@@ -121,10 +140,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if(SwingUtilities.isLeftMouseButton(arg0)) {
 			if(activeObject != null) {
 				/*Remove top card*/
-				if(activeObject.botttomInstance != null) {
-					activeObject.botttomInstance.topInstance = null;
+				if(activeObject.state.belowInstance != null) {
+					activeObject.state.belowInstance.state.aboveInstance = null;
 				}
-				activeObject.botttomInstance = null;
+				activeObject.state.belowInstance = null;
 
 				activeObject.state.posX = objOrigPosX - pressedXPos + arg0.getX();
 				activeObject.state.posY = objOrigPosX - pressedXPos + arg0.getY();
@@ -187,16 +206,16 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public ObjectInstance getTopElement(ObjectInstance objectInstance){
 		ObjectInstance currentTop = objectInstance;
-		while (currentTop.topInstance != null){
-			currentTop = currentTop.topInstance;
+		while (currentTop.state.aboveInstance != null){
+			currentTop = currentTop.state.aboveInstance;
 		}
 		return currentTop;
 	}
 
 	public ObjectInstance getBottomElement(ObjectInstance objectInstance){
 		ObjectInstance currentBottom = objectInstance;
-		while (currentBottom.botttomInstance != null){
-			currentBottom = currentBottom.topInstance;
+		while (currentBottom.state.belowInstance != null){
+			currentBottom = currentBottom.state.aboveInstance;
 		}
 		return currentBottom;
 	}

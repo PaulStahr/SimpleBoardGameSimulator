@@ -7,6 +7,10 @@ public class ObjectState {
 	public int posY;
 	public int rotation;
 	public Player owner;
+
+	/*stacking objects on top of each other*/
+	public ObjectInstance aboveInstance = null;
+	public ObjectInstance belowInstance = null;
 	
 	public int hashCode()
 	{
