@@ -3,6 +3,7 @@ package gameObjects.instance;
 import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectCard;
+import gui.GamePanel;
 import main.Player;
 import util.data.IntegerArrayList;
 
@@ -25,7 +26,7 @@ public class ObjectActionMenu {
     public ObjectInstance gameObjectInstance;
     public GameInstance gameInstance;
 
-    public ObjectActionMenu(ObjectInstance gameObjectInstance, GameInstance gameInstance, Player player)
+    public ObjectActionMenu(ObjectInstance gameObjectInstance, GameInstance gameInstance, Player player, GamePanel gamePanel)
     {
         this.gameObjectInstance = gameObjectInstance;
         this.gameInstance = gameInstance;
@@ -43,7 +44,7 @@ public class ObjectActionMenu {
         flipItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ((GameObjectCard.CardState)gameObjectInstance.state).side = !((GameObjectCard.CardState)gameObjectInstance.state).side;
-                gameInstance.update(new GameObjectInstanceEditAction(-1, player, gameObjectInstance));
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, gameObjectInstance));
             }
         });
 
@@ -59,7 +60,7 @@ public class ObjectActionMenu {
                     gameObjectInstance.inHand = player;
                 }
 
-                gameInstance.update(new GameObjectInstanceEditAction(-1, player, gameObjectInstance));
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, gameObjectInstance));
             }
         });
 
@@ -91,7 +92,7 @@ public class ObjectActionMenu {
                         currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i-1)).id;
                         currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i+1)).id;
                     }
-                    gameInstance.update(new GameObjectInstanceEditAction(-1, player, gameObjectInstance));
+                    gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentObject));
                 }
 
             }

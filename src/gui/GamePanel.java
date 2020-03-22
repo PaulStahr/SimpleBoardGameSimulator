@@ -28,7 +28,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	int objOrigPosX = -1;
 	int objOrigPosY = -1;
 	Player player;
-	int id = (int)System.nanoTime();
+	public final int id = (int)System.nanoTime();
 
 	int maxInaccuracy = 20;
 
@@ -89,7 +89,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			getActiveObjectByMouseEvent(arg0);
 			/*Show popup menu of active object*/
-			activeObject.newObjectActionMenu(gameInstance, player).showPopup(arg0);
+			activeObject.newObjectActionMenu(gameInstance, player, this).showPopup(arg0);
 		}
 	}
 
@@ -133,7 +133,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 			}
 			activeObject = null;
-
 		}
 	}
 
