@@ -99,9 +99,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void mouseDragged(MouseEvent arg0) {
 		/* Drag only when left mouse down */
 		if(SwingUtilities.isLeftMouseButton(arg0)) {
-			activeObject.state.posX = objOrigPosX - pressedXPos + arg0.getX();
-			activeObject.state.posY = objOrigPosX - pressedXPos + arg0.getY();
-			gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
+			if(activeObject != null) {
+				activeObject.state.posX = objOrigPosX - pressedXPos + arg0.getX();
+				activeObject.state.posY = objOrigPosX - pressedXPos + arg0.getY();
+				gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
+			}
 		}
 	}
 
