@@ -171,7 +171,7 @@ public class GameServer implements Runnable {
 			    			case NetworkString.GAME_INSTANCE:
 			    			{
 			    				GameInstance gi = getGameInstance(split.get(2));
-			    				GameIO.saveSnapshotToZip(gi, output);
+			    				GameIO.writeSnapshotToZip(gi, output);
 			    				break;
 			    			}
 			    			case NetworkString.MESSAGE:

@@ -42,7 +42,7 @@ public class GameIO {
 		return null;
 	}
 	
-	public static void saveSnapshotToZip(GameInstance gi, OutputStream os) throws IOException
+	public static void writeSnapshotToZip(GameInstance gi, OutputStream os) throws IOException
 	{
 		ZipOutputStream zipOutputStream = null;
 		try
@@ -150,7 +150,7 @@ public class GameIO {
 		}
 	}
 	
-	public static void saveGameToZip(Game game, OutputStream os) throws IOException
+	public static void writeGameToZip(Game game, OutputStream os) throws IOException
 	{	
 		ZipOutputStream zipOutputStream = null;
 		try
@@ -235,7 +235,7 @@ public class GameIO {
 			}
 		}
 	}
-		
+
 	public static void writeObjectStateToStream(ObjectState object, OutputStream output) throws IOException
 	{
 		Document doc = new Document();
@@ -246,10 +246,7 @@ public class GameIO {
 		elem.setAttribute("x", Integer.toString(object.posX));
 		elem.setAttribute("y", Integer.toString(object.posY));
 		elem.setAttribute("r", Integer.toString(object.rotation));
-		if(object.owner != null)
-		{
-			elem.setAttribute("owner_id", Integer.toString(object.owner.id));
-		}
+		elem.setAttribute("owner_id", Integer.toString(object.owner_id));
 		
 		if (object instanceof CardState)
     	{
@@ -259,7 +256,7 @@ public class GameIO {
 		new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
 
 	}
-	
+
 	/* This function is not ready! */
 	public static void writeObjectInstanceToStream(ObjectInstance object, OutputStream output) throws IOException
 	{
@@ -276,7 +273,7 @@ public class GameIO {
 
 		new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
 	}
-	
+
 	public static GameInstance readSnapshotFromStream(InputStream in) throws IOException, JDOMException
 	{
 		ZipInputStream stream = new ZipInputStream(in);
@@ -291,18 +288,18 @@ public class GameIO {
 		//rufe dabei die update funktion des games auf, um ﾃｼber die ﾃ､nderungen mitzuteilen
 		//Rufe dabei auch die update Methode auf 
 	}
-	
+
 	public static void editObjectInstanceFromStream(ObjectInstance objectInstance, InputStream input) throws IOException {
 		ZipInputStream zipStream = new ZipInputStream(input);
 		editObjectInstanceFromZip(objectInstance, zipStream);
 		zipStream.close();
 	}
-	
+
 	public static void editObjectInstanceFromZip(ObjectInstance objectInstance, ZipInputStream in) {
 		
 	}
-	
-	public static void editObjectStateFromStream(ObjectState objectState, GameInstance gi, InputStream input) throws IOException, JDOMException
+
+	public static void editObjectStateFromStream(ObjectState objectState, InputStream input) throws IOException, JDOMException
 	{
 		Document doc = new SAXBuilder().build(input);
     	Element root = doc.getRootElement();
@@ -315,15 +312,7 @@ public class GameIO {
 			
 			if (elem.getAttribute("owner_id") != null)
 			{
-				int owner_id = Integer.parseInt(elem.getAttributeValue("owner_id"));
-				Iterator<Player> playerIt = gi.players.iterator();
-		        while (playerIt.hasNext()) {
-		        	Player player = playerIt.next();
-		            if (player.id == owner_id) 
-		            {
-		            	objectState.owner = player;
-		            }
-		        }
+		        objectState.owner_id = Integer.parseInt(elem.getAttributeValue("owner_id"));
 			}
 			
 			if (objectState instanceof CardState && elem.getAttribute("side") != null)
@@ -332,7 +321,7 @@ public class GameIO {
 	    	}
 	   	}
 	}
-	
+
 	public static GameInstance readSnapshotFromZip(ZipInputStream stream) throws IOException, JDOMException
 	{
 		Game game = new Game();
@@ -404,7 +393,7 @@ public class GameIO {
     	readGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
     	return result;
 	}
-	
+
 	public static void readGameInstanceFromStream(InputStream is, GameInstance gi) throws JDOMException, IOException
 	{
 		Document doc = new SAXBuilder().build(is);
@@ -425,6 +414,5 @@ public class GameIO {
     		}
 	   	}
 	}
-
 	
 }

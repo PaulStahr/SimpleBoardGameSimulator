@@ -6,7 +6,7 @@ public class ObjectState {
 	public int posX;
 	public int posY;
 	public int rotation;
-	public Player owner;
+	public int owner_id = -1;
 
 	/*stacking objects on top of each other*/
 	public ObjectInstance aboveInstance = null;
@@ -14,6 +14,6 @@ public class ObjectState {
 	
 	public int hashCode()
 	{
-		return posX ^ (posY << 16) ^ rotation ^ (owner == null ? 0: owner.hashCode());
+		return posX ^ (posY << 16) ^ rotation ^ owner_id;
 	}
 }
