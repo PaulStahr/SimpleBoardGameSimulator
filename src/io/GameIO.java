@@ -142,7 +142,7 @@ public class GameIO {
 		}
 	}
 	
-	public static void saveGame(Game game, OutputStream os) throws IOException
+	public static void saveGame(Game game, OutputStream os)
 	{		
 		    	
 	}

@@ -1,18 +1,30 @@
 ## Inspiration
-Usually I meet with a few friends to play some board games. But in the moment this is not possible. Some of the games are maybe possible over skype, but for most of them it gets hard to play them very fast.
+We are a group of friends who like playing board games together. But in the moment this is not possible. 
+Some of the simple and famous games are maybe possible over Skype. 
+For some of them, there might be even an online version. 
+But for most of them (especially some of our favorite) it gets hard to play them for various reasons, 
+e.g. you have to play them fast or they are not so famous.
 ## What it does
-<<<<<<< HEAD
-It creates a shared virtual desk on which everyone can do simple manipulations of objects (moving them arround, flipping cards, etc)... . New games can be defined by a simple xml file and are automatically distributed to friends which want to play with you. Everyone who can forward network traffic can create his own server, there is no registration needed.
-=======
-It creates a shared virtual desk on which everyone can do simple manipulations of objects (moving them arround, flipping cards, etc)... . New games can be defined by a simple xml file and are automatically distributed to friends which want to play with you.
->>>>>>> e03d51fffddcdd98440c81e754d29ca37b54df2f
+It creates a shared virtual desk on which everyone can do simple manipulations of objects (moving them arround, flipping cards, etc)... . 
+New games can be defined by a simple xml file and are automatically distributed to friends which want to play with you. 
+Everyone who can forward network traffic can create his own server, there is no registration needed.
+If this does sound super difficult, it is not ;) We will provide a step by step explanation. 
+The only restriction is that some networks do not allow this, for example many company networks. But your network at home should work fine.
 ## How we built it
 
 ## Challenges we ran into
-
+Apart from normal programming issues, it is surprisingly difficult to describe the parts of a game. 
+E.g. we started cards (with to sides) and dices (with 6 sides) and figures (with one side). We thought that makes totally sense in a 2D game.
+However, one person asked "But what if we have to lay the figure down as you do in many games? Than it should have to sides. Or phases. Or whatever."
+- "But if it has two sides, it is like a card?" - "But it is a figure, not a card!"
+Long story short: It is quite challenging to think of all the things you can do with different components of the game.
 ## Accomplishments that we are proud of
 Starting from nothing with this project and having the first working version after two days. Even if it's not very well documented yet, etc.
+Besides, as we told friends about this, many were really enthusiastic and some joined in to help.
+So now we have a cool group pushing this project forward.
+It seems like people are really missing playing board games.
 ## What we learned
 Basically what you can learn in this short period of time was to work in a team.
 ## What's next for Simple Board Game Simulator
-
+Make it as easy to use. 
+If we can make some grandparents play a board game with their grandchildren without putting the grandparents at risk, that would be great.
