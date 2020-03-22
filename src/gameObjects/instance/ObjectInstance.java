@@ -45,15 +45,15 @@ public class ObjectInstance {
 		return go.hashCode() + state.hashCode() + id + (inHand == null ? 0 : inHand.hashCode()) + (state.owner == null ? 0 : state.owner.hashCode());
 	}
 	
-	public ObjectActionMenu newObjectActionMenu(GameInstance gameInstance){
-		return new CardActionMenu(this, gameInstance, owner());
+	public ObjectActionMenu newObjectActionMenu(GameInstance gameInstance, Player player){
+		return new CardActionMenu(this, gameInstance, player);
 	}
 
 	public static class CardActionMenu extends ObjectActionMenu
 	{
 
 		public CardActionMenu(ObjectInstance gameObject, GameInstance gameInstance, Player player) {
-			super(gameObject, gameInstance, null);
+			super(gameObject, gameInstance, player);
 		}
 	}
 }

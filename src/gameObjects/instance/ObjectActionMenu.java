@@ -39,14 +39,14 @@ public class ObjectActionMenu {
         flipItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ((GameObjectCard.CardState)gameObjectInstance.state).side = !((GameObjectCard.CardState)gameObjectInstance.state).side;
-                gameInstance.update(new GameObjectInstanceEditAction(-1, null, gameObjectInstance));
+                gameInstance.update(new GameObjectInstanceEditAction(-1, player, gameObjectInstance));
             }
         });
 
         discardRecordItem.getAccessibleContext().setAccessibleDescription("Discard Record Card");
         discardRecordItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (gameObjectInstance.inHand == player)
+                if (gameObjectInstance.inHand != null && gameObjectInstance.inHand == player)
                 {
                     gameObjectInstance.inHand = null;
                 }
@@ -55,7 +55,7 @@ public class ObjectActionMenu {
                     gameObjectInstance.inHand = player;
                 }
 
-                gameInstance.update(new GameObjectInstanceEditAction(-1, null, gameObjectInstance));
+                gameInstance.update(new GameObjectInstanceEditAction(-1, player, gameObjectInstance));
             }
         });
 

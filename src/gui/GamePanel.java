@@ -73,7 +73,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			getActiveObjectByMouseEvent(arg0);
 			/*Show popup menu of active object*/
-			activeObject.newObjectActionMenu(gameInstance).showPopup(arg0);
+			activeObject.newObjectActionMenu(gameInstance, player).showPopup(arg0);
 		}
 	}
 
