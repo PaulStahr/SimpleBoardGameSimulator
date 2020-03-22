@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.GroupLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
@@ -16,7 +17,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableColumnModelListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
@@ -26,13 +26,8 @@ import gameObjects.ColumnTypes;
 import gameObjects.ObjectColumnType;
 import gameObjects.ValueColumnTypes;
 import gameObjects.instance.GameInstance;
-import geometry.Vector3d;
 import gui.util.ButtonColumn;
-import net.ServerConnection;
 import net.SynchronousGameClientLobbyConnection;
-import util.ArrayTools;
-import util.ArrayTools.UnmodifiableArrayList;
-import util.data.UniqueObjects;
 
 public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener{
 	public final SynchronousGameClientLobbyConnection client;
@@ -73,12 +68,14 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private final JTable tableOperGames = new JTable(tableModelOpenGames);
 	private final JScrollPane scrollPaneSurfaces = new JScrollPane(tableOperGames);
     private static final DefaultCellEditor checkBoxCellEditor = new DefaultCellEditor(new JCheckBox()); 
-
+    private final JButton buttonPoll = new JButton("Aktualisiere");
 	private boolean isUpdating = false;
     
 	@Override
 	public void actionPerformed(ActionEvent e)
-	    {
+    {
+		Object source = e.getSource();
+		
 		ButtonColumn.TableButtonActionEvent event = (ButtonColumn.TableButtonActionEvent)e;
 		Object tableSource = event.getSource();
 		int col = event.getCol();
@@ -96,9 +93,10 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	{
 		Container content = getContentPane();
 		GroupLayout layout = new GroupLayout(content);
-		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(tableOpenGames));
-		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(tableOpenGames));
+		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(tableOpenGames).addGroup(layout.createSequentialGroup().addComponent(buttonPoll)));
+		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(tableOpenGames).addGroup(layout.createParallelGroup().addComponent(buttonPoll)));
 		setLayout(layout);
+		buttonPoll.addActionListener(this);
 		tableOperGames.getSelectionModel().addListSelectionListener(this);
 		tableOperGames.getModel().addTableModelListener(this);
 		this.client = client;

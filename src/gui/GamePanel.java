@@ -56,6 +56,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			double locationX = img.getWidth() / 2;
 			double locationY = img.getHeight() / 2;
 			AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX, locationY);
+			tx.scale(oi.scale, oi.scale);
 			AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 			g.drawImage(op.filter(img, null), oi.state.posX, oi.state.posY, null);
 		}
@@ -75,7 +76,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			for (int i = 0;i<gameInstance.objects.size(); ++i)
 			{
 				ObjectInstance oi = gameInstance.objects.get(i);
-				int xDiff = pressedXPos - oi.state.posX, yDiff = pressedYPos - oi.state.posY;
+				int xDiff = clickedXPos - oi.state.posX, yDiff = clickedXPos - oi.state.posY;
 				int dist = xDiff * xDiff + yDiff * yDiff;
 				if (dist < distance)
 				{

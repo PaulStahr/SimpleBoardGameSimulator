@@ -121,7 +121,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    			{
 				    				writer.print("write zip");
 				    				writer.flush();
-				    				GameIO.saveGame(gi, output);
+				    				try {
+										GameIO.saveGame(gi, output);
+									} catch (IOException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
 				    				break;
 				    			}
 				    			case "gameobject":

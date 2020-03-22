@@ -18,11 +18,11 @@ import net.GameServer;
 
 public class Main {
     public static final void main (String args[]){
-    	connectionTest();
-    	/*
+    	//connectionTest();
+    	
     	FileInputStream fis;
 		try {
-			fis = new FileInputStream("SchreckenDesTempels.zip");
+			fis = new FileInputStream("Doppelkopf.zip");
 			GameInstance game = GameIO.readGame(fis);
 	    	fis.close();
 	    	GameWindow gw = new GameWindow(game);
@@ -42,7 +42,7 @@ public class Main {
 		} catch (JDOMException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}*/
+		}
     }
     
     public static void connectionTest()
