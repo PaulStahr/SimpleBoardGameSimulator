@@ -237,9 +237,9 @@ public class GameIO {
 	}
 		
 	public static void saveObjectState(ObjectState object, OutputStream output) {
-		Document doc_game = new Document();
-    	Element root_game = new Element("xml");
-    	doc_game.addContent(root_game);
+		Document doc = new Document();
+    	Element root = new Element("xml");
+    	doc.addContent(root);
     	
     	Element elem = new Element("object_state");
 		elem.setAttribute("x", Integer.toString(object.posX));
@@ -258,33 +258,26 @@ public class GameIO {
     	 * umwandeln kann, damit ich output.write() nehmen kann.
     	 */
 		PrintWriter p = new PrintWriter(output);
-		p.print(doc_game);
+		p.print(doc);
 
 	}
 	
 	public static void saveObjectInstance(ObjectInstance object, OutputStream output) {
-		/*Document doc_game = new Document();
-    	Element root_game = new Element("xml");
-    	doc_game.addContent(root_game);
+		Document doc = new Document();
+    	Element root = new Element("xml");
+    	doc.addContent(root);
     	
-    	Element elem = new Element("object_state");
-		elem.setAttribute("x", Integer.toString(object.posX));
-		elem.setAttribute("y", Integer.toString(object.posY));
-		elem.setAttribute("r", Integer.toString(object.rotation));
-		if(object.owner != null)
-		{
-			elem.setAttribute("owner_id", Integer.toString(object.owner.id));
-		}
-		
-		if (object instanceof CardState)
-    	{
-			elem.setAttribute("side", Boolean.toString(((CardState)object).side));
-    	}*/
+    	//@Paul: Which info from ObjectState, Player and GameObject are needed?
+    	Element elem = new Element("object_instance");
+		elem.setAttribute("id", Integer.toString(object.id));
+		elem.setAttribute("scale", Double.toString(object.scale));
+		elem.setAttribute("width", Integer.toString(object.width));
+		elem.setAttribute("height", Integer.toString(object.height));
     	/* An Paul: geht das?? Ich weiß nicht, wie ich doc_game in Bytes
     	 * umwandeln kann, damit ich output.write() nehmen kann.
     	 */
-		/*PrintWriter p = new PrintWriter(output);
-		p.print(doc_game);*/
+		PrintWriter p = new PrintWriter(output);
+		p.print(doc);
 	}
 	
 	public static GameInstance readGame(InputStream in) throws IOException, JDOMException
