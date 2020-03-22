@@ -32,7 +32,7 @@ public class GameObjectCard extends GameObject{
 
 	public static class CardState  extends ObjectState
 	{
-		public boolean side;
+		public boolean side = true;
 		
 		@Override
 		public int hashCode()
