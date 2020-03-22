@@ -24,8 +24,8 @@ public class ObjectInstance {
 		this.state = go.newObjectState();
 		this.id = id;
 
-		this.width = getLook().getWidth(null);
-		this.height = getLook().getHeight(null);
+		this.width = (int) (getLook().getWidth(null)*scale);
+		this.height = (int) (getLook().getHeight(null)*scale);
 	}
 	
 	public Image getLook()
