@@ -9,15 +9,23 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import org.jdom2.JDOMException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import gameObjects.UsertextMessageAction;
 import gameObjects.definition.GameObject;
+import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.GameInstance.GameChangeListener;
 import io.GameIO;
 import main.DataHandler;
 import main.Player;
 import util.StringUtils;
 
 public class GameServer implements Runnable {
+	private static final Logger logger = LoggerFactory.getLogger(GameServer.class);
 	private int port;
 
 	public GameServer(int port)
@@ -26,6 +34,7 @@ public class GameServer implements Runnable {
 	}
 	
 	public final ArrayList<GameInstance> gameInstances = new ArrayList<>();
+	public final ArrayList<UsertextMessageAction> userMessageChatHistory = new ArrayList<>();
 	private Thread th;
 	
 	private GameInstance getGameInstance(String name)
@@ -58,28 +67,27 @@ public class GameServer implements Runnable {
 				String line = in.nextLine();
 				ArrayList<String> split = new ArrayList<>();
 				StringUtils.split(line, ' ', split);
-				String player = split.get(0);
-				int id = Integer.parseInt(split.get(1));
 				split.clear();
 				
 			    line = in.nextLine();
 			    StringUtils.split(line, ' ', split);
 			    switch (split.get(0))
 			    {
-			    	case "list":
+			    	case NetworkString.LIST:
 			    	{
 			    		switch (split.get(1))
 			    		{
-			    			case "gameinstances": 
+			    			case NetworkString.GAME_INSTANCE: 
 			    			{
 					    	    PrintWriter out = new PrintWriter( output, true );
 					    		for (int i = 0; i < gameInstances.size(); ++i)
 					    		{
 					    			out.write(gameInstances.get(i).name);
+					    			out.write(' ');
 					    		}
 					    		out.close();
 			    			}
-			    			case "player":
+			    			case NetworkString.PLAYER:
 			    			{
 			    				PrintWriter out = new PrintWriter(output, true);
 			    				String gameinstanceName = split.get(2);
@@ -92,18 +100,32 @@ public class GameServer implements Runnable {
 			    			}
 			    		}
 			    	}
-			    	case "hash":
+			    	case NetworkString.HASH:
 			    	{
 			    		switch (split.get(1))
 			    		{
-			    			
+			    			case NetworkString.GAME_INSTANCE:
+			    			{
+			    				GameInstance gi = getGameInstance(split.get(2));
+			    				PrintWriter out = new PrintWriter(output, true);
+			    				out.write(gi.hashCode());
+			    				out.flush();
+			    				break;
+			    			}
 			    		}
 			    	}
-			    	case "push":
+			    	case NetworkString.CREATE:
 			    	{
 			    		switch (split.get(1))
 			    		{
-			    			case "gameinstance":
+			    			case NetworkString.GAME_INSTANCE:
+								GameInstance gi = new GameInstance(new Game());
+								gi.name = split.get(2);
+								synchronized(gameInstances)
+			    				{
+			    					gameInstances.add(gi);
+			    				}
+							
 			    				break;
 			    			case "gameobject":
 			    				break;
@@ -114,15 +136,58 @@ public class GameServer implements Runnable {
 			    			
 			    		}
 			    	}
-			    	case "pull":
+			    	case NetworkString.PUSH:
+			    	{
+			    		switch (split.get(1))
+			    		{
+			    			case NetworkString.GAME_INSTANCE:
+								try {
+									GameInstance gi = GameIO.readGame(input);
+									synchronized(gameInstances)
+				    				{
+				    					gameInstances.add(gi);
+				    				}
+								} catch (JDOMException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+			    				
+			    				break;
+			    			case NetworkString.MESSAGE:
+			    				userMessageChatHistory.add(new UsertextMessageAction(Integer.parseInt(split.get(2)), Integer.parseInt(split.get(3)), split.get(4)));
+			    			case "gameobject":
+			    				break;
+			    			case "gameobjectinstance":
+			    				break;
+			    			case "player":
+			    				break;
+			    			
+			    		}
+			    	}
+			    	case NetworkString.PULL:
 			    	{
 			    		switch(split.get(1))
 			    		{
-			    			case "gameinstance":
+			    			case NetworkString.GAME_INSTANCE:
 			    			{
 			    				GameInstance gi = getGameInstance(split.get(2));
 			    				GameIO.saveGame(gi, output);
 			    				break;
+			    			}
+			    			case NetworkString.MESSAGE:
+			    			{
+			    				int index = Integer.parseInt(split.get(2));
+			    				if (index < userMessageChatHistory.size())
+			    				{
+				    				UsertextMessageAction message = userMessageChatHistory.get(index);
+				    				PrintWriter printer = new PrintWriter(output);
+				    				printer.print(message.source);
+				    				printer.print(' ');
+				    				printer.print(message.player);
+				    				printer.print(' ');
+				    				printer.print(message.message);
+				    				printer.close();
+			    				}
 			    			}
 			    			case "gameobject":
 			    			{
@@ -142,13 +207,15 @@ public class GameServer implements Runnable {
 			    	}
 			    	case "join":
 			    	{
-			    		GameInstance gi = getGameInstance(split.get(1));
-			    		if (gi.password != null || gi.password.equals(split.get(2)))
+			    		String player = split.get(2);
+						int id = Integer.parseInt(split.get(3));
+						GameInstance gi = getGameInstance(split.get(4));
+			    		if (gi.password != null || gi.password.equals(split.get(5)))
 			    		{
-			    			gi.players.add(new Player("player", id));
+			    			gi.players.add(new Player(player, id));
 			    		}
 			    	}
-			    	case "connect":
+			    	case NetworkString.CONNECT:
 			    	{
 			    		GameInstance gi = getGameInstance(split.get(1));
 			    		AsynchronousGameConnection asc = new AsynchronousGameConnection(gi, input, output);
@@ -156,8 +223,7 @@ public class GameServer implements Runnable {
 			    	}
 			    }
 			} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				logger.error("Networking error", e);
 			}
 			try { client.close(); } catch ( IOException e ) { }
 		}	
@@ -178,14 +244,17 @@ public class GameServer implements Runnable {
 		    	}
 		    	catch ( IOException e ) {
 		    		e.printStackTrace();
-		    		client.close();
+		    		
 		    	}
+		    	if (client != null)
+	    		{
+	    			client.close();
+	    		}
 		    }
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-	    
 	}
 
 	public void start() throws IOException

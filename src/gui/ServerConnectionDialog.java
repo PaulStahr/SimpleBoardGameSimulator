@@ -9,6 +9,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import net.SynchronousGameClientLobbyConnection;
+
 public class ServerConnectionDialog extends JFrame implements ActionListener{
 	JLabel labelAddress = new JLabel("Server");
 	JTextField textFieldAddress = new JTextField();
@@ -43,7 +45,7 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 		Object source = arg0.getSource();
 		if (source == buttonConnect)
 		{
-			
+			ServerLobbyWindow slw = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection(textFieldAddress.getText(), 1234));
 		}
 		else if (source == buttonStartServer)
 		{
