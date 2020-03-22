@@ -48,10 +48,10 @@ public class Main {
     public static void connectionTest()
     {
     	try {
-    		FileInputStream fis = new FileInputStream("SchreckenDesTempels.zip");
+    		FileInputStream fis = new FileInputStream("Doppelkopf.zip");
     		GameInstance game0 = GameIO.readGame(fis);
         	fis.close();
-        	fis = new FileInputStream("SchreckenDesTempels.zip");
+        	fis = new FileInputStream("Doppelkopf.zip");
         	GameInstance game1 = GameIO.readGame(fis);
 	    	fis.close();
 	    	GameServer server = new GameServer(1234);
