@@ -43,7 +43,7 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 		Object source = arg0.getSource();
 		if (source == buttonConnect)
 		{
-			
+			ServerLobbyWindow slw = new ServerLobbyWindow(textFieldAddress.getText(), 1234);
 		}
 		else if (source == buttonStartServer)
 		{
