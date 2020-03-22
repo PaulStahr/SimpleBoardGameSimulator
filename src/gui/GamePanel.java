@@ -86,8 +86,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 		getActiveObjectByMouseEvent(arg0);
-		objOrigPosX = activeObject.state.posX;
-		objOrigPosY = activeObject.state.posY;
+		if(activeObject != null) {
+			objOrigPosX = activeObject.state.posX;
+			objOrigPosY = activeObject.state.posY;
+		}
 	}
 
 	@Override
