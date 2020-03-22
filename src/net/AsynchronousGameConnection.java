@@ -11,8 +11,8 @@ import java.util.Scanner;
 
 import gameObjects.GameAction;
 import gameObjects.GameObjectInstanceEditAction;
-//import gameObjects.UserSoundMessageAction;
-//import gameObjects.UsertextMessageAction;
+import gameObjects.UserSoundMessageAction;
+import gameObjects.UsertextMessageAction;
 import gameObjects.definition.GameObject;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -170,25 +170,25 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					    	writer.flush();
 					 		GameIO.saveObjectInstance(((GameObjectInstanceEditAction)action).object, output);
 				 		}
-/*					    else if (action instanceof UsertextMessageAction)
+					    else if (action instanceof UsertextMessageAction)
 					    {
 					    	writer.print("action message ");
 					    	writer.print(action.source);
 					    	writer.print(' ');
-					    	//writer.print(((UsertextMessageAction) action).player);
+					    	writer.print(((UsertextMessageAction) action).player);
 					    	writer.print(' ');
-					    	//writer.print(((UsertextMessageAction) action).message);
+					    	writer.print(((UsertextMessageAction) action).message);
 					    }
 					    else if (action instanceof UserSoundMessageAction)
 					    {
 					    	writer.print("action message ");
 					    	writer.print(action.source);
 					    	writer.print(' ');
-					    	//writer.print(((UsertextMessageAction) action).player);
+					    	writer.print(((UsertextMessageAction) action).player);
 					    	writer.print(' ');
-					    	//writer.print(((UsertextMessageAction) action).message);
+					    	writer.print(((UsertextMessageAction) action).message);
 					    }
-*/					}
+					}
 				    catch ( Exception e ) {
 				    	e.printStackTrace();
 				    }
@@ -250,7 +250,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						if (sourceId != id)
 						{
 							int playerId = Integer.parseInt(split.get(3));
-							//gi.update(new UsertextMessageAction(sourceId, playerId, split.get(4)));
+							gi.update(new UsertextMessageAction(sourceId, playerId, split.get(4)));
 						}
 					}
 					split.clear();
