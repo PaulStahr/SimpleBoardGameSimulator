@@ -40,4 +40,14 @@ public class GameObjectCard extends GameObject{
 			return super.hashCode() ^ (side ? 0xF00BA : 0);
 		}
 	}
+	
+	public BufferedImage getUpsideLook()
+	{
+		return upsideLook;
+	}
+	
+	public BufferedImage getDownsideLook()
+	{
+		return downsideLook;
+	}
 }
