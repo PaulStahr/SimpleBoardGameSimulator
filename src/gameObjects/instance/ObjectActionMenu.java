@@ -81,15 +81,15 @@ public class ObjectActionMenu {
                     ObjectInstance currentObject = gameInstance.objects.get(objectStack.get(i));
                     if (i==0 && i<objectStack.size()-1){
                         currentObject.state.belowInstanceId = -1;
-                        currentObject.state.aboveInstanceId = gameInstance.objects.get(i+1).id;
+                        currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i+1)).id;
                     }
                     else if(i==objectStack.size()-1){
-                        currentObject.state.belowInstanceId = gameInstance.objects.get(i-1).id;
+                        currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i-1)).id;
                         currentObject.state.aboveInstanceId = -1;
                     }
                     else{
-                        currentObject.state.belowInstanceId = gameInstance.objects.get(i-1).id;
-                        currentObject.state.aboveInstanceId = gameInstance.objects.get(i+1).id;
+                        currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i-1)).id;
+                        currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i+1)).id;
                     }
                     gameInstance.update(new GameObjectInstanceEditAction(-1, player, gameObjectInstance));
                 }
