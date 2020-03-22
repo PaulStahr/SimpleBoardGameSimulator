@@ -112,21 +112,22 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
 		if (activeObject != null) {
+			Boolean hasReleased = false;
 			for (int i = 0; i < gameInstance.objects.size(); ++i) {
-				ObjectInstance oi = gameInstance.objects.get(i);
+				if(!hasReleased) {
+					ObjectInstance oi = gameInstance.objects.get(i);
 
-				int xDiff = activeObject.state.posX - oi.state.posX, yDiff = activeObject.state.posY - oi.state.posY;
-				int dist = xDiff * xDiff + yDiff * yDiff;
-				if (dist < maxInaccuracy * maxInaccuracy && oi != activeObject) {
-					ObjectInstance currentTop = oi;
-					while (currentTop.state.aboveInstance != null) {
-						currentTop = oi.state.aboveInstance;
+					int xDiff = activeObject.state.posX - oi.state.posX, yDiff = activeObject.state.posY - oi.state.posY;
+					int dist = xDiff * xDiff + yDiff * yDiff;
+					if (dist < maxInaccuracy * maxInaccuracy && oi != activeObject) {
+						ObjectInstance topElement = getTopElement(oi);
+						topElement.state.aboveInstance = activeObject;
+						activeObject.state.belowInstance = topElement;
+						activeObject.state.posX = topElement.state.posX;
+						activeObject.state.posY = topElement.state.posY;
+						gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
+						hasReleased = true;
 					}
-					currentTop.state.aboveInstance = activeObject;
-					activeObject.state.belowInstance = currentTop;
-					activeObject.state.posX = currentTop.state.posX;
-					activeObject.state.posY = currentTop.state.posY;
-					gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
 				}
 			}
 			activeObject = null;
