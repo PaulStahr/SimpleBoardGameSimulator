@@ -161,7 +161,7 @@ public class GameIO {
 		    Iterator<Entry<String, BufferedImage>> it = game.images.entrySet().iterator();
 		    while (it.hasNext()) {
 		    	HashMap.Entry<String, BufferedImage> pair = it.next();
-		        System.out.println(pair.getKey() + " = " + pair.getValue());
+		        //System.out.println(pair.getKey() + " = " + pair.getValue());
 		    
 			    ZipEntry imageZipOutput = new ZipEntry(pair.getKey());
 			    zipOutputStream.putNextEntry(imageZipOutput);
@@ -327,7 +327,7 @@ public class GameIO {
 	            if (name.endsWith(".png") || name.endsWith(".jpg"))
 	            {
 	            	BufferedImage img = ImageIO.read(stream);
-	            	System.out.println("put " + name);
+	            	//System.out.println("put " + name);
 	            	images.put(name, img);
 	            }
 	            else if (name.equals("game.xml"))
@@ -374,10 +374,10 @@ public class GameIO {
     		}
     		else if (name.equals("background"))
     		{
-    			System.out.println(elem.getValue());
+    			//System.out.println(elem.getValue());
     			game.background = images.get(elem.getValue());
     		}
-    		System.out.println(name);
+    		//System.out.println(name);
 	   	}
     	GameInstance result = new GameInstance(game);
     	readGameInstance(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
@@ -392,7 +392,7 @@ public class GameIO {
     	for (Element elem : root.getChildren())
     	{
     		String name = elem.getName();
-    		System.out.println("name" + name);
+    		//System.out.println("name" + name);
     		if (name.equals("object"))
     		{
     			String uniqueName = elem.getAttributeValue("unique_name");
