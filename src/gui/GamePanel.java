@@ -31,7 +31,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	Player player;
 	int id = (int)System.nanoTime();
 
-	int maxInaccuracy = 10;
+	int maxInaccuracy = 20;
 
 
 	public GamePanel(GameInstance gameInstance)
@@ -92,23 +92,27 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
-		for (int i = 0;i<gameInstance.objects.size(); ++i) {
-			ObjectInstance oi = gameInstance.objects.get(i);
-			int xDiff = activeObject.state.posX - oi.state.posX, yDiff = activeObject.state.posY - oi.state.posY;
-			int dist = xDiff * xDiff + yDiff * yDiff;
-			if (dist < maxInaccuracy*maxInaccuracy && oi != activeObject)
-			{
-				ObjectInstance currentTop = oi;
-				while(oi.topInstance != null)
-				{
-					currentTop = oi.topInstance;
-				}
-				currentTop.topInstance = activeObject;
-				activeObject.botttomInstance = currentTop;
-			}
-		}
-		activeObject = null;
+		if (activeObject != null) {
+			for (int i = 0; i < gameInstance.objects.size(); ++i) {
+				ObjectInstance oi = gameInstance.objects.get(i);
 
+				int xDiff = activeObject.state.posX - oi.state.posX, yDiff = activeObject.state.posY - oi.state.posY;
+				int dist = xDiff * xDiff + yDiff * yDiff;
+				if (dist < maxInaccuracy * maxInaccuracy && oi != activeObject) {
+					ObjectInstance currentTop = oi;
+					while (currentTop.topInstance != null) {
+						currentTop = oi.topInstance;
+					}
+					currentTop.topInstance = activeObject;
+					activeObject.botttomInstance = currentTop;
+					activeObject.state.posX = currentTop.state.posX;
+					activeObject.state.posY = currentTop.state.posY;
+					gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
+				}
+			}
+			activeObject = null;
+
+		}
 	}
 
 	@Override
@@ -116,6 +120,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		/* Drag only when left mouse down */
 		if(SwingUtilities.isLeftMouseButton(arg0)) {
 			if(activeObject != null) {
+				/*Remove top card*/
+				if(activeObject.botttomInstance != null) {
+					activeObject.botttomInstance.topInstance = null;
+				}
+				activeObject.botttomInstance = null;
+
 				activeObject.state.posX = objOrigPosX - pressedXPos + arg0.getX();
 				activeObject.state.posY = objOrigPosX - pressedXPos + arg0.getY();
 				gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
@@ -163,11 +173,32 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 			}
 		}
-		if(!insideObject)
+
+
+		if(insideObject)
 		{
+			activeObject = getTopElement(activeObject);
+		}
+		else {
 			activeObject = null;
 		}
 	}
 
+
+	public ObjectInstance getTopElement(ObjectInstance objectInstance){
+		ObjectInstance currentTop = objectInstance;
+		while (currentTop.topInstance != null){
+			currentTop = currentTop.topInstance;
+		}
+		return currentTop;
+	}
+
+	public ObjectInstance getBottomElement(ObjectInstance objectInstance){
+		ObjectInstance currentBottom = objectInstance;
+		while (currentBottom.botttomInstance != null){
+			currentBottom = currentBottom.topInstance;
+		}
+		return currentBottom;
+	}
 
 }
