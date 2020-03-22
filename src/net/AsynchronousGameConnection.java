@@ -78,11 +78,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					StringUtils.split(command, ' ', split);
 					switch (split.get(1))
 				    {
-				    	case "list":
+				    	case NetworkString.LIST:
 				    	{
 				    		switch (split.get(2))
 				    		{
-				    			case "player":
+				    			case NetworkString.PLAYER:
 				    			{
 				    				writer.write("write list player");
 				    				for (int i = 0; i < gi.players.size(); ++i)
@@ -93,7 +93,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    			}
 				    		}
 				    	}
-				    	case "hash":
+				    	case NetworkString.HASH:
 				    	{
 			    			writer.write("write hash ");
 			    			writer.write(gi.hashCode());
@@ -113,11 +113,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    			
 				    		}
 				    	}
-				    	case "read":
+				    	case NetworkString.READ:
 				    	{
 				    		switch(split.get(1))
 				    		{
-				    			case "gameinstance":
+				    			case NetworkString.GAME_INSTANCE:
 				    			{
 				    				writer.print("write zip");
 				    				writer.flush();
@@ -168,7 +168,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    {
 					    if (action instanceof GameObjectInstanceEditAction)
 				 		{
-					    	writer.print("action edit " );
+					    	writer.print("action edit state " );
 					    	writer.print(id);
 					    	writer.print(' ');
 					    	writer.print(action.source);
@@ -177,7 +177,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					    	writer.print(' ');
 					    	writer.print(((GameObjectInstanceEditAction) action).object.id);
 					    	writer.flush();
-					 		GameIO.writeObjectInstanceToStream(((GameObjectInstanceEditAction)action).object, output);
+					 		GameIO.writeObjectStateToStream(((GameObjectInstanceEditAction)action).object.state, output);
 				 		}
 					    else if (action instanceof UsertextMessageAction)
 					    {
@@ -193,9 +193,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					    	writer.print("action message ");
 					    	writer.print(action.source);
 					    	writer.print(' ');
-					    	writer.print(((UsertextMessageAction) action).player);
+					    	writer.print(((UserSoundMessageAction) action).player);
 					    	writer.print(' ');
-					    	writer.print(((UsertextMessageAction) action).message);
+					    	writer.print(((UserSoundMessageAction) action).message);
 					    }
 					}
 				    catch ( Exception e ) {
@@ -237,7 +237,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						int id = Integer.parseInt(split.get(2));
 						String type = split.get(3);	
 					}
-					else if (line.startsWith("action edit"))
+					else if (line.startsWith("action edit state"))
 					{
 						StringUtils.split(line, ' ', split);
 						int sourceId = Integer.parseInt(split.get(2));
@@ -247,7 +247,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 							int objectId = Integer.parseInt(split.get(4));
 							if (sourceId != id)
 							{
-								GameIO.editObjectInstanceFromStream(gi.getObjectInstance(objectId), input);
+								GameIO.editObjectStateFromStream(gi.getObjectInstance(objectId).state, gi, input);
 							}
 							gi.update(new GameObjectInstanceEditAction(sourceId, gi.getPlayer(playerId), gi.getObjectInstance(objectId)));
 						}
