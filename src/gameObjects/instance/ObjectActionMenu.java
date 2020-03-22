@@ -21,7 +21,7 @@ public class ObjectActionMenu {
     public ObjectInstance gameObjectInstance;
     public GameInstance gameInstance;
 
-    public ObjectActionMenu(ObjectInstance gameObject, GameInstance gameInstance, Player player)
+    public ObjectActionMenu(ObjectInstance gameObjectInstance, GameInstance gameInstance, Player player)
     {
         this.gameObjectInstance = gameObjectInstance;
         this.gameInstance = gameInstance;

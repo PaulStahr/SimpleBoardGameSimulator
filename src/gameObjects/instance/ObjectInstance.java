@@ -11,12 +11,19 @@ public class ObjectInstance {
 	public final int id;
 	public double scale = 0.2;
 	public Player inHand = null;
+
+	/* size of the objects */
+	public int width;
+	public int height;
 	
 	public ObjectInstance(GameObject go, int id)
 	{
 		this.go = go;
 		this.state = go.newObjectState();
 		this.id = id;
+
+		this.width = getLook().getWidth(null);
+		this.height = getLook().getHeight(null);
 	}
 	
 	public Image getLook()

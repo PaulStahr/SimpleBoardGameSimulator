@@ -33,6 +33,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	Player player;
 	int id = (int)System.nanoTime();
 
+	int maxInaccuracy = 10;
 
 
 	public GamePanel(GameInstance gameInstance)
@@ -70,20 +71,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		/* Right Mouse Click on Object */
 		if(SwingUtilities.isRightMouseButton(arg0))
 		{
-			clickedXPos = arg0.getX();
-			clickedYPos = arg0.getY();
-			int distance = Integer.MAX_VALUE;
-			for (int i = 0;i<gameInstance.objects.size(); ++i)
-			{
-				ObjectInstance oi = gameInstance.objects.get(i);
-				int xDiff = clickedXPos - oi.state.posX, yDiff = clickedXPos - oi.state.posY;
-				int dist = xDiff * xDiff + yDiff * yDiff;
-				if (dist < distance)
-				{
-					activeObject = oi;
-					distance = dist;
-				}
-			}
+			getActiveObjectByMouseEvent(arg0);
 			/*Show popup menu of active object*/
 			activeObject.newObjectActionMenu(gameInstance).showPopup(arg0);
 		}
@@ -97,26 +85,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
-		pressedXPos = arg0.getX();
-		pressedYPos = arg0.getY();
-		int distance = Integer.MAX_VALUE;
-		for (int i = 0;i<gameInstance.objects.size(); ++i)
-		{
-			ObjectInstance oi = gameInstance.objects.get(i);
-			int xDiff = pressedXPos - oi.state.posX, yDiff = pressedYPos - oi.state.posY;
-			int dist = xDiff * xDiff + yDiff * yDiff;
-			if (dist < distance)
-			{
-				activeObject = oi;
-				distance = dist;
-			}
-		}
+		getActiveObjectByMouseEvent(arg0);
 		objOrigPosX = activeObject.state.posX;
 		objOrigPosY = activeObject.state.posY;
 	}
 
 	@Override
-	public void mouseReleased(MouseEvent arg0) {}
+	public void mouseReleased(MouseEvent arg0) {
+		activeObject = null;
+	}
 
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
@@ -141,4 +118,38 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			repaint();
 		}
 	}
+
+
+	public void getActiveObjectByMouseEvent(MouseEvent arg0){
+		pressedXPos = arg0.getX();
+		pressedYPos = arg0.getY();
+		int distance = Integer.MAX_VALUE;
+		Boolean insideObject = false;
+		for (int i = 0;i<gameInstance.objects.size(); ++i)
+		{
+			ObjectInstance oi = gameInstance.objects.get(i);
+			int xDiff = pressedXPos - oi.state.posX, yDiff = pressedYPos - oi.state.posY;
+			int dist = xDiff * xDiff + yDiff * yDiff;
+
+			Boolean leftIn = (pressedXPos > ( oi.state.posX - maxInaccuracy));
+			Boolean rightIn = (pressedXPos < (oi.state.posX + oi.width +  maxInaccuracy));
+			Boolean topIn = (pressedYPos < (oi.state.posY + oi.height + maxInaccuracy));
+			Boolean bottomIn = (pressedYPos > ( oi.state.posY - maxInaccuracy));
+
+			if (dist < distance)
+			{
+				insideObject = leftIn && rightIn && topIn && bottomIn;
+				if(insideObject) {
+					activeObject = oi;
+					distance = dist;
+				}
+			}
+		}
+		if(!insideObject)
+		{
+			activeObject = null;
+		}
+	}
+
+
 }
