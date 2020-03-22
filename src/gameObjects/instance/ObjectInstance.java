@@ -38,14 +38,14 @@ public class ObjectInstance {
 	}
 	
 	public ObjectActionMenu newObjectActionMenu(GameInstance gameInstance){
-		return new CardActionMenu(this, gameInstance);
+		return new CardActionMenu(this, gameInstance, owner());
 	}
 
 	public static class CardActionMenu extends ObjectActionMenu
 	{
 
-		public CardActionMenu(ObjectInstance gameObject, GameInstance gameInstance) {
-			super(gameObject, gameInstance);
+		public CardActionMenu(ObjectInstance gameObject, GameInstance gameInstance, Player player) {
+			super(gameObject, gameInstance, null);
 		}
 	}
 }
