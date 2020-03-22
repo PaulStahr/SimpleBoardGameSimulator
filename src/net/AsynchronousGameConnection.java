@@ -122,7 +122,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    				writer.print("write zip");
 				    				writer.flush();
 				    				try {
-										GameIO.saveSnapshotToZip(gi, output);
+										GameIO.writeSnapshotToZip(gi, output);
 									} catch (IOException e) {
 										// TODO Auto-generated catch block
 										e.printStackTrace();
@@ -247,7 +247,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 							int objectId = Integer.parseInt(split.get(4));
 							if (sourceId != id)
 							{
-								GameIO.editObjectStateFromStream(gi.getObjectInstance(objectId).state, gi, input);
+								GameIO.editObjectStateFromStream(gi.getObjectInstance(objectId).state, input);
 							}
 							gi.update(new GameObjectInstanceEditAction(sourceId, gi.getPlayer(playerId), gi.getObjectInstance(objectId)));
 						}

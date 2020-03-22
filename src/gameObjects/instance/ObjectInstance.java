@@ -33,9 +33,9 @@ public class ObjectInstance {
 		return go.getLook(state);
 	}
 	
-	public Player owner()
+	public int owner_id()
 	{
-		return state.owner;
+		return state.owner_id;
 	}
 
 	public int getRotation() {
@@ -44,7 +44,7 @@ public class ObjectInstance {
 	
 	public int hashCode()
 	{
-		return go.hashCode() + state.hashCode() + id + (inHand == null ? 0 : inHand.hashCode()) + (state.owner == null ? 0 : state.owner.hashCode());
+		return go.hashCode() + state.hashCode() + id + (inHand == null ? 0 : inHand.hashCode()) + state.owner_id;
 	}
 	
 	public ObjectActionMenu newObjectActionMenu(GameInstance gameInstance, Player player){

@@ -79,7 +79,7 @@ public class SynchronousGameClientLobbyConnection {
 	    out.write(' ');
 	    out.write(NetworkString.GAME_INSTANCE);
 	    out.flush();
-	    GameIO.saveSnapshotToZip(gi, oStream);
+	    GameIO.writeSnapshotToZip(gi, oStream);
 	    server.close();
 	}
 	
