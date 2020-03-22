@@ -26,8 +26,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	ObjectInstance activeObject = null;
 	int pressedXPos = -1;
 	int pressedYPos = -1;
-	int clickedXPos = -1;
-	int clickedYPos = -1;
 	int objOrigPosX = -1;
 	int objOrigPosY = -1;
 	Player player;
@@ -94,7 +92,23 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
+		for (int i = 0;i<gameInstance.objects.size(); ++i) {
+			ObjectInstance oi = gameInstance.objects.get(i);
+			int xDiff = activeObject.state.posX - oi.state.posX, yDiff = activeObject.state.posY - oi.state.posY;
+			int dist = xDiff * xDiff + yDiff * yDiff;
+			if (dist < maxInaccuracy*maxInaccuracy && oi != activeObject)
+			{
+				ObjectInstance currentTop = oi;
+				while(oi.topInstance != null)
+				{
+					currentTop = oi.topInstance;
+				}
+				currentTop.topInstance = activeObject;
+				activeObject.botttomInstance = currentTop;
+			}
+		}
 		activeObject = null;
+
 	}
 
 	@Override
