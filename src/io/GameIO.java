@@ -1,16 +1,11 @@
 package io;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -20,6 +15,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 
+import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -41,6 +37,47 @@ public class GameIO {
 	{
 		return null;
 	}
+	
+	private static void exportState(ObjectState state, Element elem)
+	{
+		elem.setAttribute("x", Integer.toString(state.posX));
+		elem.setAttribute("y", Integer.toString(state.posY));
+		elem.setAttribute("r", Integer.toString(state.rotation));
+		elem.setAttribute("owner", Integer.toString(state.owner_id));
+		elem.setAttribute("above", Integer.toString(state.aboveInstanceId));
+		elem.setAttribute("below", Integer.toString(state.belowInstanceId));
+		if (state instanceof CardState)
+    	{
+			elem.setAttribute("side", Boolean.toString(((CardState)state).side));
+    	}
+	}
+	
+	private static void importState(ObjectState state, Element elem)
+	{
+		state.posX = Integer.parseInt(elem.getAttributeValue("x"));
+		state.posY = Integer.parseInt(elem.getAttributeValue("y"));
+		String v = elem.getAttributeValue("above");
+		if (v != null)
+		{
+			state.aboveInstanceId = Integer.parseInt(v);
+		}
+		v = elem.getAttributeValue("below");
+		if (v != null)
+		{
+			state.belowInstanceId = Integer.parseInt(v);
+		}
+		state.rotation = Integer.parseInt(elem.getAttributeValue("r"));
+		Attribute ownerAttribute = elem.getAttribute("owner_id");
+		if (ownerAttribute != null)
+		{
+	        state.owner_id = Integer.parseInt(ownerAttribute.getValue());
+		}
+		if (state instanceof CardState && elem.getAttribute("side") != null)
+    	{
+			((CardState)state).side = Boolean.parseBoolean(elem.getAttributeValue("side"));
+    	}
+	}
+
 	
 	public static void writeSnapshotToZip(GameInstance gi, OutputStream os) throws IOException
 	{
@@ -130,9 +167,7 @@ public class GameIO {
 	        	Element elem = new Element("object");
         		elem.setAttribute("unique_name", entry.go.uniqueName);
         		elem.setAttribute("id", Integer.toString(entry.id));
-        		elem.setAttribute("x", Integer.toString(entry.state.posX));
-        		elem.setAttribute("y", Integer.toString(entry.state.posY));
-        		elem.setAttribute("r", Integer.toString(entry.state.rotation));
+        		exportState(entry.state, elem);
         		root_inst.addContent(elem);
         	}
 	    	
@@ -242,15 +277,8 @@ public class GameIO {
     	//Element root = new Element("xml");
     	
     	Element elem = new Element("object_state");
-		elem.setAttribute("x", Integer.toString(object.posX));
-		elem.setAttribute("y", Integer.toString(object.posY));
-		elem.setAttribute("r", Integer.toString(object.rotation));
-		elem.setAttribute("owner_id", Integer.toString(object.owner_id));
-		
-		if (object instanceof CardState)
-    	{
-			elem.setAttribute("side", Boolean.toString(((CardState)object).side));
-    	}
+		exportState(object, elem);
+
 		//root.addContent(elem);
 		doc.addContent(elem);
     	new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
@@ -306,19 +334,7 @@ public class GameIO {
     	
     	//for (Element elem : root.getChildren())
     	//{
-			objectState.posX = Integer.parseInt(elem.getAttributeValue("x"));
-			objectState.posY = Integer.parseInt(elem.getAttributeValue("y"));
-			objectState.rotation = Integer.parseInt(elem.getAttributeValue("r"));
-			
-			if (elem.getAttribute("owner_id") != null)
-			{
-		        objectState.owner_id = Integer.parseInt(elem.getAttributeValue("owner_id"));
-			}
-			
-			if (objectState instanceof CardState && elem.getAttribute("side") != null)
-	    	{
-				((CardState)objectState).side = Boolean.parseBoolean(elem.getAttributeValue("side"));
-	    	}
+			importState(objectState, elem);
 	   //	}
 	}
 
@@ -393,6 +409,7 @@ public class GameIO {
     	readGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
     	return result;
 	}
+	
 
 	public static void readGameInstanceFromStream(InputStream is, GameInstance gi) throws JDOMException, IOException
 	{
@@ -407,9 +424,7 @@ public class GameIO {
     		{
     			String uniqueName = elem.getAttributeValue("unique_name");
     			ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue("id")));
-    			oi.state.posX = Integer.parseInt(elem.getAttributeValue("x"));
-    			oi.state.posY = Integer.parseInt(elem.getAttributeValue("y"));
-    			oi.state.rotation = Integer.parseInt(elem.getAttributeValue("r"));
+    			importState(oi.state, elem);
     			gi.objects.add(oi);
     		}
 	   	}
