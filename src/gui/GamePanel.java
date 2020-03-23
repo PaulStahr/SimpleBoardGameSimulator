@@ -16,6 +16,8 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import main.Player;
 
+import static java.lang.Math.abs;
+
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener, KeyListener, KeyEventDispatcher, MouseWheelListener{
 	/**
 	 * 
@@ -40,6 +42,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	int mouseX = -1;
 	int mouseY = -1;
 
+	int mouseWheelValue = 0;
+
 
 	public GamePanel(GameInstance gameInstance)
 	{
@@ -58,7 +62,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		g.drawImage(gameInstance.game.background, 0, 0, getWidth(), getHeight(), Color.BLACK, null);
 		for (int i = 0; i < gameInstance.objects.size(); ++i)
 		{
-			System.out.println(i);
 			ObjectInstance oi = gameInstance.objects.get(i);
 			if(oi.state.aboveInstanceId == -1 && oi != activeObject) {
 				BufferedImage img = oi.go.getLook(oi.state);
@@ -277,6 +280,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			isShiftDown = true;
 		}
 
+		if(e.getKeyCode() == KeyEvent.VK_C)
+		{
+			activeObject = CardFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			int count = CardFunctions.countStack(gameInstance, activeObject);
+			getGraphics().drawString("Object Number: " + String.valueOf(count), mouseX, mouseY);
+
+		}
+
 		if(e.getKeyCode() == KeyEvent.VK_F && !loggedKeys[KeyEvent.VK_CONTROL])
 		{
 			loggedKeys[e.getKeyCode()] = true;
@@ -306,6 +317,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		isControlDown = false;
 		isShiftDown = false;
 		loggedKeys[e.getKeyCode()] = false;
+		paintComponent(getGraphics());
 	}
 
 	@Override
@@ -315,7 +327,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		getGraphics().drawString(String.valueOf(e.getWheelRotation()), mouseX, mouseY);
+		mouseWheelValue += (int) e.getPreciseWheelRotation();
+		getGraphics().drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
 		paintComponent(getGraphics());
 	}
 }

@@ -68,12 +68,38 @@ public class CardFunctions {
         return objectStack;
     }
 
+    public static IntegerArrayList getAboveStack(GameInstance gameInstance, ObjectInstance objectInstance, int number){
+        /*Get the whole stack*/
+        IntegerArrayList objectStack = new IntegerArrayList();
+        objectStack.add(objectInstance.id);
+        ObjectInstance currentObjectInstance = objectInstance;
+        while (currentObjectInstance.state.aboveInstanceId != -1 && objectStack.size() < number)
+        {
+            objectStack.add(currentObjectInstance.state.aboveInstanceId);
+            currentObjectInstance =  gameInstance.objects.get(currentObjectInstance.state.aboveInstanceId);
+        }
+        return objectStack;
+    }
+
     public static IntegerArrayList getBelowStack(GameInstance gameInstance, ObjectInstance objectInstance){
         /*Get the whole stack*/
         IntegerArrayList objectStack = new IntegerArrayList();
         objectStack.add(objectInstance.id);
         ObjectInstance currentObjectInstance = objectInstance;
         while (currentObjectInstance.state.belowInstanceId != -1)
+        {
+            objectStack.add(currentObjectInstance.state.belowInstanceId);
+            currentObjectInstance =  gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+        }
+        return objectStack;
+    }
+
+    public static IntegerArrayList getBelowStack(GameInstance gameInstance, ObjectInstance objectInstance, int number){
+        /*Get the whole stack*/
+        IntegerArrayList objectStack = new IntegerArrayList();
+        objectStack.add(objectInstance.id);
+        ObjectInstance currentObjectInstance = objectInstance;
+        while (currentObjectInstance.state.belowInstanceId != -1 && objectStack.size() < number)
         {
             objectStack.add(currentObjectInstance.state.belowInstanceId);
             currentObjectInstance =  gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
@@ -282,6 +308,5 @@ public class CardFunctions {
     {
         return getTopActiveObjectByPosition(gameInstance, xPos, yPos, 0);
     }
-
 
 }
