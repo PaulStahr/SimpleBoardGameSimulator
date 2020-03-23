@@ -21,6 +21,10 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 	JButton buttonStartServer = new JButton();
 	public ServerConnectionDialog()
 	{
+		this("", -1);
+	}
+
+	public ServerConnectionDialog(String string, int i) {
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		
@@ -38,6 +42,7 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 		setSize(1000, 500);
 		buttonConnect.addActionListener(this);
 		buttonStartServer.addActionListener(this);
+		textFieldAddress.setText(string);
 	}
 
 	@Override
