@@ -9,6 +9,7 @@ import gui.GamePanel;
 import main.Player;
 import util.data.IntegerArrayList;
 
+import java.awt.event.MouseEvent;
 import java.util.Collections;
 
 public class CardFunctions {
@@ -244,5 +245,40 @@ public class CardFunctions {
         objectInstance.state.posY = yPos;
         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
     }
+
+
+    public static ObjectInstance getTopActiveObjectByPosition(GameInstance gameInstance, int xPos, int yPos, int maxInaccuracy)
+    {
+        ObjectInstance activeObject = null;
+        int distance = Integer.MAX_VALUE;
+        Boolean insideObject = false;
+        for (int i = 0;i<gameInstance.objects.size(); ++i)
+        {
+            ObjectInstance oi = gameInstance.objects.get(i);
+            int xDiff = xPos - (oi.state.posX + oi.width/2), yDiff = yPos - (oi.state.posY + oi.height/2);
+            int dist = xDiff * xDiff + yDiff * yDiff;
+
+            Boolean leftIn = (xPos > (oi.state.posX - maxInaccuracy));
+            Boolean rightIn = (xPos < (oi.state.posX + oi.width + maxInaccuracy));
+            Boolean topIn = (yPos < (oi.state.posY + oi.height + maxInaccuracy));
+            Boolean bottomIn = (yPos > (oi.state.posY - maxInaccuracy));
+
+            if (dist < distance) {
+                insideObject = leftIn && rightIn && topIn && bottomIn;
+                if (insideObject) {
+                    activeObject = getStackTop(gameInstance, oi);
+                    distance = dist;
+                }
+            }
+        }
+
+        return activeObject;
+    }
+
+    public static ObjectInstance getTopActiveObjectByPosition(GameInstance gameInstance, int xPos, int yPos)
+    {
+        return getTopActiveObjectByPosition(gameInstance, xPos, yPos, 0);
+    }
+
 
 }

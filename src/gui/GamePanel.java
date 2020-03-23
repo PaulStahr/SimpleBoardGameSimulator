@@ -35,6 +35,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	Boolean isControlDown = false;
 	Boolean isShiftDown = false;
 
+	int mouseX = -1;
+	int mouseY = -1;
+
 
 	public GamePanel(GameInstance gameInstance)
 	{
@@ -178,7 +181,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	}
 
 	@Override
-	public void mouseMoved(MouseEvent arg0) {}
+	public void mouseMoved(MouseEvent arg0) {
+		mouseX = arg0.getX();
+		mouseY = arg0.getY();
+	}
 
 
 
@@ -264,6 +270,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			isShiftDown = true;
 		}
+
+		if(e.getKeyCode() == KeyEvent.VK_F)
+		{
+			activeObject = CardFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			CardFunctions.flipObject(id, gameInstance, player, activeObject);
+		}
+		if(e.getKeyCode() == KeyEvent.VK_S)
+		{
+			activeObject = CardFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			CardFunctions.shuffleStack(id, gameInstance, player, activeObject);
+		}
+
 	}
 	public void keyReleased(KeyEvent e) {
 		//System.out.println("keyReleased: "+e);
