@@ -429,5 +429,20 @@ public class GameIO {
     		}
 	   	}
 	}
+
+	public static void writeObjectInstanceToZip(Game game, ByteArrayOutputStream byteStream) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static void writeObjectToZip(Game game, ByteArrayOutputStream byteStream) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static void writePlayerToZip(Player player, ByteArrayOutputStream byteStream) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 }
