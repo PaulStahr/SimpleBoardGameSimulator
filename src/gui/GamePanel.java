@@ -50,14 +50,22 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			System.out.println(i);
 			ObjectInstance oi = gameInstance.objects.get(i);
 			if(oi.state.aboveInstanceId == -1 && oi != activeObject) {
-				double rotationRequired = Math.toRadians(oi.getRotation());
 				BufferedImage img = oi.go.getLook(oi.state);
-				double locationX = img.getWidth() / 2;
-				double locationY = img.getHeight() / 2;
-				AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX, locationY);
-				tx.scale(oi.scale, oi.scale);
-				AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-				g.drawImage(op.filter(img, null), oi.state.posX, oi.state.posY, null);
+				if (oi.getRotation() == 0)
+				{
+					g.drawImage(img, oi.state.posX, oi.state.posY , (int)(oi.scale * img.getWidth()), (int)(oi.scale * img.getHeight()), null);		
+				}
+				else
+				{
+					double rotationRequired = Math.toRadians(oi.getRotation());
+					double locationX = img.getWidth() / 2;
+					double locationY = img.getHeight() / 2;
+					
+					AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX, locationY);
+					tx.scale(oi.scale, oi.scale);
+					AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+					g.drawImage(op.filter(img, null), oi.state.posX, oi.state.posY, null);	
+				}
 			}
 		}
 		if(activeObject != null) {
