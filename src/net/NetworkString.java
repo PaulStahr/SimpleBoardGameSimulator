@@ -21,4 +21,5 @@ public class NetworkString {
 	public static final Object STATE = "state";
 	public static final Object SOUNDMESSAGE = "soundmessage";
 	public static final Object TEXTMESSAGE = "textmessage";
+	public static final String WRITE = "write";
 }

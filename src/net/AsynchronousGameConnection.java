@@ -301,7 +301,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				//String line = in.nextLine();
 				String line = (String)objIn.readObject();
 				System.out.println("inline: " + line);
-				if (line.startsWith("read"))
+				if (line.startsWith(NetworkString.READ))
 				{
 					synchronized(queuedOutputs)
 					{
@@ -309,16 +309,15 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						queuedOutputs.notifyAll();
 					}	
 				}
-				else if (line.startsWith("write"))
+				else if (line.startsWith(NetworkString.WRITE))
 				{
 					StringUtils.split(line, ' ', split);
 					String player = split.get(1);
 					int id = Integer.parseInt(split.get(2));
 					String type = split.get(3);	
 				}
-				else if (line.startsWith("action edit state"))
+				else if (line.startsWith(NetworkString.ACTION + " " + NetworkString.EDIT + " " + NetworkString.STATE))
 				{
-					System.out.println("in edit state: " + line);
 					split.clear();
 					StringUtils.split(line, ' ', split);
 					int sourceId = Integer.parseInt(split.get(4));
