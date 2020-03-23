@@ -16,7 +16,7 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import main.Player;
 
-public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener, KeyListener, KeyEventDispatcher {
+public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener, KeyListener, KeyEventDispatcher, MouseWheelListener{
 	/**
 	 * 
 	 */
@@ -47,6 +47,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
+		addMouseWheelListener(this);
 		setFocusable(true);
 		gameInstance.changeListener.add(this);
 	}
@@ -108,9 +109,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				activeObject.newObjectActionMenu(gameInstance, player, this).showPopup(arg0);
 			}
 		}
-
-		getGraphics().drawString("Test", mouseX, mouseY);
-		paintComponent(getGraphics());
 	}
 
 	@Override
@@ -313,5 +311,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent e) {
 		return false;
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		getGraphics().drawString(String.valueOf(e.getWheelRotation()), mouseX, mouseY);
+		paintComponent(getGraphics());
 	}
 }
