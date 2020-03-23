@@ -156,31 +156,33 @@ public class CardFunctions {
 
     public static void flipObject(int gamePanelId, GameInstance gameInstance, Player player,ObjectInstance objectInstance)
     {
-        ((GameObjectCard.CardState)objectInstance.state).side = !((GameObjectCard.CardState)objectInstance.state).side;
-        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+        if (objectInstance != null) {
+            ((GameObjectCard.CardState) objectInstance.state).side = !((GameObjectCard.CardState) objectInstance.state).side;
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+        }
     }
 
     public static void flipStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
         /*Flip the whole stack*/
-        ObjectInstance topObject = getStackTop(gameInstance, objectInstance);
-        IntegerArrayList objectStack = new IntegerArrayList();
-        objectStack.add(topObject.id);
-        ObjectInstance currentObjectInstance = topObject;
-        flipObject(gamePanelId, gameInstance, player, currentObjectInstance);
-        while (currentObjectInstance.state.belowInstanceId != -1)
-        {
-            objectStack.add(currentObjectInstance.state.belowInstanceId);
-            currentObjectInstance =  gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+        if (objectInstance != null) {
+            ObjectInstance topObject = getStackTop(gameInstance, objectInstance);
+            IntegerArrayList objectStack = new IntegerArrayList();
+            objectStack.add(topObject.id);
+            ObjectInstance currentObjectInstance = topObject;
             flipObject(gamePanelId, gameInstance, player, currentObjectInstance);
-        }
+            while (currentObjectInstance.state.belowInstanceId != -1) {
+                objectStack.add(currentObjectInstance.state.belowInstanceId);
+                currentObjectInstance = gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+                flipObject(gamePanelId, gameInstance, player, currentObjectInstance);
+            }
 
-        for (int i = objectStack.size() - 1; i >=0 ; i--)
-        {
-            ObjectInstance currentObject = gameInstance.objects.get(objectStack.get(i));
-            int aboveId = currentObject.state.aboveInstanceId;
-            currentObject.state.aboveInstanceId = currentObject.state.belowInstanceId;
-            currentObject.state.belowInstanceId = aboveId;
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
+            for (int i = objectStack.size() - 1; i >= 0; i--) {
+                ObjectInstance currentObject = gameInstance.objects.get(objectStack.get(i));
+                int aboveId = currentObject.state.aboveInstanceId;
+                currentObject.state.aboveInstanceId = currentObject.state.belowInstanceId;
+                currentObject.state.belowInstanceId = aboveId;
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
+            }
         }
     }
 
