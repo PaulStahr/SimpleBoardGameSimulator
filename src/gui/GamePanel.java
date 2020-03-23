@@ -153,8 +153,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					}
 				}
 			}
-			activeObject = null;
 		}
+		activeObject = null;
 	}
 
 	@Override

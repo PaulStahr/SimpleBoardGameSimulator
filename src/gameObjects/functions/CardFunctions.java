@@ -95,26 +95,30 @@ public class CardFunctions {
 
     public static void moveStackTo(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList idList, ObjectInstance objectInstance)
     {
-        for(int i=0;i<idList.size();i++)
-        {
-            ObjectInstance currentObject = gameInstance.objects.get(idList.get(i));
-            currentObject.state.posX = objectInstance.state.posX;
-            currentObject.state.posY = objectInstance.state.posY;
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
+        if (objectInstance != null) {
+            for (int i = 0; i < idList.size(); i++) {
+                ObjectInstance currentObject = gameInstance.objects.get(idList.get(i));
+                currentObject.state.posX = objectInstance.state.posX;
+                currentObject.state.posY = objectInstance.state.posY;
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
+            }
         }
-
     }
 
     public static void moveAboveStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
     {
-        IntegerArrayList idList = getAboveStack(gameInstance, objectInstance);
-        moveStackTo(gamePanelId, gameInstance, player, idList, objectInstance);
+        if (objectInstance != null) {
+            IntegerArrayList idList = getAboveStack(gameInstance, objectInstance);
+            moveStackTo(gamePanelId, gameInstance, player, idList, objectInstance);
+        }
     }
 
     public static void moveBelowStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
     {
-        IntegerArrayList idList = getBelowStack(gameInstance, objectInstance);
-        moveStackTo(gamePanelId, gameInstance, player, idList, objectInstance);
+        if (objectInstance != null) {
+            IntegerArrayList idList = getBelowStack(gameInstance, objectInstance);
+            moveStackTo(gamePanelId, gameInstance, player, idList, objectInstance);
+        }
     }
 
 
@@ -124,34 +128,31 @@ public class CardFunctions {
 
     public static void shuffleStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
         /*Shuffle objects on a stack*/
-        ObjectInstance topObject = getStackTop(gameInstance, objectInstance);
-        IntegerArrayList objectStack = new IntegerArrayList();
-        objectStack.add(topObject.id);
-        ObjectInstance currentObjectInstance = topObject;
-        while (currentObjectInstance.state.belowInstanceId != -1)
-        {
-            objectStack.add(currentObjectInstance.state.belowInstanceId);
-            currentObjectInstance =  gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+        if (objectInstance != null) {
+            ObjectInstance topObject = getStackTop(gameInstance, objectInstance);
+            IntegerArrayList objectStack = new IntegerArrayList();
+            objectStack.add(topObject.id);
+            ObjectInstance currentObjectInstance = topObject;
+            while (currentObjectInstance.state.belowInstanceId != -1) {
+                objectStack.add(currentObjectInstance.state.belowInstanceId);
+                currentObjectInstance = gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+            }
+            Collections.shuffle(objectStack);
+            for (int i = 0; i < objectStack.size(); i++) {
+                ObjectInstance currentObject = gameInstance.objects.get(objectStack.get(i));
+                if (i == 0 && i < objectStack.size() - 1) {
+                    currentObject.state.belowInstanceId = -1;
+                    currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i + 1)).id;
+                } else if (i == objectStack.size() - 1) {
+                    currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i - 1)).id;
+                    currentObject.state.aboveInstanceId = -1;
+                } else {
+                    currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i - 1)).id;
+                    currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i + 1)).id;
+                }
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
+            }
         }
-        Collections.shuffle(objectStack);
-        for (int i = 0; i < objectStack.size(); i++)
-        {
-            ObjectInstance currentObject = gameInstance.objects.get(objectStack.get(i));
-            if (i==0 && i<objectStack.size()-1){
-                currentObject.state.belowInstanceId = -1;
-                currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i+1)).id;
-            }
-            else if(i==objectStack.size()-1){
-                currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i-1)).id;
-                currentObject.state.aboveInstanceId = -1;
-            }
-            else{
-                currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i-1)).id;
-                currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i+1)).id;
-            }
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
-        }
-
     }
 
     public static void flipObject(int gamePanelId, GameInstance gameInstance, Player player,ObjectInstance objectInstance)
