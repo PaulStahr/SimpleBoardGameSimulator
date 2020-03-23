@@ -89,7 +89,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			getActiveObjectByMouseEvent(arg0);
 			/*Show popup menu of active object*/
-			activeObject.newObjectActionMenu(gameInstance, player, this).showPopup(arg0);
+			if (activeObject!=null) {
+				activeObject.newObjectActionMenu(gameInstance, player, this).showPopup(arg0);
+			}
 		}
 	}
 
@@ -180,22 +182,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		for (int i = 0;i<gameInstance.objects.size(); ++i)
 		{
 			ObjectInstance oi = gameInstance.objects.get(i);
-			if(!topObjectFound && oi != activeObject) {
-				int xDiff = pressedXPos - oi.state.posX, yDiff = pressedYPos - oi.state.posY;
-				int dist = xDiff * xDiff + yDiff * yDiff;
+			int xDiff = pressedXPos - (oi.state.posX + oi.width/2), yDiff = pressedYPos - (oi.state.posY + oi.height/2);
+			int dist = xDiff * xDiff + yDiff * yDiff;
 
-				Boolean leftIn = (pressedXPos > (oi.state.posX - maxInaccuracy));
-				Boolean rightIn = (pressedXPos < (oi.state.posX + oi.width + maxInaccuracy));
-				Boolean topIn = (pressedYPos < (oi.state.posY + oi.height + maxInaccuracy));
-				Boolean bottomIn = (pressedYPos > (oi.state.posY - maxInaccuracy));
+			Boolean leftIn = (pressedXPos > (oi.state.posX - maxInaccuracy));
+			Boolean rightIn = (pressedXPos < (oi.state.posX + oi.width + maxInaccuracy));
+			Boolean topIn = (pressedYPos < (oi.state.posY + oi.height + maxInaccuracy));
+			Boolean bottomIn = (pressedYPos > (oi.state.posY - maxInaccuracy));
 
-				if (dist < distance) {
-					insideObject = leftIn && rightIn && topIn && bottomIn;
-					if (insideObject) {
-						activeObject = getTopElement(oi);
-						distance = dist;
-						topObjectFound = true;
-					}
+			if (dist < distance) {
+				insideObject = leftIn && rightIn && topIn && bottomIn;
+				if (insideObject) {
+					activeObject = getTopElement(oi);
+					distance = dist;
 				}
 			}
 		}

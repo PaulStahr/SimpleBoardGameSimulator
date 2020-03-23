@@ -84,17 +84,19 @@ public class CardStackFunctions {
         IntegerArrayList objectStack = new IntegerArrayList();
         objectStack.add(topObject.id);
         ObjectInstance currentObjectInstance = topObject;
+        flipObject(gamePanelId, gameInstance, player, currentObjectInstance);
         while (currentObjectInstance.state.belowInstanceId != -1)
         {
             objectStack.add(currentObjectInstance.state.belowInstanceId);
             currentObjectInstance =  gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+            flipObject(gamePanelId, gameInstance, player, currentObjectInstance);
         }
-        for (int i = 0; i < objectStack.size(); i++)
+
+        for (int i = objectStack.size() - 1; i >=0 ; i--)
         {
             ObjectInstance currentObject = gameInstance.objects.get(objectStack.get(i));
-            flipObject(gamePanelId, gameInstance, player, objectInstance);
-            Integer aboveId = currentObject.state.aboveInstanceId;
-            currentObject.state.aboveInstanceId = currentObjectInstance.state.belowInstanceId;
+            int aboveId = currentObject.state.aboveInstanceId;
+            currentObject.state.aboveInstanceId = currentObject.state.belowInstanceId;
             currentObject.state.belowInstanceId = aboveId;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
         }
