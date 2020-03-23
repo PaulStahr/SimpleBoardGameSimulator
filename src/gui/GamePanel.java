@@ -145,6 +145,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				/*Remove top card*/
 				if(activeObject.state.belowInstanceId != -1) {
 					gameInstance.objects.get(activeObject.state.belowInstanceId).state.aboveInstanceId = -1;
+					gameInstance.update(new GameObjectInstanceEditAction(id, player, gameInstance.objects.get(activeObject.state.belowInstanceId)));
 				}
 				activeObject.state.belowInstanceId = -1;
 

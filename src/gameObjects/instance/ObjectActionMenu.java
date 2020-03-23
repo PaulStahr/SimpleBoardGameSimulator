@@ -3,6 +3,7 @@ package gameObjects.instance;
 import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectCard;
+import gameObjects.functions.CardStackFunctions;
 import gui.GamePanel;
 import main.Player;
 import util.data.IntegerArrayList;
@@ -21,7 +22,8 @@ public class ObjectActionMenu {
 
     public JMenuItem flipItem = new JMenuItem("Flip Card");
     public JMenuItem discardRecordItem = new JMenuItem("");
-    public JMenuItem shuffleCardItem = new JMenuItem("Shuffle Cards");
+    public JMenuItem shuffleCardItem = new JMenuItem("Shuffle Stack");
+    public JMenuItem flipStackItem = new JMenuItem("Flip Stack");
 
     public ObjectInstance gameObjectInstance;
     public GameInstance gameInstance;
@@ -40,15 +42,13 @@ public class ObjectActionMenu {
             discardRecordItem.setText("Record Card");
         }
 
-        flipItem.getAccessibleContext().setAccessibleDescription("Flip Card");
+
         flipItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ((GameObjectCard.CardState)gameObjectInstance.state).side = !((GameObjectCard.CardState)gameObjectInstance.state).side;
-                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, gameObjectInstance));
+                CardStackFunctions.flipObject(gamePanel.id, gameInstance, player, gameObjectInstance);
             }
         });
 
-        discardRecordItem.getAccessibleContext().setAccessibleDescription("Discard Record Card");
         discardRecordItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (gameObjectInstance.inHand != null && gameObjectInstance.inHand == player)
@@ -64,43 +64,26 @@ public class ObjectActionMenu {
             }
         });
 
-        shuffleCardItem.getAccessibleContext().setAccessibleDescription("ShuffleCards");
         shuffleCardItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 /*Shuffle objects on a stack*/
-                IntegerArrayList objectStack = new IntegerArrayList();
-                objectStack.add(gameObjectInstance.id);
-                ObjectInstance currentObjectInstance = gameObjectInstance;
-                while (currentObjectInstance.state.belowInstanceId != -1)
-                {
-                    objectStack.add(currentObjectInstance.state.belowInstanceId);
-                    currentObjectInstance =  gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
-                }
-                Collections.shuffle(objectStack);
-                for (int i = 0; i < objectStack.size(); i++)
-                {
-                    ObjectInstance currentObject = gameInstance.objects.get(objectStack.get(i));
-                    if (i==0 && i<objectStack.size()-1){
-                        currentObject.state.belowInstanceId = -1;
-                        currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i+1)).id;
-                    }
-                    else if(i==objectStack.size()-1){
-                        currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i-1)).id;
-                        currentObject.state.aboveInstanceId = -1;
-                    }
-                    else{
-                        currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i-1)).id;
-                        currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i+1)).id;
-                    }
-                    gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentObject));
-                }
+                CardStackFunctions.shuffleStack(gamePanel.id, gameInstance, player, gameObjectInstance);
+            }
+        });
 
+        flipStackItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                CardStackFunctions.flipStack(gamePanel.id, gameInstance, player, gameObjectInstance);
             }
         });
 
         popup.add(flipItem);
         popup.add(discardRecordItem);
-        popup.add(shuffleCardItem);
+        if(CardStackFunctions.countStack(gameInstance, gameObjectInstance) > 1) {
+            popup.add(shuffleCardItem);
+            popup.add(flipStackItem);
+        }
     }
 
 
