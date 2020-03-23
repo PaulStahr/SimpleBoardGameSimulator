@@ -1,9 +1,8 @@
--Hashfunktionen implementieren -> Paul
 -Testserver aufsetzen -> Florian
 -Testserver implementieren -> Paul
--Client Verbindung implementieren -> Paul
+-Netzwerksynchronisation implementieren -> Paul
 -Zip exporter implementieren -> Rike
 -Grafische Oberfläche für laufendes Spiel implementieren -> Florian
 -Grafische Oberflaeche fuer Serverloppy -> Hanno
 -Ein ingame broadcasting chat (kann das Action system fuer Nachrichten nutzen)
--Falls wir bei der WirVsVirus mitmachen wollen benötigen wir bis 18 Uhr ein Video von 2 Minuten Länge für youtube die fertige zusammenfassung
+-Ein ingame broadcasting soundchat (kann ebenfalls das Action system nutzen)
