@@ -34,28 +34,46 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	Thread inputThread;
 	InputStream input;
 	OutputStream output;
-	ArrayDeque<GameAction> ga = new ArrayDeque<>();
-	ArrayDeque<String> queuedCommands = new ArrayDeque<>();
+	ArrayDeque<Object> queuedOutputs = new ArrayDeque<>();
 	boolean isUpdating = false;
 	private final int id = (int)System.nanoTime();
+	private boolean syncPull;
+	private boolean syncPush;
 
 	@Override
 	public void changeUpdate(GameAction action) {
 		if (action.source != id && !isUpdating)
 		{
-			synchronized(ga)
+			synchronized(queuedOutputs)
 			{
-				ga.add(action);
+				queuedOutputs.add(action);
+				queuedOutputs.notifyAll();
 			}
 		}
 	}
 	
+	/**
+	 * Constructs an connection with the GameInstance and the two streams.
+	 * @param gi
+	 * @param input
+	 * @param output
+	 */
 	public AsynchronousGameConnection(GameInstance gi, InputStream input, OutputStream output)
 	{
 		this.gi = gi;
 		gi.changeListener.add(this);
 		this.input = input;
 		this.output = output;
+	}
+	
+	public void syncPull()
+	{
+		syncPull = true;
+	}
+	
+	public void syncPush()
+	{
+		syncPush = true;
 	}
 	
 	public void start()
@@ -84,15 +102,25 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 			}
 	    	while (true)
 			{
-				String command;
-				synchronized(queuedCommands)
+				Object outputObject = null;
+				synchronized(queuedOutputs)
 				{
-					command = queuedCommands.size() == 0 ? null : queuedCommands.pop();
+					if (queuedOutputs.size() == 0)
+					{
+						try {
+							queuedOutputs.wait();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+					outputObject = queuedOutputs.size() == 0 ? null : queuedOutputs.pop();
 				}
 				try
 				{
-					if (command != null)
+					if (outputObject instanceof String)
 					{
+						String command = (String)outputObject;
 						StringUtils.split(command, ' ', split);
 						switch (split.get(1))
 					    {
@@ -171,15 +199,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					}
 					split.clear();
 					
-					GameAction action;
-					synchronized (ga)
-					{
-						action = ga.size() == 0 ? null : ga.pop();
-					}
+					
 					Socket server = null;
 					
-					if (action != null)
+					if (outputObject instanceof GameAction)
 					{
+						GameAction action = (GameAction)outputObject;
 					    try
 					    {
 						    if (action instanceof GameObjectInstanceEditAction)
@@ -260,16 +285,15 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 			while (true)
 			{
 				try {
-					Thread.sleep(100);
-					
 					//String line = in.nextLine();
 					String line = (String)objIn.readObject();
 					System.out.println("inline: " + line);
 					if (line.startsWith("read"))
 					{
-						synchronized(queuedCommands)
+						synchronized(queuedOutputs)
 						{
-							queuedCommands.add(line);
+							queuedOutputs.add(line);
+							queuedOutputs.notifyAll();
 						}	
 					}
 					else if (line.startsWith("write"))
