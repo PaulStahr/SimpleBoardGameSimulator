@@ -163,20 +163,22 @@ public class CardFunctions {
                 objectStack.add(currentObjectInstance.state.belowInstanceId);
                 currentObjectInstance = gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
             }
-            Collections.shuffle(objectStack);
-            for (int i = 0; i < objectStack.size(); i++) {
-                ObjectInstance currentObject = gameInstance.objects.get(objectStack.get(i));
-                if (i == 0 && i < objectStack.size() - 1) {
-                    currentObject.state.belowInstanceId = -1;
-                    currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i + 1)).id;
-                } else if (i == objectStack.size() - 1) {
-                    currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i - 1)).id;
-                    currentObject.state.aboveInstanceId = -1;
-                } else {
-                    currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i - 1)).id;
-                    currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i + 1)).id;
+            if (objectStack.size() > 1) {
+                Collections.shuffle(objectStack);
+                for (int i = 0; i < objectStack.size(); i++) {
+                    ObjectInstance currentObject = gameInstance.objects.get(objectStack.get(i));
+                    if (i == 0 && i < objectStack.size() - 1) {
+                        currentObject.state.belowInstanceId = -1;
+                        currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i + 1)).id;
+                    } else if (i == objectStack.size() - 1) {
+                        currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i - 1)).id;
+                        currentObject.state.aboveInstanceId = -1;
+                    } else {
+                        currentObject.state.belowInstanceId = gameInstance.objects.get(objectStack.get(i - 1)).id;
+                        currentObject.state.aboveInstanceId = gameInstance.objects.get(objectStack.get(i + 1)).id;
+                    }
+                    gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
                 }
-                gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
             }
         }
     }
@@ -307,6 +309,36 @@ public class CardFunctions {
     public static ObjectInstance getTopActiveObjectByPosition(GameInstance gameInstance, int xPos, int yPos)
     {
         return getTopActiveObjectByPosition(gameInstance, xPos, yPos, 0);
+    }
+
+
+    public static void removeFromStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
+    {
+        if (objectInstance!= null) {
+            objectInstance.state.aboveInstanceId = -1;
+            objectInstance.state.belowInstanceId = -1;
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+        }
+    }
+
+    public static void viewBelowCards(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int cardMargin)
+    {
+        if (objectInstance!=null) {
+            IntegerArrayList belowList = getBelowStack(gameInstance, objectInstance);
+            if (belowList.size() > 1) {
+                int posX = objectInstance.state.posX;
+                int posY = objectInstance.state.posY;
+
+                for (int i = 0; i < belowList.size(); i++) {
+                    moveObjectTo(gamePanelId, gameInstance, player, gameInstance.objects.get(belowList.get(i)), (int) (posX - (belowList.size() / 2.0 - i) * cardMargin), posY);
+                    removeFromStack(gamePanelId, gameInstance, player, gameInstance.objects.get(belowList.get(i)));
+                }
+            }
+        }
+    }
+    public static void viewBelowCards(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
+    {
+        viewBelowCards(gamePanelId, gameInstance, player, objectInstance, 20);
     }
 
 }

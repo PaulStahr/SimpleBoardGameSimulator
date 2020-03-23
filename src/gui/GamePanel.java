@@ -234,8 +234,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 			}
 		}
-
-
 		if(!insideObject)
 		{
 			activeObject = null;
@@ -311,13 +309,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			activeObject = CardFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
 			CardFunctions.flipStack(id, gameInstance, player, activeObject);
 		}
+
+		if (e.getKeyCode() == KeyEvent.VK_V)
+		{
+			loggedKeys[e.getKeyCode()] = true;
+			activeObject = CardFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			CardFunctions.viewBelowCards(id, gameInstance, player, activeObject);
+		}
 	}
 	public void keyReleased(KeyEvent e) {
 		//System.out.println("keyReleased: "+e);
 		isControlDown = false;
 		isShiftDown = false;
 		loggedKeys[e.getKeyCode()] = false;
-		paintComponent(getGraphics());
+		repaint();
 	}
 
 	@Override
@@ -329,6 +334,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		mouseWheelValue += (int) e.getPreciseWheelRotation();
 		getGraphics().drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
-		paintComponent(getGraphics());
+		repaint();
 	}
 }
