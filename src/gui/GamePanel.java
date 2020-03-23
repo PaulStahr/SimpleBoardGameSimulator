@@ -1,7 +1,6 @@
 package gui;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -12,11 +11,12 @@ import javax.swing.*;
 import gameObjects.GameAction;
 //import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.GameObjectInstanceEditAction;
+import gameObjects.functions.CardFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import main.Player;
 
-public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener{
+public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener, KeyListener, KeyEventDispatcher {
 	/**
 	 * 
 	 */
@@ -32,12 +32,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	int maxInaccuracy = 20;
 
+	Boolean isControlDown = false;
+	Boolean isShiftDown = false;
+
 
 	public GamePanel(GameInstance gameInstance)
 	{
 		this.gameInstance = gameInstance;
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addKeyListener(this);
+		setFocusable(true);
 		gameInstance.changeListener.add(this);
 	}
 	
@@ -87,8 +92,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 
 	}
-
-
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
@@ -149,20 +152,29 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
 		/* Drag only when left mouse down */
-		if(SwingUtilities.isLeftMouseButton(arg0)) {
+		if(SwingUtilities.isLeftMouseButton(arg0) && !isShiftDown) {
 			if(activeObject != null) {
-
-				/*Remove top card*/
-				if(activeObject.state.belowInstanceId != -1) {
-					gameInstance.objects.get(activeObject.state.belowInstanceId).state.aboveInstanceId = -1;
-					gameInstance.update(new GameObjectInstanceEditAction(id, player, gameInstance.objects.get(activeObject.state.belowInstanceId)));
+				/*Remove top card if not control pressed*/
+				if (!isControlDown) {
+					CardFunctions.removeObject(id, gameInstance, player, activeObject);
 				}
-				activeObject.state.belowInstanceId = -1;
+				CardFunctions.moveObjectTo(id, gameInstance, player, activeObject,  objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
+				if (isControlDown)
+				{
+					CardFunctions.moveBelowStackTo(id, gameInstance, player, activeObject);
+				}
+			}
+		}
+		else if(SwingUtilities.isLeftMouseButton(arg0) && isShiftDown)
+		{
+			if(activeObject != null) {
+				/*Remove top card*/
+				CardFunctions.removeObject(id, gameInstance, player, activeObject);
 
-				activeObject.state.posX = objOrigPosX - pressedXPos + arg0.getX();
-				activeObject.state.posY = objOrigPosX - pressedXPos + arg0.getY();
+				CardFunctions.moveObjectTo(id, gameInstance, player, activeObject,  objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
 				gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
 			}
+
 		}
 	}
 
@@ -200,18 +212,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (dist < distance) {
 				insideObject = leftIn && rightIn && topIn && bottomIn;
 				if (insideObject) {
-					activeObject = getTopElement(oi);
+					if(!isShiftDown) {
+						activeObject = getTopElement(oi);
+					}
+					else {
+						activeObject = getBottomElement(oi);
+					}
 					distance = dist;
 				}
 			}
 		}
 
 
-		if(insideObject)
+		if(!insideObject)
 		{
-			activeObject = getTopElement(activeObject);
-		}
-		else {
 			activeObject = null;
 		}
 	}
@@ -233,9 +247,33 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public ObjectInstance getBottomElement(ObjectInstance objectInstance){
 		ObjectInstance currentBottom = objectInstance;
 		while (currentBottom.state.belowInstanceId != -1){
-			currentBottom = gameInstance.objects.get(currentBottom.state.aboveInstanceId);
+			currentBottom = gameInstance.objects.get(currentBottom.state.belowInstanceId);
 		}
 		return currentBottom;
 	}
 
+	public void keyTyped(KeyEvent e) {
+		//System.out.println("keyTyped: "+e);
+	}
+	public void keyPressed(KeyEvent e) {
+		//System.out.println("keyPressed: "+e);
+		if (e.isControlDown())
+		{
+			isControlDown = true;
+		}
+		else if(e.isShiftDown())
+		{
+			isShiftDown = true;
+		}
+	}
+	public void keyReleased(KeyEvent e) {
+		//System.out.println("keyReleased: "+e);
+		isControlDown = false;
+		isShiftDown = false;
+	}
+
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent e) {
+		return false;
+	}
 }

@@ -1,20 +1,14 @@
 package gameObjects.instance;
 
 import gameObjects.GameObjectInstanceEditAction;
-import gameObjects.definition.GameObject;
-import gameObjects.definition.GameObjectCard;
-import gameObjects.functions.CardStackFunctions;
+import gameObjects.functions.CardFunctions;
 import gui.GamePanel;
 import main.Player;
-import util.data.IntegerArrayList;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.util.Collections;
-import java.util.List;
 
 public class ObjectActionMenu {
     /*Popup menu for object actions*/
@@ -45,7 +39,7 @@ public class ObjectActionMenu {
 
         flipItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CardStackFunctions.flipObject(gamePanel.id, gameInstance, player, gameObjectInstance);
+                CardFunctions.flipObject(gamePanel.id, gameInstance, player, gameObjectInstance);
             }
         });
 
@@ -67,20 +61,20 @@ public class ObjectActionMenu {
         shuffleCardItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 /*Shuffle objects on a stack*/
-                CardStackFunctions.shuffleStack(gamePanel.id, gameInstance, player, gameObjectInstance);
+                CardFunctions.shuffleStack(gamePanel.id, gameInstance, player, gameObjectInstance);
             }
         });
 
         flipStackItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CardStackFunctions.flipStack(gamePanel.id, gameInstance, player, gameObjectInstance);
+                CardFunctions.flipStack(gamePanel.id, gameInstance, player, gameObjectInstance);
             }
         });
 
         popup.add(flipItem);
         popup.add(discardRecordItem);
-        if(CardStackFunctions.countStack(gameInstance, gameObjectInstance) > 1) {
+        if(CardFunctions.countStack(gameInstance, gameObjectInstance) > 1) {
             popup.add(shuffleCardItem);
             popup.add(flipStackItem);
         }
