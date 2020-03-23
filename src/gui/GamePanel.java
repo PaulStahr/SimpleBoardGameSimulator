@@ -108,6 +108,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				activeObject.newObjectActionMenu(gameInstance, player, this).showPopup(arg0);
 			}
 		}
+
+		getGraphics().drawString("Test", mouseX, mouseY);
+		paintComponent(getGraphics());
 	}
 
 	@Override
