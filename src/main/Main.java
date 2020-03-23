@@ -19,8 +19,8 @@ import net.GameServer;
 
 public class Main {
     public static final void main (String args[]){
-    	//connectionTest();
-    	
+    	connectionTest();
+    	/*
     	FileInputStream fis;
 		try {
 			fis = new FileInputStream("Doppelkopf.zip");
@@ -30,7 +30,7 @@ public class Main {
 	    	gw.gamePanel.player = new Player("Paul", 0);
 	    	gw.setVisible(true);
 	    	
-			ServerConnectionDialog scd = new ServerConnectionDialog();
+			ServerConnectionDialog scd = new ServerConnectionDialog("127.0.0.1", 1234);
 			scd.setVisible(true);
 			FileOutputStream fos = new FileOutputStream("output.zip");
 			GameIO.writeSnapshotToZip(game, fos);
@@ -44,17 +44,17 @@ public class Main {
 		} catch (JDOMException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
     }
     
     public static void connectionTest()
     {
     	try {
     		
-    		FileInputStream fis = new FileInputStream("SchreckenDesTempels.zip");
+    		FileInputStream fis = new FileInputStream("Doppelkopf.zip");
     		GameInstance game0 = GameIO.readSnapshotFromStream(fis);
         	fis.close();
-        	fis = new FileInputStream("SchreckenDesTempels.zip");
+        	fis = new FileInputStream("Doppelkopf.zip");
         	GameInstance game1 = GameIO.readSnapshotFromStream(fis);
 	    	fis.close();
 	    	/*GameServer server = new GameServer(1234);
