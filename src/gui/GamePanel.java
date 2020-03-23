@@ -186,7 +186,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		pressedYPos = arg0.getY();
 		int distance = Integer.MAX_VALUE;
 		Boolean insideObject = false;
-		Boolean topObjectFound = false;
 		for (int i = 0;i<gameInstance.objects.size(); ++i)
 		{
 			ObjectInstance oi = gameInstance.objects.get(i);
