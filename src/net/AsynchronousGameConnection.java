@@ -37,18 +37,21 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	ArrayDeque<Object> queuedOutputs = new ArrayDeque<>();
 	boolean isUpdating = false;
 	private final int id = (int)System.nanoTime();
-	private boolean syncPull;
-	private boolean syncPush;
 
 	@Override
 	public void changeUpdate(GameAction action) {
 		if (action.source != id && !isUpdating)
 		{
-			synchronized(queuedOutputs)
-			{
-				queuedOutputs.add(action);
-				queuedOutputs.notifyAll();
-			}
+			queueOutput(action);
+		}
+	}
+	
+	private void queueOutput(Object output)
+	{
+		synchronized(queuedOutputs)
+		{
+			queuedOutputs.add(output);
+			queuedOutputs.notifyAll();
 		}
 	}
 	
@@ -68,12 +71,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	
 	public void syncPull()
 	{
-		syncPull = true;
+		queueOutput(NetworkString.PULL);
 	}
 	
 	public void syncPush()
 	{
-		syncPush = true;
+		queueOutput(NetworkString.PUSH);
 	}
 	
 	public void start()
@@ -87,261 +90,282 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		}
 	}
 	
-	public void run()
+	private void outputLoop()
 	{
 		ArrayList<String> split = new ArrayList<>();
+		StringBuilder strB = new StringBuilder();
+		//PrintWriter writer = new PrintWriter(output, true);
+		ObjectOutputStream objOut = null;
+		try {
+			objOut = new ObjectOutputStream(output);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+    	while (true)
+		{
+			Object outputObject = null;
+			synchronized(queuedOutputs)
+			{
+				if (queuedOutputs.size() == 0)
+				{
+					try {
+						queuedOutputs.wait();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				outputObject = queuedOutputs.size() == 0 ? null : queuedOutputs.pop();
+			}
+			try
+			{
+				if (outputObject instanceof String)
+				{
+					String command = (String)outputObject;
+					StringUtils.split(command, ' ', split);
+					switch (split.get(1))
+				    {
+				    	case NetworkString.LIST:
+				    	{
+				    		switch (split.get(2))
+				    		{
+				    			case NetworkString.PLAYER:
+				    			{
+				    				objOut.writeObject("write list player");
+				    				objOut.writeObject(gi.getPlayerNames());
+				    			}
+				    		}
+				    	}
+				    	case NetworkString.HASH:
+				    	{
+				    		strB.append(NetworkString.READBACK).append(' ').append(NetworkString.HASH).append(' ');
+				    		objOut.writeObject(strB.toString());
+		    				objOut.write(gi.hashCode());
+		    				objOut.flush();
+		    				strB.setLength(0);
+				    	}
+				    	case NetworkString.PULL:
+				    	case NetworkString.READ:
+				    	{
+				    		strB.append(split.get(1).equals(NetworkString.PULL) ? NetworkString.PUSH : NetworkString.READBACK).append(' ');
+				    		switch (split.get(1))
+				    		{
+				    			case NetworkString.GAME_INSTANCE:
+				    			{
+				    				ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+				    				GameIO.writeSnapshotToZip(gi, byteStream);
+				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(byteStream.size());
+				    				objOut.writeObject(strB.toString());
+				    				objOut.write(byteStream.toByteArray());
+				    				objOut.flush();
+				    				strB.setLength(0);
+				    				break;
+				    			}
+				    			case NetworkString.GAME:
+				    			{
+				    				ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+				    				GameIO.writeGameToZip(gi.game, byteStream);
+				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME).append(' ').append(byteStream.size());
+				    				objOut.writeObject(strB.toString());
+				    				objOut.write(byteStream.toByteArray());
+				    				objOut.flush();
+				    				strB.setLength(0);
+				    				break;
+				    			}
+				    			case NetworkString.GAME_OBJECT:
+				    			{
+				    				ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+				    				GameIO.writeObjectToZip(gi.game, byteStream);
+				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT).append(' ').append(byteStream.size());
+				    				objOut.writeObject(strB.toString());
+				    				objOut.write(byteStream.toByteArray());
+				    				objOut.flush();
+				    				strB.setLength(0);
+				    				break;
+				    			}
+				    			case NetworkString.GAME_OBJECT_INSTANCE:
+				    			{
+				    				ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+				    				GameIO.writeObjectInstanceToZip(gi.game, byteStream);
+				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT_INSTANCE).append(' ').append(byteStream.size());
+				    				objOut.write(byteStream.toByteArray());
+				    				objOut.flush();
+				    				break;
+				    			}
+				    			case NetworkString.PLAYER:
+				    			{
+				    				ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+				    				GameIO.writePlayerToZip(gi.getPlayer(Integer.parseInt(split.get(2))), byteStream);
+				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.PLAYER).append(' ').append(byteStream.size());
+				    				objOut.write(byteStream.toByteArray());
+				    				objOut.flush();
+				    				break;
+				    			}
+				    		}
+				    	}
+				    }
+				}
+				split.clear();
+				
+				
+				Socket server = null;
+				
+				if (outputObject instanceof GameAction)
+				{
+					GameAction action = (GameAction)outputObject;
+				    try
+				    {
+					    if (action instanceof GameObjectInstanceEditAction)
+				 		{
+					    	ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+					 		GameIO.writeObjectStateToStream(((GameObjectInstanceEditAction)action).object.state, byteStream);
+					 		strB.append(NetworkString.ACTION).append(' ')
+					 			.append(NetworkString.EDIT).append(' ')
+					 			.append(NetworkString.STATE).append(' ')
+					 			.append(id).append(' ')
+					 			.append(action.source).append(' ')
+					 			.append(((GameObjectInstanceEditAction) action).player.id).append(' ')
+					 			.append(((GameObjectInstanceEditAction) action).object.id).append(' ')
+					 			.append( byteStream.size());
+					 		objOut.writeObject(strB.toString());
+					    	objOut.write(byteStream.toByteArray());
+					     	objOut.flush();
+					     	strB.setLength(0);
+					   }
+					   else if (action instanceof UsertextMessageAction)
+					   {
+					    	strB.append(NetworkString.ACTION).append(' ')
+					 			.append(NetworkString.TEXTMESSAGE).append(' ')
+					 			.append(((UsertextMessageAction) action).player).append(' ')
+					 			.append(id).append(' ')
+					 			.append(action.source).append(' ')
+					 			.append(((GameObjectInstanceEditAction) action).player.id).append(' ')
+					 			.append(((GameObjectInstanceEditAction) action).object.id).append(' ');
+					 		objOut.writeObject(strB.toString());
+					 		objOut.writeObject(((UsertextMessageAction) action).message);
+					    	objOut.flush();
+					     	strB.setLength(0);
+					    }
+					    else if (action instanceof UserSoundMessageAction)
+					    {
+					    	strB.append(NetworkString.ACTION).append(' ')
+					 			.append(NetworkString.SOUNDMESSAGE).append(' ')
+					 			.append(((UsertextMessageAction) action).player).append(' ')
+					 			.append(id).append(' ')
+					 			.append(action.source).append(' ')
+					 			.append(((GameObjectInstanceEditAction) action).player.id).append(' ')
+					 			.append(((GameObjectInstanceEditAction) action).object.id).append(' ');
+					 		objOut.writeObject(strB.toString());
+					 		objOut.writeObject(((UsertextMessageAction) action).message);
+					    	objOut.flush();
+					     	strB.setLength(0);
+					    }
+					}
+				    catch ( Exception e ) {
+				    	e.printStackTrace();
+				    }
+				    finally {
+				    	if ( server != null )
+				    	{
+				    		try { server.close(); } catch ( IOException e ) { }
+				    	}
+				    }
+					//server = new Socket( address, port);
+					
+					//Scanner in  = new Scanner( server.getInputStream() );
+					//PrintWriter out = new PrintWriter( server.getOutputStream(), true );
+				
+			    }
+			}catch(IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void inputLoop()
+	{
+		ArrayList<String> split = new ArrayList<>();
+		//Scanner in = new Scanner( input);
+		ObjectInputStream objIn = null;
+		try {
+			objIn = new ObjectInputStream(input);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		while (true)
+		{
+			try {
+				//String line = in.nextLine();
+				String line = (String)objIn.readObject();
+				System.out.println("inline: " + line);
+				if (line.startsWith("read"))
+				{
+					synchronized(queuedOutputs)
+					{
+						queuedOutputs.add(line);
+						queuedOutputs.notifyAll();
+					}	
+				}
+				else if (line.startsWith("write"))
+				{
+					StringUtils.split(line, ' ', split);
+					String player = split.get(1);
+					int id = Integer.parseInt(split.get(2));
+					String type = split.get(3);	
+				}
+				else if (line.startsWith("action edit state"))
+				{
+					System.out.println("in edit state: " + line);
+					split.clear();
+					StringUtils.split(line, ' ', split);
+					int sourceId = Integer.parseInt(split.get(4));
+					if (sourceId != id)
+					{
+						int playerId = Integer.parseInt(split.get(5));
+						int objectId = Integer.parseInt(split.get(6));
+						int size = Integer.parseInt(split.get(7));
+						byte data[] = new byte[size];
+						
+						objIn.read(data, 0, size);
+						//byte data[] = objIn.readObject();
+						if (sourceId != id)
+						{
+							GameIO.editObjectStateFromStream(gi.getObjectInstance(objectId).state, new ByteArrayInputStream(data));
+						}
+						isUpdating = true;
+						gi.update(new GameObjectInstanceEditAction(sourceId, gi.getPlayer(playerId), gi.getObjectInstance(objectId)));
+						isUpdating = false;
+					}
+				}
+				else if (line.startsWith("action message"))
+				{
+					StringUtils.split(line, ' ', split);
+					int sourceId = Integer.parseInt(split.get(2));
+					if (sourceId != id)
+					{
+						int playerId = Integer.parseInt(split.get(3));
+						gi.update(new UsertextMessageAction(sourceId, playerId, split.get(4)));
+					}
+				}
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+			split.clear();
+		}
+	}
+	
+	public void run()
+	{
 		if (Thread.currentThread() == outputThread)
 		{
-			//PrintWriter writer = new PrintWriter(output, true);
-			ObjectOutputStream objOut = null;
-			try {
-				objOut = new ObjectOutputStream(output);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-	    	while (true)
-			{
-				Object outputObject = null;
-				synchronized(queuedOutputs)
-				{
-					if (queuedOutputs.size() == 0)
-					{
-						try {
-							queuedOutputs.wait();
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-					outputObject = queuedOutputs.size() == 0 ? null : queuedOutputs.pop();
-				}
-				try
-				{
-					if (outputObject instanceof String)
-					{
-						String command = (String)outputObject;
-						StringUtils.split(command, ' ', split);
-						switch (split.get(1))
-					    {
-					    	case NetworkString.LIST:
-					    	{
-					    		switch (split.get(2))
-					    		{
-					    			case NetworkString.PLAYER:
-					    			{
-					    				objOut.writeObject("write list player");
-					    				objOut.writeObject(gi.getPlayerNames());
-					    			}
-					    		}
-					    	}
-					    	case NetworkString.HASH:
-					    	{
-					    		objOut.writeObject("write hash");
-					    		objOut.write(gi.hashCode());
-				    			//writer.write("write hash ");
-				    			//writer.write(gi.hashCode());
-					    	}
-					    	case "push":
-					    	{
-					    		switch (split.get(1))
-					    		{
-					    			case "gameinstance":
-					    				break;
-					    			case "gameobject":
-					    				break;
-					    			case "gameobjectinstance":
-					    				break;
-					    			case "player":
-					    				break;
-					    			
-					    		}
-					    	}
-					    	case NetworkString.READ:
-					    	{
-					    		switch(split.get(1))
-					    		{
-					    			case NetworkString.GAME_INSTANCE:
-					    			{
-					    				objOut.writeObject("write zip");
-					    				objOut.flush();
-					    				try {
-											GameIO.writeSnapshotToZip(gi, output);
-										} catch (IOException e) {
-											// TODO Auto-generated catch block
-											e.printStackTrace();
-										}
-					    				break;
-					    			}
-					    			case "gameobject":
-					    			{
-					    				objOut.writeObject("write zip");
-					    				objOut.flush();
-					    				GameObject go = gi.game.getObject(split.get(3));
-					    				//GameIO.saveObjectInstance(go, output);
-					    				break;
-					    			}
-					    			case "gameobjectinstance":
-					    			{
-					    				objOut.writeObject("write zip");
-					    				objOut.flush();
-					    				ObjectInstance oi = gi.getObjectInstance(Integer.parseInt(split.get(1)));
-										try {
-											GameIO.writeObjectInstanceToStream(oi, output);
-										} catch (IOException e) {
-											e.printStackTrace();
-										}
-										break;
-					    			}
-					    		}
-					    	}
-					    }
-					}
-					split.clear();
-					
-					
-					Socket server = null;
-					
-					if (outputObject instanceof GameAction)
-					{
-						GameAction action = (GameAction)outputObject;
-					    try
-					    {
-						    if (action instanceof GameObjectInstanceEditAction)
-					 		{
-						    	System.out.println("out edit state");
-						    	ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-						 		GameIO.writeObjectStateToStream(((GameObjectInstanceEditAction)action).object.state, byteStream);
-						    	objOut.writeObject("action edit state " + id + " " + action.source + " " + ((GameObjectInstanceEditAction) action).player.id + " " + ((GameObjectInstanceEditAction) action).object.id + " " + byteStream.size());
-						    	objOut.flush();
-					 	    	/*writer.print("action edit state " );
-						    	writer.print(id);
-						    	writer.print(' ');
-						    	writer.print(action.source);
-						    	writer.print(' ');
-						    	writer.print(((GameObjectInstanceEditAction) action).player.id);
-						    	writer.print(' ');
-						    	writer.print(((GameObjectInstanceEditAction) action).object.id);
-						    	writer.print(' ');
-						    	writer.print(byteStream.size());
-						    	writer.print('\n');
-						     	writer.flush();*/
-						     	objOut.write(byteStream.toByteArray());
-						     	objOut.flush();
-						     	output.flush();
-						   }
-						    else if (action instanceof UsertextMessageAction)
-						    {
-						    	objOut.writeObject("action message " + action.source + ' ' + ((UsertextMessageAction) action).player + " " + ((UsertextMessageAction) action).message);
-						    	/*writer.print("action message ");
-						    	writer.print(action.source);
-						    	writer.print(' ');
-						    	writer.print(((UsertextMessageAction) action).player);
-						    	writer.print(' ');
-						    	writer.print(((UsertextMessageAction) action).message);*/
-						    }
-						    else if (action instanceof UserSoundMessageAction)
-						    {
-						    	objOut.writeObject("action message sound" + action.source + ' ' + ((UserSoundMessageAction) action).player + " " + ((UserSoundMessageAction) action).message);
-						    	/*writer.print("action message ");
-						    	writer.print(action.source);
-						    	writer.print(' ');
-						    	writer.print(((UserSoundMessageAction) action).player);
-						    	writer.print(' ');
-						    	writer.print(((UserSoundMessageAction) action).message);*/
-						    }
-						}
-					    catch ( Exception e ) {
-					    	e.printStackTrace();
-					    }
-					    finally {
-					    	if ( server != null )
-					    	{
-					    		try { server.close(); } catch ( IOException e ) { }
-					    	}
-					    }
-						//server = new Socket( address, port);
-						
-						//Scanner in  = new Scanner( server.getInputStream() );
-						//PrintWriter out = new PrintWriter( server.getOutputStream(), true );
-					
-				    }
-				}catch(IOException e)
-				{
-					e.printStackTrace();
-				}
-			}
+			outputLoop();
 		}
 		else if (Thread.currentThread() == inputThread)
 		{
-			//Scanner in = new Scanner( input);
-			ObjectInputStream objIn = null;
-			try {
-				objIn = new ObjectInputStream(input);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			while (true)
-			{
-				try {
-					//String line = in.nextLine();
-					String line = (String)objIn.readObject();
-					System.out.println("inline: " + line);
-					if (line.startsWith("read"))
-					{
-						synchronized(queuedOutputs)
-						{
-							queuedOutputs.add(line);
-							queuedOutputs.notifyAll();
-						}	
-					}
-					else if (line.startsWith("write"))
-					{
-						StringUtils.split(line, ' ', split);
-						String player = split.get(1);
-						int id = Integer.parseInt(split.get(2));
-						String type = split.get(3);	
-					}
-					else if (line.startsWith("action edit state"))
-					{
-						System.out.println("in edit state: " + line);
-						split.clear();
-						StringUtils.split(line, ' ', split);
-						int sourceId = Integer.parseInt(split.get(4));
-						if (sourceId != id)
-						{
-							int playerId = Integer.parseInt(split.get(5));
-							int objectId = Integer.parseInt(split.get(6));
-							int size = Integer.parseInt(split.get(7));
-							byte data[] = new byte[size];
-							
-							objIn.read(data, 0, size);
-							//byte data[] = objIn.readObject();
-							if (sourceId != id)
-							{
-								GameIO.editObjectStateFromStream(gi.getObjectInstance(objectId).state, new ByteArrayInputStream(data));
-							}
-							isUpdating = true;
-							gi.update(new GameObjectInstanceEditAction(sourceId, gi.getPlayer(playerId), gi.getObjectInstance(objectId)));
-							isUpdating = false;
-						}
-					}
-					else if (line.startsWith("action message"))
-					{
-						StringUtils.split(line, ' ', split);
-						int sourceId = Integer.parseInt(split.get(2));
-						if (sourceId != id)
-						{
-							int playerId = Integer.parseInt(split.get(3));
-							gi.update(new UsertextMessageAction(sourceId, playerId, split.get(4)));
-						}
-					}
-				}catch(Exception e) {
-					e.printStackTrace();
-				}
-				split.clear();
-			}
+			inputLoop();
 		}
 	}
 }
