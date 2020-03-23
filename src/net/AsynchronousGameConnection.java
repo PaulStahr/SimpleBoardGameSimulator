@@ -96,6 +96,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		StringBuilder strB = new StringBuilder();
 		//PrintWriter writer = new PrintWriter(output, true);
 		ObjectOutputStream objOut = null;
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 		try {
 			objOut = new ObjectOutputStream(output);
 		} catch (IOException e1) {
@@ -161,48 +162,51 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    		{
 				    			case NetworkString.GAME_INSTANCE:
 				    			{
-				    				ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 				    				GameIO.writeSnapshotToZip(gi, byteStream);
 				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(byteStream.size());
 				    				objOut.writeObject(strB.toString());
 				    				objOut.write(byteStream.toByteArray());
+				    				byteStream.reset();
 				    				strB.setLength(0);
 				    				break;
 				    			}
 				    			case NetworkString.GAME:
 				    			{
-				    				ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 				    				GameIO.writeGameToZip(gi.game, byteStream);
 				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME).append(' ').append(byteStream.size());
 				    				objOut.writeObject(strB.toString());
 				    				objOut.write(byteStream.toByteArray());
+				    				byteStream.reset();
 				    				strB.setLength(0);
 				    				break;
 				    			}
 				    			case NetworkString.GAME_OBJECT:
 				    			{
-				    				ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 				    				GameIO.writeObjectToZip(gi.game, byteStream);
 				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT).append(' ').append(byteStream.size());
 				    				objOut.writeObject(strB.toString());
 				    				objOut.write(byteStream.toByteArray());
+				    				byteStream.reset();
 				    				strB.setLength(0);
 				    				break;
 				    			}
 				    			case NetworkString.GAME_OBJECT_INSTANCE:
 				    			{
-				    				ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 				    				GameIO.writeObjectInstanceToZip(gi.game, byteStream);
 				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT_INSTANCE).append(' ').append(byteStream.size());
+				    				objOut.writeObject(strB.toString());
 				    				objOut.write(byteStream.toByteArray());
+				    				strB.setLength(0);
+				    				byteStream.reset();
 				    				break;
 				    			}
 				    			case NetworkString.PLAYER:
 				    			{
-				    				ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 				    				GameIO.writePlayerToZip(gi.getPlayer(Integer.parseInt(split.get(2))), byteStream);
 				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.PLAYER).append(' ').append(byteStream.size());
 				    				objOut.write(byteStream.toByteArray());
+				    				strB.setLength(0);
+				    				byteStream.reset();
 				    				break;
 				    			}
 				    		}
@@ -221,8 +225,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    {
 					    if (action instanceof GameObjectInstanceEditAction)
 				 		{
-					    	ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-					 		GameIO.writeObjectStateToStream(((GameObjectInstanceEditAction)action).object.state, byteStream);
+					    	GameIO.writeObjectStateToStream(((GameObjectInstanceEditAction)action).object.state, byteStream);
 					 		strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.EDIT).append(' ')
 					 			.append(NetworkString.STATE).append(' ')
@@ -233,6 +236,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append( byteStream.size());
 					 		objOut.writeObject(strB.toString());
 					    	objOut.write(byteStream.toByteArray());
+					    	byteStream.reset();
 					     	strB.setLength(0);
 					   }
 					   else if (action instanceof UsertextMessageAction)
@@ -300,7 +304,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 			try {
 				//String line = in.nextLine();
 				String line = (String)objIn.readObject();
-				System.out.println("inline: " + line);
+				//System.out.println("inline: " + line);
 				if (line.startsWith(NetworkString.READ))
 				{
 					synchronized(queuedOutputs)
@@ -314,7 +318,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					StringUtils.split(line, ' ', split);
 					String player = split.get(1);
 					int id = Integer.parseInt(split.get(2));
-					String type = split.get(3);	
+					String type = split.get(3);
 				}
 				else if (line.startsWith(NetworkString.ACTION + " " + NetworkString.EDIT + " " + NetworkString.STATE))
 				{
