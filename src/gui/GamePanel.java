@@ -32,6 +32,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	int maxInaccuracy = 20;
 
+	boolean[] loggedKeys = new boolean[256];
+
 	Boolean isControlDown = false;
 	Boolean isShiftDown = false;
 
@@ -136,12 +138,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					if (dist < maxInaccuracy * maxInaccuracy && oi != activeObject) {
 						ObjectInstance topElement = getTopElement(oi);
 						if (topElement != activeObject) {
-							topElement.state.aboveInstanceId = activeObject.id;
-							activeObject.state.belowInstanceId = topElement.id;
-							activeObject.state.posX = topElement.state.posX;
-							activeObject.state.posY = topElement.state.posY;
+							ObjectInstance stackBottom = CardFunctions.getStackBottom(gameInstance, activeObject);
+							topElement.state.aboveInstanceId = stackBottom.id;
+							stackBottom.state.belowInstanceId = topElement.id;
+							stackBottom.state.posX = topElement.state.posX;
+							stackBottom.state.posY = topElement.state.posY;
 							gameInstance.update(new GameObjectInstanceEditAction(id, player, topElement));
-							gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
+							gameInstance.update(new GameObjectInstanceEditAction(id, player, stackBottom));
 						}
 						hasReleased = true;
 					}
@@ -264,29 +267,44 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		//System.out.println("keyPressed: "+e);
 		if (e.isControlDown())
 		{
+			loggedKeys[e.getKeyCode()] = true;
 			isControlDown = true;
 		}
 		else if(e.isShiftDown())
 		{
+			loggedKeys[e.getKeyCode()] = true;
 			isShiftDown = true;
 		}
 
-		if(e.getKeyCode() == KeyEvent.VK_F)
+		if(e.getKeyCode() == KeyEvent.VK_F && !loggedKeys[KeyEvent.VK_CONTROL])
 		{
+			loggedKeys[e.getKeyCode()] = true;
 			activeObject = CardFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
 			CardFunctions.flipObject(id, gameInstance, player, activeObject);
 		}
 		if(e.getKeyCode() == KeyEvent.VK_S)
 		{
+			loggedKeys[e.getKeyCode()] = true;
 			activeObject = CardFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
 			CardFunctions.shuffleStack(id, gameInstance, player, activeObject);
 		}
-
+		if(e.getKeyCode() == KeyEvent.VK_S)
+		{
+			loggedKeys[e.getKeyCode()] = true;
+			activeObject = CardFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			CardFunctions.shuffleStack(id, gameInstance, player, activeObject);
+		}
+		if (loggedKeys[KeyEvent.VK_CONTROL] && loggedKeys[KeyEvent.VK_F])
+		{
+			activeObject = CardFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			CardFunctions.flipStack(id, gameInstance, player, activeObject);
+		}
 	}
 	public void keyReleased(KeyEvent e) {
 		//System.out.println("keyReleased: "+e);
 		isControlDown = false;
 		isShiftDown = false;
+		loggedKeys[e.getKeyCode()] = false;
 	}
 
 	@Override
