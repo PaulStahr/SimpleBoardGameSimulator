@@ -110,6 +110,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				if (queuedOutputs.size() == 0)
 				{
 					try {
+						objOut.flush();
+						output.flush();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					try {
 						queuedOutputs.wait();
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
@@ -132,8 +139,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    		{
 				    			case NetworkString.PLAYER:
 				    			{
-				    				objOut.writeObject("write list player");
+				    				strB.append(NetworkString.READBACK).append(' ').append(NetworkString.PLAYER);
+				    				objOut.writeObject(strB.toString());
 				    				objOut.writeObject(gi.getPlayerNames());
+				    				strB.setLength(0);
 				    			}
 				    		}
 				    	}
@@ -142,7 +151,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    		strB.append(NetworkString.READBACK).append(' ').append(NetworkString.HASH).append(' ');
 				    		objOut.writeObject(strB.toString());
 		    				objOut.write(gi.hashCode());
-		    				objOut.flush();
 		    				strB.setLength(0);
 				    	}
 				    	case NetworkString.PULL:
@@ -158,7 +166,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(byteStream.size());
 				    				objOut.writeObject(strB.toString());
 				    				objOut.write(byteStream.toByteArray());
-				    				objOut.flush();
 				    				strB.setLength(0);
 				    				break;
 				    			}
@@ -169,7 +176,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME).append(' ').append(byteStream.size());
 				    				objOut.writeObject(strB.toString());
 				    				objOut.write(byteStream.toByteArray());
-				    				objOut.flush();
 				    				strB.setLength(0);
 				    				break;
 				    			}
@@ -180,7 +186,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT).append(' ').append(byteStream.size());
 				    				objOut.writeObject(strB.toString());
 				    				objOut.write(byteStream.toByteArray());
-				    				objOut.flush();
 				    				strB.setLength(0);
 				    				break;
 				    			}
@@ -190,7 +195,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    				GameIO.writeObjectInstanceToZip(gi.game, byteStream);
 				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT_INSTANCE).append(' ').append(byteStream.size());
 				    				objOut.write(byteStream.toByteArray());
-				    				objOut.flush();
 				    				break;
 				    			}
 				    			case NetworkString.PLAYER:
@@ -199,7 +203,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    				GameIO.writePlayerToZip(gi.getPlayer(Integer.parseInt(split.get(2))), byteStream);
 				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.PLAYER).append(' ').append(byteStream.size());
 				    				objOut.write(byteStream.toByteArray());
-				    				objOut.flush();
 				    				break;
 				    			}
 				    		}
@@ -230,7 +233,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append( byteStream.size());
 					 		objOut.writeObject(strB.toString());
 					    	objOut.write(byteStream.toByteArray());
-					     	objOut.flush();
 					     	strB.setLength(0);
 					   }
 					   else if (action instanceof UsertextMessageAction)
@@ -244,7 +246,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append(((GameObjectInstanceEditAction) action).object.id).append(' ');
 					 		objOut.writeObject(strB.toString());
 					 		objOut.writeObject(((UsertextMessageAction) action).message);
-					    	objOut.flush();
 					     	strB.setLength(0);
 					    }
 					    else if (action instanceof UserSoundMessageAction)
@@ -258,7 +259,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append(((GameObjectInstanceEditAction) action).object.id).append(' ');
 					 		objOut.writeObject(strB.toString());
 					 		objOut.writeObject(((UsertextMessageAction) action).message);
-					    	objOut.flush();
 					     	strB.setLength(0);
 					    }
 					}
