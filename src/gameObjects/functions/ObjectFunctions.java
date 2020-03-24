@@ -381,4 +381,23 @@ public class ObjectFunctions {
         return (objectInstanceA.state.posX == objectInstanceB.state.posX && objectInstanceA.state.posY == objectInstanceB.state.posY);
     }
 
+
+    public static void removeStackRelations(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
+    {
+        if (objectInstance != null && !haveSamePositions(getStackTop(gameInstance, objectInstance), getStackBottom(gameInstance, objectInstance))) {
+            IntegerArrayList stackList = getStack(gameInstance, objectInstance);
+            for (int x : stackList) {
+                gameInstance.objects.get(x).state.aboveInstanceId = -1;
+                gameInstance.objects.get(x).state.belowInstanceId = -1;
+            }
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+        }
+    }
+
+    public static void takeObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
+    {
+        objectInstance.inHand = player;
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+    }
+
 }

@@ -45,6 +45,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	int mouseWheelValue = 0;
 
+	ControlPanel controlPanel = new ControlPanel();
+
 
 	public GamePanel(GameInstance gameInstance)
 	{
@@ -55,6 +57,21 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		addMouseWheelListener(this);
 		setFocusable(true);
 		gameInstance.changeListener.add(this);
+
+		JPanel p = new JPanel();
+		p.setLayout(new FlowLayout());
+		p.add(new JLabel(" Move Top Card: Shift + Drag  | "));
+		p.add(new JLabel(" Grab Stack: Strg + Drag  | "));
+		p.add(new JLabel(" Get Bottom Card: Shift + Grab  | "));
+		p.add(new JLabel(" Shuffle Stack: S  | "));
+		p.add(new JLabel(" Flip Card: F  | "));
+		p.add(new JLabel(" Flip Stack: Strg + F  | "));
+		p.add(new JLabel(" View Stack: V  | "));
+		p.add(new JLabel(" Collect Stack: Strg + C  | "));
+		p.add(new JLabel(" Remove Stack: D  | "));
+		p.add(new JLabel(" Count Objects: C"));
+
+		this.add(p);
 	}
 	
 	@Override
@@ -286,12 +303,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 		if(e.getKeyCode() == KeyEvent.VK_C)
 		{
+			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
 			int count = ObjectFunctions.countStack(gameInstance, activeObject);
 			getGraphics().drawString("Object Number: " + String.valueOf(count), mouseX, mouseY);
 		}
 		if (loggedKeys[KeyEvent.VK_CONTROL] && loggedKeys[KeyEvent.VK_C])
 		{
+			loggedKeys[e.getKeyCode()] = true;
+			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
 			ObjectFunctions.collectStack(id, gameInstance, player, activeObject);
 		}
 
@@ -310,6 +330,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		if (loggedKeys[KeyEvent.VK_CONTROL] && loggedKeys[KeyEvent.VK_F])
 		{
+			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
 			ObjectFunctions.flipStack(id, gameInstance, player, activeObject);
 		}
@@ -319,6 +340,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
 			ObjectFunctions.viewBelowCards(id, gameInstance, player, activeObject, activeObject.width/2);
+		}
+		if (e.getKeyCode() == KeyEvent.VK_D)
+		{
+			loggedKeys[e.getKeyCode()] = true;
+			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			ObjectFunctions.removeStackRelations(id, gameInstance, player, activeObject);
+		}
+		if (e.getKeyCode() == KeyEvent.VK_T)
+		{
+			loggedKeys[e.getKeyCode()] = true;
+			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			ObjectFunctions.takeObject(id, gameInstance, player, activeObject);
 		}
 	}
 	public void keyReleased(KeyEvent e) {
