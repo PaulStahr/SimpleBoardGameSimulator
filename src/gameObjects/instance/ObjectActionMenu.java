@@ -1,7 +1,7 @@
 package gameObjects.instance;
 
 import gameObjects.GameObjectInstanceEditAction;
-import gameObjects.functions.CardFunctions;
+import gameObjects.functions.ObjectFunctions;
 import gui.GamePanel;
 import main.Player;
 
@@ -22,12 +22,12 @@ public class ObjectActionMenu {
     public ObjectInstance gameObjectInstance;
     public GameInstance gameInstance;
 
-    public ObjectActionMenu(ObjectInstance gameObjectInstance, GameInstance gameInstance, Player player, GamePanel gamePanel)
+    public ObjectActionMenu(ObjectInstance objectInstance, GameInstance gameInstance, Player player, GamePanel gamePanel)
     {
-        this.gameObjectInstance = gameObjectInstance;
+        this.gameObjectInstance = objectInstance;
         this.gameInstance = gameInstance;
 
-        if (gameObjectInstance.inHand != null && gameObjectInstance.inHand == player)
+        if (objectInstance.inHand != null && objectInstance.inHand == player)
         {
             discardRecordItem.setText("Discard Card");
         }
@@ -39,42 +39,42 @@ public class ObjectActionMenu {
 
         flipItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                CardFunctions.flipObject(gamePanel.id, gameInstance, player, gameObjectInstance);
+                ObjectFunctions.flipObject(gamePanel.id, gameInstance, player, objectInstance);
             }
         });
 
         discardRecordItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (gameObjectInstance.inHand != null && gameObjectInstance.inHand == player)
+                if (objectInstance.inHand != null && objectInstance.inHand == player)
                 {
-                    gameObjectInstance.inHand = null;
+                    objectInstance.inHand = null;
                 }
                 else
                 {
-                    gameObjectInstance.inHand = player;
+                    objectInstance.inHand = player;
                 }
 
-                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, gameObjectInstance));
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
             }
         });
 
         shuffleCardItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 /*Shuffle objects on a stack*/
-                CardFunctions.shuffleStack(gamePanel.id, gameInstance, player, gameObjectInstance);
+                ObjectFunctions.shuffleStack(gamePanel.id, gameInstance, player, objectInstance);
             }
         });
 
         flipStackItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                CardFunctions.flipStack(gamePanel.id, gameInstance, player, gameObjectInstance);
+                ObjectFunctions.flipStack(gamePanel.id, gameInstance, player, objectInstance);
             }
         });
 
         popup.add(flipItem);
         popup.add(discardRecordItem);
-        if(CardFunctions.countStack(gameInstance, gameObjectInstance) > 1) {
+        if(ObjectFunctions.countStack(gameInstance, objectInstance) > 1) {
             popup.add(shuffleCardItem);
             popup.add(flipStackItem);
         }
