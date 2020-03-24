@@ -12,7 +12,7 @@ import util.data.IntegerArrayList;
 import java.awt.event.MouseEvent;
 import java.util.Collections;
 
-public class CardFunctions {
+public class ObjectFunctions {
 
     public static ObjectInstance getStackTop(GameInstance gameInstance, ObjectInstance objectInstance)
     {
@@ -329,16 +329,56 @@ public class CardFunctions {
                 int posX = objectInstance.state.posX;
                 int posY = objectInstance.state.posY;
 
-                for (int i = 0; i < belowList.size(); i++) {
-                    moveObjectTo(gamePanelId, gameInstance, player, gameInstance.objects.get(belowList.get(i)), (int) (posX - (belowList.size() / 2.0 - i) * cardMargin), posY);
-                    removeFromStack(gamePanelId, gameInstance, player, gameInstance.objects.get(belowList.get(i)));
-                }
+               if(haveSamePositions(gameInstance.objects.get(belowList.get(0)), gameInstance.objects.get(belowList.last()))){
+                   for (int i = 0; i < belowList.size(); i++) {
+                       moveObjectTo(gamePanelId, gameInstance, player, gameInstance.objects.get(belowList.get(i)), (int) (posX - (belowList.size() / 2.0 - i) * cardMargin), posY);
+                       //removeFromStack(gamePanelId, gameInstance, player, gameInstance.objects.get(belowList.get(i)));
+                   }
+               }
             }
         }
     }
     public static void viewBelowCards(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
     {
         viewBelowCards(gamePanelId, gameInstance, player, objectInstance, 20);
+    }
+
+
+    public static void collectStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
+    {
+        if(!haveSamePositions(getStackBottom(gameInstance, objectInstance), getStackTop(gameInstance, objectInstance))) {
+            IntegerArrayList stack = getStack(gameInstance, objectInstance);
+            moveStackTo(gamePanelId, gameInstance, player, stack, objectInstance);
+        }
+    }
+
+    public static boolean isStackBottom(ObjectInstance objectInstance)
+    {
+        if (objectInstance.state.belowInstanceId == -1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public static boolean isStackTop(ObjectInstance objectInstance)
+    {
+        if (objectInstance.state.aboveInstanceId == -1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public static boolean haveSamePositions(ObjectInstance objectInstanceA, ObjectInstance objectInstanceB)
+    {
+        return (objectInstanceA.state.posX == objectInstanceB.state.posX && objectInstanceA.state.posY == objectInstanceB.state.posY);
     }
 
 }
