@@ -62,13 +62,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		p.setLayout(new FlowLayout());
 		p.add(new JLabel(" Move Top Card: Shift + Drag  | "));
 		p.add(new JLabel(" Grab Stack: Strg + Drag  | "));
+		p.add(new JLabel(" Take Object: T  | "));
+		p.add(new JLabel(" Drop Object: D  | "));
 		p.add(new JLabel(" Get Bottom Card: Shift + Grab  | "));
 		p.add(new JLabel(" Shuffle Stack: S  | "));
 		p.add(new JLabel(" Flip Card: F  | "));
 		p.add(new JLabel(" Flip Stack: Strg + F  | "));
 		p.add(new JLabel(" View Stack: V  | "));
 		p.add(new JLabel(" Collect Stack: Strg + C  | "));
-		p.add(new JLabel(" Remove Stack: D  | "));
+		p.add(new JLabel(" Remove Stack: R  | "));
 		p.add(new JLabel(" Count Objects: C"));
 
 		this.add(p);
@@ -341,7 +343,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
 			ObjectFunctions.viewBelowCards(id, gameInstance, player, activeObject, activeObject.width/2);
 		}
-		if (e.getKeyCode() == KeyEvent.VK_D)
+		if (e.getKeyCode() == KeyEvent.VK_R)
 		{
 			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
@@ -352,6 +354,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
 			ObjectFunctions.takeObject(id, gameInstance, player, activeObject);
+		}
+
+		if (e.getKeyCode() == KeyEvent.VK_D)
+		{
+			loggedKeys[e.getKeyCode()] = true;
+			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			ObjectFunctions.dropObject(id, gameInstance, player, activeObject);
 		}
 	}
 	public void keyReleased(KeyEvent e) {
