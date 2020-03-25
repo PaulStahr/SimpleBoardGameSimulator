@@ -16,43 +16,52 @@ public class ObjectFunctions {
 
     public static ObjectInstance getStackTop(GameInstance gameInstance, ObjectInstance objectInstance)
     {
-        ObjectInstance currentTop = objectInstance;
-        while (currentTop.state.aboveInstanceId != -1){
-            currentTop = gameInstance.objects.get(currentTop.state.aboveInstanceId);
-            if (objectInstance == currentTop)
-            {
-                throw new RuntimeException();
+        if(objectInstance != null) {
+            ObjectInstance currentTop = objectInstance;
+            while (currentTop.state.aboveInstanceId != -1) {
+                currentTop = gameInstance.objects.get(currentTop.state.aboveInstanceId);
+                if (objectInstance == currentTop) {
+                    throw new RuntimeException();
+                }
             }
+            return currentTop;
         }
-        return currentTop;
-
+        else{
+            return null;
+        }
     }
 
 
     public static ObjectInstance getStackBottom(GameInstance gameInstance, ObjectInstance objectInstance){
-        ObjectInstance currentBottom = objectInstance;
-        while (currentBottom.state.belowInstanceId != -1){
-            currentBottom = gameInstance.objects.get(currentBottom.state.belowInstanceId);
-            if (objectInstance == currentBottom)
-            {
-                throw new RuntimeException();
+        if(objectInstance != null) {
+            ObjectInstance currentBottom = objectInstance;
+            while (currentBottom.state.belowInstanceId != -1) {
+                currentBottom = gameInstance.objects.get(currentBottom.state.belowInstanceId);
+                if (objectInstance == currentBottom) {
+                    throw new RuntimeException();
+                }
             }
+            return currentBottom;
         }
-        return currentBottom;
+        else{
+            return null;
+        }
     }
 
     public static IntegerArrayList getStack(GameInstance gameInstance, ObjectInstance objectInstance){
         /*Get the whole stack*/
-        ObjectInstance topObject = getStackTop(gameInstance, objectInstance);
-        IntegerArrayList objectStack = new IntegerArrayList();
-        objectStack.add(topObject.id);
-        ObjectInstance currentObjectInstance = topObject;
-        while (currentObjectInstance.state.belowInstanceId != -1)
-        {
-            objectStack.add(currentObjectInstance.state.belowInstanceId);
-            currentObjectInstance =  gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+        if(objectInstance != null) {
+            ObjectInstance topObject = getStackTop(gameInstance, objectInstance);
+            IntegerArrayList objectStack = new IntegerArrayList();
+            objectStack.add(topObject.id);
+            ObjectInstance currentObjectInstance = topObject;
+            while (currentObjectInstance.state.belowInstanceId != -1) {
+                objectStack.add(currentObjectInstance.state.belowInstanceId);
+                currentObjectInstance = gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+            }
+            return objectStack;
         }
-        return objectStack;
+        else return null;
     }
 
     public static IntegerArrayList getAboveStack(GameInstance gameInstance, ObjectInstance objectInstance){
@@ -216,16 +225,18 @@ public class ObjectFunctions {
     }
 
     public static int countStack(GameInstance gameInstance, ObjectInstance objectInstance){
-        /*Flip the whole stack*/
-        int counter = 1;
-        ObjectInstance topObject = getStackTop(gameInstance, objectInstance);
-        ObjectInstance currentObjectInstance = topObject;
-        while (currentObjectInstance.state.belowInstanceId != -1)
-        {
-            counter += 1;
-            currentObjectInstance =  gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+        /*Count the whole stack*/
+        if(objectInstance != null) {
+            int counter = 1;
+            ObjectInstance topObject = getStackTop(gameInstance, objectInstance);
+            ObjectInstance currentObjectInstance = topObject;
+            while (currentObjectInstance.state.belowInstanceId != -1) {
+                counter += 1;
+                currentObjectInstance = gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+            }
+            return counter;
         }
-        return counter;
+        else return 0;
     }
 
     public static ObjectInstance removeObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
@@ -404,4 +415,12 @@ public class ObjectFunctions {
         objectInstance.inHand = null;
         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
     }
+
+
+    public static ObjectInstance setActiveObjectByMouseAndKey(MouseEvent arg0, boolean[] loggedKeys, int maxInaccuracy)
+    {
+        ObjectInstance activeObject = null;
+        return activeObject;
+    }
+
 }
