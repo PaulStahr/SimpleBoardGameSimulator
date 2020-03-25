@@ -1,27 +1,27 @@
 Server:
-Verwaltet eine Liste von Spielen und Spielern. Bietet auch die Möglichkeit eine Spielsession zu verwalten, was auch der standartweg ein Spiel miteinander zu spielen sein wird.
+Verwaltet eine Liste von Spielen und Spielern. Bietet auch die Möglichkeit eine Spielsession zu verwalten, was auch der Standardweg ein Spiel miteinander zu spielen sein wird.
 
 Game:
-Beinhaltet alles was für das Spiel relevanten Daten
+Beinhaltet alle für das Spiel relevanten Daten
 
 GameInstance:
-Beinhaltet die Art des spieles (Game) und die aktuelle konfiguration
+Beinhaltet die Art des Spiels (Game) und die aktuelle Konfiguration
 
 GameObject
-Beinhaltet die Informationen für einen Spielobjecttyp (Beispielsweise Herz 10)
+Beinhaltet die Informationen für einen Spielobjekttyp (Beispielsweise Herz 10)
 
 GameObjectInstance
-Beinhaltet eine Object das sich im Spielfeld befindet
+Beinhaltet ein Objekt das sich im Spielfeld befindet
 
 Object State
-Beinhaltet die aktuelle konfiguration eines Objectes welches sich im Spielfeld befindet. Kann für einzelne Objekte weiter spezifiziert werden (Beispielsweise kann eine Karte auf verschiedenen Seiten liegen)
+Beinhaltet die aktuelle Konfiguration eines Objektes welches sich im Spielfeld befindet. Kann für einzelne Objekte weiter spezifiziert werden (Beispielsweise kann eine Karte auf verschiedenen Seiten liegen)
 
 AsynchronousGameConnection
 Stellt die Verbindung zwischen zwei Spielinstanzen her, womit sie idealerweise von außen wie ein und dieselbe Instanz behandelt werden können. Beide Seiten werden dabei symmetrisch behandelt.
 
 Allgemeines Modell:
-Spieler verbinden sich zu einem Server, welcher alle Spielsessions verwaltet. Daten an und vom Server werden über direkte Commandos oder Zip-Archive versendet. Spiele besitzen für den gesicherten Zugriff ein Passwort. Der eigene Spielernamen ist teil der Anfrage.
+Spieler verbinden sich zu einem Server, welcher alle Spielsessions verwaltet. Daten an und vom Server werden über direkte Commandos oder Zip-Archive versendet. Spiele besitzen für den gesicherten Zugriff ein Passwort. Der eigene Spielernamen ist Teil der Anfrage.
 
-Verbindung außerhalb eines Spiels sind fürs erste synchron geplant (Spiele auflisten, ...)
+Verbindungen außerhalb eines Spiels sind fürs erste synchron geplant (Spiele auflisten, ...)
 
-Die Verbindung bei einem laufenden Spiel ist dagegen asynchron, jede Verbindong besitzt einen Thread zum schreiben in den Stream und einem zum lesen von diesem. Der client kann somit anfragen stellen oder auch zustandsänderungen bewirken. Im Begin der Nachricht steht immer die Spieler, der Befehl eventuell gefolgt von einem Zip-Archiv für größere Datenblöcke. Die Antworten kommen idealerweise aber nicht zwingend in der selben Reihenfolge, mit anderen Events, die dazwischen aufgetreten sind zurück. Server und Client verhalten sich im wesentlichen symmetrisch, bis auf den Unterschied, dass der Server keinen Spieler zugeordnet hat und somit nicht in der Lage ist selbst Events zu erzeugen. Die Netwerkverbindung buffert selbstständing updates die im Spiel auftraten, bis der sende-Thread diese abschicken kann.
+Die Verbindung bei einem laufenden Spiel ist dagegen asynchron, jede Verbindong besitzt einen Thread zum Schreiben in den Stream und einem zum Lesen von diesem. Der Client kann somit Anfragen stellen oder auch Zustandsänderungen bewirken. Am Beginn der Nachricht steht immer der Spieler, der Befehl eventuell gefolgt von einem Zip-Archiv für größere Datenblöcke. Die Antworten kommen idealerweise aber nicht zwingend in der selben Reihenfolge, mit anderen Events, die dazwischen aufgetreten sind zurück. Server und Client verhalten sich im wesentlichen symmetrisch, bis auf den Unterschied, dass der Server keinen Spieler zugeordnet hat und somit nicht in der Lage ist selbst Events zu erzeugen. Die Netwerkverbindung buffert selbstständing Updates die im Spiel auftraten, bis der Sende-Thread diese abschicken kann.
