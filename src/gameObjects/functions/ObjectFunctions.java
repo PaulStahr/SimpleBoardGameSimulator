@@ -400,4 +400,8 @@ public class ObjectFunctions {
         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
     }
 
+    public static void dropObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
+        objectInstance.inHand = null;
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+    }
 }
