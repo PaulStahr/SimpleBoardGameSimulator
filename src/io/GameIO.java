@@ -1,20 +1,15 @@
 package io;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
-
-import javax.imageio.ImageIO;
-
+import gameObjects.definition.GameObject;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
+import gameObjects.definition.GameObjectToken.TokenState;
+import gameObjects.instance.Game;
+import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.ObjectState;
+import main.Player;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -23,14 +18,16 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
-import gameObjects.definition.GameObject;
-import gameObjects.definition.GameObjectToken;
-import gameObjects.definition.GameObjectToken.TokenState;
-import gameObjects.instance.Game;
-import gameObjects.instance.GameInstance;
-import gameObjects.instance.ObjectInstance;
-import gameObjects.instance.ObjectState;
-import main.Player;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class GameIO {
 	public Player readPlayer(ZipInputStream stream)
@@ -396,17 +393,58 @@ public class GameIO {
     			{
     				case "card":
     				{
-    					game.objects.add(new GameObjectToken(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), images.get(elem.getAttributeValue("front")), images.get(elem.getAttributeValue("back"))));
-    					break;
+    					int width = 66;
+    					int height = 88;
+    					int value = 0;
+    					if(elem.getAttributeValue("width") != null) {
+							width = Integer.parseInt(elem.getAttributeValue("width"));
+						}
+						if(elem.getAttributeValue("height") != null) {
+							height = Integer.parseInt(elem.getAttributeValue("height"));
+						}
+						if(elem.getAttributeValue("value") != null) {
+							value = Integer.parseInt(elem.getAttributeValue("value"));
+						}
+    					game.objects.add(new GameObjectToken(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, images.get(elem.getAttributeValue("front")), images.get(elem.getAttributeValue("back")), value));
+						break;
     				}
+					case "figure":
+					{
+						int width = 20;
+						int height = 40;
+						if(elem.getAttributeValue("width") != null) {
+							width = Integer.parseInt(elem.getAttributeValue("width"));
+						}
+						if(elem.getAttributeValue("height") != null) {
+							height = Integer.parseInt(elem.getAttributeValue("height"));
+						}
+						game.objects.add(new GameObjectFigure(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, images.get(elem.getAttributeValue("standing"))));
+						break;
+					}
+					case "dice":
+					{
+						int width = 20;
+						int height = 20;
+						if(elem.getAttributeValue("width") != null) {
+							width = Integer.parseInt(elem.getAttributeValue("width"));
+						}
+						if(elem.getAttributeValue("height") != null) {
+							height = Integer.parseInt(elem.getAttributeValue("height"));
+						}
+						ArrayList<BufferedImage> sides = new ArrayList<>();
+						for (Element side : elem.getChildren())
+						{
+							sides.add(images.get(side.getValue()));
+						}
+						game.objects.add(new GameObjectDice(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, sides));
+						break;
+					}
     			}
     		}
     		else if (name.equals("background"))
     		{
-    			//System.out.println(elem.getValue());
     			game.background = images.get(elem.getValue());
     		}
-    		//System.out.println(name);
 	   	}
     	GameInstance result = new GameInstance(game);
     	readGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
@@ -422,7 +460,6 @@ public class GameIO {
     	for (Element elem : root.getChildren())
     	{
     		String name = elem.getName();
-    		//System.out.println("name" + name);
     		if (name.equals("name"))
     		{
 	    		gi.name = elem.getValue();	

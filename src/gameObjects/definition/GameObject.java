@@ -1,27 +1,38 @@
 package gameObjects.definition;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 import gameObjects.instance.ObjectState;
 
+import java.awt.image.BufferedImage;
+
 public abstract class GameObject {
-	int drawSize;
+	public int widthInMM;
+	public int heightInMM;
 	public String uniqueName;
 	public String objectType;
-	public final ArrayList<String> groups = new ArrayList<>();
 
-	public GameObject(String uniqueName, String objectType)
+	public GameObject(String uniqueName, String objectType, int widthInMM, int heightInMM)
 	{
 		this.uniqueName = uniqueName;
 		this.objectType = objectType;
+		this.widthInMM = widthInMM;
+		this.heightInMM = heightInMM;
 	}
 	
 	public abstract BufferedImage getLook(ObjectState state);
+
+	public int getWidth(ObjectState state) {
+		return (int) (getLook(state).getWidth()*0.2);
+	}
+
+	public int getHeight(ObjectState state) {
+		return (int) (getLook(state).getHeight()*0.2);
+	}
+
 
 	public abstract ObjectState newObjectState();
 
 	public int hashCode()
 	{
-		return drawSize ^ uniqueName.hashCode();
+		return widthInMM ^ heightInMM ^ uniqueName.hashCode();
 	}
 }

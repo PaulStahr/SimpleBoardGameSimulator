@@ -1,23 +1,19 @@
 package gameObjects.definition;
 
-import java.awt.image.BufferedImage;
-
 import gameObjects.instance.ObjectState;
+
+import java.awt.image.BufferedImage;
 
 public class GameObjectToken extends GameObject{
 	BufferedImage upsideLook;
 	BufferedImage downsideLook;
-	public GameObjectToken(String uniqueName, String objectType, BufferedImage front, BufferedImage back) {
-		super(uniqueName, objectType);
-		this.upsideLook = front;
-		downsideLook = null;
-		this.downsideLook = back;
-	}
+	int value;
 
-	public GameObjectToken(String uniqueName, String objectType, BufferedImage front) {
-		super(uniqueName, objectType);
+	public GameObjectToken(String uniqueName, String objectType, int widthInMM, int heightInMM, BufferedImage front, BufferedImage back, int value) {
+		super(uniqueName, objectType, widthInMM, heightInMM);
 		this.upsideLook = front;
-		downsideLook = null;
+		this.downsideLook = back;
+		this.value = value;
 	}
 
 	@Override

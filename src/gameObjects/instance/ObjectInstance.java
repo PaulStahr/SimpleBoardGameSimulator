@@ -1,10 +1,9 @@
 package gameObjects.instance;
-import java.awt.Image;
-import java.util.ArrayList;
-
 import gameObjects.definition.GameObject;
 import gui.GamePanel;
 import main.Player;
+
+import java.awt.*;
 
 public class ObjectInstance {
 	public final ObjectState state;

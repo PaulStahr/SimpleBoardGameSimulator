@@ -1,11 +1,5 @@
 package test;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.UnknownHostException;
-
-import org.jdom2.JDOMException;
-
 import gameObjects.instance.GameInstance;
 import gui.GameWindow;
 import io.GameIO;
@@ -13,6 +7,11 @@ import main.Player;
 import net.AsynchronousGameConnection;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
+import org.jdom2.JDOMException;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.UnknownHostException;
 
 public class SimpleNetworkServertest {
     

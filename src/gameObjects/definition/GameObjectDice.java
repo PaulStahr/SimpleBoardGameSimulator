@@ -1,21 +1,15 @@
 package gameObjects.definition;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import gameObjects.instance.ObjectState;
+
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
-import gameObjects.GameObjectInstanceEditAction;
-import gameObjects.instance.ObjectActionMenu;
-import gameObjects.instance.ObjectInstance;
-import gameObjects.instance.ObjectState;
-
 public class GameObjectDice extends GameObject{
 	ArrayList<BufferedImage> sides;
-	public GameObjectDice(String uniqueName, String objectType, ArrayList<BufferedImage> sides) {
-		super(uniqueName, objectType);
+	public GameObjectDice(String uniqueName, String objectType, int widthInMM, int heightInMM, ArrayList<BufferedImage> sides) {
+		super(uniqueName, objectType, widthInMM, heightInMM);
 		this.sides = new ArrayList<BufferedImage>(sides);
 	}
 
@@ -23,7 +17,7 @@ public class GameObjectDice extends GameObject{
 	public BufferedImage getLook(ObjectState state) {
 		return sides.get(((DiceState)state).side);
 	}
-	
+
 	@Override
 	public ObjectState newObjectState()
 	{

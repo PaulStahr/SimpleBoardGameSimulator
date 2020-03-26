@@ -1,21 +1,15 @@
 package gameObjects.definition;
 
-import java.awt.Graphics2D;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-
-import gameObjects.GameObjectInstanceEditAction;
-import gameObjects.instance.ObjectActionMenu;
-import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class GameObjectFigure extends GameObject{
 	BufferedImage standingLook;
 	BufferedImage lyingLook;
-	public GameObjectFigure(String uniqueName, String objectType, BufferedImage standingLook) {
-		super(uniqueName, objectType);
+	public GameObjectFigure(String uniqueName, String objectType, int widthInMM, int heightInMM, BufferedImage standingLook) {
+		super(uniqueName, objectType, widthInMM, heightInMM);
 		this.standingLook = standingLook;
 		
 		// calc a rotated figure from standing figure
