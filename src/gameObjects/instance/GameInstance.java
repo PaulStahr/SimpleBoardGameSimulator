@@ -1,6 +1,10 @@
 package gameObjects.instance;
 
 import java.util.ArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import gameObjects.ColumnTypes;
 import gameObjects.GameAction;
 import gameObjects.ObjectColumnType;
@@ -8,6 +12,7 @@ import main.Player;
 
 public class GameInstance {
 	public static final ColumnTypes TYPES = new ColumnTypes(new ObjectColumnType[]{ObjectColumnType.ID}, new ObjectColumnType[]{ObjectColumnType.ID});
+	public static final Logger logger = LoggerFactory.getLogger(GameInstance.class);
 	public Game game;
 	public String password;
 	public String name;
@@ -83,7 +88,13 @@ public class GameInstance {
 	public void update(GameAction action) {
 		for (int i = 0; i < changeListener.size(); ++i)
 		{
-			changeListener.get(i).changeUpdate(action);
+			try
+			{
+				changeListener.get(i).changeUpdate(action);
+			}catch(Exception e)
+			{
+				logger.error("Error in Change Listener", e);
+			}
 		}
 	}
 
