@@ -90,15 +90,15 @@ public class GameIO {
 		    Iterator<Entry<String, BufferedImage>> it = game.images.entrySet().iterator();
 		    while (it.hasNext()) {
 		    	HashMap.Entry<String, BufferedImage> pair = it.next();
-		    
-			    ZipEntry imageZipOutput = new ZipEntry(pair.getKey());
+		    	String key = pair.getKey();
+			    ZipEntry imageZipOutput = new ZipEntry(key);
 			    zipOutputStream.putNextEntry(imageZipOutput);
 
-			    if (pair.getKey().endsWith(".jpg"))
+			    if (key.endsWith(".jpg"))
 			    {
 			    	ImageIO.write(pair.getValue(), "jpg", zipOutputStream);
 			    }
-			    else if (pair.getKey().endsWith(".png"))
+			    else if (key.endsWith(".png"))
 			    {
 			    	ImageIO.write(pair.getValue(), "png", zipOutputStream);
 			    }
@@ -159,7 +159,6 @@ public class GameIO {
 		    // save game_instance.xml
 	    	Document doc_inst = new Document();
 	    	Element root_inst = new Element("xml");
-	    	doc_inst.addContent(root_inst);
 	    	
 	    	Iterator<ObjectInstance> instIt = gi.objects.iterator();
 	        while (instIt.hasNext()) {
@@ -170,7 +169,11 @@ public class GameIO {
         		exportState(entry.state, elem);
         		root_inst.addContent(elem);
         	}
+	        Element sessionName = new Element("name");
+	        sessionName.setText(gi.name);
+	        root_inst.addContent(sessionName);
 	    	
+	        doc_inst.addContent(root_inst);
 	    	ZipEntry xmlZipOutput = new ZipEntry("game_instance.xml");
 	    	zipOutputStream.putNextEntry(xmlZipOutput);
 	    	new XMLOutputter(Format.getPrettyFormat()).output(doc_inst, zipOutputStream);
@@ -302,7 +305,7 @@ public class GameIO {
 		new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
 	}
 
-	public static GameInstance readSnapshotFromStream(InputStream in) throws IOException, JDOMException
+	public static GameInstance readSnapshotFromZip(InputStream in) throws IOException, JDOMException
 	{
 		ZipInputStream stream = new ZipInputStream(in);
 		GameInstance result = readSnapshotFromZip(stream);
@@ -420,7 +423,11 @@ public class GameIO {
     	{
     		String name = elem.getName();
     		//System.out.println("name" + name);
-    		if (name.equals("object"))
+    		if (name.equals("name"))
+    		{
+	    		gi.name = elem.getValue();	
+    		}
+    		else if (name.equals("object"))
     		{
     			String uniqueName = elem.getAttributeValue("unique_name");
     			ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue("id")));
