@@ -9,6 +9,7 @@ import gui.GamePanel;
 import main.Player;
 import util.data.IntegerArrayList;
 
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Collections;
 
@@ -139,6 +140,12 @@ public class ObjectFunctions {
             }
         }
     }
+
+    public static void moveStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject)
+    {
+        moveStackTo(gamePanelId, gameInstance, player, getStack(gameInstance, stackObject), baseObject);
+    }
+
 
     public static void moveAboveStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
     {
@@ -323,6 +330,41 @@ public class ObjectFunctions {
     }
 
 
+    public static ObjectInstance getActiveObjectByPosition(GameInstance gameInstance, int xPos, int yPos, int maxInaccuracy)
+    {
+        ObjectInstance activeObject = null;
+        int distance = Integer.MAX_VALUE;
+        Boolean insideObject = false;
+        for (int i = 0;i<gameInstance.objects.size(); ++i)
+        {
+            ObjectInstance oi = gameInstance.objects.get(i);
+            int xDiff = xPos - (oi.state.posX + oi.width/2), yDiff = yPos - (oi.state.posY + oi.height/2);
+            int dist = xDiff * xDiff + yDiff * yDiff;
+
+            Boolean leftIn = (xPos > (oi.state.posX - maxInaccuracy));
+            Boolean rightIn = (xPos < (oi.state.posX + oi.width + maxInaccuracy));
+            Boolean topIn = (yPos < (oi.state.posY + oi.height + maxInaccuracy));
+            Boolean bottomIn = (yPos > (oi.state.posY - maxInaccuracy));
+
+            if (dist < distance) {
+                insideObject = leftIn && rightIn && topIn && bottomIn;
+                if (insideObject) {
+                    activeObject = oi;
+                    distance = dist;
+                }
+            }
+        }
+
+        return activeObject;
+    }
+
+    public static ObjectInstance getActiveObjectByPosition(GameInstance gameInstance, int xPos, int yPos)
+    {
+        return getActiveObjectByPosition(gameInstance, xPos, yPos, 0);
+    }
+
+
+
     public static void removeFromStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
     {
         if (objectInstance!= null) {
@@ -347,6 +389,7 @@ public class ObjectFunctions {
                    }
                }
             }
+
         }
     }
     public static void viewBelowCards(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
@@ -417,10 +460,58 @@ public class ObjectFunctions {
     }
 
 
-    public static ObjectInstance setActiveObjectByMouseAndKey(MouseEvent arg0, boolean[] loggedKeys, int maxInaccuracy)
+    public static ObjectInstance setActiveObjectByMouseAndKey(GameInstance gameInstance, MouseEvent arg0, boolean[] loggedKeys, int maxInaccuracy)
     {
         ObjectInstance activeObject = null;
+        int pressedXPos = arg0.getX();
+        int pressedYPos = arg0.getY();
+        int distance = Integer.MAX_VALUE;
+        Boolean insideObject = false;
+        for (int i = 0;i<gameInstance.objects.size(); ++i)
+        {
+            ObjectInstance oi = gameInstance.objects.get(i);
+            int xDiff = pressedXPos - (oi.state.posX + oi.width/2), yDiff = pressedYPos - (oi.state.posY + oi.height/2);
+            int dist = xDiff * xDiff + yDiff * yDiff;
+
+            Boolean leftIn = (pressedXPos > (oi.state.posX - maxInaccuracy));
+            Boolean rightIn = (pressedXPos < (oi.state.posX + oi.width + maxInaccuracy));
+            Boolean topIn = (pressedYPos < (oi.state.posY + oi.height + maxInaccuracy));
+            Boolean bottomIn = (pressedYPos > (oi.state.posY - maxInaccuracy));
+
+            if (dist < distance) {
+                insideObject = leftIn && rightIn && topIn && bottomIn;
+                if (insideObject) {
+                    if(!loggedKeys[KeyEvent.VK_SHIFT] && ObjectFunctions.haveSamePositions(oi, ObjectFunctions.getStackTop(gameInstance, oi))) {
+                        activeObject = ObjectFunctions.getStackTop(gameInstance, oi);
+                    }
+                    else if(!ObjectFunctions.haveSamePositions(oi, ObjectFunctions.getStackTop(gameInstance, oi))){
+                        activeObject = oi;
+                    }
+                    else {
+                        activeObject = ObjectFunctions.getStackBottom(gameInstance, oi);
+                    }
+                    distance = dist;
+                }
+            }
+        }
+        if(!insideObject)
+        {
+            activeObject = null;
+        }
         return activeObject;
+    }
+
+
+    public static void mergeStacks(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance topStackInstance, ObjectInstance bottomStackInstance)
+    {
+        moveStackTo(gamePanelId, gameInstance, player, topStackInstance, bottomStackInstance);
+        ObjectInstance topElement = getStackTop(gameInstance, bottomStackInstance);
+        ObjectInstance bottomElement = getStackBottom(gameInstance, topStackInstance);
+        topElement.state.aboveInstanceId = bottomElement.id;
+        bottomElement.state.belowInstanceId = topElement.id;
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, topElement));
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, bottomElement));
+
     }
 
 }
