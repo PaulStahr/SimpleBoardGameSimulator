@@ -45,11 +45,6 @@ public class ServerControlWindow extends JFrame implements ActionListener, Runna
 	}
 	@Override
 	public void run() {
-		try {
-			gs.start();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		gs.start();
 	}
 }

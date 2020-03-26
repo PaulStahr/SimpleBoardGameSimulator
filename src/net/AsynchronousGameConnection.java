@@ -37,6 +37,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	ArrayDeque<Object> queuedOutputs = new ArrayDeque<>();
 	boolean isUpdating = false;
 	private final int id = (int)System.nanoTime();
+	private ObjectInputStream objIn;
 
 	@Override
 	public void changeUpdate(GameAction action) {
@@ -55,6 +56,25 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		}
 	}
 	
+	public GameInstance getGameInstance()
+	{
+		return gi;
+	}
+	
+	/**
+	 * Constructs an connection with the GameInstance and the two streams.
+	 * @param gi
+	 * @param input
+	 * @param output
+	 */
+	public AsynchronousGameConnection(GameInstance gi, ObjectInputStream input, OutputStream output)
+	{
+		this.gi = gi;
+		gi.changeListener.add(this);
+		this.objIn = input;
+		this.output = output;
+	}
+	
 	/**
 	 * Constructs an connection with the GameInstance and the two streams.
 	 * @param gi
@@ -65,6 +85,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	{
 		this.gi = gi;
 		gi.changeListener.add(this);
+		/*if (!(input instanceof ObjectInputStream))
+		{
+			throw new RuntimeException();
+		}*/
 		this.input = input;
 		this.output = output;
 	}
@@ -97,11 +121,18 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		//PrintWriter writer = new PrintWriter(output, true);
 		ObjectOutputStream objOut = null;
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		try {
-			objOut = new ObjectOutputStream(output);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		if (output instanceof ObjectOutputStream)
+		{
+			objOut = ((ObjectOutputStream)output);
+		}
+		else
+		{
+			try {
+				objOut = new ObjectOutputStream(output);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		}
     	while (true)
 		{
@@ -292,12 +323,25 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	{
 		ArrayList<String> split = new ArrayList<>();
 		//Scanner in = new Scanner( input);
-		ObjectInputStream objIn = null;
-		try {
-			objIn = new ObjectInputStream(input);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		if (objIn == null)
+		{
+			if (input instanceof ObjectInputStream)
+			{
+				objIn = (ObjectInputStream)input;
+			}
+			else
+			{
+				try {
+					objIn = new ObjectInputStream(input);
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		}
+		if (objIn == null)
+		{
+			return;
 		}
 		while (true)
 		{
