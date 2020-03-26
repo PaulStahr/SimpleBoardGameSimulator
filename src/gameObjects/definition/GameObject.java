@@ -7,11 +7,13 @@ import gameObjects.instance.ObjectState;
 public abstract class GameObject {
 	int drawSize;
 	public String uniqueName;
+	public String objectType;
 	public final ArrayList<String> groups = new ArrayList<>();
 
-	public GameObject(String uniqueName)
+	public GameObject(String uniqueName, String objectType)
 	{
 		this.uniqueName = uniqueName;
+		this.objectType = objectType;
 	}
 	
 	public abstract BufferedImage getLook(ObjectState state);

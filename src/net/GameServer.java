@@ -1,11 +1,14 @@
 package net;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.rmi.activation.ActivationGroupDesc.CommandEnvironment;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -27,7 +30,6 @@ import util.StringUtils;
 public class GameServer implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(GameServer.class);
 	private int port;
-
 	public GameServer(int port)
 	{
 		this.port = port;
@@ -35,18 +37,41 @@ public class GameServer implements Runnable {
 	
 	public final ArrayList<GameInstance> gameInstances = new ArrayList<>();
 	public final ArrayList<UsertextMessageAction> userMessageChatHistory = new ArrayList<>();
+	volatile boolean isReady;
 	private Thread th;
+	CommandEncoding ce = CommandEncoding.SERIALIZE;
+	private final int id = (int)(Integer.MAX_VALUE * Math.random());
+	
+	public boolean isReady()
+	{
+		return isReady;
+	}
 	
 	private GameInstance getGameInstance(String name)
 	{
+		System.out.print("get instance (" + id + ")" + name);
 		for (int i = 0; i < gameInstances.size(); ++i)
 		{
+			System.out.print("\"" + gameInstances.get(i).name + "\" ");
 			if (gameInstances.get(i).name.equals(name))
 			{
+				System.out.println("found");
 				return gameInstances.get(i);
 			}
 		}
+		System.out.println();
 		return null;
+	}
+	
+	public static String readLine(InputStream is) throws IOException
+	{
+		StringBuilder strB = new StringBuilder();
+		int value;
+		while ((value = is.read()) != '\n')
+		{
+			strB.append((char)value);
+		}
+		return strB.toString();
 	}
 	
 	class ConnectionHandle implements Runnable
@@ -59,18 +84,29 @@ public class GameServer implements Runnable {
 		
 		public void run()
 		{
-		    Scanner in;
 			try {
 				InputStream input = client.getInputStream();
 				OutputStream output = client.getOutputStream();
-				in = new Scanner( input);
-				String line = in.nextLine();
+				//in = new Scanner( input);
+				//String line = in.nextLine();
+				String line = null;
+				if (ce == CommandEncoding.SERIALIZE)
+				{
+					ObjectInputStream objIn = new ObjectInputStream(input);
+					try {
+						line = (String)objIn.readObject();
+					} catch (ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+					input = objIn;
+				}
+				else if (ce == CommandEncoding.PLAIN)
+				{
+					line = readLine(input);
+				}
 				ArrayList<String> split = new ArrayList<>();
 				StringUtils.split(line, ' ', split);
-				split.clear();
-				
-			    line = in.nextLine();
-			    StringUtils.split(line, ' ', split);
+				logger.debug(line);
 			    switch (split.get(0))
 			    {
 			    	case NetworkString.LIST:
@@ -99,6 +135,7 @@ public class GameServer implements Runnable {
 			    				out.close();
 			    			}
 			    		}
+			    		break;
 			    	}
 			    	case NetworkString.HASH:
 			    	{
@@ -113,6 +150,7 @@ public class GameServer implements Runnable {
 			    				break;
 			    			}
 			    		}
+			    		break;
 			    	}
 			    	case NetworkString.CREATE:
 			    	{
@@ -127,22 +165,33 @@ public class GameServer implements Runnable {
 			    				}
 							
 			    				break;
-			    			case "gameobject":
+			    			case NetworkString.GAME_OBJECT:
 			    				break;
-			    			case "gameobjectinstance":
+			    			case NetworkString.GAME_OBJECT_INSTANCE:
 			    				break;
-			    			case "player":
+			    			case NetworkString.PLAYER:
 			    				break;
 			    			
 			    		}
+			    		break;
 			    	}
 			    	case NetworkString.PUSH:
 			    	{
 			    		switch (split.get(1))
 			    		{
 			    			case NetworkString.GAME_INSTANCE:
+			    				System.out.println("do push (" + id + ")");
 								try {
-									GameInstance gi = GameIO.readSnapshotFromStream(input);
+									GameInstance gi;
+									if (ce == CommandEncoding.SERIALIZE)
+									{
+										gi = GameIO.readSnapshotFromZip(new ByteArrayInputStream((byte[])((ObjectInputStream)input).readObject()));
+									}
+									else
+									{
+										gi = GameIO.readSnapshotFromZip(input);		
+									}
+									System.out.println("read successfull");
 									synchronized(gameInstances)
 				    				{
 				    					gameInstances.add(gi);
@@ -150,19 +199,23 @@ public class GameServer implements Runnable {
 								} catch (JDOMException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
+								} catch (ClassNotFoundException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
 								}
 			    				
 			    				break;
 			    			case NetworkString.MESSAGE:
 			    				userMessageChatHistory.add(new UsertextMessageAction(Integer.parseInt(split.get(2)), Integer.parseInt(split.get(3)), split.get(4)));
-			    			case "gameobject":
+			    			case NetworkString.GAME_OBJECT:
 			    				break;
-			    			case "gameobjectinstance":
+			    			case NetworkString.GAME_OBJECT_INSTANCE:
 			    				break;
-			    			case "player":
+			    			case NetworkString.PLAYER:
 			    				break;
 			    			
 			    		}
+			    		break;
 			    	}
 			    	case NetworkString.PULL:
 			    	{
@@ -189,14 +242,14 @@ public class GameServer implements Runnable {
 				    				printer.close();
 			    				}
 			    			}
-			    			case "gameobject":
+			    			case NetworkString.GAME_OBJECT:
 			    			{
 			    				GameInstance gi = getGameInstance(split.get(2));
 			    				GameObject go = gi.game.getObject(split.get(3));
 			    				//GameIO.saveGameObject(go, output);
 			    				break;
 			    			}
-			    			case "gameobjectinstance":
+			    			case NetworkString.GAME_OBJECT_INSTANCE:
 			    			{
 			    				GameInstance gi = getGameInstance(split.get(2));
 			    				ObjectInstance oi = gi.getObjectInstance(Integer.parseInt(split.get(2)));
@@ -204,28 +257,46 @@ public class GameServer implements Runnable {
 			    				break;
 			    			}
 			    		}
+			    		break;
 			    	}
-			    	case "join":
+			    	case NetworkString.JOIN:
 			    	{
-			    		String player = split.get(2);
-						int id = Integer.parseInt(split.get(3));
-						GameInstance gi = getGameInstance(split.get(4));
-			    		if (gi.password != null || gi.password.equals(split.get(5)))
+			    		String player = split.get(1);
+						int id = Integer.parseInt(split.get(2));
+						GameInstance gi = getGameInstance(split.get(3));
+			    		if (gi.password == null || gi.password.equals(split.get(4)))
 			    		{
 			    			gi.players.add(new Player(player, id));
 			    		}
+			    		break;
 			    	}
 			    	case NetworkString.CONNECT:
 			    	{
 			    		GameInstance gi = getGameInstance(split.get(1));
-			    		AsynchronousGameConnection asc = new AsynchronousGameConnection(gi, input, output);
+			    		AsynchronousGameConnection asc;
+			    		if (input instanceof ObjectInputStream)
+			    		{
+			    			System.out.println("conect to Object input");
+			    			asc = new AsynchronousGameConnection(gi, (ObjectInputStream)input, output);
+			    		}
+			    		else
+			    		{
+			    			System.out.println("connect to stream input");
+			    			asc = new AsynchronousGameConnection(gi, input, output);
+				    	}
+			    		input = null;
+			    		output = null;
+			    		client = null;
 			    		asc.start();
+			    		break;
 			    	}
+			    	default:
+			    		logger.error("Unknown command");
 			    }
 			} catch (IOException e) {
 				logger.error("Networking error", e);
 			}
-			try { client.close(); } catch ( IOException e ) { }
+			try { if (client != null) {client.close();} } catch ( IOException e ) { }
 			client = null;
 		}	
     }
@@ -235,6 +306,7 @@ public class GameServer implements Runnable {
 		ServerSocket server;
 		try {
 			server = new ServerSocket( port );
+			isReady = true;
 			while ( true )
 		    {
 		    	Socket client = null;
@@ -247,10 +319,7 @@ public class GameServer implements Runnable {
 		    		e.printStackTrace();
 		    		
 		    	}
-		    	if (client != null)
-	    		{
-	    			client.close();
-	    		}
+		    	
 		    }
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
@@ -258,7 +327,7 @@ public class GameServer implements Runnable {
 		}
 	}
 
-	public void start() throws IOException
+	public void start()
     {
 		 if (th == null)
 		 {

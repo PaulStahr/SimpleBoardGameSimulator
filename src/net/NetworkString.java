@@ -22,4 +22,5 @@ public class NetworkString {
 	public static final Object SOUNDMESSAGE = "soundmessage";
 	public static final Object TEXTMESSAGE = "textmessage";
 	public static final String WRITE = "write";
+	public static final String JOIN = "join";
 }

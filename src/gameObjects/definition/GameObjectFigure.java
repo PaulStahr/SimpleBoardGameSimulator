@@ -14,8 +14,8 @@ import gameObjects.instance.ObjectState;
 public class GameObjectFigure extends GameObject{
 	BufferedImage standingLook;
 	BufferedImage lyingLook;
-	public GameObjectFigure(String uniqueName, BufferedImage standingLook) {
-		super(uniqueName);
+	public GameObjectFigure(String uniqueName, String objectType, BufferedImage standingLook) {
+		super(uniqueName, objectType);
 		this.standingLook = standingLook;
 		
 		// calc a rotated figure from standing figure

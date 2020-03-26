@@ -19,7 +19,13 @@ import net.GameServer;
 
 public class Main {
     public static final void main (String args[]){
-    	connectionTest();
+    	try {
+			test.SimpleNetworkServertest.localTwoInstanceTest();
+		} catch (IOException | JDOMException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	//connectionTest();
     	/*
     	FileInputStream fis;
 		try {
@@ -46,22 +52,35 @@ public class Main {
 			e.printStackTrace();
 		}*/
     }
+
+    
+    public static void connectToServer(String address, int port)
+    {
+    	
+    }
     
     public static void connectionTest()
     {
     	try {
     		
     		FileInputStream fis = new FileInputStream("Doppelkopf.zip");
-    		GameInstance game0 = GameIO.readSnapshotFromStream(fis);
+    		GameInstance game0 = GameIO.readSnapshotFromZip(fis);
         	fis.close();
         	fis = new FileInputStream("Doppelkopf.zip");
-        	GameInstance game1 = GameIO.readSnapshotFromStream(fis);
+        	GameInstance game1 = GameIO.readSnapshotFromZip(fis);
 	    	fis.close();
 	    	/*GameServer server = new GameServer(1234);
 	    	server.gameInstances.add(game0);
 	    	server.start();*/
-	    	
-	    	ServerSocket server = new ServerSocket(1234);
+	    	ServerSocket server = null;
+	    	try
+	    	{
+	    		server = new ServerSocket(1234);
+	    	}
+	    	catch(Exception e)
+	    	{
+	    		e.printStackTrace();
+	    	}
 	    	final Socket socket[] = new Socket[1];
 	        Thread th = new Thread()
 			{
@@ -69,7 +88,6 @@ public class Main {
 	    		{
 	    			try {
 						socket[0] = new Socket( "localhost", 1234 );
-						System.out.println("hu");
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -77,28 +95,31 @@ public class Main {
 	    		}
 			};
 			th.start();
+			Player player = new Player("Paul", 0);
 			Socket socket2 = null;
-			do {
-				socket2 = server.accept();
-			}while(socket2 == null);
-	    	System.out.println("hi");
-	        System.out.println("ho");
-	        
+			if (server != null)
+			{
+				do {
+					socket2 = server.accept();
+				}while(socket2 == null);	
+		    	AsynchronousGameConnection sgc1 = new AsynchronousGameConnection(game1, socket2.getInputStream(), socket2.getOutputStream());
+		    	sgc1.start();
+		    	GameWindow gw2 = new GameWindow(game1);
+		       	gw2.gamePanel.player = player;
+		       	game1.players.add(player);    	
+		       	gw2.setVisible(true);
+		    }
+			
+			while (socket[0] == null);
 	        AsynchronousGameConnection sgc = new AsynchronousGameConnection(game0, socket[0].getInputStream(), socket[0].getOutputStream());
 	    	sgc.start();
-	    	AsynchronousGameConnection sgc1 = new AsynchronousGameConnection(game1, socket2.getInputStream(), socket2.getOutputStream());
-	    	sgc1.start();
 	    	GameWindow gw0 = new GameWindow(game0);
-	    	gw0.gamePanel.player = new Player("Paul", 0);
-	    	game0.players.add(gw0.gamePanel.player);
+	    	gw0.gamePanel.player = player;
+	    	game0.players.add(player);
 		    	//GameWindow gw1 = new GameWindow(game0);
 	    	
-	    	GameWindow gw2 = new GameWindow(game1);
-	       	gw2.gamePanel.player = new Player("Paul", 0);
-	       	game1.players.add(gw0.gamePanel.player);
-		    gw0.setVisible(true);
+	    	gw0.setVisible(true);
 	    	//gw1.setVisible(true);
-	    	gw2.setVisible(true);
 	    	FileOutputStream fos = new FileOutputStream("output.zip");
 			GameIO.writeSnapshotToZip(game0, fos);
 			fos.close();

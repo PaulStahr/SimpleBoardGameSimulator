@@ -1,11 +1,9 @@
 package gameObjects.functions;
 
 import gameObjects.GameObjectInstanceEditAction;
-import gameObjects.definition.GameObject;
-import gameObjects.definition.GameObjectCard;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import gui.GamePanel;
 import main.Player;
 import util.data.IntegerArrayList;
 
@@ -202,7 +200,7 @@ public class ObjectFunctions {
     public static void flipObject(int gamePanelId, GameInstance gameInstance, Player player,ObjectInstance objectInstance)
     {
         if (objectInstance != null) {
-            ((GameObjectCard.CardState) objectInstance.state).side = !((GameObjectCard.CardState) objectInstance.state).side;
+            ((GameObjectToken.TokenState) objectInstance.state).side = !((GameObjectToken.TokenState) objectInstance.state).side;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
         }
     }

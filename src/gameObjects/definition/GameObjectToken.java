@@ -1,27 +1,23 @@
 package gameObjects.definition;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
-import gameObjects.GameObjectInstanceEditAction;
-import gameObjects.instance.ObjectActionMenu;
-import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
 
 public class GameObjectToken extends GameObject{
 	BufferedImage upsideLook;
-	BufferedImage downsideLook = null;
-	public GameObjectToken(String uniqueName, BufferedImage front, BufferedImage back) {
-		super(uniqueName);
+	BufferedImage downsideLook;
+	public GameObjectToken(String uniqueName, String objectType, BufferedImage front, BufferedImage back) {
+		super(uniqueName, objectType);
 		this.upsideLook = front;
+		downsideLook = null;
 		this.downsideLook = back;
 	}
-	
-	public GameObjectToken(String uniqueName, BufferedImage front) {
-		super(uniqueName);
+
+	public GameObjectToken(String uniqueName, String objectType, BufferedImage front) {
+		super(uniqueName, objectType);
 		this.upsideLook = front;
+		downsideLook = null;
 	}
 
 	@Override
@@ -35,7 +31,7 @@ public class GameObjectToken extends GameObject{
 		return new TokenState();
 	}
 
-	public static class TokenState  extends ObjectState
+	public static class TokenState extends ObjectState
 	{
 		public boolean side = true;
 		
