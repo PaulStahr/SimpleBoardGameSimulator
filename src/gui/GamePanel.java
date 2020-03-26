@@ -62,8 +62,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 		JPanel p = new JPanel();
 		p.setLayout(new FlowLayout());
-		p.add(new JLabel(" Move Top Card: Shift + Drag  | "));
-		p.add(new JLabel(" Grab Stack: Strg + Drag  | "));
+		p.add(new JLabel(" Move Top Card: Left Click + Drag  | "));
+		p.add(new JLabel(" Move Stack: Middle Click + Drag  | "));
 		p.add(new JLabel(" Take Object: T  | "));
 		p.add(new JLabel(" Drop Object: D  | "));
 		p.add(new JLabel(" Get Bottom Card: Shift + Grab  | "));
@@ -159,19 +159,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
-		if (activeObject != null && SwingUtilities.isLeftMouseButton(arg0)) {
-			for (int i = 0; i < gameInstance.objects.size(); ++i) {
-					ObjectInstance oi = gameInstance.objects.get(i);
-					int xDiff = activeObject.state.posX - oi.state.posX, yDiff = activeObject.state.posY - oi.state.posY;
-					int dist = xDiff * xDiff + yDiff * yDiff;
-					if (dist < maxInaccuracy * maxInaccuracy && oi != activeObject) {
-						ObjectInstance topElement = ObjectFunctions.getStackTop(gameInstance, oi);
-						if (topElement != activeObject) {
-							ObjectFunctions.mergeStacks(id, gameInstance, player, activeObject, topElement);
-							break;
-						}
-				}
-			}
+		if (activeObject != null && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
+			/*ObjectInstance belowObject = null;
+			ObjectInstance neighbourTop = null;
+			if(activeObject.state.belowInstanceId != -1) {
+				belowObject = gameInstance.objects.get(activeObject.state.belowInstanceId);
+				neighbourTop = ObjectFunctions.findNeighbouredStackTop(gameInstance, player, activeObject);
+			}*/
+			ObjectFunctions.releaseObjects(id, gameInstance, player, activeObject);
+			/*if (belowObject != null && neighbourTop != null)
+			{
+				ObjectFunctions.mergeStacks(id, gameInstance, player, neighbourTop, belowObject);
+			}*/
 		}
 		activeObject = null;
 	}
@@ -179,13 +178,16 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
 		/* Drag only when left mouse down */
-		if(SwingUtilities.isLeftMouseButton(arg0) && !isShiftDown && activeObject != null) {
-			/*Remove top card if not control pressed*/
-			if (!isControlDown) {
+		if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0)) && !isShiftDown && activeObject != null) {
+			/*Remove top card if not control pressed and release below cards if exist*/
+			if (!SwingUtilities.isMiddleMouseButton(arg0)) {
+				/*if(activeObject.state.belowInstanceId != -1) {
+					ObjectFunctions.releaseObjects(id, gameInstance, player, gameInstance.objects.get(activeObject.state.belowInstanceId));
+				}*/
 				ObjectFunctions.removeObject(id, gameInstance, player, activeObject);
 			}
 			ObjectFunctions.moveObjectTo(id, gameInstance, player, activeObject, objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
-			if (isControlDown) {
+			if (SwingUtilities.isMiddleMouseButton(arg0)) {
 				ObjectFunctions.moveStackTo(id, gameInstance, player, activeObject, activeObject);
 			}
 		}
