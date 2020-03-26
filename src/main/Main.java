@@ -19,6 +19,14 @@ import net.GameServer;
 
 public class Main {
     public static final void main (String args[]){
+    	for (int i = 0; i < args.length; ++i)
+    	{
+    		if (args[i].equals("--server"))
+    		{
+    			GameServer gs = test.SimpleNetworkServertest.startNewServer(Integer.parseInt(args[i + 1]));
+    			return;
+    		}
+    	}
     	try {
 			test.SimpleNetworkServertest.localTwoInstanceTest();
 		} catch (IOException | JDOMException e) {
