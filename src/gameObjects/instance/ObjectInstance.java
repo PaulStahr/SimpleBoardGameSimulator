@@ -12,25 +12,27 @@ public class ObjectInstance {
 	public double scale = 0.2;
 	public Player inHand = null;
 
-	/* size of the objects */
-	public int width;
-	public int height;
-
-
 	
 	public ObjectInstance(GameObject go, int id)
 	{
 		this.go = go;
 		this.state = go.newObjectState();
 		this.id = id;
-
-		this.width = (int) (getLook().getWidth(null)*scale);
-		this.height = (int) (getLook().getHeight(null)*scale);
 	}
 	
 	public Image getLook()
 	{
 		return go.getLook(state);
+	}
+
+	public int getWidth()
+	{
+		return go.getWidth(state);
+	}
+
+	public int getHeight()
+	{
+		return go.getHeight(state);
 	}
 	
 	public int owner_id()

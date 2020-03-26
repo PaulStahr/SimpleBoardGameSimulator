@@ -284,12 +284,12 @@ public class ObjectFunctions {
         Boolean insideObject = false;
         for (int i = 0; i < gameInstance.objects.size(); ++i) {
             ObjectInstance oi = gameInstance.objects.get(i);
-            int xDiff = xPos - (oi.state.posX + oi.width / 2), yDiff = yPos - (oi.state.posY + oi.height / 2);
+            int xDiff = xPos - (oi.state.posX + oi.getWidth() / 2), yDiff = yPos - (oi.state.posY + oi.getHeight() / 2);
             int dist = xDiff * xDiff + yDiff * yDiff;
 
             Boolean leftIn = (xPos > (oi.state.posX - maxInaccuracy));
-            Boolean rightIn = (xPos < (oi.state.posX + oi.width + maxInaccuracy));
-            Boolean topIn = (yPos < (oi.state.posY + oi.height + maxInaccuracy));
+            Boolean rightIn = (xPos < (oi.state.posX + oi.getWidth() + maxInaccuracy));
+            Boolean topIn = (yPos < (oi.state.posY + oi.getHeight() + maxInaccuracy));
             Boolean bottomIn = (yPos > (oi.state.posY - maxInaccuracy));
 
             if (dist < distance) {
@@ -315,12 +315,12 @@ public class ObjectFunctions {
         Boolean insideObject = false;
         for (int i = 0; i < gameInstance.objects.size(); ++i) {
             ObjectInstance oi = gameInstance.objects.get(i);
-            int xDiff = xPos - (oi.state.posX + oi.width / 2), yDiff = yPos - (oi.state.posY + oi.height / 2);
+            int xDiff = xPos - (oi.state.posX + oi.getWidth() / 2), yDiff = yPos - (oi.state.posY + oi.getHeight() / 2);
             int dist = xDiff * xDiff + yDiff * yDiff;
 
             Boolean leftIn = (xPos > (oi.state.posX - maxInaccuracy));
-            Boolean rightIn = (xPos < (oi.state.posX + oi.width + maxInaccuracy));
-            Boolean topIn = (yPos < (oi.state.posY + oi.height + maxInaccuracy));
+            Boolean rightIn = (xPos < (oi.state.posX + oi.getWidth() + maxInaccuracy));
+            Boolean topIn = (yPos < (oi.state.posY + oi.getHeight() + maxInaccuracy));
             Boolean bottomIn = (yPos > (oi.state.posY - maxInaccuracy));
 
             if (dist < distance) {
@@ -429,12 +429,12 @@ public class ObjectFunctions {
         Boolean insideObject = false;
         for (int i = 0; i < gameInstance.objects.size(); ++i) {
             ObjectInstance oi = gameInstance.objects.get(i);
-            int xDiff = pressedXPos - (oi.state.posX + oi.width / 2), yDiff = pressedYPos - (oi.state.posY + oi.height / 2);
+            int xDiff = pressedXPos - (oi.state.posX + oi.getWidth() / 2), yDiff = pressedYPos - (oi.state.posY + oi.getHeight() / 2);
             int dist = xDiff * xDiff + yDiff * yDiff;
 
             Boolean leftIn = (pressedXPos > (oi.state.posX - maxInaccuracy));
-            Boolean rightIn = (pressedXPos < (oi.state.posX + oi.width + maxInaccuracy));
-            Boolean topIn = (pressedYPos < (oi.state.posY + oi.height + maxInaccuracy));
+            Boolean rightIn = (pressedXPos < (oi.state.posX + oi.getWidth() + maxInaccuracy));
+            Boolean topIn = (pressedYPos < (oi.state.posY + oi.getHeight() + maxInaccuracy));
             Boolean bottomIn = (pressedYPos > (oi.state.posY - maxInaccuracy));
 
             if (dist < distance) {
@@ -486,7 +486,7 @@ public class ObjectFunctions {
 
 
     public static void releaseObjects(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance activeObject) {
-        releaseObjects(gamePanelId, gameInstance, player, activeObject, activeObject.width/3);
+        releaseObjects(gamePanelId, gameInstance, player, activeObject, activeObject.getWidth()/3);
     }
 
     public static ObjectInstance findNeighbouredStackTop(GameInstance gameInstance, Player player, ObjectInstance activeObject, int maxInaccuracy){
@@ -505,7 +505,7 @@ public class ObjectFunctions {
     }
 
     public static ObjectInstance findNeighbouredStackTop(GameInstance gameInstance, Player player, ObjectInstance activeObject){
-        return findNeighbouredStackTop(gameInstance, player, activeObject, activeObject.width/3);
+        return findNeighbouredStackTop(gameInstance, player, activeObject, activeObject.getWidth()/3);
     }
 
     public static boolean checkIfInStack(GameInstance gameInstance,ObjectInstance stackInstance, ObjectInstance checkInstance)

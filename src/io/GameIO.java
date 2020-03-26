@@ -295,9 +295,8 @@ public class GameIO {
     	//@Paul: Which info from ObjectState, Player and GameObject are needed?
     	Element elem = new Element("object_instance");
 		elem.setAttribute("id", Integer.toString(object.id));
-		elem.setAttribute("scale", Double.toString(object.scale));
-		elem.setAttribute("width", Integer.toString(object.width));
-		elem.setAttribute("height", Integer.toString(object.height));
+		elem.setAttribute("width", Integer.toString(object.getWidth()));
+		elem.setAttribute("height", Integer.toString(object.getHeight()));
 
 		new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
 	}

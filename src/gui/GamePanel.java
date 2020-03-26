@@ -1,15 +1,6 @@
 package gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
-
-import javax.swing.*;
-
 import gameObjects.GameAction;
-//import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
@@ -17,7 +8,14 @@ import gameObjects.instance.ObjectInstance;
 import main.Player;
 import util.data.IntegerArrayList;
 
-import static java.lang.Math.abs;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+
+//import gameObjects.GameObjectInstanceEditAction;
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener, KeyListener, KeyEventDispatcher, MouseWheelListener{
 	/**
@@ -258,7 +256,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (activeObject!= null) {
 				if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, activeObject), ObjectFunctions.getStackBottom(gameInstance, activeObject))) {
 					activeObject = ObjectFunctions.getStackTop(gameInstance, activeObject);
-					ObjectFunctions.viewBelowCards(id, gameInstance, player, activeObject, activeObject.width / 2);
+					ObjectFunctions.viewBelowCards(id, gameInstance, player, activeObject, activeObject.getWidth() / 2);
 				} else {
 					ObjectFunctions.collectStack(id, gameInstance, player, activeObject);
 				}
