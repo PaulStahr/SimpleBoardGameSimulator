@@ -217,8 +217,22 @@ public class ObjectFunctions {
             ObjectInstance topObject = getStackTop(gameInstance, objectInstance);
             ObjectInstance currentObjectInstance = topObject;
             while (currentObjectInstance.state.belowInstanceId != -1) {
-                counter += 1;
+                ++counter;
                 currentObjectInstance = gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+            }
+            return counter;
+        } else return 0;
+    }
+
+    public static int countStackValues(GameInstance gameInstance, ObjectInstance objectInstance) {
+        /*Add all values of the stack*/
+        if (objectInstance != null) {
+            ObjectInstance topObject = getStackTop(gameInstance, objectInstance);
+            ObjectInstance currentObjectInstance = topObject;
+            int counter = currentObjectInstance.state.value;
+            while (currentObjectInstance.state.belowInstanceId != -1) {
+                currentObjectInstance = gameInstance.objects.get(currentObjectInstance.state.belowInstanceId);
+                counter += currentObjectInstance.state.value;
             }
             return counter;
         } else return 0;

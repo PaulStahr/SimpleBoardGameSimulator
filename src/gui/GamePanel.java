@@ -73,6 +73,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		p.add(new JLabel(" View + Collect Stack: V  | "));
 		p.add(new JLabel(" Remove Stack: R  | "));
 		p.add(new JLabel(" Count Objects: C"));
+		p.add(new JLabel(" Count Values: Strg + C"));
 
 		this.add(p);
 	}
@@ -160,17 +161,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
 		if (activeObject != null && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
-			/*ObjectInstance belowObject = null;
-			ObjectInstance neighbourTop = null;
-			if(activeObject.state.belowInstanceId != -1) {
-				belowObject = gameInstance.objects.get(activeObject.state.belowInstanceId);
-				neighbourTop = ObjectFunctions.findNeighbouredStackTop(gameInstance, player, activeObject);
-			}*/
 			ObjectFunctions.releaseObjects(id, gameInstance, player, activeObject);
-			/*if (belowObject != null && neighbourTop != null)
-			{
-				ObjectFunctions.mergeStacks(id, gameInstance, player, neighbourTop, belowObject);
-			}*/
 		}
 		activeObject = null;
 	}
@@ -179,11 +170,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void mouseDragged(MouseEvent arg0) {
 		/* Drag only when left mouse down */
 		if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0)) && !isShiftDown && activeObject != null) {
-			/*Remove top card if not control pressed and release below cards if exist*/
+			/*Drop objects if middle mouse button is not held*/
 			if (!SwingUtilities.isMiddleMouseButton(arg0)) {
-				/*if(activeObject.state.belowInstanceId != -1) {
-					ObjectFunctions.releaseObjects(id, gameInstance, player, gameInstance.objects.get(activeObject.state.belowInstanceId));
-				}*/
 				ObjectFunctions.removeObject(id, gameInstance, player, activeObject);
 			}
 			ObjectFunctions.moveObjectTo(id, gameInstance, player, activeObject, objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
@@ -194,7 +182,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		else if(SwingUtilities.isLeftMouseButton(arg0) && isShiftDown && activeObject != null) {
 			/*Remove top card*/
 			ObjectFunctions.removeObject(id, gameInstance, player, activeObject);
-
 			ObjectFunctions.moveObjectTo(id, gameInstance, player, activeObject, objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
 			gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
 		}
@@ -218,10 +205,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	}
 
 	public void keyTyped(KeyEvent e) {
-		//System.out.println("keyTyped: "+e);
 	}
 	public void keyPressed(KeyEvent e) {
-		//System.out.println("keyPressed: "+e);
 		if (e.isControlDown())
 		{
 			loggedKeys[e.getKeyCode()] = true;
@@ -233,7 +218,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			isShiftDown = true;
 		}
 
-		if(e.getKeyCode() == KeyEvent.VK_C)
+		if(e.getKeyCode() == KeyEvent.VK_C && !loggedKeys[KeyEvent.VK_CONTROL])
 		{
 			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
@@ -257,6 +242,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
 			ObjectFunctions.flipStack(id, gameInstance, player, activeObject);
+		}
+		if (loggedKeys[KeyEvent.VK_CONTROL] && loggedKeys[KeyEvent.VK_C])
+		{
+			loggedKeys[e.getKeyCode()] = true;
+			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			int count = ObjectFunctions.countStackValues(gameInstance, activeObject);
+			getGraphics().drawString("Value: " + String.valueOf(count), mouseX, mouseY);
 		}
 
 		if (e.getKeyCode() == KeyEvent.VK_V)
