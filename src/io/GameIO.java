@@ -24,8 +24,8 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import gameObjects.definition.GameObject;
-import gameObjects.definition.GameObjectCard;
-import gameObjects.definition.GameObjectCard.CardState;
+import gameObjects.definition.GameObjectToken;
+import gameObjects.definition.GameObjectToken.TokenState;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -46,9 +46,9 @@ public class GameIO {
 		elem.setAttribute("owner", Integer.toString(state.owner_id));
 		elem.setAttribute("above", Integer.toString(state.aboveInstanceId));
 		elem.setAttribute("below", Integer.toString(state.belowInstanceId));
-		if (state instanceof CardState)
+		if (state instanceof TokenState)
     	{
-			elem.setAttribute("side", Boolean.toString(((CardState)state).side));
+			elem.setAttribute("side", Boolean.toString(((TokenState)state).side));
     	}
 	}
 	
@@ -72,9 +72,9 @@ public class GameIO {
 		{
 	        state.owner_id = Integer.parseInt(ownerAttribute.getValue());
 		}
-		if (state instanceof CardState && elem.getAttribute("side") != null)
+		if (state instanceof TokenState && elem.getAttribute("side") != null)
     	{
-			((CardState)state).side = Boolean.parseBoolean(elem.getAttributeValue("side"));
+			((TokenState)state).side = Boolean.parseBoolean(elem.getAttributeValue("side"));
     	}
 	}
 
@@ -114,9 +114,9 @@ public class GameIO {
 	        while (gameIt.hasNext()) {
 	        	GameObject entry = gameIt.next();
 	        	Element elem = new Element("object");
-	        	if (entry instanceof GameObjectCard)
+	        	if (entry instanceof GameObjectToken)
 	        	{
-	        		GameObjectCard card = (GameObjectCard) entry;
+	        		GameObjectToken card = (GameObjectToken) entry;
 	        		elem.setAttribute("type", "card");
 	        		elem.setAttribute("unique_name", card.uniqueName);
 	        		for (String key : game.images.keySet())
@@ -223,9 +223,9 @@ public class GameIO {
 	        while (gameIt.hasNext()) {
 	        	GameObject entry = gameIt.next();
 	        	Element elem = new Element("object");
-	        	if (entry instanceof GameObjectCard)
+	        	if (entry instanceof GameObjectToken)
 	        	{
-	        		GameObjectCard card = (GameObjectCard) entry;
+	        		GameObjectToken card = (GameObjectToken) entry;
 	        		elem.setAttribute("type", "card");
 	        		elem.setAttribute("unique_name", card.uniqueName);
 	        		for (String key : game.images.keySet())
@@ -396,7 +396,7 @@ public class GameIO {
     			{
     				case "card":
     				{
-    					game.objects.add(new GameObjectCard(elem.getAttributeValue("unique_name"), images.get(elem.getAttributeValue("front")), images.get(elem.getAttributeValue("back"))));
+    					game.objects.add(new GameObjectToken(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), images.get(elem.getAttributeValue("front")), images.get(elem.getAttributeValue("back"))));
     					break;
     				}
     			}

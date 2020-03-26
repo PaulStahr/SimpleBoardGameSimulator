@@ -14,8 +14,8 @@ import gameObjects.instance.ObjectState;
 
 public class GameObjectDice extends GameObject{
 	ArrayList<BufferedImage> sides;
-	public GameObjectDice(String uniqueName, ArrayList<BufferedImage> sides) {
-		super(uniqueName);
+	public GameObjectDice(String uniqueName, String objectType, ArrayList<BufferedImage> sides) {
+		super(uniqueName, objectType);
 		this.sides = new ArrayList<BufferedImage>(sides);
 	}
 
