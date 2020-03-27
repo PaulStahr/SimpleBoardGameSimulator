@@ -519,6 +519,56 @@ public class ObjectFunctions {
         return  false;
     }
 
+    public static void makeStack(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList stackElements)
+    {
+        for(int i = 0; i < stackElements.size(); ++i)
+        {
+            if(i==0 && stackElements.size() > 1)
+            {
+                gameInstance.objects.get(stackElements.get(i)).state.belowInstanceId = -1;
+                gameInstance.objects.get(stackElements.get(i)).state.aboveInstanceId = gameInstance.objects.get(stackElements.get(i+1)).id;
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, gameInstance.objects.get(stackElements.get(i))));
+            }
+            else if(i == stackElements.size()-1 && stackElements.size() > 1)
+            {
+                gameInstance.objects.get(stackElements.get(i)).state.aboveInstanceId = -1;
+                gameInstance.objects.get(stackElements.get(i)).state.belowInstanceId = gameInstance.objects.get(stackElements.get(i-1)).id;
+                setObjectPosition(gamePanelId, gameInstance, player, gameInstance.objects.get(stackElements.get(i)), gameInstance.objects.get(stackElements.get(i-1)));
+            }
+            else
+            {
+                gameInstance.objects.get(stackElements.get(i)).state.aboveInstanceId = gameInstance.objects.get(stackElements.get(i+1)).id;
+                gameInstance.objects.get(stackElements.get(i)).state.belowInstanceId = gameInstance.objects.get(stackElements.get(i-1)).id;
+                setObjectPosition(gamePanelId, gameInstance, player, gameInstance.objects.get(stackElements.get(i)), gameInstance.objects.get(stackElements.get(i-1)));
+            }
+        }
+    }
+
+    public static void setObjectPosition(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int posX, int posY)
+    {
+        objectInstance.state.posX = posX;
+        objectInstance.state.posY = posY;
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+    }
+
+
+    public static void setObjectPosition(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance targetObjectInstance)
+    {
+        setObjectPosition(gamePanelId, gameInstance, player, objectInstance, targetObjectInstance.state.posX, targetObjectInstance.state.posY);
+    }
+
+    public static void getAllObjectsOfType(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance)
+    {
+        String objectType = objectInstance.go.objectType;
+        IntegerArrayList objectTypeList = new IntegerArrayList();
+        objectTypeList.add(objectInstance.id);
+        for (int i = 0; i < gameInstance.objects.size(); ++i) {
+            if (gameInstance.objects.get(i).go.objectType.equals(objectType) && i != objectInstance.id) {
+                objectTypeList.add(i);
+            }
+        }
+        makeStack(gamePanelId, gameInstance, player, objectTypeList);
+    }
 
 
 }

@@ -59,19 +59,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		gameInstance.changeListener.add(this);
 
 		JPanel p = new JPanel();
-		p.setLayout(new FlowLayout());
-		p.add(new JLabel(" Move Top Card: Left Click + Drag  | "));
-		p.add(new JLabel(" Move Stack: Middle Click + Drag  | "));
-		p.add(new JLabel(" Take Object: T  | "));
-		p.add(new JLabel(" Drop Object: D  | "));
-		p.add(new JLabel(" Get Bottom Card: Shift + Grab  | "));
-		p.add(new JLabel(" Shuffle Stack: S  | "));
-		p.add(new JLabel(" Flip Card: F  | "));
-		p.add(new JLabel(" Flip Stack: Strg + F  | "));
-		p.add(new JLabel(" View + Collect Stack: V  | "));
-		p.add(new JLabel(" Remove Stack: R  | "));
-		p.add(new JLabel(" Count Objects: C"));
-		p.add(new JLabel(" Count Values: Strg + C"));
+		p.setLayout(new GridLayout(4, 4, 20, 0));
+		p.add(new JLabel("Move Top Card: Left Click + Drag"));
+		p.add(new JLabel("Move Stack: Middle Click + Drag"));
+		p.add(new JLabel("Take Object: T"));
+		p.add(new JLabel("Drop Object: D"));
+		p.add(new JLabel("Get Bottom Card: Shift + Grab"));
+		p.add(new JLabel("Shuffle Stack: S"));
+		p.add(new JLabel("Flip Card: F"));
+		p.add(new JLabel("Flip Stack: Strg + F"));
+		p.add(new JLabel("View + Collect Stack: V"));
+		p.add(new JLabel("Collect Objects: M"));
+		p.add(new JLabel("Remove Stack: R"));
+		p.add(new JLabel("Count Objects: C"));
+		p.add(new JLabel("Count Values: Strg + C"));
 
 		this.add(p);
 	}
@@ -281,7 +282,23 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
 			ObjectFunctions.dropObject(id, gameInstance, player, activeObject);
 		}
+
+		if (e.getKeyCode() == KeyEvent.VK_P)
+		{
+			loggedKeys[e.getKeyCode()] = true;
+			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			getGraphics().drawString("Type: " + String.valueOf(activeObject.go.objectType) + " " + "Value: " + String.valueOf(activeObject.go.uniqueName), mouseX, mouseY);
+		}
+
+		if (e.getKeyCode() == KeyEvent.VK_M)
+		{
+			loggedKeys[e.getKeyCode()] = true;
+			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			ObjectFunctions.getAllObjectsOfType(id, gameInstance, player, activeObject);
+		}
 	}
+
+
 	public void keyReleased(KeyEvent e) {
 		//System.out.println("keyReleased: "+e);
 		isControlDown = false;

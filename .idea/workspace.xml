@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="9715c59e-d8b1-42d9-8fd1-ffdf843c36de" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/src/gameObjects/functions/ObjectFunctions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gameObjects/functions/ObjectFunctions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gui/GamePanel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gui/GamePanel.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1ZUV53z2Y7zXG7Z7PzLtPxOPxHF" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/src" />
+    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.proportion" value="0.0" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.build" />
+  </component>
+  <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="main.Main" />
+      <module name="SimpleOnlineCardGameSimulator" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <option name="ALTERNATIVE_JRE_PATH" value="1.8" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <option name="MAIN_CLASS_NAME" value="main.Main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="9715c59e-d8b1-42d9-8fd1-ffdf843c36de" name="Default Changelist" comment="" />
+      <created>1584893473344</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1584893473344</updated>
+      <workItem from="1584893475978" duration="16459000" />
+      <workItem from="1584910577420" duration="876000" />
+      <workItem from="1584949295027" duration="463000" />
+      <workItem from="1584987382829" duration="18327000" />
+      <workItem from="1585006541677" duration="1426000" />
+      <workItem from="1585066459559" duration="28000" />
+      <workItem from="1585069078218" duration="9256000" />
+      <workItem from="1585145994049" duration="1455000" />
+      <workItem from="1585150442933" duration="1000" />
+      <workItem from="1585160429642" duration="7137000" />
+      <workItem from="1585237641894" duration="2789000" />
+      <workItem from="1585248052338" duration="14421000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="414" y="195" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1584893575308">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="414" y="195" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1584893575308" />
+    <state x="765" y="249" key="#com.intellij.ide.util.MemberChooser" timestamp="1585002596222">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="765" y="249" key="#com.intellij.ide.util.MemberChooser/0.0.1920.1080@0.0.1920.1080" timestamp="1585002596222" />
+    <state x="689" y="324" key="#com.intellij.ide.util.TreeClassChooserDialog" timestamp="1584893553709">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="689" y="324" key="#com.intellij.ide.util.TreeClassChooserDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1584893553709" />
+    <state width="434" height="466" key="DebuggerActiveHint" timestamp="1584907275516">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="434" height="466" key="DebuggerActiveHint/0.0.1920.1080@0.0.1920.1080" timestamp="1584907275516" />
+    <state x="761" y="349" key="FileChooserDialogImpl" timestamp="1584893531984">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="761" y="349" key="FileChooserDialogImpl/0.0.1920.1080@0.0.1920.1080" timestamp="1584893531984" />
+    <state width="1877" height="365" key="GridCell.Tab.0.bottom" timestamp="1585318114563">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="365" key="GridCell.Tab.0.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1585318114563" />
+    <state width="1877" height="365" key="GridCell.Tab.0.center" timestamp="1585318114563">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="365" key="GridCell.Tab.0.center/0.0.1920.1080@0.0.1920.1080" timestamp="1585318114563" />
+    <state width="1877" height="365" key="GridCell.Tab.0.left" timestamp="1585318114563">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="365" key="GridCell.Tab.0.left/0.0.1920.1080@0.0.1920.1080" timestamp="1585318114563" />
+    <state width="1877" height="365" key="GridCell.Tab.0.right" timestamp="1585318114563">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="365" key="GridCell.Tab.0.right/0.0.1920.1080@0.0.1920.1080" timestamp="1585318114563" />
+    <state width="1877" height="365" key="GridCell.Tab.1.bottom" timestamp="1585318114563">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="365" key="GridCell.Tab.1.bottom/0.0.1920.1080@0.0.1920.1080" timestamp="1585318114563" />
+    <state width="1877" height="365" key="GridCell.Tab.1.center" timestamp="1585318114563">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="365" key="GridCell.Tab.1.center/0.0.1920.1080@0.0.1920.1080" timestamp="1585318114563" />
+    <state width="1877" height="365" key="GridCell.Tab.1.left" timestamp="1585318114563">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="365" key="GridCell.Tab.1.left/0.0.1920.1080@0.0.1920.1080" timestamp="1585318114563" />
+    <state width="1877" height="365" key="GridCell.Tab.1.right" timestamp="1585318114563">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1877" height="365" key="GridCell.Tab.1.right/0.0.1920.1080@0.0.1920.1080" timestamp="1585318114563" />
+    <state x="461" y="182" key="SettingsEditor" timestamp="1584893542477">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="461" y="182" key="SettingsEditor/0.0.1920.1080@0.0.1920.1080" timestamp="1584893542477" />
+    <state x="656" y="364" key="com.intellij.ide.util.TipDialog" timestamp="1585334585614">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="656" y="364" key="com.intellij.ide.util.TipDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1585334585614" />
+    <state x="666" y="168" key="refactoring.ChangeSignatureDialog" timestamp="1584893882395">
+      <screen x="0" y="0" width="1920" height="1080" />
+    </state>
+    <state x="666" y="168" key="refactoring.ChangeSignatureDialog/0.0.1920.1080@0.0.1920.1080" timestamp="1584893882395" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/gameObjects/instance/ObjectActionMenu.java</url>
+          <line>47</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/gameObjects/functions/ObjectFunctions.java</url>
+          <line>174</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/gameObjects/functions/ObjectFunctions.java</url>
+          <line>99</line>
+          <option name="timeStamp" value="40" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/gameObjects/functions/ObjectFunctions.java</url>
+          <line>113</line>
+          <option name="timeStamp" value="42" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/gui/GamePanel.java</url>
+          <line>303</line>
+          <option name="timeStamp" value="58" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/gui/GamePanel.java</url>
+          <line>183</line>
+          <option name="timeStamp" value="67" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/gameObjects/functions/ObjectFunctions.java</url>
+          <line>523</line>
+          <option name="timeStamp" value="69" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
