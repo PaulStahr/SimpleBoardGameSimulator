@@ -87,7 +87,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				IntegerArrayList aboveList = ObjectFunctions.getAboveStack(gameInstance, oi);
 				for (int x : aboveList) {
 					ObjectInstance currentInstance = gameInstance.objects.get(x);
-					BufferedImage img = currentInstance.go.getLook(oi.state);
+					BufferedImage img = currentInstance.go.getLook(currentInstance.state);
 					if (currentInstance.getRotation() == 0) {
 						g.drawImage(img, currentInstance.state.posX, currentInstance.state.posY, (int) (currentInstance.scale * img.getWidth()), (int) (currentInstance.scale * img.getHeight()), null);
 					} else {
