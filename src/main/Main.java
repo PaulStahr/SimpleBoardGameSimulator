@@ -55,6 +55,7 @@ public class Main {
 				} catch (JDOMException e) {
 					logger.error("Can't read", e);
 				}
+				return;
     		}
     		else if (args[i].equals("--create"))
     		{
@@ -79,6 +80,7 @@ public class Main {
 				} catch (JDOMException e) {
 					logger.error("Can't read", e);
 				}
+				return;
     		}
     	}
     	try {
