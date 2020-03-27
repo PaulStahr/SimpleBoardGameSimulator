@@ -2,6 +2,7 @@ package io;
 
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectDice.DiceSideState;
 import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.definition.GameObjectToken.TokenState;
@@ -21,6 +22,7 @@ import org.jdom2.output.XMLOutputter;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -130,12 +132,12 @@ public class GameIO {
 				if(elem.getAttributeValue("height") != null) {
 					height = Integer.parseInt(elem.getAttributeValue("height"));
 				}
-				HashMap<Integer, BufferedImage> sides = new HashMap<>();
+				ArrayList<DiceSideState> dss = new ArrayList<>();
 				for (Element side : elem.getChildren())
 				{
-					sides.put(Integer.parseInt(side.getAttributeValue("value")), images.get(side.getValue()));
+					dss.add(new DiceSideState(Integer.parseInt(side.getAttributeValue("value")), images.get(side.getValue())));
 				}
-				return new GameObjectDice(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, sides);
+				return new GameObjectDice(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, dss.toArray(new DiceSideState[dss.size()]));
 			}
 		}
 		return null;
@@ -186,7 +188,7 @@ public class GameIO {
 					elem.setAttribute("value", Integer.toString(token.value));
 	        		for (String key : game.images.keySet())
 	        		{
-	        			if(game.images.get(key).equals(token.getUpsideLook()))
+	        			if(game.images.get(key).equals(token.getUpsideLook()))//TODO slow
 	        			{
 	        				elem.setAttribute("front", key);
 	        				break;
@@ -220,13 +222,13 @@ public class GameIO {
 				else if (entry instanceof GameObjectDice)
 				{
 					GameObjectDice dice = (GameObjectDice) entry;
-					for (Integer side_idx : dice.sides.keySet())
+					for (DiceSideState sideState : dice.dss)
 					{
 						Element side = new Element("side");
-						side.setAttribute("value", Integer.toString(side_idx));
+						side.setAttribute("value", Integer.toString(sideState.value));
 						for (String key : game.images.keySet())
 						{
-							if(game.images.get(key).equals(dice.sides.get(side_idx)))
+							if(game.images.get(key).equals(sideState.img)) //TODO is this possible without comparing images?
 							{
 								side.setText(key);
 								break;

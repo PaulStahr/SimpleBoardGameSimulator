@@ -7,24 +7,46 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class GameObjectDice extends GameObject{
-	public HashMap<Integer, BufferedImage> sides;
-	public GameObjectDice(String uniqueName, String objectType, int widthInMM, int heightInMM, HashMap<Integer, BufferedImage> sides) {
+	public static class DiceSideState
+	{
+		public final int value;
+		public final BufferedImage img;
+	
+		public DiceSideState(int value, BufferedImage img)
+		{
+			this.value = value;
+			this.img = img;
+		}
+	}
+	public DiceSideState dss[];
+	
+	public GameObjectDice(String uniqueName, String objectType, int widthInMM, int heightInMM, DiceSideState sides[]) {
 		super(uniqueName, objectType, widthInMM, heightInMM);
-		this.sides = new HashMap<>(sides);
+		this.dss = sides;
 	}
 
 	@Override
 	public BufferedImage getLook(ObjectState state) {
-		return sides.get(((DiceState)state).side);
+		return dss[((DiceState)state).side].img;
 	}
 
+	public DiceSideState getDiceState(int value)
+	{
+		for (DiceSideState dss : this.dss)
+		{
+			if (dss.value == value)
+			{
+				return dss;
+			}
+		}
+		return null;
+	}
+	
 	@Override
 	public ObjectState newObjectState()
 	{
-		DiceState state = new DiceState();
-		Object[] keys = sides.keySet().toArray();
-		Object key = keys[new Random().nextInt(keys.length)];
-		state.side = (int) key;
+		DiceState state = new DiceState();//This implementation copys the state (Name suggests just creating object)
+		state.side = 0;
 		state.value = state.side;
 		return state;
 	}
@@ -41,13 +63,11 @@ public class GameObjectDice extends GameObject{
 	}
 	
 	// Outputs a random side of the dice and saves the new state
-	public BufferedImage rollTheDice(DiceState state)
+	public DiceSideState rollTheDice(DiceState state, Random rnd)
 	{
-		Object[] keys = sides.keySet().toArray();
-		Object key = keys[new Random().nextInt(keys.length)];
-		state.side = (int) key;
+		state.side = rnd.nextInt(dss.length);
 		state.value = state.side;
-		return sides.get(key);
+		return dss[state.value];
 	}
 
 }
