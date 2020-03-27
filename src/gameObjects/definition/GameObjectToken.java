@@ -24,7 +24,9 @@ public class GameObjectToken extends GameObject{
 	@Override
 	public ObjectState newObjectState()
 	{
-		return new TokenState();
+		TokenState state = new TokenState();
+		state.value = this.value;
+	    return state;
 	}
 
 	public static class TokenState extends ObjectState

@@ -21,7 +21,6 @@ import org.jdom2.output.XMLOutputter;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -430,10 +429,10 @@ public class GameIO {
 						if(elem.getAttributeValue("height") != null) {
 							height = Integer.parseInt(elem.getAttributeValue("height"));
 						}
-						ArrayList<BufferedImage> sides = new ArrayList<>();
+						HashMap<Integer, BufferedImage> sides = new HashMap<>();
 						for (Element side : elem.getChildren())
 						{
-							sides.add(images.get(side.getValue()));
+							sides.put(Integer.parseInt(elem.getAttributeValue("value")), images.get(side.getValue()));
 						}
 						game.objects.add(new GameObjectDice(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, sides));
 						break;
