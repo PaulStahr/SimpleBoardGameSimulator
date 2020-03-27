@@ -7,7 +7,7 @@ import java.awt.image.BufferedImage;
 public class GameObjectToken extends GameObject{
 	BufferedImage upsideLook;
 	BufferedImage downsideLook;
-	int value;
+	public int value;
 
 	public GameObjectToken(String uniqueName, String objectType, int widthInMM, int heightInMM, BufferedImage front, BufferedImage back, int value) {
 		super(uniqueName, objectType, widthInMM, heightInMM);

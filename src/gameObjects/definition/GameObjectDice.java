@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Random;
 
 public class GameObjectDice extends GameObject{
-	HashMap<Integer, BufferedImage> sides;
+	public HashMap<Integer, BufferedImage> sides;
 	public GameObjectDice(String uniqueName, String objectType, int widthInMM, int heightInMM, HashMap<Integer, BufferedImage> sides) {
 		super(uniqueName, objectType, widthInMM, heightInMM);
 		this.sides = new HashMap<>(sides);

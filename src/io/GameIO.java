@@ -34,7 +34,7 @@ public class GameIO {
 		return null;
 	}
 	
-	private static void exportState(ObjectState state, Element elem)
+	private static void writeStateToElement(ObjectState state, Element elem)
 	{
 		elem.setAttribute("x", Integer.toString(state.posX));
 		elem.setAttribute("y", Integer.toString(state.posY));
@@ -42,13 +42,18 @@ public class GameIO {
 		elem.setAttribute("owner", Integer.toString(state.owner_id));
 		elem.setAttribute("above", Integer.toString(state.aboveInstanceId));
 		elem.setAttribute("below", Integer.toString(state.belowInstanceId));
+		elem.setAttribute("value", Integer.toString(state.value));
 		if (state instanceof TokenState)
     	{
 			elem.setAttribute("side", Boolean.toString(((TokenState)state).side));
     	}
+		if (state instanceof GameObjectFigure.FigureState)
+		{
+			elem.setAttribute("standing", Boolean.toString(((GameObjectFigure.FigureState) state).standing));
+		}
 	}
 	
-	private static void importState(ObjectState state, Element elem)
+	private static void readStateFromElement(ObjectState state, Element elem)
 	{
 		state.posX = Integer.parseInt(elem.getAttributeValue("x"));
 		state.posY = Integer.parseInt(elem.getAttributeValue("y"));
@@ -68,13 +73,75 @@ public class GameIO {
 		{
 	        state.owner_id = Integer.parseInt(ownerAttribute.getValue());
 		}
+		Attribute valueAttribute = elem.getAttribute("value");
+		if (valueAttribute != null)
+		{
+			state.value = Integer.parseInt(valueAttribute.getValue());
+		}
 		if (state instanceof TokenState && elem.getAttribute("side") != null)
     	{
 			((TokenState)state).side = Boolean.parseBoolean(elem.getAttributeValue("side"));
     	}
+		if (state instanceof GameObjectFigure.FigureState && elem.getAttribute("standing") != null)
+		{
+			((GameObjectFigure.FigureState)state).standing = Boolean.parseBoolean(elem.getAttributeValue("standing"));
+		}
 	}
 
-	
+	private static GameObject createGameObjectFromElement(Element elem, HashMap<String, BufferedImage> images)
+	{
+		switch(elem.getAttributeValue("type"))
+		{
+			case "card":
+			{
+				int width = 66;
+				int height = 88;
+				int value = 0;
+				if(elem.getAttributeValue("width") != null) {
+					width = Integer.parseInt(elem.getAttributeValue("width"));
+				}
+				if(elem.getAttributeValue("height") != null) {
+					height = Integer.parseInt(elem.getAttributeValue("height"));
+				}
+				if(elem.getAttributeValue("value") != null) {
+					value = Integer.parseInt(elem.getAttributeValue("value"));
+				}
+				return new GameObjectToken(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, images.get(elem.getAttributeValue("front")), images.get(elem.getAttributeValue("back")), value);
+			}
+			case "figure":
+			{
+				int width = 20;
+				int height = 40;
+				if(elem.getAttributeValue("width") != null) {
+					width = Integer.parseInt(elem.getAttributeValue("width"));
+				}
+				if(elem.getAttributeValue("height") != null) {
+					height = Integer.parseInt(elem.getAttributeValue("height"));
+				}
+				return new GameObjectFigure(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, images.get(elem.getAttributeValue("standing")));
+			}
+			case "dice":
+			{
+				int width = 20;
+				int height = 20;
+				if(elem.getAttributeValue("width") != null) {
+					width = Integer.parseInt(elem.getAttributeValue("width"));
+				}
+				if(elem.getAttributeValue("height") != null) {
+					height = Integer.parseInt(elem.getAttributeValue("height"));
+				}
+				HashMap<Integer, BufferedImage> sides = new HashMap<>();
+				for (Element side : elem.getChildren())
+				{
+					sides.put(Integer.parseInt(elem.getAttributeValue("value")), images.get(side.getValue()));
+				}
+				return new GameObjectDice(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, sides);
+			}
+		}
+		return null;
+	}
+
+	/* Not written: password, actions, changeListener, TYPES, logger*/
 	public static void writeSnapshotToZip(GameInstance gi, OutputStream os) throws IOException
 	{
 		ZipOutputStream zipOutputStream = null;
@@ -105,34 +172,69 @@ public class GameIO {
 		    Document doc_game = new Document();
 	    	Element root_game = new Element("xml");
 	    	doc_game.addContent(root_game);
-	    	
-	    	Iterator<GameObject> gameIt = game.objects.iterator();
-	        while (gameIt.hasNext()) {
-	        	GameObject entry = gameIt.next();
+
+			for (int idx = 0; idx < game.objects.size(); idx++)  {
+	        	GameObject entry = game.objects.get(idx);
 	        	Element elem = new Element("object");
+				elem.setAttribute("type", entry.objectType);
+				elem.setAttribute("unique_name", entry.uniqueName);
+				elem.setAttribute("width", Integer.toString(entry.widthInMM));
+				elem.setAttribute("height", Integer.toString(entry.heightInMM));
 	        	if (entry instanceof GameObjectToken)
 	        	{
-	        		GameObjectToken card = (GameObjectToken) entry;
-	        		elem.setAttribute("type", "card");
-	        		elem.setAttribute("unique_name", card.uniqueName);
+	        		GameObjectToken token = (GameObjectToken) entry;
+					elem.setAttribute("value", Integer.toString(token.value));
 	        		for (String key : game.images.keySet())
 	        		{
-	        			if(game.images.get(key).equals(card.getUpsideLook())) 
+	        			if(game.images.get(key).equals(token.getUpsideLook()))
 	        			{
 	        				elem.setAttribute("front", key);
 	        				break;
 	        	        }
 	        		}
-	        		
-	        		for (String key : game.images.keySet())
+	        		if (token.getDownsideLook() != null)
 	        		{
-	        			if(game.images.get(key).equals(card.getDownsideLook())) 
-	        			{
-	        				elem.setAttribute("back", key);
-	        				break;
-	        	        }
-	        		}
+						for (String key : game.images.keySet())
+						{
+							if(game.images.get(key).equals(token.getDownsideLook()))
+							{
+								elem.setAttribute("back", key);
+								break;
+							}
+						}
+					}
+
 	        	}
+	        	else if (entry instanceof GameObjectFigure)
+	        	{
+					GameObjectFigure figure = (GameObjectFigure) entry;
+					for (String key : game.images.keySet())
+					{
+						if(game.images.get(key).equals(figure.getStandingLook()))
+						{
+							elem.setAttribute("standing", key);
+							break;
+						}
+					}
+				}
+				else if (entry instanceof GameObjectDice)
+				{
+					GameObjectDice dice = (GameObjectDice) entry;
+					for (Integer side_idx : dice.sides.keySet())
+					{
+						Element side = new Element("side");
+						side.setAttribute("value", Integer.toString(side_idx));
+						for (String key : game.images.keySet())
+						{
+							if(game.images.get(key).equals(dice.sides.get(side_idx)))
+							{
+								side.setText(key);
+								break;
+							}
+						}
+						elem.addContent(side);
+					}
+				}
 	        	root_game.addContent(elem);
 	        }
 	        
@@ -155,19 +257,28 @@ public class GameIO {
 		    // save game_instance.xml
 	    	Document doc_inst = new Document();
 	    	Element root_inst = new Element("xml");
-	    	
-	    	Iterator<ObjectInstance> instIt = gi.objects.iterator();
-	        while (instIt.hasNext()) {
-	        	ObjectInstance entry = instIt.next();
+
+			for (int idx = 0; idx < gi.objects.size(); idx++) {
+	        	ObjectInstance gameObject = gi.objects.get(idx);
 	        	Element elem = new Element("object");
-        		elem.setAttribute("unique_name", entry.go.uniqueName);
-        		elem.setAttribute("id", Integer.toString(entry.id));
-        		exportState(entry.state, elem);
+        		elem.setAttribute("unique_name", gameObject.go.uniqueName);
+        		elem.setAttribute("id", Integer.toString(gameObject.id));
+        		writeStateToElement(gameObject.state, elem);
         		root_inst.addContent(elem);
         	}
+			for (int idx = 0; idx < gi.players.size(); idx++) {
+				Player player = gi.players.get(idx);
+				Element elem = new Element("player");
+				writePlayerToElement(player, elem);
+				root_inst.addContent(elem);
+			}
 	        Element sessionName = new Element("name");
 	        sessionName.setText(gi.name);
 	        root_inst.addContent(sessionName);
+
+			Element hidden = new Element("hidden");
+			hidden.setText(String.valueOf(gi.hidden));
+			root_inst.addContent(hidden);
 	    	
 	        doc_inst.addContent(root_inst);
 	    	ZipEntry xmlZipOutput = new ZipEntry("game_instance.xml");
@@ -183,7 +294,12 @@ public class GameIO {
 			}
 		}
 	}
-	
+
+	private static void writePlayerToElement(Player player, Element elem) {
+		elem.setAttribute("name", player.name);
+		elem.setAttribute("id", Integer.toString(player.id));
+	}
+
 	public static void writeGameToZip(Game game, OutputStream os) throws IOException
 	{	
 		ZipOutputStream zipOutputStream = null;
@@ -273,33 +389,16 @@ public class GameIO {
 	public static void writeObjectStateToStream(ObjectState object, OutputStream output) throws IOException
 	{
 		Document doc = new Document();
-    	//Element root = new Element("xml");
     	
     	Element elem = new Element("object_state");
-		exportState(object, elem);
+		writeStateToElement(object, elem);
 
-		//root.addContent(elem);
 		doc.addContent(elem);
     	new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
 
 	}
 
-	/* This function is not ready! */
-	public static void writeObjectInstanceToStream(ObjectInstance object, OutputStream output) throws IOException
-	{
-		Document doc = new Document();
-    	Element root = new Element("xml");
-    	doc.addContent(root);
-    	
-    	//@Paul: Which info from ObjectState, Player and GameObject are needed?
-    	Element elem = new Element("object_instance");
-		elem.setAttribute("id", Integer.toString(object.id));
-		elem.setAttribute("width", Integer.toString(object.getWidth()));
-		elem.setAttribute("height", Integer.toString(object.getHeight()));
-
-		new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
-	}
-
+	// TODO Fragen
 	public static GameInstance readSnapshotFromZip(InputStream in) throws IOException, JDOMException
 	{
 		ZipInputStream stream = new ZipInputStream(in);
@@ -308,6 +407,7 @@ public class GameIO {
 		return result;
 	}
 
+	// TODO Fragen
 	public static void editGameInstanceFromZip(ZipInputStream stream, GameInstance game, Object source)
 	{
 		//Editiere nur das was in dem Stream steht
@@ -315,12 +415,14 @@ public class GameIO {
 		//Rufe dabei auch die update Methode auf 
 	}
 
-	public static void editObjectInstanceFromStream(ObjectInstance objectInstance, InputStream input) throws IOException {
+	// TODO Fragen
+	public static void editObjectInstanceFromZip(ObjectInstance objectInstance, InputStream input) throws IOException {
 		ZipInputStream zipStream = new ZipInputStream(input);
 		editObjectInstanceFromZip(objectInstance, zipStream);
 		zipStream.close();
 	}
 
+	// TODO Fragen
 	public static void editObjectInstanceFromZip(ObjectInstance objectInstance, ZipInputStream in) {
 		
 	}
@@ -329,11 +431,8 @@ public class GameIO {
 	{
 		Document doc = new SAXBuilder().build(input);
     	Element elem = doc.getRootElement();
-    	
-    	//for (Element elem : root.getChildren())
-    	//{
-			importState(objectState, elem);
-	   //	}
+
+    	readStateFromElement(objectState, elem);
 	}
 
 	public static GameInstance readSnapshotFromZip(ZipInputStream stream) throws IOException, JDOMException
@@ -351,7 +450,6 @@ public class GameIO {
 	            if (name.endsWith(".png") || name.endsWith(".jpg"))
 	            {
 	            	BufferedImage img = ImageIO.read(stream);
-	            	//System.out.println("put " + name);
 	            	images.put(name, img);
 	            }
 	            else if (name.equals("game.xml"))
@@ -387,57 +485,7 @@ public class GameIO {
     		String name = elem.getName();
     		if (name.equals("object"))
     		{
-    			switch(elem.getAttributeValue("type"))
-    			{
-    				case "card":
-    				{
-    					int width = 66;
-    					int height = 88;
-    					int value = 0;
-    					if(elem.getAttributeValue("width") != null) {
-							width = Integer.parseInt(elem.getAttributeValue("width"));
-						}
-						if(elem.getAttributeValue("height") != null) {
-							height = Integer.parseInt(elem.getAttributeValue("height"));
-						}
-						if(elem.getAttributeValue("value") != null) {
-							value = Integer.parseInt(elem.getAttributeValue("value"));
-						}
-    					game.objects.add(new GameObjectToken(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, images.get(elem.getAttributeValue("front")), images.get(elem.getAttributeValue("back")), value));
-						break;
-    				}
-					case "figure":
-					{
-						int width = 20;
-						int height = 40;
-						if(elem.getAttributeValue("width") != null) {
-							width = Integer.parseInt(elem.getAttributeValue("width"));
-						}
-						if(elem.getAttributeValue("height") != null) {
-							height = Integer.parseInt(elem.getAttributeValue("height"));
-						}
-						game.objects.add(new GameObjectFigure(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, images.get(elem.getAttributeValue("standing"))));
-						break;
-					}
-					case "dice":
-					{
-						int width = 20;
-						int height = 20;
-						if(elem.getAttributeValue("width") != null) {
-							width = Integer.parseInt(elem.getAttributeValue("width"));
-						}
-						if(elem.getAttributeValue("height") != null) {
-							height = Integer.parseInt(elem.getAttributeValue("height"));
-						}
-						HashMap<Integer, BufferedImage> sides = new HashMap<>();
-						for (Element side : elem.getChildren())
-						{
-							sides.put(Integer.parseInt(elem.getAttributeValue("value")), images.get(side.getValue()));
-						}
-						game.objects.add(new GameObjectDice(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, sides));
-						break;
-					}
-    			}
+				game.objects.add(createGameObjectFromElement(elem, game.images));
     		}
     		else if (name.equals("background"))
     		{
@@ -466,7 +514,7 @@ public class GameIO {
     		{
     			String uniqueName = elem.getAttributeValue("unique_name");
     			ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue("id")));
-    			importState(oi.state, elem);
+    			readStateFromElement(oi.state, elem);
     			gi.objects.add(oi);
     		}
 	   	}
