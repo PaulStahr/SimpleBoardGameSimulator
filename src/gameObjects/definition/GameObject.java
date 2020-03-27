@@ -21,11 +21,13 @@ public abstract class GameObject {
 	public abstract BufferedImage getLook(ObjectState state);
 
 	public int getWidth(ObjectState state) {
-		return (int) (getLook(state).getWidth()*0.2);
+		BufferedImage img = getLook(state);
+		return img == null ? 0 : (int) (img.getWidth()*0.2);
 	}
 
 	public int getHeight(ObjectState state) {
-		return (int) (getLook(state).getHeight()*0.2);
+		BufferedImage img = getLook(state);
+		return img == null ? 0 : (int) (img.getHeight()*0.2);
 	}
 
 

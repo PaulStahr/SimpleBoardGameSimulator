@@ -89,7 +89,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					ObjectInstance currentInstance = gameInstance.objects.get(x);
 					BufferedImage img = currentInstance.go.getLook(currentInstance.state);
 					if (currentInstance.getRotation() == 0) {
-						g.drawImage(img, currentInstance.state.posX, currentInstance.state.posY, (int) (currentInstance.scale * img.getWidth()), (int) (currentInstance.scale * img.getHeight()), null);
+						if (currentInstance.state == null || img == null)
+						{
+							//logger.error("Object state is null");
+							System.out.println("Null");
+						}
+						else
+						{
+							g.drawImage(img, currentInstance.state.posX, currentInstance.state.posY, (int) (currentInstance.scale * img.getWidth()), (int) (currentInstance.scale * img.getHeight()), null);
+						}
 					} else {
 						double rotationRequired = Math.toRadians(currentInstance.getRotation());
 						double locationX = img.getWidth() / 2;
