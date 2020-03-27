@@ -6,8 +6,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 
 import org.jdom2.JDOMException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
@@ -17,7 +20,9 @@ import io.GameIO;
 import net.AsynchronousGameConnection;
 import net.GameServer;
 
+
 public class Main {
+	public static final Logger logger = LoggerFactory.getLogger(Main.class);
     public static final void main (String args[]){
     	for (int i = 0; i < args.length; ++i)
     	{
@@ -25,6 +30,30 @@ public class Main {
     		{
     			GameServer gs = test.SimpleNetworkServertest.startNewServer(Integer.parseInt(args[i + 1]));
     			return;
+    		}
+    		else if (args[i].equals("--client"))
+    		{
+    			FileInputStream fis;
+				try {
+					fis = new FileInputStream("Doppelkopf.zip");
+			 		GameInstance game0 = GameIO.readSnapshotFromZip(fis);
+	            	fis.close();
+	    			test.SimpleNetworkServertest.connectAndJoinGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), game0);
+	    		} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NumberFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (UnknownHostException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (JDOMException e) {
+					logger.error("Can't read", e);
+				}
     		}
     	}
     	try {
