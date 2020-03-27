@@ -133,7 +133,7 @@ public class GameIO {
 				HashMap<Integer, BufferedImage> sides = new HashMap<>();
 				for (Element side : elem.getChildren())
 				{
-					sides.put(Integer.parseInt(elem.getAttributeValue("value")), images.get(side.getValue()));
+					sides.put(Integer.parseInt(side.getAttributeValue("value")), images.get(side.getValue()));
 				}
 				return new GameObjectDice(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, sides);
 			}
