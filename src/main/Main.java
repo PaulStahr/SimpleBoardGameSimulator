@@ -31,14 +31,39 @@ public class Main {
     			GameServer gs = test.SimpleNetworkServertest.startNewServer(Integer.parseInt(args[i + 1]));
     			return;
     		}
-    		else if (args[i].equals("--client"))
+    		else if (args[i].equals("--join"))
     		{
     			FileInputStream fis;
 				try {
 					fis = new FileInputStream("Doppelkopf.zip");
 			 		GameInstance game0 = GameIO.readSnapshotFromZip(fis);
 	            	fis.close();
+	            	game0.name = "Testsession";
 	    			test.SimpleNetworkServertest.connectAndJoinGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), game0);
+	    		} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NumberFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (UnknownHostException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (JDOMException e) {
+					logger.error("Can't read", e);
+				}
+    		}
+    		else if (args[i].equals("--create"))
+    		{
+				try {
+	    			FileInputStream fis = new FileInputStream("Doppelkopf.zip");
+			 		GameInstance game0 = GameIO.readSnapshotFromZip(fis);
+	            	fis.close();
+	            	game0.name = "Testsession";
+	            	test.SimpleNetworkServertest.connectAndStartGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), game0);
 	    		} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
