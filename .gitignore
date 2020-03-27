@@ -1,2 +1,8 @@
 bin/
 output.zip
+.idea/.gitignore
+.idea/libraries/
+.idea/misc.xml
+.idea/modules.xml
+SimpleBoardGameSimulator.iml
+out/
