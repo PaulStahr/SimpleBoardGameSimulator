@@ -570,5 +570,40 @@ public class ObjectFunctions {
         makeStack(gamePanelId, gameInstance, player, objectTypeList);
     }
 
+    public static IntegerArrayList getTopNObjects(GameInstance gameInstance, ObjectInstance objectInstance, int number)
+    {
+        IntegerArrayList objectList = new IntegerArrayList();
+        ObjectInstance topObject = getStackTop(gameInstance, objectInstance);
+        for (int i = 0; i < number; ++i)
+        {
+            int belowId = topObject.state.belowInstanceId;
+            objectList.add(topObject.id);
+            if (belowId != -1)
+            {
+                objectList.add(belowId);
+                topObject = gameInstance.objects.get(topObject.state.belowInstanceId);
+            }
+            else
+            {
+                break;
+            }
+        }
+        return objectList;
+    }
+
+    public static void splitStackAtN(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int number){
+        int splitObjectid = ObjectFunctions.getTopNObjects(gameInstance, objectInstance, number).last();
+        if(gameInstance.objects.get(splitObjectid).state.belowInstanceId == -1) {
+            gameInstance.objects.get(splitObjectid).state.belowInstanceId = -1;
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, gameInstance.objects.get(splitObjectid)));
+        }
+        else
+        {
+            gameInstance.objects.get(gameInstance.objects.get(splitObjectid).state.belowInstanceId).state.aboveInstanceId = -1;
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, gameInstance.objects.get(gameInstance.objects.get(splitObjectid).state.belowInstanceId)));
+            gameInstance.objects.get(splitObjectid).state.belowInstanceId = -1;
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, gameInstance.objects.get(splitObjectid)));
+        }
+    }
 
 }

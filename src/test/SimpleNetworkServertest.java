@@ -65,7 +65,7 @@ public class SimpleNetworkServertest {
 			}
     	}
     	Player player = new Player("Player1", 1);
-    	FileInputStream fis = new FileInputStream("doppelkopfplus.zip");
+    	FileInputStream fis = new FileInputStream("Doppelkopf.zip");
 		GameInstance gi = GameIO.readSnapshotFromZip(fis);
 		gi.name = "Testsession";
     	fis.close();
