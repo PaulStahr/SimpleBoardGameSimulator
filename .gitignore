@@ -6,3 +6,5 @@ output.zip
 .idea/
 SimpleBoardGameSimulator.iml
 out/
+build
+.gradle
