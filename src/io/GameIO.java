@@ -39,6 +39,10 @@ import net.AsynchronousGameConnection;
 
 public class GameIO {
 
+	/**
+	 * Returns the Java version used by the system.
+	 * @return the Java version used by the system
+	 */
 	private static int getVersion() {
 		String version = System.getProperty("java.version");
 		if(version.startsWith("1.")) {
@@ -49,6 +53,13 @@ public class GameIO {
 		} return Integer.parseInt(version);
 	}
 
+	/**
+	 * Write an ObjectState to an XML-Element. All fields of @param state
+	 * will be added as Attributes to @param elem. If state is a TokenState
+	 * or a FigureState, it will also write the side of standing attribute respectively.
+	 * @param state the ObjectState
+	 * @param elem the Element
+	 */
 	private static void writeStateToElement(ObjectState state, Element elem)
 	{
 		elem.setAttribute("x", Integer.toString(state.posX));
@@ -67,11 +78,19 @@ public class GameIO {
 			elem.setAttribute("standing", Boolean.toString(((GameObjectFigure.FigureState) state).standing));
 		}
 	}
-	
+
+	/**
+	 * Edit a ObjectState from an XML Element. The Attributes "x", "y"
+	 * and "r" are needed in @param elem. All others are optional.
+	 * @param elem the Element with all needed information
+	 * @param state the ObjectState that shall the updated
+	 */
 	private static void editStateFromElement(ObjectState state, Element elem)
 	{
 		state.posX = Integer.parseInt(elem.getAttributeValue("x"));
 		state.posY = Integer.parseInt(elem.getAttributeValue("y"));
+		state.rotation = Integer.parseInt(elem.getAttributeValue("r"));
+
 		String v = elem.getAttributeValue("above");
 		if (v != null)
 		{
@@ -82,7 +101,6 @@ public class GameIO {
 		{
 			state.belowInstanceId = Integer.parseInt(v);
 		}
-		state.rotation = Integer.parseInt(elem.getAttributeValue("r"));
 		Attribute ownerAttribute = elem.getAttribute("owner_id");
 		if (ownerAttribute != null)
 		{
@@ -103,6 +121,12 @@ public class GameIO {
 		}
 	}
 
+	/**
+	 * Edit a GameInstance from an XML Element.
+	 * ATTENTION: Only the fieldS players, name and objects get updated.
+	 * @param root the root Element with all Elements that need updating as children
+	 * @param gi the GameInstance that shall the updated
+	 */
 	private static void editGameInstanceFromElement(Element root, GameInstance gi) throws JDOMException, IOException {
 
 		for (Element elem : root.getChildren())
@@ -128,6 +152,13 @@ public class GameIO {
 		}
 	}
 
+	/**
+	 * Creates a new GameObject. All needed information will be retrieved
+	 * from the XML-element @param elem.
+	 * @param elem the Element with all needed information
+	 * @param images a HashMap of all images saved in the game
+	 * @return the created GameInstance
+	 */
 	private static GameObject createGameObjectFromElement(Element elem, HashMap<String, BufferedImage> images)
 	{
 		switch(elem.getAttributeValue("type"))
@@ -181,15 +212,41 @@ public class GameIO {
 		return null;
 	}
 
-	private static Element createElementFromGameObjectInstance(ObjectInstance gameObjectInstance)
+	/**
+	 * Creates a new Player. All needed information will be retrieved
+	 * from the XML-element @param elem.
+	 * @param elem the Element with all needed information
+	 * @return the created GameInstance
+	 */
+	private static Player createPlayerFromElement(Element elem)
+	{
+		return new Player(elem.getAttributeValue("name"), Integer.parseInt(elem.getAttributeValue("id")));
+	}
+
+	/**
+	 * Creates a new Element that represents the @param objectInstance.
+	 * ATTENTION: Does not save the fields GameObject go, double scale and Player inHand.
+	 * @param objectInstance the ObjectInstance that shall be encoded
+	 * @return the created Element
+	 */
+	private static Element createElementFromObjectInstance(ObjectInstance objectInstance)
 	{
 		Element elem = new Element("object");
-		elem.setAttribute("unique_name", gameObjectInstance.go.uniqueName);
-		elem.setAttribute("id", Integer.toString(gameObjectInstance.id));
-		writeStateToElement(gameObjectInstance.state, elem);
+		elem.setAttribute("unique_name", objectInstance.go.uniqueName);
+		elem.setAttribute("id", Integer.toString(objectInstance.id));
+		writeStateToElement(objectInstance.state, elem);
 		return elem;
 	}
 
+	/**
+	 * Creates a new Element that represents the @param gameObject. Additional field
+	 * from different child classes (GameObjectToken, GameObjectFigure and GameObjectDice)
+	 * are considered. (GameObjectFigure only saves the standing picture as the lying picture
+	 * gets created from the standing one)
+	 * @param gameObject the GameObject that shall be encoded
+	 * @param images a HashMap that contains at least all images used by the gameObject
+	 * @return the created Element
+	 */
 	private static Element createElementFromGameObject(GameObject gameObject, HashMap<String, BufferedImage> images)
 	{
 		Element elem = new Element("object");
@@ -255,6 +312,11 @@ public class GameIO {
 		return elem;
 	}
 
+	/**
+	 * Creates a new Element that represents the @param player.
+	 * @param player the Player that shall be encoded
+	 * @return the created Element
+	 */
 	private static Element createElementFromPlayer(Player player) {
 		Element elem = new Element("player");
 		elem.setAttribute("name", player.name);
@@ -262,12 +324,18 @@ public class GameIO {
 		return elem;
 	}
 
-	private static Player createPlayerFromElement(Element elem)
-	{
-		return new Player(elem.getAttributeValue("name"), Integer.parseInt(elem.getAttributeValue("id")));
-	}
-
-	/* Not written: password, actions, changeListener, TYPES, logger*/
+	/**
+	 * Creates a snapshot of a current GameInstance @param gi incl. the
+	 * GameObject gi.game itself. This snapshot can be read by
+	 * {@link #readSnapshotFromZip(InputStream)} to resume to
+	 * the instance later.
+	 * ATTENTION 1: Even though the @param os is an abstract OutputStream, it will
+	 * used to create a ZipOutputStream via ZipOutputStream(os).
+	 * ATTENTION 2: The following fields are not written into the
+	 * ZipOutputStream: password, actions, changeListener, TYPES, logger
+	 * @param gi the GameInstance that shall be encoded
+	 * @param os the OutputStream the GameInstance will be written to
+	 */
 	public static void writeSnapshotToZip(GameInstance gi, OutputStream os) throws IOException
 	{
 		ZipOutputStream zipOutputStream = null;
@@ -325,8 +393,8 @@ public class GameIO {
 	    	Element root_inst = new Element("xml");
 
 			for (int idx = 0; idx < gi.objects.size(); idx++) {
-	        	ObjectInstance gameObjectInstance = gi.objects.get(idx);
-        		root_inst.addContent(createElementFromGameObjectInstance(gameObjectInstance));
+	        	ObjectInstance ObjectInstance = gi.objects.get(idx);
+        		root_inst.addContent(createElementFromObjectInstance(ObjectInstance));
         	}
 			for (int idx = 0; idx < gi.players.size(); idx++) {
 				Player player = gi.players.get(idx);
@@ -355,6 +423,14 @@ public class GameIO {
 		}
 	}
 
+	/**
+	 * Encodes all fields of @param game to an XML document and puts
+	 * it into @param os.
+	 * ATTENTION: Even though the @param os is an abstract OutputStream, it will
+	 * used to create a ZipOutputStream via ZipOutputStream(os).
+	 * @param game the Game that shall be encoded
+	 * @param os the OutputStream the Game will be written to
+	 */
 	public static void writeGameToZip(Game game, OutputStream os) throws IOException
 	{	
 		ZipOutputStream zipOutputStream = null;
@@ -413,6 +489,12 @@ public class GameIO {
 		}
 	}
 
+	/**
+	 * Encodes all fields of @param object to an XML document and puts
+	 * it into @param os.
+	 * @param object the ObjectState that shall be encoded
+	 * @param output the OutputStream the Game will be written to
+	 */
 	public static void writeObjectStateToZip(ObjectState object, OutputStream output) throws IOException
 	{
 		Document doc = new Document();
@@ -440,6 +522,18 @@ public class GameIO {
 
 	}
 
+	/**
+	 * Reads a snapshot of a GameInstance encoded into @param in incl. the
+	 * GameObject gi.game itself.
+	 * ATTENTION 1: Even though the @param in is an abstract InputStream, it will
+	 * used to create a ZipInputStream via ZipInputStream(in).
+	 * ATTENTION 2: It is expected, that all images used in the game are in the stream.
+	 * Possible image formats are .png and .jpg.
+	 * Besides, two files "game.xml" and "game_instance.xml" are expected, that encode
+	 * the game itself and the specific instance respectively.
+	 * @param in the InputStream that encodes the snapshot
+	 * @return the GameInstance encodes in @param stream
+	 */
 	public static GameInstance readSnapshotFromZip(InputStream in) throws IOException, JDOMException
 	{
 		ZipInputStream stream = new ZipInputStream(in);
@@ -448,6 +542,16 @@ public class GameIO {
 		return result;
 	}
 
+	/**
+	 * Reads a snapshot of a GameInstance encoded into @param stream incl. the
+	 * GameObject gi.game itself.
+	 * ATTENTION: It is expected, that all images used in the game are in the stream.
+	 * Possible image formats are .png and .jpg.
+	 * Besides, two files "game.xml" and "game_instance.xml" are expected, that encode
+	 * the game itself and the specific instance respectively.
+	 * @param stream the ZipInputStream that encodes the snapshot
+	 * @return the GameInstance encodes in @param stream
+	 */
 	public static GameInstance readSnapshotFromZip(ZipInputStream stream) throws IOException, JDOMException
 	{
 		Game game = new Game();
@@ -530,6 +634,15 @@ public class GameIO {
 		
 	}
 
+	/**
+	 * Edit the ObjectState @param objectState from information encoded in @param input.
+	 * ATTENTION 1: @param input is expected to contain an XML document
+	 * that can be used to build a Document via the SAXBuilder.
+	 * ATTENTION 2: Only the root element will be considered and it has to have the
+	 * attributes "x", "y" and "r". All other attributes are optional.
+	 * @param objectState the ObjectState to be edited
+	 * @param input the InputStream with all update information
+	 */
 	public static void editObjectStateFromZip(ObjectState objectState, InputStream input) throws IOException, JDOMException
 	{
 		Document doc = new SAXBuilder().build(input);
@@ -538,6 +651,14 @@ public class GameIO {
     	editStateFromElement(objectState, elem);
 	}
 
+	/**
+	 * Edit the GameInstance @param gi from information encoded in @param input.
+	 * ATTENTION 1: @param input is expected to contain an XML document
+	 * that can be used to build a Document via the SAXBuilder.
+	 * ATTENTION 2: Only the fields players, name and objects get updated.
+	 * @param gi the GameInstance to be edited
+	 * @param is the InputStream with all update information
+	 */
 	public static void editGameInstanceFromZip(InputStream is, GameInstance gi) throws JDOMException, IOException
 	{
 		Document doc = new SAXBuilder().build(is);
@@ -546,10 +667,18 @@ public class GameIO {
 		editGameInstanceFromElement(root, gi);
 	}
 
-	// Paul sagt wir brauchen irgendwann die AsynchronousGameConnection^^ Bisher brauchen wir sie nicht.
-	public static void editGameInstanceFromZip(InputStream InputStream, GameInstance gi,
+	/**
+	 * Edit the GameInstance @param gi from information encoded in @param input.
+	 * ATTENTION 1: @param input is expected to contain an XML document
+	 * that can be used to build a Document via the SAXBuilder.
+	 * ATTENTION 2: Only the fields players, name and objects get updated.
+	 * @param gi the GameInstance to be edited
+	 * @param inputStream the InputStream with all update information
+	 * @param source Paul sagt wir brauchen irgendwann die AsynchronousGameConnection^^ Bisher brauchen wir sie nicht.
+	 */
+	public static void editGameInstanceFromZip(InputStream inputStream, GameInstance gi,
 			AsynchronousGameConnection source) throws JDOMException, IOException {
-		editGameInstanceFromZip(InputStream, gi);
+		editGameInstanceFromZip(inputStream, gi);
 	}
 	
 }
