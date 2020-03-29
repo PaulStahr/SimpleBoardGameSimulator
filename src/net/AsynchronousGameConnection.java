@@ -2,6 +2,7 @@ package net;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -514,11 +515,16 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}
 			}catch(Exception e) {
 				logger.error("Exception in input loop", e);
+				if (e instanceof EOFException)
+				{
+					return;
+				}
 			}
 			split.clear();
 		}
 	}
 	
+	@Override
 	public void run()
 	{
 		if (Thread.currentThread() == outputThread)
