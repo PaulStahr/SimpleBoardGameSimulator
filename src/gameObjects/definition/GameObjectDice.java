@@ -1,10 +1,9 @@
 package gameObjects.definition;
 
-import gameObjects.instance.ObjectState;
-
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
 import java.util.Random;
+
+import gameObjects.instance.ObjectState;
 
 public class GameObjectDice extends GameObject{
 	public static class DiceSideState
