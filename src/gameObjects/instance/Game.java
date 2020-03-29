@@ -1,7 +1,6 @@
 package gameObjects.instance;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 
