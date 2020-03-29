@@ -14,13 +14,16 @@ public class NetworkString {
 	public static final String READ = "read";
 	public static final String GAME_OBJECT = "gameobject";
 	public static final String GAME_OBJECT_INSTANCE = "gameobjectinstance";
-	public static final Object ZIP = "zip";
-	public static final String READBACK = "readback";
-	public static final Object ACTION = "action";
-	public static final Object EDIT = "edit";
-	public static final Object STATE = "state";
-	public static final Object SOUNDMESSAGE = "soundmessage";
-	public static final Object TEXTMESSAGE = "textmessage";
+	public static final String ZIP = "zip";
+	public static final String WRITEBACK = "writeback";
+	public static final String ACTION = "action";
+	public static final String EDIT = "edit";
+	public static final String STATE = "state";
+	public static final String SOUNDMESSAGE = "soundmessage";
+	public static final String TEXTMESSAGE = "textmessage";
 	public static final String WRITE = "write";
 	public static final String JOIN = "join";
+	public static final String REQUEST = "request";
+	public static final String TRIGGER = "trigger";
+	public static final String PLAIN = "plain";
 }
