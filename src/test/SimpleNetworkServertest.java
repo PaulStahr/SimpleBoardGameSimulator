@@ -90,11 +90,6 @@ public class SimpleNetworkServertest {
     	try {
     		Thread.sleep(500);
     	}catch(InterruptedException e) {}
-    	gi.update(new GameObjectInstanceEditAction(0, gi.players.get(0), gi.objects.get(0)));
-       	try {
-    		Thread.sleep(2000);
-    	}catch(InterruptedException e) {}
-       	System.exit(0);
-    	
+    	gi.update(new GameObjectInstanceEditAction(0, gi.players.get(0), gi.objects.get(0)));    	
     }
 }
