@@ -306,7 +306,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    {
 					    if (action instanceof GameObjectInstanceEditAction)
 				 		{
-					    	GameIO.writeObjectStateToStream(((GameObjectInstanceEditAction)action).object.state, byteStream);
+					    	GameIO.writeObjectStateToZip(((GameObjectInstanceEditAction)action).object.state, byteStream);
 					 		strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.EDIT).append(' ')
 					 			.append(NetworkString.STATE).append(' ')
@@ -488,7 +488,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								//byte data[] = objIn.readObject();
 								if (sourceId != id)
 								{
-									GameIO.editObjectStateFromStream(gi.getObjectInstance(objectId).state, new ByteArrayInputStream(data));
+									GameIO.editObjectStateFromZip(gi.getObjectInstance(objectId).state, new ByteArrayInputStream(data));
 								}
 								Player pl = gi.getPlayer(playerId);
 								if (pl == null)

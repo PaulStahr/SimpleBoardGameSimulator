@@ -8,9 +8,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -41,7 +39,16 @@ import net.AsynchronousGameConnection;
 
 public class GameIO {
 
-	
+	private static int getVersion() {
+		String version = System.getProperty("java.version");
+		if(version.startsWith("1.")) {
+			version = version.substring(2, 3);
+		} else {
+			int dot = version.indexOf(".");
+			if(dot != -1) { version = version.substring(0, dot); }
+		} return Integer.parseInt(version);
+	}
+
 	private static void writeStateToElement(ObjectState state, Element elem)
 	{
 		elem.setAttribute("x", Integer.toString(state.posX));
@@ -61,7 +68,7 @@ public class GameIO {
 		}
 	}
 	
-	private static void readStateFromElement(ObjectState state, Element elem)
+	private static void editStateFromElement(ObjectState state, Element elem)
 	{
 		state.posX = Integer.parseInt(elem.getAttributeValue("x"));
 		state.posY = Integer.parseInt(elem.getAttributeValue("y"));
@@ -93,6 +100,31 @@ public class GameIO {
 		if (state instanceof GameObjectFigure.FigureState && elem.getAttribute("standing") != null)
 		{
 			((GameObjectFigure.FigureState)state).standing = Boolean.parseBoolean(elem.getAttributeValue("standing"));
+		}
+	}
+
+	private static void editGameInstanceFromElement(Element root, GameInstance gi) throws JDOMException, IOException {
+
+		for (Element elem : root.getChildren())
+		{
+			String name = elem.getName();
+			if (name.equals("player"))
+			{
+				Player player = createPlayerFromElement(elem);
+				System.out.println(player);
+				gi.addPlayer(player);
+			}
+			else if (name.equals("name"))
+			{
+				gi.name = elem.getValue();
+			}
+			else if (name.equals("object"))
+			{
+				String uniqueName = elem.getAttributeValue("unique_name");
+				ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue("id")));
+				editStateFromElement(oi.state, elem);
+				gi.addObjectInstance(oi);
+			}
 		}
 	}
 
@@ -149,16 +181,92 @@ public class GameIO {
 		return null;
 	}
 
-	private static int getVersion() {
-	    String version = System.getProperty("java.version");
-	    if(version.startsWith("1.")) {
-	        version = version.substring(2, 3);
-	    } else {
-	        int dot = version.indexOf(".");
-	        if(dot != -1) { version = version.substring(0, dot); }
-	    } return Integer.parseInt(version);
+	private static Element createElementFromGameObjectInstance(ObjectInstance gameObjectInstance)
+	{
+		Element elem = new Element("object");
+		elem.setAttribute("unique_name", gameObjectInstance.go.uniqueName);
+		elem.setAttribute("id", Integer.toString(gameObjectInstance.id));
+		writeStateToElement(gameObjectInstance.state, elem);
+		return elem;
 	}
-	
+
+	private static Element createElementFromGameObject(GameObject gameObject, HashMap<String, BufferedImage> images)
+	{
+		Element elem = new Element("object");
+		elem.setAttribute("type", gameObject.objectType);
+		elem.setAttribute("unique_name", gameObject.uniqueName);
+		elem.setAttribute("width", Integer.toString(gameObject.widthInMM));
+		elem.setAttribute("height", Integer.toString(gameObject.heightInMM));
+		if (gameObject instanceof GameObjectToken)
+		{
+			GameObjectToken token = (GameObjectToken) gameObject;
+			elem.setAttribute("value", Integer.toString(token.value));
+			for (String key : images.keySet())
+			{
+				if(images.get(key).equals(token.getUpsideLook()))//TODO slow
+				{
+					elem.setAttribute("front", key);
+					break;
+				}
+			}
+			if (token.getDownsideLook() != null)
+			{
+				for (String key : images.keySet())
+				{
+					if(images.get(key).equals(token.getDownsideLook()))
+					{
+						elem.setAttribute("back", key);
+						break;
+					}
+				}
+			}
+
+		}
+		else if (gameObject instanceof GameObjectFigure)
+		{
+			GameObjectFigure figure = (GameObjectFigure) gameObject;
+			for (String key : images.keySet())
+			{
+				if(images.get(key).equals(figure.getStandingLook()))
+				{
+					elem.setAttribute("standing", key);
+					break;
+				}
+			}
+		}
+		else if (gameObject instanceof GameObjectDice)
+		{
+			GameObjectDice dice = (GameObjectDice) gameObject;
+			for (DiceSideState sideState : dice.dss)
+			{
+				Element side = new Element("side");
+				side.setAttribute("value", Integer.toString(sideState.value));
+				for (Map.Entry<String, BufferedImage> mapEntry : images.entrySet())
+				{
+					if(mapEntry.getValue().equals(sideState.img)) //TODO is this possible without comparing images?
+					{
+						side.setText(mapEntry.getKey());
+						break;
+					}
+				}
+				elem.addContent(side);
+			}
+		}
+		return elem;
+	}
+
+	private static Element createElementFromPlayer(Player player) {
+		Element elem = new Element("player");
+		elem.setAttribute("name", player.name);
+		elem.setAttribute("id", Integer.toString(player.id));
+		return elem;
+	}
+
+	private static Player createPlayerFromElement(Element elem)
+	{
+		return new Player(elem.getAttributeValue("name"), Integer.parseInt(elem.getAttributeValue("id")));
+	}
+
 	/* Not written: password, actions, changeListener, TYPES, logger*/
 	public static void writeSnapshotToZip(GameInstance gi, OutputStream os) throws IOException
 	{
@@ -193,67 +301,7 @@ public class GameIO {
 
 			for (int idx = 0; idx < game.objects.size(); idx++)  {
 	        	GameObject entry = game.objects.get(idx);
-	        	Element elem = new Element("object");
-				elem.setAttribute("type", entry.objectType);
-				elem.setAttribute("unique_name", entry.uniqueName);
-				elem.setAttribute("width", Integer.toString(entry.widthInMM));
-				elem.setAttribute("height", Integer.toString(entry.heightInMM));
-	        	if (entry instanceof GameObjectToken)
-	        	{
-	        		GameObjectToken token = (GameObjectToken) entry;
-					elem.setAttribute("value", Integer.toString(token.value));
-	        		for (String key : game.images.keySet())
-	        		{
-	        			if(game.images.get(key).equals(token.getUpsideLook()))//TODO slow
-	        			{
-	        				elem.setAttribute("front", key);
-	        				break;
-	        	        }
-	        		}
-	        		if (token.getDownsideLook() != null)
-	        		{
-						for (String key : game.images.keySet())
-						{
-							if(game.images.get(key).equals(token.getDownsideLook()))
-							{
-								elem.setAttribute("back", key);
-								break;
-							}
-						}
-					}
-
-	        	}
-	        	else if (entry instanceof GameObjectFigure)
-	        	{
-					GameObjectFigure figure = (GameObjectFigure) entry;
-					for (String key : game.images.keySet())
-					{
-						if(game.images.get(key).equals(figure.getStandingLook()))
-						{
-							elem.setAttribute("standing", key);
-							break;
-						}
-					}
-				}
-				else if (entry instanceof GameObjectDice)
-				{
-					GameObjectDice dice = (GameObjectDice) entry;
-					for (DiceSideState sideState : dice.dss)
-					{
-						Element side = new Element("side");
-						side.setAttribute("value", Integer.toString(sideState.value));
-						for (Map.Entry<String, BufferedImage> mapEntry : game.images.entrySet())
-						{
-							if(mapEntry.getValue().equals(sideState.img)) //TODO is this possible without comparing images?
-							{
-								side.setText(mapEntry.getKey());
-								break;
-							}
-						}
-						elem.addContent(side);
-					}
-				}
-	        	root_game.addContent(elem);
+	        	root_game.addContent(createElementFromGameObject(entry, game.images));
 	        }
 	        
 	        Element elem_back = new Element("background");
@@ -277,18 +325,12 @@ public class GameIO {
 	    	Element root_inst = new Element("xml");
 
 			for (int idx = 0; idx < gi.objects.size(); idx++) {
-	        	ObjectInstance gameObject = gi.objects.get(idx);
-	        	Element elem = new Element("object");
-        		elem.setAttribute("unique_name", gameObject.go.uniqueName);
-        		elem.setAttribute("id", Integer.toString(gameObject.id));
-        		writeStateToElement(gameObject.state, elem);
-        		root_inst.addContent(elem);
+	        	ObjectInstance gameObjectInstance = gi.objects.get(idx);
+        		root_inst.addContent(createElementFromGameObjectInstance(gameObjectInstance));
         	}
 			for (int idx = 0; idx < gi.players.size(); idx++) {
 				Player player = gi.players.get(idx);
-				Element elem = new Element("player");
-				writePlayerToElement(player, elem);
-				root_inst.addContent(elem);
+				root_inst.addContent(createElementFromPlayer(player));
 			}
 	        Element sessionName = new Element("name");
 	        sessionName.setText(gi.name);
@@ -313,16 +355,6 @@ public class GameIO {
 		}
 	}
 
-	private static Player readPlayerFromElement(Element elem)
-	{
-		return new Player(elem.getAttributeValue("name"), Integer.parseInt(elem.getAttributeValue("id")));
-	}
-	
-	private static void writePlayerToElement(Player player, Element elem) {
-		elem.setAttribute("name", player.name);
-		elem.setAttribute("id", Integer.toString(player.id));
-	}
-
 	public static void writeGameToZip(Game game, OutputStream os) throws IOException
 	{	
 		ZipOutputStream zipOutputStream = null;
@@ -331,21 +363,18 @@ public class GameIO {
 			zipOutputStream = new ZipOutputStream(os);
 			
 			// Save all images
-		    Iterator<Entry<String, BufferedImage>> it = game.images.entrySet().iterator();
-		    while (it.hasNext()) {
-		    	HashMap.Entry<String, BufferedImage> pair = it.next();
-		        //System.out.println(pair.getKey() + " = " + pair.getValue());
-		    
-			    ZipEntry imageZipOutput = new ZipEntry(pair.getKey());
+		    for (String key : game.images.keySet()) {
+
+			    ZipEntry imageZipOutput = new ZipEntry(key);
 			    zipOutputStream.putNextEntry(imageZipOutput);
 
-			    if (pair.getKey().endsWith(".jpg"))
+			    if (key.endsWith(".jpg"))
 			    {
-			    	ImageIO.write(pair.getValue(), "jpg", zipOutputStream);
+			    	ImageIO.write(game.images.get(key), "jpg", zipOutputStream);
 			    }
-			    else if (pair.getKey().endsWith(".png"))
+			    else if (key.endsWith(".png"))
 			    {
-			    	ImageIO.write(pair.getValue(), "png", zipOutputStream);
+			    	ImageIO.write(game.images.get(key), "png", zipOutputStream);
 			    }
 			    zipOutputStream.closeEntry();
 		    }
@@ -353,35 +382,10 @@ public class GameIO {
 			Document doc_game = new Document();
 	    	Element root_game = new Element("xml");
 	    	doc_game.addContent(root_game);
-	    	
-	    	Iterator<GameObject> gameIt = game.objects.iterator();
-	        while (gameIt.hasNext()) {
-	        	GameObject entry = gameIt.next();
-	        	Element elem = new Element("object");
-	        	if (entry instanceof GameObjectToken)
-	        	{
-	        		GameObjectToken card = (GameObjectToken) entry;
-	        		elem.setAttribute("type", "card");
-	        		elem.setAttribute("unique_name", card.uniqueName);
-	        		for (String key : game.images.keySet())
-	        		{
-	        			if(game.images.get(key).equals(card.getUpsideLook())) 
-	        			{
-	        				elem.setAttribute("front", key);
-	        				break;
-	        	        }
-	        		}
-	        		
-	        		for (String key : game.images.keySet())
-	        		{
-	        			if(game.images.get(key).equals(card.getDownsideLook())) 
-	        			{
-	        				elem.setAttribute("back", key);
-	        				break;
-	        	        }
-	        		}
-	        	}
-	        	root_game.addContent(elem);
+
+	        for (int idx = 0; idx < game.objects.size(); idx++) {
+	        	GameObject entry = game.objects.get(idx);
+	        	root_game.addContent(createElementFromGameObject(entry, game.images));
 	        }
 	        
 	        Element elem_back = new Element("background");
@@ -409,24 +413,100 @@ public class GameIO {
 		}
 	}
 
-	public static void writeObjectStateToStream(ObjectState object, OutputStream output) throws IOException
+	public static void writeObjectStateToZip(ObjectState object, OutputStream output) throws IOException
 	{
 		Document doc = new Document();
-    	
     	Element elem = new Element("object_state");
 		writeStateToElement(object, elem);
-
 		doc.addContent(elem);
     	new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
+	}
+
+	// TODO fertig machen
+	public static void writeObjectInstanceToZip(ObjectInstance game, ByteArrayOutputStream byteStream) {
+		// TODO Auto-generated method stub
 
 	}
 
-	// TODO Fragen
+	// TODO Fragen -> What Object?
+	public static void writeObjectToZip(GameObject game, ByteArrayOutputStream byteStream) {
+		// TODO Auto-generated method stub
+
+	}
+
+	// TODO fertig machen
+	public static void writePlayerToZip(Player player, ByteArrayOutputStream byteStream) {
+		// TODO Auto-generated method stub
+
+	}
+
 	public static GameInstance readSnapshotFromZip(InputStream in) throws IOException, JDOMException
 	{
 		ZipInputStream stream = new ZipInputStream(in);
 		GameInstance result = readSnapshotFromZip(stream);
 		in.close();
+		return result;
+	}
+
+	public static GameInstance readSnapshotFromZip(ZipInputStream stream) throws IOException, JDOMException
+	{
+		Game game = new Game();
+		HashMap<String, BufferedImage> images = game.images;
+		ByteArrayOutputStream gameBuffer = new ByteArrayOutputStream();
+		ByteArrayOutputStream gameInstanceBuffer = new ByteArrayOutputStream();
+		try
+		{
+			ZipEntry entry;
+			while((entry = stream.getNextEntry())!=null)
+			{
+				String name = entry.getName();
+				if (name.endsWith(".png") || name.endsWith(".jpg"))
+				{
+					BufferedImage img = ImageIO.read(stream);
+					images.put(name, img);
+				}
+				else if (name.equals("game.xml"))
+				{
+					int nRead;
+					byte[] data = new byte[1024];
+					while ((nRead = stream.read(data, 0, data.length)) != -1) {
+						gameBuffer.write(data, 0, nRead);
+					}
+
+				}
+				else if (name.equals("game_instance.xml"))
+				{
+					int nRead;
+					byte[] data = new byte[1024];
+					while ((nRead = stream.read(data, 0, data.length)) != -1) {
+						gameInstanceBuffer.write(data, 0, nRead);
+					}
+
+				}
+			}
+		}
+		finally
+		{
+			stream.close();
+		}
+		Document doc = new SAXBuilder().build(new ByteArrayInputStream(gameBuffer.toByteArray()));
+		Element root = doc.getRootElement();
+
+
+		for (Element elem : root.getChildren())
+		{
+			String name = elem.getName();
+			if (name.equals("object"))
+			{
+				game.objects.add(createGameObjectFromElement(elem, game.images));
+			}
+			else if (name.equals("background"))
+			{
+				game.background = images.get(elem.getValue());
+			}
+		}
+		GameInstance result = new GameInstance(game);
+		editGameInstanceFromZip(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
 		return result;
 	}
 
@@ -450,78 +530,15 @@ public class GameIO {
 		
 	}
 
-	public static void editObjectStateFromStream(ObjectState objectState, InputStream input) throws IOException, JDOMException
+	public static void editObjectStateFromZip(ObjectState objectState, InputStream input) throws IOException, JDOMException
 	{
 		Document doc = new SAXBuilder().build(input);
     	Element elem = doc.getRootElement();
 
-    	readStateFromElement(objectState, elem);
+    	editStateFromElement(objectState, elem);
 	}
 
-	public static GameInstance readSnapshotFromZip(ZipInputStream stream) throws IOException, JDOMException
-	{
-		Game game = new Game();
-		HashMap<String, BufferedImage> images = game.images;
-		ByteArrayOutputStream gameBuffer = new ByteArrayOutputStream();
-		ByteArrayOutputStream gameInstanceBuffer = new ByteArrayOutputStream();
-		try
-	    {
-			ZipEntry entry;
-	        while((entry = stream.getNextEntry())!=null)
-	        {
-	        	String name = entry.getName();
-	            if (name.endsWith(".png") || name.endsWith(".jpg"))
-	            {
-	            	BufferedImage img = ImageIO.read(stream);
-	            	images.put(name, img);
-	            }
-	            else if (name.equals("game.xml"))
-	            {
-            	    int nRead;
-            	    byte[] data = new byte[1024];
-            	    while ((nRead = stream.read(data, 0, data.length)) != -1) {
-            	        gameBuffer.write(data, 0, nRead);
-            	    }
-            	    
-	            }
-	            else if (name.equals("game_instance.xml"))
-	            {
-            	    int nRead;
-            	    byte[] data = new byte[1024];
-            	    while ((nRead = stream.read(data, 0, data.length)) != -1) {
-            	        gameInstanceBuffer.write(data, 0, nRead);
-            	    }
-            	    
-	            }
-	        }
-	    }
-	    finally
-	    {
-	        stream.close();
-	    }
-		Document doc = new SAXBuilder().build(new ByteArrayInputStream(gameBuffer.toByteArray()));
-    	Element root = doc.getRootElement();
-    	
-    
-    	for (Element elem : root.getChildren())
-    	{
-    		String name = elem.getName();
-    		if (name.equals("object"))
-    		{
-				game.objects.add(createGameObjectFromElement(elem, game.images));
-    		}
-    		else if (name.equals("background"))
-    		{
-    			game.background = images.get(elem.getValue());
-    		}
-	   	}
-    	GameInstance result = new GameInstance(game);
-    	editGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
-    	return result;
-	}
-	
-
-	public static void editGameInstanceFromStream(InputStream is, GameInstance gi) throws JDOMException, IOException
+	public static void editGameInstanceFromZip(InputStream is, GameInstance gi) throws JDOMException, IOException
 	{
 		Document doc = new SAXBuilder().build(is);
     	Element root = doc.getRootElement();
@@ -529,50 +546,10 @@ public class GameIO {
 		editGameInstanceFromElement(root, gi);
 	}
 
-	public static void writeObjectInstanceToZip(ObjectInstance game, ByteArrayOutputStream byteStream) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void writeObjectToZip(GameObject game, ByteArrayOutputStream byteStream) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void writePlayerToZip(Player player, ByteArrayOutputStream byteStream) {
-		// TODO Auto-generated method stub
-		
-	}
-
 	// Paul sagt wir brauchen irgendwann die AsynchronousGameConnection^^ Bisher brauchen wir sie nicht.
 	public static void editGameInstanceFromZip(InputStream InputStream, GameInstance gi,
 			AsynchronousGameConnection source) throws JDOMException, IOException {
-		editGameInstanceFromStream(InputStream, gi);
-	}
-
-	private static void editGameInstanceFromElement(Element root, GameInstance gi) throws JDOMException, IOException {
-
-		for (Element elem : root.getChildren())
-		{
-			String name = elem.getName();
-			if (name.equals("player"))
-			{
-				Player player = readPlayerFromElement(elem);
-				System.out.println(player);
-				gi.addPlayer(player);
-			}
-			else if (name.equals("name"))
-			{
-				gi.name = elem.getValue();
-			}
-			else if (name.equals("object"))
-			{
-				String uniqueName = elem.getAttributeValue("unique_name");
-				ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue("id")));
-				readStateFromElement(oi.state, elem);
-				gi.addObjectInstance(oi);
-			}
-		}
+		editGameInstanceFromZip(InputStream, gi);
 	}
 	
 }
