@@ -1,5 +1,31 @@
 package io;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
+
+import javax.imageio.ImageIO;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
+
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
+
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectDice.DiceSideState;
@@ -11,30 +37,10 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
 import main.Player;
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
+import net.AsynchronousGameConnection;
 
 public class GameIO {
-	public Player readPlayer(ZipInputStream stream)
-	{
-		return null;
-	}
+
 	
 	private static void writeStateToElement(ObjectState state, Element elem)
 	{
@@ -143,6 +149,16 @@ public class GameIO {
 		return null;
 	}
 
+	private static int getVersion() {
+	    String version = System.getProperty("java.version");
+	    if(version.startsWith("1.")) {
+	        version = version.substring(2, 3);
+	    } else {
+	        int dot = version.indexOf(".");
+	        if(dot != -1) { version = version.substring(0, dot); }
+	    } return Integer.parseInt(version);
+	}
+	
 	/* Not written: password, actions, changeListener, TYPES, logger*/
 	public static void writeSnapshotToZip(GameInstance gi, OutputStream os) throws IOException
 	{
@@ -152,21 +168,21 @@ public class GameIO {
 			zipOutputStream = new ZipOutputStream(os);
 			Game game = gi.game;
 			// Save all images
-		    Iterator<Entry<String, BufferedImage>> it = game.images.entrySet().iterator();
-		    while (it.hasNext()) {
-		    	HashMap.Entry<String, BufferedImage> pair = it.next();
+		    for (HashMap.Entry<String, BufferedImage> pair : game.images.entrySet()) {
 		    	String key = pair.getKey();
 			    ZipEntry imageZipOutput = new ZipEntry(key);
 			    zipOutputStream.putNextEntry(imageZipOutput);
 
-			    if (key.endsWith(".jpg"))
+			    if (getVersion() < 9)
+		    	{
+		    		MemoryCacheImageOutputStream tmp = new MemoryCacheImageOutputStream(zipOutputStream);
+		    		ImageIO.write(pair.getValue(), key.substring(key.length() - 3), tmp);
+		    		tmp.close();
+		    	}
+			    else
 			    {
-			    	ImageIO.write(pair.getValue(), "jpg", zipOutputStream);
-			    }
-			    else if (key.endsWith(".png"))
-			    {
-			    	ImageIO.write(pair.getValue(), "png", zipOutputStream);
-			    }
+			    	ImageIO.write(pair.getValue(), key.substring(key.length() - 3), zipOutputStream);
+		    	}
 			    zipOutputStream.closeEntry();
 		    }
 		    
@@ -226,11 +242,11 @@ public class GameIO {
 					{
 						Element side = new Element("side");
 						side.setAttribute("value", Integer.toString(sideState.value));
-						for (String key : game.images.keySet())
+						for (Map.Entry<String, BufferedImage> mapEntry : game.images.entrySet())
 						{
-							if(game.images.get(key).equals(sideState.img)) //TODO is this possible without comparing images?
+							if(mapEntry.getValue().equals(sideState.img)) //TODO is this possible without comparing images?
 							{
-								side.setText(key);
+								side.setText(mapEntry.getKey());
 								break;
 							}
 						}
@@ -297,6 +313,11 @@ public class GameIO {
 		}
 	}
 
+	private static Player readPlayerFromElement(Element elem)
+	{
+		return new Player(elem.getAttributeValue("name"), Integer.parseInt(elem.getAttributeValue("id")));
+	}
+	
 	private static void writePlayerToElement(Player player, Element elem) {
 		elem.setAttribute("name", player.name);
 		elem.setAttribute("id", Integer.toString(player.id));
@@ -508,7 +529,13 @@ public class GameIO {
     	for (Element elem : root.getChildren())
     	{
     		String name = elem.getName();
-    		if (name.equals("name"))
+    		if (name.equals("player"))
+    		{
+    			Player player = readPlayerFromElement(elem);
+				System.out.println(player);
+    			gi.players.add(player);
+    		}
+    		else if (name.equals("name"))
     		{
 	    		gi.name = elem.getValue();	
     		}
@@ -522,17 +549,23 @@ public class GameIO {
 	   	}
 	}
 
-	public static void writeObjectInstanceToZip(Game game, ByteArrayOutputStream byteStream) {
+	public static void writeObjectInstanceToZip(ObjectInstance game, ByteArrayOutputStream byteStream) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public static void writeObjectToZip(Game game, ByteArrayOutputStream byteStream) {
+	public static void writeObjectToZip(GameObject game, ByteArrayOutputStream byteStream) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	public static void writePlayerToZip(Player player, ByteArrayOutputStream byteStream) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static void editGameInstanceFromZip(ByteArrayInputStream byteArrayInputStream, GameInstance gi,
+			AsynchronousGameConnection source) {
 		// TODO Auto-generated method stub
 		
 	}
