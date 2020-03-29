@@ -3,7 +3,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -12,10 +11,8 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gui.GameWindow;
-import gui.ServerConnectionDialog;
 import io.GameIO;
 import net.AsynchronousGameConnection;
 import net.GameServer;
@@ -148,7 +145,8 @@ public class Main {
 	    	final Socket socket[] = new Socket[1];
 	        Thread th = new Thread()
 			{
-	    		public void run()
+	    		@Override
+				public void run()
 	    		{
 	    			try {
 						socket[0] = new Socket( "localhost", 1234 );
