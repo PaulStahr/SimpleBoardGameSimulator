@@ -26,7 +26,7 @@ import org.jdom2.output.XMLOutputter;
 
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectDice.DiceSideState;
+import gameObjects.definition.GameObjectDice.DiceSide;
 import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.definition.GameObjectToken.TokenState;
@@ -201,12 +201,12 @@ public class GameIO {
 				if(elem.getAttributeValue("height") != null) {
 					height = Integer.parseInt(elem.getAttributeValue("height"));
 				}
-				ArrayList<DiceSideState> dss = new ArrayList<>();
+				ArrayList<DiceSide> dss = new ArrayList<>();
 				for (Element side : elem.getChildren())
 				{
-					dss.add(new DiceSideState(Integer.parseInt(side.getAttributeValue("value")), images.get(side.getValue())));
+					dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue("value")), images.get(side.getValue())));
 				}
-				return new GameObjectDice(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, dss.toArray(new DiceSideState[dss.size()]));
+				return new GameObjectDice(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, dss.toArray(new DiceSide[dss.size()]));
 			}
 		}
 		return null;
@@ -294,7 +294,7 @@ public class GameIO {
 		else if (gameObject instanceof GameObjectDice)
 		{
 			GameObjectDice dice = (GameObjectDice) gameObject;
-			for (DiceSideState sideState : dice.dss)
+			for (DiceSide sideState : dice.dss)
 			{
 				Element side = new Element("side");
 				side.setAttribute("value", Integer.toString(sideState.value));
