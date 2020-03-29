@@ -123,7 +123,7 @@ public class GameIO {
 
 	/**
 	 * Edit a GameInstance from an XML Element.
-	 * ATTENTION: Only the fieldS players, name and objects get updated.
+	 * ATTENTION: The following fields are not edited: game, actions, changeListener, TYPES, logger
 	 * @param root the root Element with all Elements that need updating as children
 	 * @param gi the GameInstance that shall the updated
 	 */
@@ -148,6 +148,14 @@ public class GameIO {
 				ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue("id")));
 				editStateFromElement(oi.state, elem);
 				gi.addObjectInstance(oi);
+			}
+			else if (name.equals("password"))
+			{
+				gi.password = elem.getValue();
+			}
+			else if (name.equals("hidden"))
+			{
+				gi.hidden = Boolean.parseBoolean(elem.getValue());
 			}
 		}
 	}
@@ -304,7 +312,7 @@ public class GameIO {
 	 * ATTENTION 1: Even though the @param os is an abstract OutputStream, it will
 	 * used to create a ZipOutputStream via ZipOutputStream(os).
 	 * ATTENTION 2: The following fields are not written into the
-	 * ZipOutputStream: password, actions, changeListener, TYPES, logger
+	 * ZipOutputStream: actions, changeListener, TYPES, logger
 	 * @param gi the GameInstance that shall be encoded
 	 * @param os the OutputStream the GameInstance will be written to
 	 */
@@ -372,6 +380,10 @@ public class GameIO {
 			Element hidden = new Element("hidden");
 			hidden.setText(String.valueOf(gi.hidden));
 			root_inst.addContent(hidden);
+
+			Element password = new Element("password");
+			hidden.setText(String.valueOf(gi.password));
+			root_inst.addContent(password);
 	    	
 	        doc_inst.addContent(root_inst);
 	    	ZipEntry xmlZipOutput = new ZipEntry("game_instance.xml");
@@ -635,7 +647,7 @@ public class GameIO {
 	 * @param source Paul sagt wir brauchen irgendwann die AsynchronousGameConnection^^ Bisher brauchen wir sie nicht.
 	 */
 	public static void editGameInstanceFromZip(InputStream inputStream, GameInstance gi,
-			AsynchronousGameConnection source) throws JDOMException, IOException {
+			Object source) throws JDOMException, IOException {
 		editGameInstanceFromZip(inputStream, gi);
 	}
 	
