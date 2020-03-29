@@ -56,7 +56,7 @@ public class GameServer implements Runnable {
 				return gameInstances.get(i);
 			}
 		}
-		System.out.println();
+		System.out.println("Not found");
 		return null;
 	}
 	
@@ -195,16 +195,15 @@ public class GameServer implements Runnable {
 				    					gameInstances.add(gi);
 				    				}
 								} catch (JDOMException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+									logger.error("Can't read instance ", e);
 								} catch (ClassNotFoundException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
+									logger.error("Can't read instance ", e);
 								}
 			    				
 			    				break;
 			    			case NetworkString.MESSAGE:
 			    				userMessageChatHistory.add(new UsertextMessageAction(Integer.parseInt(split.get(2)), Integer.parseInt(split.get(3)), split.get(4)));
+			    				break;
 			    			case NetworkString.GAME_OBJECT:
 			    				break;
 			    			case NetworkString.GAME_OBJECT_INSTANCE:
@@ -268,7 +267,7 @@ public class GameServer implements Runnable {
 						}
 			    		if (gi.password == null || gi.password.equals(split.get(4)))
 			    		{
-			    			gi.players.add(new Player(player, id));
+			    			gi.addPlayer(new Player(player, id));
 			    		}
 			    		break;
 			    	}

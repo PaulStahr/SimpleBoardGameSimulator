@@ -32,6 +32,18 @@ public class GameInstance {
 		this.game = game;
 	}
 	
+	public Player addPlayer(Player player)
+	{
+		Player pl = getPlayer(player.id);
+		if (pl != null)
+		{
+			pl.name = player.name;
+			return pl;
+		}
+		players.add(player);
+		return player;
+	}
+	
 	public Player getPlayer(int id)
 	{
 		for (int i = 0; i < players.size(); ++i)

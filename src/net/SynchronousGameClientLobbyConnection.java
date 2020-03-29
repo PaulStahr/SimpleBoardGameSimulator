@@ -91,7 +91,7 @@ public class SynchronousGameClientLobbyConnection {
 		StringBuilder strB = new StringBuilder();
 		strB.append(NetworkString.PUSH).append(' ').append(NetworkString.GAME_INSTANCE);
 		oStream = writeCommand(strB, oStream);
-	    System.out.println("write command");
+	    logger.debug("write command " + strB.toString());
 	    //GameIO.writeSnapshotToZip(gi, oStream);
 	    ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	    GameIO.writeSnapshotToZip(gi, bos);
@@ -104,6 +104,7 @@ public class SynchronousGameClientLobbyConnection {
 	    	((ObjectOutputStream)oStream).write(bos.toByteArray());	    	
 	    }
 	    server.close();
+	    logger.debug("successfull");
 	}
 	
 	public void getPlayers(String gameInstanceName, ArrayList<String> result) throws UnknownHostException, IOException
@@ -132,7 +133,7 @@ public class SynchronousGameClientLobbyConnection {
 	    server.close();
 	}
 	
-	public void joinToGameSession(Player player, String name, String password) throws UnknownHostException, IOException
+	public void addPlayerToGameSession(Player player, String name, String password) throws UnknownHostException, IOException
 	{
 		Socket server = new Socket( address, port);
 	    StringBuilder strB = new StringBuilder();

@@ -35,9 +35,10 @@ public class SimpleNetworkServertest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-    	sclc.joinToGameSession(player, gi.name, gi.password);
+    	sclc.addPlayerToGameSession(player, gi.name, gi.password);
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi);
     	connection.start();
+    	gi.addPlayer(player);
     	gw.setVisible(true);
     }
     
@@ -45,8 +46,9 @@ public class SimpleNetworkServertest {
     {
     	GameWindow gw = new GameWindow(gi, player);
     	SynchronousGameClientLobbyConnection sclc = new SynchronousGameClientLobbyConnection(address,  port);
-    	sclc.joinToGameSession(player, gi.name, gi.password);
+    	sclc.addPlayerToGameSession(player, gi.name, gi.password);
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi);
+    	gi.addPlayer(player);
     	connection.syncPull();
     	connection.start();
     	gw.setVisible(true);
