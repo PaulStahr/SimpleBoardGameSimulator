@@ -244,10 +244,10 @@ public class GameIO {
 	 * are considered. (GameObjectFigure only saves the standing picture as the lying picture
 	 * gets created from the standing one)
 	 * @param gameObject the GameObject that shall be encoded
-	 * @param images a HashMap that contains at least all images used by the gameObject
+	 * @param game the game which contains the HashMap of all images in the game
 	 * @return the created Element
 	 */
-	private static Element createElementFromGameObject(GameObject gameObject, HashMap<String, BufferedImage> images)
+	private static Element createElementFromGameObject(GameObject gameObject, Game game)
 	{
 		Element elem = new Element("object");
 		elem.setAttribute("type", gameObject.objectType);
@@ -258,55 +258,27 @@ public class GameIO {
 		{
 			GameObjectToken token = (GameObjectToken) gameObject;
 			elem.setAttribute("value", Integer.toString(token.value));
-			for (String key : images.keySet())
-			{
-				if(images.get(key).equals(token.getUpsideLook()))//TODO slow
-				{
-					elem.setAttribute("front", key);
-					break;
-				}
-			}
+			elem.setAttribute("front", game.getImageKey(token.getUpsideLook()));
 			if (token.getDownsideLook() != null)
 			{
-				for (String key : images.keySet())
-				{
-					if(images.get(key).equals(token.getDownsideLook()))
-					{
-						elem.setAttribute("back", key);
-						break;
-					}
-				}
+				elem.setAttribute("back", game.getImageKey(token.getDownsideLook()));
 			}
 
 		}
 		else if (gameObject instanceof GameObjectFigure)
 		{
 			GameObjectFigure figure = (GameObjectFigure) gameObject;
-			for (String key : images.keySet())
-			{
-				if(images.get(key).equals(figure.getStandingLook()))
-				{
-					elem.setAttribute("standing", key);
-					break;
-				}
-			}
+			elem.setAttribute("standing", game.getImageKey(figure.getStandingLook()));
 		}
 		else if (gameObject instanceof GameObjectDice)
 		{
 			GameObjectDice dice = (GameObjectDice) gameObject;
-			for (DiceSide sideState : dice.dss)
+			for (DiceSide side : dice.dss)
 			{
-				Element side = new Element("side");
-				side.setAttribute("value", Integer.toString(sideState.value));
-				for (Map.Entry<String, BufferedImage> mapEntry : images.entrySet())
-				{
-					if(mapEntry.getValue().equals(sideState.img)) //TODO is this possible without comparing images?
-					{
-						side.setText(mapEntry.getKey());
-						break;
-					}
-				}
-				elem.addContent(side);
+				Element sideElem = new Element("side");
+				sideElem.setAttribute("value", Integer.toString(side.value));
+				sideElem.setText(game.getImageKey(side.img));
+				elem.addContent(sideElem);
 			}
 		}
 		return elem;
@@ -369,18 +341,11 @@ public class GameIO {
 
 			for (int idx = 0; idx < game.objects.size(); idx++)  {
 	        	GameObject entry = game.objects.get(idx);
-	        	root_game.addContent(createElementFromGameObject(entry, game.images));
+	        	root_game.addContent(createElementFromGameObject(entry, game));
 	        }
 	        
 	        Element elem_back = new Element("background");
-	        for (String key : game.images.keySet())
-    		{
-    			if(game.images.get(key).equals(game.background)) 
-    			{
-    				elem_back.setText(key);
-    				break;
-    	        }
-    		}
+			elem_back.setText(game.getImageKey((BufferedImage) game.background));
 	        root_game.addContent(elem_back);
 	    	
 	    	ZipEntry gameZipOutput = new ZipEntry("game.xml");
@@ -461,18 +426,11 @@ public class GameIO {
 
 	        for (int idx = 0; idx < game.objects.size(); idx++) {
 	        	GameObject entry = game.objects.get(idx);
-	        	root_game.addContent(createElementFromGameObject(entry, game.images));
+	        	root_game.addContent(createElementFromGameObject(entry, game));
 	        }
 	        
 	        Element elem_back = new Element("background");
-	        for (String key : game.images.keySet())
-			{
-				if(game.images.get(key).equals(game.background)) 
-				{
-					elem_back.setText(key);
-					break;
-		        }
-			}
+	        elem_back.setText(game.getImageKey((BufferedImage) game.background));
 	        root_game.addContent(elem_back);
 	    	
 	        ZipEntry gameZipOutput = new ZipEntry("game.xml");

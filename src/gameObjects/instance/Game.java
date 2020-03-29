@@ -3,6 +3,7 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import gameObjects.definition.GameObject;
 
@@ -16,6 +17,24 @@ public class Game {
 			if (objects.get(i).uniqueName.equals(uniqueName))
 			{
 				return objects.get(i);
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Gets the initial image name from the images HashMap.
+	 * The names function as keys in this array.
+	 * @param image image for which the name is needed
+	 * @return name of the image or null if image not found
+	 */
+	public String getImageKey(BufferedImage image)
+	{
+		for (Map.Entry<String, BufferedImage> mapEntry : images.entrySet())
+		{
+			if(mapEntry.getValue() == image)
+			{
+				return mapEntry.getKey();
 			}
 		}
 		return null;
