@@ -516,37 +516,17 @@ public class GameIO {
     		}
 	   	}
     	GameInstance result = new GameInstance(game);
-    	readGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
+    	editGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
     	return result;
 	}
 	
 
-	public static void readGameInstanceFromStream(InputStream is, GameInstance gi) throws JDOMException, IOException
+	public static void editGameInstanceFromStream(InputStream is, GameInstance gi) throws JDOMException, IOException
 	{
 		Document doc = new SAXBuilder().build(is);
     	Element root = doc.getRootElement();
-    	
-    	for (Element elem : root.getChildren())
-    	{
-    		String name = elem.getName();
-    		if (name.equals("player"))
-    		{
-    			Player player = readPlayerFromElement(elem);
-				System.out.println(player);
-    			gi.players.add(player);
-    		}
-    		else if (name.equals("name"))
-    		{
-	    		gi.name = elem.getValue();	
-    		}
-    		else if (name.equals("object"))
-    		{
-    			String uniqueName = elem.getAttributeValue("unique_name");
-    			ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue("id")));
-    			readStateFromElement(oi.state, elem);
-    			gi.objects.add(oi);
-    		}
-	   	}
+
+		editGameInstanceFromElement(root, gi);
 	}
 
 	public static void writeObjectInstanceToZip(ObjectInstance game, ByteArrayOutputStream byteStream) {
@@ -564,10 +544,35 @@ public class GameIO {
 		
 	}
 
-	public static void editGameInstanceFromZip(ByteArrayInputStream byteArrayInputStream, GameInstance gi,
-			AsynchronousGameConnection source) {
-		// TODO Auto-generated method stub
-		
+	// Paul sagt wir brauchen irgendwann die AsynchronousGameConnection^^ Bisher brauchen wir sie nicht.
+	public static void editGameInstanceFromZip(InputStream InputStream, GameInstance gi,
+			AsynchronousGameConnection source) throws JDOMException, IOException {
+		editGameInstanceFromStream(InputStream, gi);
+	}
+
+	private static void editGameInstanceFromElement(Element root, GameInstance gi) throws JDOMException, IOException {
+
+		for (Element elem : root.getChildren())
+		{
+			String name = elem.getName();
+			if (name.equals("player"))
+			{
+				Player player = readPlayerFromElement(elem);
+				System.out.println(player);
+				gi.addPlayer(player);
+			}
+			else if (name.equals("name"))
+			{
+				gi.name = elem.getValue();
+			}
+			else if (name.equals("object"))
+			{
+				String uniqueName = elem.getAttributeValue("unique_name");
+				ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue("id")));
+				readStateFromElement(oi.state, elem);
+				gi.addObjectInstance(oi);
+			}
+		}
 	}
 	
 }

@@ -67,6 +67,20 @@ public class GameInstance {
 		}
 		return null;
 	}
+
+	public ObjectInstance addObjectInstance(ObjectInstance objectInstance)
+	{
+		ObjectInstance oi = getObjectInstance(objectInstance.id);
+		if (oi != null)
+		{
+			oi.updateState(objectInstance.state);
+			oi.scale = objectInstance.scale;
+			oi.inHand = objectInstance.inHand;
+			return oi;
+		}
+		objects.add(objectInstance);
+		return objectInstance;
+	}
 	
 	public ObjectInstance getObjectInstance(int id)
 	{
