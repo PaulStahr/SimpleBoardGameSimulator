@@ -8,9 +8,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.rmi.activation.ActivationGroupDesc.CommandEnvironment;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
@@ -21,7 +19,6 @@ import gameObjects.definition.GameObject;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import gameObjects.instance.GameInstance.GameChangeListener;
 import io.GameIO;
 import main.DataHandler;
 import main.Player;
@@ -49,7 +46,7 @@ public class GameServer implements Runnable {
 	
 	private GameInstance getGameInstance(String name)
 	{
-		System.out.print("get instance (" + id + ")" + name);
+		logger.debug("get instance (" + id + ")" + name);
 		for (int i = 0; i < gameInstances.size(); ++i)
 		{
 			System.out.print("\"" + gameInstances.get(i).name + "\" ");
@@ -82,6 +79,7 @@ public class GameServer implements Runnable {
 			this.client = client;
 		}
 		
+		@Override
 		public void run()
 		{
 			try {
@@ -96,7 +94,7 @@ public class GameServer implements Runnable {
 					try {
 						line = (String)objIn.readObject();
 					} catch (ClassNotFoundException e) {
-						e.printStackTrace();
+						logger.error("Unknonwn input class", e);
 					}
 					input = objIn;
 				}
@@ -180,7 +178,7 @@ public class GameServer implements Runnable {
 			    		switch (split.get(1))
 			    		{
 			    			case NetworkString.GAME_INSTANCE:
-			    				System.out.println("do push (" + id + ")");
+			    				logger.debug("do push (" + id + ")");
 								try {
 									GameInstance gi;
 									if (ce == CommandEncoding.SERIALIZE)
@@ -191,7 +189,7 @@ public class GameServer implements Runnable {
 									{
 										gi = GameIO.readSnapshotFromZip(input);		
 									}
-									System.out.println("read successfull");
+									logger.debug("read successfull");
 									synchronized(gameInstances)
 				    				{
 				    					gameInstances.add(gi);
@@ -264,6 +262,10 @@ public class GameServer implements Runnable {
 			    		String player = split.get(1);
 						int id = Integer.parseInt(split.get(2));
 						GameInstance gi = getGameInstance(split.get(3));
+						if (gi == null)
+						{
+							throw new NullPointerException("Can't find game instance " + split.get(3));
+						}
 			    		if (gi.password == null || gi.password.equals(split.get(4)))
 			    		{
 			    			gi.players.add(new Player(player, id));
@@ -276,12 +278,12 @@ public class GameServer implements Runnable {
 			    		AsynchronousGameConnection asc;
 			    		if (input instanceof ObjectInputStream)
 			    		{
-			    			System.out.println("conect to Object input");
+			    			logger.debug("Connect to Object Input");
 			    			asc = new AsynchronousGameConnection(gi, (ObjectInputStream)input, output);
 			    		}
 			    		else
 			    		{
-			    			System.out.println("connect to stream input");
+			    			logger.debug("Connect to Stream Input");
 			    			asc = new AsynchronousGameConnection(gi, input, output);
 				    	}
 			    		input = null;
@@ -301,6 +303,7 @@ public class GameServer implements Runnable {
 		}	
     }
 	
+	@Override
 	public void run()
 	{
 		ServerSocket server;

@@ -4,11 +4,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gameObjects.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
@@ -20,6 +22,7 @@ public class SynchronousGameClientLobbyConnection {
 	String address;
 	int port;
 	CommandEncoding ce = CommandEncoding.SERIALIZE;
+	Logger logger = LoggerFactory.getLogger(SynchronousGameClientLobbyConnection.class);
 
 
 	public SynchronousGameClientLobbyConnection(String address, int port)
@@ -56,6 +59,7 @@ public class SynchronousGameClientLobbyConnection {
 	
 	OutputStream writeCommand(StringBuilder strB, OutputStream oStream) throws IOException
 	{
+		logger.debug("Write command " + strB.toString());
 		switch (ce)
 		{
 			case PLAIN: oStream.write(strB.append('\n').toString().getBytes());break;
