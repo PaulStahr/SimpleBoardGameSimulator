@@ -6,20 +6,20 @@ import java.util.Random;
 import gameObjects.instance.ObjectState;
 
 public class GameObjectDice extends GameObject{
-	public static class DiceSideState
+	public static class DiceSide
 	{
 		public final int value;
 		public final BufferedImage img;
 	
-		public DiceSideState(int value, BufferedImage img)
+		public DiceSide(int value, BufferedImage img)
 		{
 			this.value = value;
 			this.img = img;
 		}
 	}
-	public DiceSideState dss[];
+	public DiceSide dss[];
 	
-	public GameObjectDice(String uniqueName, String objectType, int widthInMM, int heightInMM, DiceSideState sides[]) {
+	public GameObjectDice(String uniqueName, String objectType, int widthInMM, int heightInMM, DiceSide sides[]) {
 		super(uniqueName, objectType, widthInMM, heightInMM);
 		this.dss = sides;
 	}
@@ -29,9 +29,9 @@ public class GameObjectDice extends GameObject{
 		return dss[((DiceState)state).side].img;
 	}
 
-	public DiceSideState getDiceState(int value)
+	public DiceSide getDiceSide(int value)
 	{
-		for (DiceSideState dss : this.dss)
+		for (DiceSide dss : this.dss)
 		{
 			if (dss.value == value)
 			{
@@ -44,15 +44,13 @@ public class GameObjectDice extends GameObject{
 	@Override
 	public ObjectState newObjectState()
 	{
-		DiceState state = new DiceState();//This implementation copys the state (Name suggests just creating object)
-		state.side = 0;
-		state.value = state.side;
+		DiceState state = new DiceState();
 		return state;
 	}
 
 	public static class DiceState  extends ObjectState
 	{
-		public int side;
+		public int side = 0;
 		
 		@Override
 		public int hashCode()
@@ -61,12 +59,15 @@ public class GameObjectDice extends GameObject{
 		}
 	}
 	
-	// Outputs a random side of the dice and saves the new state
-	public DiceSideState rollTheDice(DiceState state, Random rnd)
+	/** Outputs a random side of the dice and saves the new state.
+	 * @param state current DiceState; field "side" will be filled randomly
+	 * @param rnd randomizer
+	 *  */
+	public DiceSide rollTheDice(DiceState state, Random rnd)
 	{
 		state.side = rnd.nextInt(dss.length);
-		state.value = state.side;
-		return dss[state.value];
+		state.value = dss[state.side].value;
+		return dss[state.side];
 	}
 
 }
