@@ -32,11 +32,7 @@ public class Main {
     		{
     			FileInputStream fis;
 				try {
-					fis = new FileInputStream("Doppelkopf.zip");
-			 		GameInstance game0 = GameIO.readSnapshotFromZip(fis);
-	            	fis.close();
-	            	game0.name = "Testsession";
-	    			test.SimpleNetworkServertest.connectAndJoinGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), game0);
+					test.SimpleNetworkServertest.connectAndJoinGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), "Testsession");
 	    		} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

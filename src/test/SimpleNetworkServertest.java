@@ -6,7 +6,6 @@ import java.net.UnknownHostException;
 
 import org.jdom2.JDOMException;
 
-import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.instance.GameInstance;
 import gui.GameWindow;
 import io.GameIO;
@@ -42,16 +41,18 @@ public class SimpleNetworkServertest {
     	gw.setVisible(true);
     }
     
-    public static void connectAndJoinGame(String address, int port, Player player, GameInstance gi) throws UnknownHostException, IOException
+    public static GameWindow connectAndJoinGame(String address, int port, Player player, String gameInstanceId) throws UnknownHostException, IOException, JDOMException
     {
-    	GameWindow gw = new GameWindow(gi, player);
     	SynchronousGameClientLobbyConnection sclc = new SynchronousGameClientLobbyConnection(address,  port);
+    	GameInstance gi = sclc.getGameInstance(gameInstanceId);
     	sclc.addPlayerToGameSession(player, gi.name, gi.password);
+    	GameWindow gw = new GameWindow(gi, player);
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi);
-    	gi.addPlayer(player);
+    	//gi.addPlayer(player);
     	connection.syncPull();
     	connection.start();
     	gw.setVisible(true);
+    	return gw;
     }
     
     public static void localTwoInstanceTest() throws IOException, JDOMException
@@ -70,9 +71,9 @@ public class SimpleNetworkServertest {
 				}
 	    	}
     	}
-    	Player player = new Player("Player1", 1);
     	{
-	    	FileInputStream fis = new FileInputStream("Doppelkopf.zip");
+    	   	Player player = new Player("Paul", 1);
+    	   	FileInputStream fis = new FileInputStream("Doppelkopf.zip");
 			GameInstance gi = GameIO.readSnapshotFromZip(fis);
 			gi.name = "Testsession";
 			gi.players.add(player);
@@ -84,14 +85,16 @@ public class SimpleNetworkServertest {
     	}catch(InterruptedException e) {}
     	
     	
-    	FileInputStream fis = new FileInputStream("Doppelkopf.zip");
-		GameInstance gi = GameIO.readSnapshotFromZip(fis);
-		gi.name = "Testsession";
-		gi.players.add(player);
-	    connectAndJoinGame(address, port, player, gi);
+	   	Player player = new Player("Florian", 1);
+    	//FileInputStream fis = new FileInputStream("Doppelkopf.zip");
+		//GameInstance gi = GameIO.readSnapshotFromZip(fis);
+		//GameInstance gi = new GameInstance(new Game());
+		//gi.name = "Testsession";
+		//gi.players.add(player);
+	    GameWindow gw = connectAndJoinGame(address, port, player, "Testsession");
     	try {
     		Thread.sleep(500);
     	}catch(InterruptedException e) {}
-    	gi.update(new GameObjectInstanceEditAction(0, gi.players.get(0), gi.objects.get(0)));    	
+    	//gi.update(new GameObjectInstanceEditAction(0, gi.players.get(0), gi.objects.get(0)));    	
     }
 }

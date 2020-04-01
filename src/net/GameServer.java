@@ -215,6 +215,7 @@ public class GameServer implements Runnable {
 			    		break;
 			    	}
 			    	case NetworkString.PULL:
+			    	case NetworkString.READ:
 			    	{
 			    		switch(split.get(1))
 			    		{

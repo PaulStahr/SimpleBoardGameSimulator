@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -154,5 +155,16 @@ public class SynchronousGameClientLobbyConnection {
 	    strB.append(NetworkString.CONNECT).append(' ').append(gi.name);
 	    output = writeCommand(strB, output);
 	    return new AsynchronousGameConnection(gi, server.getInputStream(), output);
+	}
+
+	public GameInstance getGameInstance(String gameInstanceId) throws UnknownHostException, IOException, JDOMException
+	{
+		Socket server = new Socket( address, port);
+		OutputStream output = server.getOutputStream();
+	    StringBuilder strB = new StringBuilder();
+	    strB.append(NetworkString.READ).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(gameInstanceId);
+	    output = writeCommand(strB, output);
+	    GameInstance gi = GameIO.readSnapshotFromZip(server.getInputStream());
+	    return gi;
 	}
 }

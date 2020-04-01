@@ -610,7 +610,7 @@ public class GameIO {
 			}
 		}
 		GameInstance result = new GameInstance(game);
-		editGameInstanceFromZip(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
+		editGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
 		return result;
 	}
 
@@ -659,7 +659,7 @@ public class GameIO {
 	 * @param gi the GameInstance to be edited
 	 * @param is the InputStream with all update information
 	 */
-	public static void editGameInstanceFromZip(InputStream is, GameInstance gi) throws JDOMException, IOException
+	public static void editGameInstanceFromStream(InputStream is, GameInstance gi) throws JDOMException, IOException
 	{
 		Document doc = new SAXBuilder().build(is);
     	Element root = doc.getRootElement();
@@ -673,12 +673,44 @@ public class GameIO {
 	 * that can be used to build a Document via the SAXBuilder.
 	 * ATTENTION 2: Only the fields players, name and objects get updated.
 	 * @param gi the GameInstance to be edited
+	 * @param is the InputStream with all update information
+	 */
+	public static void editGameInstanceFromZip(InputStream is, GameInstance gi) throws JDOMException, IOException
+	{
+		ZipInputStream stream = new ZipInputStream(is);
+		editGameInstanceFromStream(stream, gi);
+		stream.close();
+	}
+
+	/**
+	 * Edit the GameInstance @param gi from information encoded in @param input.
+	 * ATTENTION 1: @param input is expected to contain an XML document
+	 * that can be used to build a Document via the SAXBuilder.
+	 * ATTENTION 2: Only the fields players, name and objects get updated.
+	 * @param gi the GameInstance to be edited
 	 * @param inputStream the InputStream with all update information
 	 * @param source Paul sagt wir brauchen irgendwann die AsynchronousGameConnection^^ Bisher brauchen wir sie nicht.
 	 */
 	public static void editGameInstanceFromZip(InputStream inputStream, GameInstance gi,
 			AsynchronousGameConnection source) throws JDOMException, IOException {
-		editGameInstanceFromZip(inputStream, gi);
+		ZipInputStream stream = new ZipInputStream(inputStream);
+		editGameInstanceFromStream(stream, gi);
+		stream.close();
 	}
+	
+	/**
+	 * Edit the GameInstance @param gi from information encoded in @param input.
+	 * ATTENTION 1: @param input is expected to contain an XML document
+	 * that can be used to build a Document via the SAXBuilder.
+	 * ATTENTION 2: Only the fields players, name and objects get updated.
+	 * @param gi the GameInstance to be edited
+	 * @param inputStream the InputStream with all update information
+	 * @param source Paul sagt wir brauchen irgendwann die AsynchronousGameConnection^^ Bisher brauchen wir sie nicht.
+	 */
+	public static void editGameInstanceFromStream(InputStream inputStream, GameInstance gi,
+			AsynchronousGameConnection source) throws JDOMException, IOException {
+		editGameInstanceFromStream(inputStream, gi);
+	}
+
 	
 }
