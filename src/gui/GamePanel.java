@@ -19,6 +19,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import gameObjects.GameAction;
 import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.functions.ObjectFunctions;
@@ -34,6 +37,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	 * 
 	 */
 	private static final long serialVersionUID = 3579141032474558913L;
+	private static final Logger logger = LoggerFactory.getLogger(GamePanel.class);
 	GameInstance gameInstance;
 	ObjectInstance activeObject = null;
 	int pressedXPos = -1;
@@ -56,7 +60,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	int mouseY = -1;
 
 	int mouseWheelValue = 0;
-
+	int zoomFactor = 0;
+	int translateX = 0;
+	int translateY = 0;
 	ControlPanel controlPanel = new ControlPanel();
 
 
@@ -92,6 +98,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void paintComponent(Graphics g)
 	{
+		//TODO Florian:sometimes images are drawn twice
+		double zooming = Math.exp(-zoomFactor * 0.1);
 		g.drawImage(gameInstance.game.background, 0, 0, getWidth(), getHeight(), Color.BLACK, null);
 		for (int i = 0; i < gameInstance.objects.size(); ++i) {
 			ObjectInstance oi = gameInstance.objects.get(i);
@@ -103,12 +111,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					if (currentInstance.getRotation() == 0) {
 						if (currentInstance.state == null || img == null)
 						{
-							//logger.error("Object state is null");
-							System.out.println("Null");
+							logger.error("Object state is null");
 						}
 						else
 						{
-							g.drawImage(img, currentInstance.state.posX, currentInstance.state.posY, (int) (currentInstance.scale * img.getWidth()), (int) (currentInstance.scale * img.getHeight()), null);
+							g.drawImage(img, (int)(currentInstance.state.posX * zooming), (int)(currentInstance.state.posY * zooming), (int) (currentInstance.scale * img.getWidth() * zooming), (int) (currentInstance.scale * img.getHeight() * zooming), null);
 						}
 					} else {
 						double rotationRequired = Math.toRadians(currentInstance.getRotation());
@@ -134,9 +141,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					double locationX = img.getWidth() / 2;
 					double locationY = img.getHeight() / 2;
 					AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX * oi.scale, locationY * oi.scale);
-					tx.scale(oi.scale, oi.scale);
+					tx.scale(zooming * oi.scale, zooming * oi.scale);
 					AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-					g.drawImage(op.filter(img, null), oi.state.posX, oi.state.posY, null);
+					g.drawImage(op.filter(img, null), (int)(zooming * oi.state.posX), (int)(zooming * oi.state.posY), null);
 				}
 			}
 		}
@@ -212,7 +219,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		mouseY = arg0.getY();
 	}
 
-
+	@SuppressWarnings("unused")
+	private final Runnable repaintRunnable = new Runnable() {
+		@Override
+		public void run()
+		{
+			repaint();
+		}
+	};
 
 
 	@Override
@@ -220,6 +234,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (action instanceof GameObjectInstanceEditAction)
 		{
 			repaint();
+			//If direct repaint causes problems use this:
+			//JFrameUtils.runByDispatcher(repaintRunnable);
 		}
 	}
 
@@ -341,6 +357,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		mouseWheelValue += (int) e.getPreciseWheelRotation();
+		if (isControlDown)
+		{
+			zoomFactor += (int) e.getPreciseWheelRotation();
+		}
 		getGraphics().drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
 		repaint();
 	}
