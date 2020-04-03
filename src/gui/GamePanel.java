@@ -1,5 +1,24 @@
 package gui;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.GridLayout;
+import java.awt.KeyEventDispatcher;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+
 import gameObjects.GameAction;
 import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.functions.ObjectFunctions;
@@ -7,13 +26,6 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import main.Player;
 import util.data.IntegerArrayList;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
 
 //import gameObjects.GameObjectInstanceEditAction;
 
@@ -87,7 +99,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				IntegerArrayList aboveList = ObjectFunctions.getAboveStack(gameInstance, oi);
 				for (int x : aboveList) {
 					ObjectInstance currentInstance = gameInstance.objects.get(x);
-					BufferedImage img = currentInstance.go.getLook(currentInstance.state);
+					BufferedImage img = currentInstance.go.getLook(currentInstance.state, player.id);
 					if (currentInstance.getRotation() == 0) {
 						if (currentInstance.state == null || img == null)
 						{
@@ -118,7 +130,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				if(oi == activeObject && oi.state.aboveInstanceId == -1)
 				{
 					double rotationRequired = Math.toRadians(oi.getRotation());
-					BufferedImage img = oi.go.getLook(oi.state);
+					BufferedImage img = oi.go.getLook(oi.state, player.id);
 					double locationX = img.getWidth() / 2;
 					double locationY = img.getHeight() / 2;
 					AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX * oi.scale, locationY * oi.scale);
@@ -211,8 +223,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 	}
 
+	@Override
 	public void keyTyped(KeyEvent e) {
 	}
+	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.isControlDown())
 		{
@@ -265,7 +279,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (activeObject!= null) {
 				if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, activeObject), ObjectFunctions.getStackBottom(gameInstance, activeObject))) {
 					activeObject = ObjectFunctions.getStackTop(gameInstance, activeObject);
-					ObjectFunctions.viewBelowCards(id, gameInstance, player, activeObject, activeObject.getWidth() / 2);
+					ObjectFunctions.viewBelowCards(id, gameInstance, player, activeObject, activeObject.getWidth(player.id) / 2);
 				} else {
 					ObjectFunctions.collectStack(id, gameInstance, player, activeObject);
 				}
@@ -307,6 +321,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	}
 
 
+	@Override
 	public void keyReleased(KeyEvent e) {
 		//System.out.println("keyReleased: "+e);
 		isControlDown = false;

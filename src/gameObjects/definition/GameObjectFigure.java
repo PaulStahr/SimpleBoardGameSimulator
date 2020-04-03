@@ -1,9 +1,9 @@
 package gameObjects.definition;
 
-import gameObjects.instance.ObjectState;
-
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+
+import gameObjects.instance.ObjectState;
 
 public class GameObjectFigure extends GameObject{
 	BufferedImage standingLook;
@@ -26,7 +26,7 @@ public class GameObjectFigure extends GameObject{
 	}
 
 	@Override
-	public BufferedImage getLook(ObjectState state) {
+	public BufferedImage getLook(ObjectState state, int playerId) {
 		return ((FigureState)state).standing ? standingLook : lyingLook;
 	}
 	

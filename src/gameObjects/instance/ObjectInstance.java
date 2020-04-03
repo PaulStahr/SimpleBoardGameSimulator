@@ -1,9 +1,9 @@
 package gameObjects.instance;
+import java.awt.Image;
+
 import gameObjects.definition.GameObject;
 import gui.GamePanel;
 import main.Player;
-
-import java.awt.*;
 
 public class ObjectInstance {
 	public final ObjectState state;
@@ -20,19 +20,19 @@ public class ObjectInstance {
 		this.id = id;
 	}
 	
-	public Image getLook()
+	public Image getLook(int playerId)
 	{
-		return go.getLook(state);
+		return go.getLook(state, playerId);
 	}
 
-	public int getWidth()
+	public int getWidth(int playerId)
 	{
-		return go.getWidth(state);
+		return go.getWidth(state, playerId);
 	}
 
-	public int getHeight()
+	public int getHeight(int playerId)
 	{
-		return go.getHeight(state);
+		return go.getHeight(state, playerId);
 	}
 
 	public void updateState(ObjectState objectState)
@@ -55,6 +55,7 @@ public class ObjectInstance {
 		return state.rotation;
 	}
 	
+	@Override
 	public int hashCode()
 	{
 		return go.hashCode() + state.hashCode() + id + (inHand == null ? 0 : inHand.hashCode()) + state.owner_id;

@@ -25,7 +25,7 @@ public class GameObjectDice extends GameObject{
 	}
 
 	@Override
-	public BufferedImage getLook(ObjectState state) {
+	public BufferedImage getLook(ObjectState state, int playerId) {
 		return dss[((DiceState)state).side].img;
 	}
 
