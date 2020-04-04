@@ -2,6 +2,7 @@ package gui;
 
 import gameObjects.GameAction;
 import gameObjects.GameObjectInstanceEditAction;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -17,7 +18,7 @@ import java.awt.image.BufferedImage;
 
 //import gameObjects.GameObjectInstanceEditAction;
 
-public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener, KeyListener, KeyEventDispatcher, MouseWheelListener{
+public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener, KeyListener, KeyEventDispatcher, MouseWheelListener, ActionListener{
 	/**
 	 * 
 	 */
@@ -33,7 +34,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	int maxInaccuracy = 20;
 
-	boolean[] loggedKeys = new boolean[256];
+	boolean[] loggedKeys = new boolean[1024];
 
 	Boolean isControlDown = false;
 	Boolean isShiftDown = false;
@@ -80,6 +81,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void paintComponent(Graphics g)
 	{
+		g.drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
 		g.drawImage(gameInstance.game.background, 0, 0, getWidth(), getHeight(), Color.BLACK, null);
 		for (int i = 0; i < gameInstance.objects.size(); ++i) {
 			ObjectInstance oi = gameInstance.objects.get(i);
@@ -326,7 +328,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 		mouseWheelValue += (int) e.getPreciseWheelRotation();
-		getGraphics().drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
 		repaint();
+		if(mouseWheelValue < 0) {
+			mouseWheelValue = 0;
+		}
+		getGraphics().drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent actionEvent) {
+
 	}
 }
