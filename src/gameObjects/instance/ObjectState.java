@@ -9,8 +9,7 @@ public class ObjectState {
 	/*stacking objects on top of each other*/
 	public int aboveInstanceId = -1;
 	public int belowInstanceId = -1;
-
-	public int value = 0;
+	public int value;
 	
 	@Override
 	public int hashCode()

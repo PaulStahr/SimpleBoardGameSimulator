@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.awt.KeyEventDispatcher;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -32,7 +34,7 @@ import util.data.IntegerArrayList;
 
 //import gameObjects.GameObjectInstanceEditAction;
 
-public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener, KeyListener, KeyEventDispatcher, MouseWheelListener{
+public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener, KeyListener, KeyEventDispatcher, MouseWheelListener, ActionListener{
 	/**
 	 * 
 	 */
@@ -49,7 +51,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	int maxInaccuracy = 20;
 
-	boolean[] loggedKeys = new boolean[256];
+	boolean[] loggedKeys = new boolean[1024];
 
 	Boolean isControlDown = false;
 	Boolean isShiftDown = false;
@@ -100,6 +102,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	{
 		//TODO Florian:sometimes images are drawn twice
 		double zooming = Math.exp(-zoomFactor * 0.1);
+		g.drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
 		g.drawImage(gameInstance.game.background, 0, 0, getWidth(), getHeight(), Color.BLACK, null);
 		for (int i = 0; i < gameInstance.objects.size(); ++i) {
 			ObjectInstance oi = gameInstance.objects.get(i);
@@ -363,5 +366,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		getGraphics().drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
 		repaint();
+		if(mouseWheelValue < 0) {
+			mouseWheelValue = 0;
+		}
+		getGraphics().drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent actionEvent) {
+
 	}
 }
