@@ -165,6 +165,8 @@ public class SynchronousGameClientLobbyConnection {
 	    strB.append(NetworkString.READ).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(gameInstanceId);
 	    output = writeCommand(strB, output);
 	    GameInstance gi = GameIO.readSnapshotFromZip(server.getInputStream());
+	    logger.debug("Read successfull");
+	    server.close();
 	    return gi;
 	}
 }

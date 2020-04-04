@@ -511,6 +511,20 @@ public class GameIO {
 		return result;
 	}
 
+	public static long copy(InputStream from, OutputStream to)
+		      throws IOException {
+		byte[] buf = new byte[0x1000];
+	    long total = 0;
+	    while (true) {
+	      int r = from.read(buf);
+	      if (r == -1) {
+	        break;
+	      }
+	      to.write(buf, 0, r);
+	      total += r;
+	    }
+	    return total;
+	  }	
 	/**
 	 * Reads a snapshot of a GameInstance encoded into @param stream incl. the
 	 * GameObject gi.game itself.
@@ -540,21 +554,11 @@ public class GameIO {
 				}
 				else if (name.equals("game.xml"))
 				{
-					int nRead;
-					byte[] data = new byte[1024];
-					while ((nRead = stream.read(data, 0, data.length)) != -1) {
-						gameBuffer.write(data, 0, nRead);
-					}
-
+					copy(stream, gameBuffer);
 				}
 				else if (name.equals("game_instance.xml"))
 				{
-					int nRead;
-					byte[] data = new byte[1024];
-					while ((nRead = stream.read(data, 0, data.length)) != -1) {
-						gameInstanceBuffer.write(data, 0, nRead);
-					}
-
+					copy(stream, gameInstanceBuffer);
 				}
 			}
 		}
@@ -663,7 +667,17 @@ public class GameIO {
 	public static void editGameInstanceFromZip(InputStream inputStream, GameInstance gi,
 			AsynchronousGameConnection source) throws JDOMException, IOException {
 		ZipInputStream stream = new ZipInputStream(inputStream);
-		editGameInstanceFromStream(stream, gi);
+		ZipEntry entry;
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+		while ((entry = stream.getNextEntry()) != null)
+		{
+			copy(stream, byteStream);
+			if (entry.getName().equals("game_instance.xml"))
+			{
+				editGameInstanceFromStream(new ByteArrayInputStream(byteStream.toByteArray()), gi);
+			}
+			byteStream.reset();
+		}
 		stream.close();
 	}
 	

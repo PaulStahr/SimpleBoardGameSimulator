@@ -9,4 +9,9 @@ public class Player {
 		this.name = name;
 		this.id = id;
 	}
+	
+	@Override
+	public String toString() {
+		return "(" + name + " " + id + ")";
+	}
 }

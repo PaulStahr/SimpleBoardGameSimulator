@@ -1,6 +1,7 @@
 package net;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -120,6 +121,7 @@ public class GameServer implements Runnable {
 					    			out.write(' ');
 					    		}
 					    		out.close();
+					    		break;
 			    			}
 			    			case NetworkString.PLAYER:
 			    			{
@@ -131,6 +133,7 @@ public class GameServer implements Runnable {
 			    					out.write(gi.players.get(i).name);
 			    				}
 			    				out.close();
+			    				break;
 			    			}
 			    		}
 			    		break;
@@ -222,7 +225,17 @@ public class GameServer implements Runnable {
 			    			case NetworkString.GAME_INSTANCE:
 			    			{
 			    				GameInstance gi = getGameInstance(split.get(2));
-			    				GameIO.writeSnapshotToZip(gi, output);
+			    				if (ce == CommandEncoding.SERIALIZE)
+								{
+			    					ByteArrayOutputStream tmp = new ByteArrayOutputStream();
+			    					GameIO.writeSnapshotToZip(gi, tmp);
+			    					tmp.writeTo(output);
+			    					tmp.close();
+								}
+			    				else
+			    				{
+			    					GameIO.writeSnapshotToZip(gi, output);
+			    				}
 			    				break;
 			    			}
 			    			case NetworkString.MESSAGE:
@@ -239,6 +252,7 @@ public class GameServer implements Runnable {
 				    				printer.print(message.message);
 				    				printer.close();
 			    				}
+			    				break;
 			    			}
 			    			case NetworkString.GAME_OBJECT:
 			    			{
@@ -266,9 +280,13 @@ public class GameServer implements Runnable {
 						{
 							throw new NullPointerException("Can't find game instance " + split.get(3));
 						}
-			    		if (gi.password == null || gi.password.equals(split.get(4)))
+			    		if (gi.password == null || gi.password.equals("") || (split.size() > 4 && gi.password.equals(split.get(4))))
 			    		{
 			    			gi.addPlayer(new Player(player, id));
+			    		}
+			    		else
+			    		{
+			    			logger.error("Error wrong or no password " + gi.password);
 			    		}
 			    		break;
 			    	}
@@ -325,8 +343,7 @@ public class GameServer implements Runnable {
 		    	
 		    }
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			logger.error("Error in running Server connection", e1);
 		}
 	}
 

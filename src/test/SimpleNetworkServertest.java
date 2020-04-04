@@ -81,7 +81,7 @@ public class SimpleNetworkServertest {
 	    	connectAndStartGame(address, port, player, gi);
     	}
     	try {
-    		Thread.sleep(100);
+    		Thread.sleep(300);
     	}catch(InterruptedException e) {}
     	
     	

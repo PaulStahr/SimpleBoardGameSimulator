@@ -216,13 +216,21 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    		{
 		    			case NetworkString.GAME_INSTANCE:
 		    			{
-		    				logger.debug("Write game instance to stream");
+		    				if (byteStream.size() != 0)
+		    				{
+		    					throw new RuntimeException();
+		    				}
 		    				GameIO.writeSnapshotToZip(gi, byteStream);
-		    				byte data[] = byteStream.toByteArray();
-		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(data.length);
+		    				//byte data[] = byteStream.toByteArray();
+		    				logger.debug("Write game instance to stream " + byteStream.size());
+		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(byteStream.size());
 		    				objOut.writeObject(strB.toString());
+		    				objOut.flush();
 		    				//objOut.writeObject(byteStream.toByteArray());
-		    				objOut.write(byteStream.toByteArray());
+		    				//byteStream.flush();
+		    				//logger.debug(String.valueOf(byteStream.toByteArray().length));
+		    				byteStream.writeTo(objOut);
+		    				//objOut.write(data);
 		    				byteStream.reset();
 		    				strB.setLength(0);
 		    				break;
@@ -451,7 +459,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								{
 									case NetworkString.GAME_INSTANCE:
 									{
-										logger.debug("Do local instance write");
+										logger.debug("Do local instance write " + split.get(3));
 										int size = Integer.parseInt(split.get(3));
 										//byte data[] = (byte[])objIn.readObject();
 										byte data[] = new byte[size];

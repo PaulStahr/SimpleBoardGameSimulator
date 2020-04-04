@@ -1,7 +1,5 @@
 package gameObjects.instance;
 
-import main.Player;
-
 public class ObjectState {
 	public int posX;
 	public int posY;
@@ -14,6 +12,7 @@ public class ObjectState {
 
 	public int value = 0;
 	
+	@Override
 	public int hashCode()
 	{
 		return posX ^ (posY << 16) ^ rotation ^ owner_id;
