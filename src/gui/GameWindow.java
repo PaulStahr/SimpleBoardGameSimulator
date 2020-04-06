@@ -1,5 +1,7 @@
 package gui;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
 
 import javax.swing.JFrame;
 
@@ -7,6 +9,10 @@ import gameObjects.instance.GameInstance;
 import main.Player;
 
 public class GameWindow extends JFrame{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1441104795154034811L;
 	GameInstance gi;
 	public GamePanel gamePanel;
 

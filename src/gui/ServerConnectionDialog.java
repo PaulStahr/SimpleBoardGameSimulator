@@ -12,6 +12,10 @@ import javax.swing.JTextField;
 import net.SynchronousGameClientLobbyConnection;
 
 public class ServerConnectionDialog extends JFrame implements ActionListener{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3954762140525349396L;
 	JLabel labelAddress = new JLabel("Server");
 	JTextField textFieldAddress = new JTextField();
 	JLabel labelName = new JLabel("Name");

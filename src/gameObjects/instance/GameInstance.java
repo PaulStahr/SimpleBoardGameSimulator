@@ -27,9 +27,10 @@ public class GameInstance {
 		public void changeUpdate(GameAction action);
 	}
 	
-	public GameInstance(Game game)
+	public GameInstance(Game game, String name)
 	{
 		this.game = game;
+		this.name = name;
 	}
 	
 	public Player addPlayer(Player player)
