@@ -13,9 +13,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,7 +27,6 @@ import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import main.Player;
-import util.data.IntegerArrayList;
 
 //import gameObjects.GameObjectInstanceEditAction;
 
@@ -107,51 +103,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		for (int i = 0; i < gameInstance.objects.size(); ++i) {
 			ObjectInstance oi = gameInstance.objects.get(i);
 			if (ObjectFunctions.isStackBottom(oi)) {
-				IntegerArrayList aboveList = ObjectFunctions.getAboveStack(gameInstance, oi);
-				for (int x : aboveList) {
-					ObjectInstance currentInstance = gameInstance.objects.get(x);
-					BufferedImage img = currentInstance.go.getLook(currentInstance.state, player.id);
-					if (currentInstance.getRotation() == 0) {
-						if (currentInstance.state == null || img == null)
-						{
-							logger.error("Object state is null");
-						}
-						else
-						{
-							g.drawImage(img, (int)(currentInstance.state.posX * zooming), (int)(currentInstance.state.posY * zooming), (int) (currentInstance.scale * img.getWidth() * zooming), (int) (currentInstance.scale * img.getHeight() * zooming), null);
-						}
-					} else {
-						double rotationRequired = Math.toRadians(currentInstance.getRotation());
-						double locationX = img.getWidth() / 2;
-						double locationY = img.getHeight() / 2;
-						AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX * currentInstance.scale, locationY * currentInstance.scale);
-						tx.scale(currentInstance.scale, currentInstance.scale);
-						AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-						g.drawImage(op.filter(img, null), currentInstance.state.posX, currentInstance.state.posY, null);
-					}
-
-				}
+				ObjectFunctions.drawStack(g, ObjectFunctions.getAboveStack(gameInstance, oi), gameInstance, player.id, zooming, logger);
 			}
 		}
-
-		if(activeObject != null) {
-			for (int i = 0; i < gameInstance.objects.size(); ++i) {
-				ObjectInstance oi = gameInstance.objects.get(i);
-				if(oi == activeObject && oi.state.aboveInstanceId == -1)
-				{
-					double rotationRequired = Math.toRadians(oi.getRotation());
-					BufferedImage img = oi.go.getLook(oi.state, player.id);
-					double locationX = img.getWidth() / 2;
-					double locationY = img.getHeight() / 2;
-					AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX * oi.scale, locationY * oi.scale);
-					tx.scale(zooming * oi.scale, zooming * oi.scale);
-					AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-					g.drawImage(op.filter(img, null), (int)(zooming * oi.state.posX), (int)(zooming * oi.state.posY), null);
-				}
-			}
+		if(activeObject != null && ObjectFunctions.isStackTop(activeObject)) {
+			ObjectFunctions.drawObject(g, activeObject, player.id, zooming, logger);
 		}
-
-
 	}
 
 	@Override
@@ -193,6 +150,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			ObjectFunctions.releaseObjects(id, gameInstance, player, activeObject);
 		}
 		activeObject = null;
+		mouseX = arg0.getX();
+		mouseY = arg0.getY();
 	}
 
 	@Override
@@ -205,7 +164,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 			ObjectFunctions.moveObjectTo(id, gameInstance, player, activeObject, objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
 			if (SwingUtilities.isMiddleMouseButton(arg0)) {
-				ObjectFunctions.moveStackTo(id, gameInstance, player, activeObject, activeObject);
+				if (ObjectFunctions.isStackCollected(gameInstance, activeObject))
+					ObjectFunctions.moveBelowStackTo(id, gameInstance, player, activeObject, activeObject, false);
+				else {
+					ObjectFunctions.moveBelowStackTo(id, gameInstance, player, activeObject, activeObject, false);
+					ObjectFunctions.moveAboveStackTo(id, gameInstance, player, activeObject, activeObject, false);
+				}
 			}
 		}
 		else if(SwingUtilities.isLeftMouseButton(arg0) && isShiftDown && activeObject != null) {
@@ -268,13 +232,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if(e.getKeyCode() == KeyEvent.VK_F && !loggedKeys[KeyEvent.VK_CONTROL])
 		{
 			loggedKeys[e.getKeyCode()] = true;
-			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player, mouseX, mouseY, null);
 			ObjectFunctions.flipObject(id, gameInstance, player, activeObject);
 		}
 		if(e.getKeyCode() == KeyEvent.VK_S)
 		{
 			loggedKeys[e.getKeyCode()] = true;
-			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player, mouseX, mouseY, null);
 			ObjectFunctions.shuffleStack(id, gameInstance, player, activeObject);
 		}
 		if (loggedKeys[KeyEvent.VK_CONTROL] && loggedKeys[KeyEvent.VK_F])
@@ -294,11 +258,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (e.getKeyCode() == KeyEvent.VK_V)
 		{
 			loggedKeys[e.getKeyCode()] = true;
-			activeObject = ObjectFunctions.getActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player, mouseX, mouseY, null);
 			if (activeObject!= null) {
 				if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, activeObject), ObjectFunctions.getStackBottom(gameInstance, activeObject))) {
 					activeObject = ObjectFunctions.getStackTop(gameInstance, activeObject);
-					ObjectFunctions.viewBelowCards(id, gameInstance, player, activeObject, activeObject.getWidth(player.id) / 2);
+					ObjectFunctions.viewBelowObjects(id, gameInstance, player, activeObject, activeObject.getWidth(player.id) / 2);
 				} else {
 					ObjectFunctions.collectStack(id, gameInstance, player, activeObject);
 				}
@@ -314,14 +278,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
-			ObjectFunctions.takeObject(id, gameInstance, player, activeObject);
+			ObjectFunctions.takeObjects(id, gameInstance, player, activeObject);
 		}
 
 		if (e.getKeyCode() == KeyEvent.VK_D)
 		{
 			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
-			ObjectFunctions.dropObject(id, gameInstance, player, activeObject);
+			ObjectFunctions.dropObjects(id, gameInstance, player, activeObject);
 		}
 
 		if (e.getKeyCode() == KeyEvent.VK_P)
