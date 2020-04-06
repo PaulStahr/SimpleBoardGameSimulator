@@ -561,9 +561,12 @@ public class ObjectFunctions {
     public static void dropObjects(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         IntegerArrayList stackIds = getStack(gameInstance, objectInstance);
         for(int id: stackIds) {
-            objectInstance.state.owner_id = -1;
-            flipObject(gamePanelId, gameInstance, player, objectInstance);
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+            ObjectInstance currentInstance = gameInstance.objects.get(id);
+            if (player != currentInstance.inHand) {
+                currentInstance.state.owner_id = -1;
+                flipObject(gamePanelId, gameInstance, player, currentInstance);
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentInstance));
+            }
         }
     }
 
