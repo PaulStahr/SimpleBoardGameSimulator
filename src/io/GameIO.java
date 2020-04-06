@@ -22,6 +22,8 @@ import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectDice;
@@ -37,6 +39,8 @@ import main.Player;
 import net.AsynchronousGameConnection;
 
 public class GameIO {
+
+	private static Logger logger = LoggerFactory.getLogger(GameIO.class);
 
 	/**
 	 * Returns the Java version used by the system.
@@ -322,6 +326,7 @@ public class GameIO {
 		{
 			zipOutputStream = new ZipOutputStream(os);
 			Game game = gi.game;
+			//TODO dublicated code (0)
 			// Save all images
 		    for (HashMap.Entry<String, BufferedImage> pair : game.images.entrySet()) {
 		    	String key = pair.getKey();
@@ -407,6 +412,7 @@ public class GameIO {
 	 * @param game the Game that shall be encoded
 	 * @param os the OutputStream the Game will be written to
 	 */
+	//TODO dublicated code (0)
 	public static void writeGameToZip(Game game, OutputStream os) throws IOException
 	{	
 		ZipOutputStream zipOutputStream = null;
@@ -570,9 +576,10 @@ public class GameIO {
 		Element root = doc.getRootElement();
 
 
+		String gameName = null;
 		for (Element elem : root.getChildren())
 		{
-			String name = elem.getName();
+			final String name = elem.getName();
 			if (name.equals("object"))
 			{
 				game.objects.add(createGameObjectFromElement(elem, game.images));
@@ -581,8 +588,17 @@ public class GameIO {
 			{
 				game.background = images.get(elem.getValue());
 			}
+			else if (name.equals("name"))
+			{
+				gameName = elem.getValue();
+			}
 		}
-		GameInstance result = new GameInstance(game);
+		if (gameName == null)
+		{
+			logger.warn("Name not set");
+			gameName=String.valueOf(Math.random());
+		}
+		GameInstance result = new GameInstance(game, gameName);
 		editGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
 		return result;
 	}

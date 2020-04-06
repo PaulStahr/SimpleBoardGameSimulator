@@ -158,7 +158,7 @@ public class GameServer implements Runnable {
 			    		switch (split.get(1))
 			    		{
 			    			case NetworkString.GAME_INSTANCE:
-								GameInstance gi = new GameInstance(new Game());
+								GameInstance gi = new GameInstance(new Game(), "empty");
 								gi.name = split.get(2);
 								synchronized(gameInstances)
 			    				{

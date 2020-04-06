@@ -23,9 +23,6 @@ import net.SynchronousGameClientLobbyConnection;
 public class Main {
 	public static final Logger logger = LoggerFactory.getLogger(Main.class);
     public static final void main (String args[]){
-    	ServerLobbyWindow slw = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection("127.0.0.1", 1234));
-    	slw.setVisible(true);
-    	slw.setSize(100,100);
     	for (int i = 0; i < args.length; ++i)
     	{
     		if (args[i].equals("--server"))
@@ -83,7 +80,11 @@ public class Main {
     		}
     	}
     	try {
-			test.SimpleNetworkServertest.localTwoInstanceTest();
+    		int port = 8000 + (int)(Math.random() * 100);
+    		ServerLobbyWindow slw = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection("127.0.0.1", port));
+        	slw.setVisible(true);
+        	slw.setSize(300,100);
+        	test.SimpleNetworkServertest.localTwoInstanceTest(port);
 		} catch (IOException | JDOMException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

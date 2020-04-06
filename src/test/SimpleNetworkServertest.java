@@ -55,10 +55,10 @@ public class SimpleNetworkServertest {
     	return gw;
     }
     
-    public static void localTwoInstanceTest() throws IOException, JDOMException
+    public static void localTwoInstanceTest(int port) throws IOException, JDOMException
     {
     	String address = "127.0.0.1";
-    	int port = 8000 + (int)(Math.random() * 100);
+    	
     	{
 	    	GameServer gs = startNewServer(port);
 	    	while (!gs.isReady())
