@@ -50,6 +50,11 @@ public class ColumnTypes
 	public String[] getVisibleColumnNames() {
 		return visibleColumnNames.clone();
 	}
+	
+	public ObjectColumnType[] getVisibleCols()
+	{
+		return visibleCols.clone();
+	}
     
     public final ObjectColumnType getVisibleCol(int index)
     {
