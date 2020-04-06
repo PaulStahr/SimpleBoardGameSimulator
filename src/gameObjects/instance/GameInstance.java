@@ -11,7 +11,7 @@ import gameObjects.ObjectColumnType;
 import main.Player;
 
 public class GameInstance {
-	public static final ColumnTypes TYPES = new ColumnTypes(new ObjectColumnType[]{ObjectColumnType.ID}, new ObjectColumnType[]{ObjectColumnType.ID});
+	public static final ColumnTypes TYPES = new ColumnTypes(new ObjectColumnType[]{ObjectColumnType.ID, ObjectColumnType.NAME, ObjectColumnType.CONNECT}, new ObjectColumnType[]{ObjectColumnType.ID, ObjectColumnType.NAME, ObjectColumnType.CONNECT});
 	public static final Logger logger = LoggerFactory.getLogger(GameInstance.class);
 	public Game game;
 	public String password;

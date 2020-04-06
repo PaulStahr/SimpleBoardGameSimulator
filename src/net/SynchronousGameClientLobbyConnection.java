@@ -133,7 +133,7 @@ public class SynchronousGameClientLobbyConnection {
 	    in.close();
 	    server.close();
 	}
-	
+
 	public void addPlayerToGameSession(Player player, String name, String password) throws UnknownHostException, IOException
 	{
 		Socket server = new Socket( address, port);

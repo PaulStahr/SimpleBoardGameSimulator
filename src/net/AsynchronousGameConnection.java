@@ -225,12 +225,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    				logger.debug("Write game instance to stream " + byteStream.size());
 		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(byteStream.size());
 		    				objOut.writeObject(strB.toString());
-		    				objOut.flush();
-		    				//objOut.writeObject(byteStream.toByteArray());
-		    				//byteStream.flush();
-		    				//logger.debug(String.valueOf(byteStream.toByteArray().length));
 		    				byteStream.writeTo(objOut);
-		    				//objOut.write(data);
 		    				byteStream.reset();
 		    				strB.setLength(0);
 		    				break;

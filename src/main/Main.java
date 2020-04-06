@@ -13,25 +13,30 @@ import org.slf4j.LoggerFactory;
 
 import gameObjects.instance.GameInstance;
 import gui.GameWindow;
+import gui.ServerLobbyWindow;
 import io.GameIO;
 import net.AsynchronousGameConnection;
 import net.GameServer;
+import net.SynchronousGameClientLobbyConnection;
 
 
 public class Main {
 	public static final Logger logger = LoggerFactory.getLogger(Main.class);
     public static final void main (String args[]){
+    	ServerLobbyWindow slw = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection("127.0.0.1", 1234));
+    	slw.setVisible(true);
+    	slw.setSize(100,100);
     	for (int i = 0; i < args.length; ++i)
     	{
     		if (args[i].equals("--server"))
     		{
-    			GameServer gs = test.SimpleNetworkServertest.startNewServer(Integer.parseInt(args[i + 1]));
-    			return;
+    			GameServer gs = new GameServer(Integer.parseInt(args[i + 1]));
+    	    	gs.start();
+    	    	return;
     		}
     		else if (args[i].equals("--join"))
     		{
-    			FileInputStream fis;
-				try {
+    			try {
 					test.SimpleNetworkServertest.connectAndJoinGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), "Testsession");
 	    		} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
