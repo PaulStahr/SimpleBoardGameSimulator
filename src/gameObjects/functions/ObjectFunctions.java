@@ -1,6 +1,6 @@
 package gameObjects.functions;
 
-import java.awt.*;
+import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -8,14 +8,15 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 
+import org.slf4j.Logger;
+
 import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import javafx.util.Pair;
 import main.Player;
-import org.slf4j.Logger;
+import util.Pair;
 import util.data.IntegerArrayList;
 
 public class ObjectFunctions {
@@ -723,7 +724,7 @@ public class ObjectFunctions {
                 if (objectBelow != null) {
                     objectBelow.state.aboveInstanceId = objectInstance.id;
                     objectInstance.state.belowInstanceId = objectBelow.id;
-                    moveObjectTo(gamePanelId, gameInstance, player, objectInstance, (int) (objectBelow.state.posX + cardMargin), objectBelow.state.posY);
+                    moveObjectTo(gamePanelId, gameInstance, player, objectInstance, objectBelow.state.posX + cardMargin, objectBelow.state.posY);
                     if (objectAbove != null) {
                         objectAbove.state.belowInstanceId = objectInstance.id;
                         objectInstance.state.aboveInstanceId = objectAbove.id;
