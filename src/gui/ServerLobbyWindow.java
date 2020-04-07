@@ -214,7 +214,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 					try
 					{
 						Player player = new Player("Florian", 1);
-						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(GameInstance.TYPES.getColumnNumber(ObjectColumnType.ID), row));
+						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.getColumnNumber(ObjectColumnType.ID)));
 				    	client.addPlayerToGameSession(player, gi.name, gi.password);
 				    	GameWindow gw = new GameWindow(gi, player);
 				    	AsynchronousGameConnection connection = client.connectToGameSession(gi);
