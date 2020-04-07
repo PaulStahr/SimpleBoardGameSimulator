@@ -92,7 +92,6 @@ public class SynchronousGameClientLobbyConnection {
 		StringBuilder strB = new StringBuilder();
 		strB.append(NetworkString.PUSH).append(' ').append(NetworkString.GAME_INSTANCE);
 		oStream = writeCommand(strB, oStream);
-	    logger.debug("write command " + strB.toString());
 	    //GameIO.writeSnapshotToZip(gi, oStream);
 	    ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	    GameIO.writeSnapshotToZip(gi, bos);
@@ -102,7 +101,7 @@ public class SynchronousGameClientLobbyConnection {
 	    }
 	    else
 	    {
-	    	((ObjectOutputStream)oStream).write(bos.toByteArray());	    	
+	    	bos.writeTo(oStream);	    	
 	    }
 	    server.close();
 	    logger.debug("successfull");
