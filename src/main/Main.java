@@ -60,7 +60,7 @@ public class Main {
 	            	fis.close();
 	            	game0.name = "Testsession";
 	            	game0.players.add(new Player(args[i + 3], Integer.parseInt(args[i + 4])));
-	            	test.SimpleNetworkServertest.connectAndStartGame(args[i + 1], Integer.parseInt(args[i + 2]), game0.getPlayer(0), game0);
+	            	test.SimpleNetworkServertest.connectAndStartGame(args[i + 1], Integer.parseInt(args[i + 2]), game0.getPlayer(Integer.parseInt(args[i + 4])), game0);
 	    		} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
