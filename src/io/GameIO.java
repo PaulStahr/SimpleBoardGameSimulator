@@ -480,12 +480,20 @@ public class GameIO {
 	 * @param object the ObjectState that shall be encoded
 	 * @param output the OutputStream the Game will be written to
 	 */
-	public static void writeObjectStateToZip(ObjectState object, OutputStream output) throws IOException
+	public static void writeObjectStateToStream(ObjectState object, OutputStream output) throws IOException
 	{
 		Document doc = new Document();
     	Element elem = new Element("object_state");
 		writeStateToElement(object, elem);
 		doc.addContent(elem);
+    	new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
+	}
+
+	public static void writePlayerToStream(Player player, OutputStream output) throws IOException
+	{
+		Document doc = new Document();
+		Element elem = createElementFromPlayer(player);
+    	doc.addContent(elem);
     	new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
 	}
 
@@ -497,12 +505,6 @@ public class GameIO {
 
 	// TODO Fragen -> What Object?
 	public static void writeObjectToZip(GameObject game, ByteArrayOutputStream byteStream) {
-		// TODO Auto-generated method stub
-
-	}
-
-	// TODO fertig machen
-	public static void writePlayerToZip(Player player, ByteArrayOutputStream byteStream) {
 		// TODO Auto-generated method stub
 
 	}
@@ -642,7 +644,7 @@ public class GameIO {
 	 * @param objectState the ObjectState to be edited
 	 * @param input the InputStream with all update information
 	 */
-	public static void editObjectStateFromZip(ObjectState objectState, InputStream input) throws IOException, JDOMException
+	public static void editObjectStateFromStream(ObjectState objectState, InputStream input) throws IOException, JDOMException
 	{
 		Document doc = new SAXBuilder().build(input);
     	Element elem = doc.getRootElement();
@@ -729,6 +731,14 @@ public class GameIO {
 		editPlayerFromElement(root, gi);
 	}
 
+	public static Player readPlayerFromStream(InputStream is) throws JDOMException, IOException
+	{
+		Document doc = new SAXBuilder().build(is);
+    	Element root = doc.getRootElement();
+
+		return createPlayerFromElement(root);
+	}
+
 
 	public static void editPlayerFromZip(InputStream inputStream, Player player) throws IOException, JDOMException {
 		ZipInputStream stream = new ZipInputStream(inputStream);
@@ -744,6 +754,24 @@ public class GameIO {
 			byteStream.reset();
 		}
 		stream.close();
+	}
+	
+	public static Player readPlayerFromZip(InputStream inputStream) throws IOException, JDOMException {
+		ZipInputStream stream = new ZipInputStream(inputStream);
+		ZipEntry entry;
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+		Player pl = null;
+		while ((entry = stream.getNextEntry()) != null)
+		{
+			copy(stream, byteStream);
+			if (entry.getName().equals("player.xml"))
+			{
+				pl = readPlayerFromStream(new ByteArrayInputStream(byteStream.toByteArray()));
+			}
+			byteStream.reset();
+		}
+		stream.close();
+		return pl;
 	}
 	
 }

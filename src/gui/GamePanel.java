@@ -214,7 +214,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		mouseX = arg0.getX();
 		mouseY = arg0.getY();
 		player.setMousePos(mouseX, mouseY);
-		changeUpdate(new GamePlayerEditAction(id, player, player));
+		gameInstance.update(new GamePlayerEditAction(id, player, player));
 		activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player,mouseX, mouseY, null);
 		repaint();
 	}
@@ -231,11 +231,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void changeUpdate(GameAction action) {
+		System.out.println(action.source + " " + id);
 		if (action instanceof GameObjectInstanceEditAction)
 		{
 			repaint();
 			//If direct repaint causes problems use this:
 			//JFrameUtils.runByDispatcher(repaintRunnable);
+		}
+		else if (action instanceof GamePlayerEditAction)
+		{
+			repaint();
+			System.out.println(((GamePlayerEditAction)action).object);
 		}
 	}
 
