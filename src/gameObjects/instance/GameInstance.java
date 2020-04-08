@@ -38,7 +38,7 @@ public class GameInstance {
 		Player pl = getPlayer(player.id);
 		if (pl != null)
 		{
-			pl.name = player.name;
+			pl.set(player);
 			return pl;
 		}
 		players.add(player);

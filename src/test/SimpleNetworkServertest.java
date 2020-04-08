@@ -46,11 +46,11 @@ public class SimpleNetworkServertest {
     	SynchronousGameClientLobbyConnection sclc = new SynchronousGameClientLobbyConnection(address,  port);
     	GameInstance gi = sclc.getGameInstance(gameInstanceId);
     	sclc.addPlayerToGameSession(player, gi.name, gi.password);
-    	GameWindow gw = new GameWindow(gi, player);
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi);
     	//gi.addPlayer(player);
     	connection.syncPull();
     	connection.start();
+    	GameWindow gw = new GameWindow(gi, gi.getPlayer(player.id));
     	gw.setVisible(true);
     	return gw;
     }

@@ -1,6 +1,6 @@
 package main;
 
-import java.awt.*;
+import java.awt.Color;
 import java.util.Random;
 
 public class Player {
@@ -17,6 +17,15 @@ public class Player {
 		setPlayerColor();
 	}
 	
+	public Player(String name, int id, Color color, int mouseX, int mouseY) {
+		this.name = name;
+		this.id = id;
+		this.color = color;
+		this.mouseXPos = mouseX;
+		this.mouseYPos = mouseY;
+		setPlayerColor();	
+	}
+
 	@Override
 	public String toString() {
 		return "(" + name + " " + id + ")";
@@ -34,6 +43,14 @@ public class Player {
 	public void setMousePos(int posX, int posY){
 		this.mouseXPos = posX;
 		this.mouseYPos = posY;
+	}
+
+	public void set(Player player) {
+		this.name = player.name;
+		this.color = player.color;
+		this.mouseXPos = player.mouseXPos;
+		this.mouseYPos = player.mouseYPos;
+		System.out.println(this.mouseXPos);
 	}
 
 }

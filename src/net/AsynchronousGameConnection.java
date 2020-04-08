@@ -18,10 +18,12 @@ import org.slf4j.LoggerFactory;
 
 import gameObjects.GameAction;
 import gameObjects.GameObjectInstanceEditAction;
+import gameObjects.GamePlayerEditAction;
 import gameObjects.UserSoundMessageAction;
 import gameObjects.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
+import gameObjects.instance.ObjectInstance;
 import io.GameIO;
 import main.Player;
 import util.StringUtils;
@@ -307,7 +309,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					GameAction action = (GameAction)outputObject;
 				    try
 				    {
-					    if (action instanceof GameObjectInstanceEditAction)
+				    	if (action instanceof GameObjectInstanceEditAction)
 				 		{
 					    	GameIO.writeObjectStateToZip(((GameObjectInstanceEditAction)action).object.state, byteStream);
 					 		strB.append(NetworkString.ACTION).append(' ')
@@ -319,7 +321,25 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append(((GameObjectInstanceEditAction) action).object.id).append(' ')
 					 			.append( byteStream.size());
 					 		objOut.writeObject(strB.toString());
-					    	objOut.write(byteStream.toByteArray());
+					 		byteStream.writeTo(objOut);
+					    	//objOut.write(byteStream.toByteArray());
+					    	byteStream.reset();
+					     	strB.setLength(0);
+					   }
+				    	else if (action instanceof GamePlayerEditAction)
+				 		{
+					    	GameIO.writePlayerToZip(((GamePlayerEditAction)action).object, byteStream);
+					 		strB.append(NetworkString.ACTION).append(' ')
+					 			.append(NetworkString.EDIT).append(' ')
+					 			.append(NetworkString.PLAYER).append(' ')
+					 			.append(id).append(' ')
+					 			.append(action.source).append(' ')
+					 			.append(((GamePlayerEditAction) action).player.id).append(' ')
+					 			.append(((GamePlayerEditAction) action).object.id).append(' ')
+					 			.append( byteStream.size());
+					 		objOut.writeObject(strB.toString());
+					 		byteStream.writeTo(objOut);
+					    	//objOut.write(byteStream.toByteArray());
 					    	byteStream.reset();
 					     	strB.setLength(0);
 					   }
@@ -489,9 +509,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								
 								objIn.readFully(data, 0, size);
 								//byte data[] = objIn.readObject();
+								ObjectInstance inst = gi.getObjectInstance(objectId);
 								if (sourceId != id)
 								{
-									GameIO.editObjectStateFromZip(gi.getObjectInstance(objectId).state, new ByteArrayInputStream(data));
+									GameIO.editObjectStateFromZip(inst.state, new ByteArrayInputStream(data));
 								}
 								Player pl = gi.getPlayer(playerId);
 								if (pl == null)
@@ -500,7 +521,34 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								}
 								else
 								{
-									gi.update(new GameObjectInstanceEditAction(sourceId, pl, gi.getObjectInstance(objectId)));
+									gi.update(new GameObjectInstanceEditAction(sourceId, pl, inst));
+								}
+							}
+						}
+						else if (split.get(1).equals(NetworkString.EDIT) && split.get(2).equals(NetworkString.PLAYER))
+						{
+							int sourceId = Integer.parseInt(split.get(4));
+							if (sourceId != id)
+							{
+								int playerId = Integer.parseInt(split.get(5));
+								int objectId = Integer.parseInt(split.get(6));
+								int size = Integer.parseInt(split.get(7));
+								byte data[] = new byte[size];
+								
+								objIn.readFully(data, 0, size);
+								//byte data[] = objIn.readObject();
+								if (sourceId != id)
+								{
+									GameIO.editPlayerFromZip(new ByteArrayInputStream(data), gi.getPlayer(objectId));
+								}
+								Player pl = gi.getPlayer(playerId);
+								if (pl == null)
+								{
+									logger.error("Can't find player: " + playerId);
+								}
+								else
+								{
+									gi.update(new GamePlayerEditAction(sourceId, pl, gi.getPlayer(objectId)));
 								}
 							}
 						}

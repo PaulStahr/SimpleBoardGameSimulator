@@ -1,5 +1,6 @@
 package io;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -135,30 +136,22 @@ public class GameIO {
 		for (Element elem : root.getChildren())
 		{
 			String name = elem.getName();
-			if (name.equals("player"))
+			switch (name)
 			{
-				Player player = createPlayerFromElement(elem);
-				System.out.println(player);
-				gi.addPlayer(player);
-			}
-			else if (name.equals("name"))
-			{
-				gi.name = elem.getValue();
-			}
-			else if (name.equals("object"))
-			{
-				String uniqueName = elem.getAttributeValue("unique_name");
-				ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue("id")));
-				editStateFromElement(oi.state, elem);
-				gi.addObjectInstance(oi);
-			}
-			else if (name.equals("password"))
-			{
-				gi.password = elem.getValue();
-			}
-			else if (name.equals("hidden"))
-			{
-				gi.hidden = Boolean.parseBoolean(elem.getValue());
+				case "player":
+					Player player = createPlayerFromElement(elem);
+					System.out.println(player);
+					gi.addPlayer(player);
+					break;
+				case "name":gi.name = elem.getValue();break;
+				case "object":
+					String uniqueName = elem.getAttributeValue("unique_name");
+					ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue("id")));
+					editStateFromElement(oi.state, elem);
+					gi.addObjectInstance(oi);
+					break;
+				case "password":gi.password = elem.getValue();break;
+				case "hidden":gi.hidden = Boolean.parseBoolean(elem.getValue());break;
 			}
 		}
 	}
@@ -231,7 +224,21 @@ public class GameIO {
 	 */
 	private static Player createPlayerFromElement(Element elem)
 	{
-		return new Player(elem.getAttributeValue("name"), Integer.parseInt(elem.getAttributeValue("id")));
+		return new Player(
+				elem.getAttributeValue("name"),
+				Integer.parseInt(elem.getAttributeValue("id")),
+				new Color(Integer.parseInt(elem.getAttributeValue("color"))),
+				Integer.parseInt(elem.getAttributeValue("mouseX")),
+				Integer.parseInt(elem.getAttributeValue("mouseY")));
+	}
+
+	private static Player editPlayerFromElement(Element elem, Player player)
+	{
+		player.name = elem.getAttributeValue("name");
+		player.color = new Color(Integer.parseInt(elem.getAttributeValue("color")));
+		player.mouseXPos = Integer.parseInt(elem.getAttributeValue("mouseX"));
+		player.mouseYPos = Integer.parseInt(elem.getAttributeValue("mouseY"));
+		return player;
 	}
 
 	/**
@@ -304,6 +311,9 @@ public class GameIO {
 		Element elem = new Element("player");
 		elem.setAttribute("name", player.name);
 		elem.setAttribute("id", Integer.toString(player.id));
+		elem.setAttribute("color", Integer.toString(player.color.getRGB()));
+		elem.setAttribute("mouseX", Integer.toString(player.mouseXPos));
+		elem.setAttribute("mouseY", Integer.toString(player.mouseYPos));
 		return elem;
 	}
 
@@ -711,5 +721,29 @@ public class GameIO {
 		editGameInstanceFromStream(inputStream, gi);
 	}
 
+	public static void editPlayerFromStream(InputStream is, Player gi) throws JDOMException, IOException
+	{
+		Document doc = new SAXBuilder().build(is);
+    	Element root = doc.getRootElement();
+
+		editPlayerFromElement(root, gi);
+	}
+
+
+	public static void editPlayerFromZip(InputStream inputStream, Player player) throws IOException, JDOMException {
+		ZipInputStream stream = new ZipInputStream(inputStream);
+		ZipEntry entry;
+		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+		while ((entry = stream.getNextEntry()) != null)
+		{
+			copy(stream, byteStream);
+			if (entry.getName().equals("player.xml"))
+			{
+				editPlayerFromStream(new ByteArrayInputStream(byteStream.toByteArray()), player);
+			}
+			byteStream.reset();
+		}
+		stream.close();
+	}
 	
 }
