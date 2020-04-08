@@ -4,11 +4,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import org.jdom2.JDOMException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gameObjects.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
@@ -20,6 +23,7 @@ public class SynchronousGameClientLobbyConnection {
 	String address;
 	int port;
 	CommandEncoding ce = CommandEncoding.SERIALIZE;
+	Logger logger = LoggerFactory.getLogger(SynchronousGameClientLobbyConnection.class);
 
 
 	public SynchronousGameClientLobbyConnection(String address, int port)
@@ -56,6 +60,7 @@ public class SynchronousGameClientLobbyConnection {
 	
 	OutputStream writeCommand(StringBuilder strB, OutputStream oStream) throws IOException
 	{
+		logger.debug("Write command " + strB.toString());
 		switch (ce)
 		{
 			case PLAIN: oStream.write(strB.append('\n').toString().getBytes());break;
@@ -87,7 +92,6 @@ public class SynchronousGameClientLobbyConnection {
 		StringBuilder strB = new StringBuilder();
 		strB.append(NetworkString.PUSH).append(' ').append(NetworkString.GAME_INSTANCE);
 		oStream = writeCommand(strB, oStream);
-	    System.out.println("write command");
 	    //GameIO.writeSnapshotToZip(gi, oStream);
 	    ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	    GameIO.writeSnapshotToZip(gi, bos);
@@ -97,9 +101,10 @@ public class SynchronousGameClientLobbyConnection {
 	    }
 	    else
 	    {
-	    	((ObjectOutputStream)oStream).write(bos.toByteArray());	    	
+	    	bos.writeTo(oStream);	    	
 	    }
 	    server.close();
+	    logger.debug("successfull");
 	}
 	
 	public void getPlayers(String gameInstanceName, ArrayList<String> result) throws UnknownHostException, IOException
@@ -127,8 +132,8 @@ public class SynchronousGameClientLobbyConnection {
 	    in.close();
 	    server.close();
 	}
-	
-	public void joinToGameSession(Player player, String name, String password) throws UnknownHostException, IOException
+
+	public void addPlayerToGameSession(Player player, String name, String password) throws UnknownHostException, IOException
 	{
 		Socket server = new Socket( address, port);
 	    StringBuilder strB = new StringBuilder();
@@ -149,5 +154,18 @@ public class SynchronousGameClientLobbyConnection {
 	    strB.append(NetworkString.CONNECT).append(' ').append(gi.name);
 	    output = writeCommand(strB, output);
 	    return new AsynchronousGameConnection(gi, server.getInputStream(), output);
+	}
+
+	public GameInstance getGameInstance(String gameInstanceId) throws UnknownHostException, IOException, JDOMException
+	{
+		Socket server = new Socket( address, port);
+		OutputStream output = server.getOutputStream();
+	    StringBuilder strB = new StringBuilder();
+	    strB.append(NetworkString.READ).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(gameInstanceId);
+	    output = writeCommand(strB, output);
+	    GameInstance gi = GameIO.readSnapshotFromZip(server.getInputStream());
+	    logger.debug("Read successfull");
+	    server.close();
+	    return gi;
 	}
 }

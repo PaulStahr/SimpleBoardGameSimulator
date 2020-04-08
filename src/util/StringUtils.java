@@ -697,4 +697,17 @@ public class StringUtils {
 		writer.close();
 
 	}
+
+
+	public static StringBuilder concat(ArrayList<String> split, int begin, int end, char c, StringBuilder strB) {
+		if (begin < end)
+		{
+			strB.append(split.get(begin));
+		}
+		for (++begin; begin < end; ++begin)
+		{
+			strB.append(' ').append(split.get(begin));
+		}
+		return strB;
+	}
 }

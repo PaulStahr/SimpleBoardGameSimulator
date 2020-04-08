@@ -1,8 +1,8 @@
 package gameObjects.definition;
 
-import gameObjects.instance.ObjectState;
-
 import java.awt.image.BufferedImage;
+
+import gameObjects.instance.ObjectState;
 
 public class GameObjectToken extends GameObject{
 	BufferedImage upsideLook;
@@ -17,8 +17,8 @@ public class GameObjectToken extends GameObject{
 	}
 
 	@Override
-	public BufferedImage getLook(ObjectState state) {
-		return ((TokenState)state).side ? upsideLook : downsideLook;
+	public BufferedImage getLook(ObjectState state, int playerId) {
+		return ((TokenState)state).side != (playerId == state.owner_id)? upsideLook : downsideLook;
 	}
 	
 	@Override

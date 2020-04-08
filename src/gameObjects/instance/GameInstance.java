@@ -11,7 +11,7 @@ import gameObjects.ObjectColumnType;
 import main.Player;
 
 public class GameInstance {
-	public static final ColumnTypes TYPES = new ColumnTypes(new ObjectColumnType[]{ObjectColumnType.ID}, new ObjectColumnType[]{ObjectColumnType.ID});
+	public static final ColumnTypes TYPES = new ColumnTypes(new ObjectColumnType[]{ObjectColumnType.ID, ObjectColumnType.NAME, ObjectColumnType.CONNECT}, new ObjectColumnType[]{ObjectColumnType.ID, ObjectColumnType.NAME, ObjectColumnType.CONNECT});
 	public static final Logger logger = LoggerFactory.getLogger(GameInstance.class);
 	public Game game;
 	public String password;
@@ -27,9 +27,22 @@ public class GameInstance {
 		public void changeUpdate(GameAction action);
 	}
 	
-	public GameInstance(Game game)
+	public GameInstance(Game game, String name)
 	{
 		this.game = game;
+		this.name = name;
+	}
+	
+	public Player addPlayer(Player player)
+	{
+		Player pl = getPlayer(player.id);
+		if (pl != null)
+		{
+			pl.name = player.name;
+			return pl;
+		}
+		players.add(player);
+		return player;
 	}
 	
 	public Player getPlayer(int id)
@@ -54,6 +67,20 @@ public class GameInstance {
 			}
 		}
 		return null;
+	}
+
+	public ObjectInstance addObjectInstance(ObjectInstance objectInstance)
+	{
+		ObjectInstance oi = getObjectInstance(objectInstance.id);
+		if (oi != null)
+		{
+			oi.updateState(objectInstance.state);
+			oi.scale = objectInstance.scale;
+			oi.inHand = objectInstance.inHand;
+			return oi;
+		}
+		objects.add(objectInstance);
+		return objectInstance;
 	}
 	
 	public ObjectInstance getObjectInstance(int id)

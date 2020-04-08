@@ -10,7 +10,7 @@ public class GameObjectInstanceEditAction extends GameAction{
 		super(source);
 		if (player == null)
 		{
-			throw new RuntimeException();
+			throw new NullPointerException();
 		}
 		this.player = player;
 		this.object = activeObject;

@@ -3,7 +3,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -12,13 +11,13 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gui.GameWindow;
-import gui.ServerConnectionDialog;
+import gui.ServerLobbyWindow;
 import io.GameIO;
 import net.AsynchronousGameConnection;
 import net.GameServer;
+import net.SynchronousGameClientLobbyConnection;
 
 
 public class Main {
@@ -28,18 +27,14 @@ public class Main {
     	{
     		if (args[i].equals("--server"))
     		{
-    			GameServer gs = test.SimpleNetworkServertest.startNewServer(Integer.parseInt(args[i + 1]));
-    			return;
+    			GameServer gs = new GameServer(Integer.parseInt(args[i + 1]));
+    	    	gs.start();
+    	    	return;
     		}
     		else if (args[i].equals("--join"))
     		{
-    			FileInputStream fis;
-				try {
-					fis = new FileInputStream("Doppelkopf.zip");
-			 		GameInstance game0 = GameIO.readSnapshotFromZip(fis);
-	            	fis.close();
-	            	game0.name = "Testsession";
-	    			test.SimpleNetworkServertest.connectAndJoinGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), game0);
+    			try {
+					test.SimpleNetworkServertest.connectAndJoinGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), "Testsession");
 	    		} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -64,7 +59,8 @@ public class Main {
 			 		GameInstance game0 = GameIO.readSnapshotFromZip(fis);
 	            	fis.close();
 	            	game0.name = "Testsession";
-	            	test.SimpleNetworkServertest.connectAndStartGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), game0);
+	            	game0.players.add(new Player(args[i + 3], Integer.parseInt(args[i + 4])));
+	            	test.SimpleNetworkServertest.connectAndStartGame(args[i + 1], Integer.parseInt(args[i + 2]), game0.getPlayer(Integer.parseInt(args[i + 4])), game0);
 	    		} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -84,7 +80,11 @@ public class Main {
     		}
     	}
     	try {
-			test.SimpleNetworkServertest.localTwoInstanceTest();
+    		int port = 8000 + (int)(Math.random() * 100);
+    		ServerLobbyWindow slw = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection("127.0.0.1", port));
+        	slw.setVisible(true);
+        	slw.setSize(300,100);
+        	test.SimpleNetworkServertest.localTwoInstanceTest(port);
 		} catch (IOException | JDOMException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -148,7 +148,8 @@ public class Main {
 	    	final Socket socket[] = new Socket[1];
 	        Thread th = new Thread()
 			{
-	    		public void run()
+	    		@Override
+				public void run()
 	    		{
 	    			try {
 						socket[0] = new Socket( "localhost", 1234 );

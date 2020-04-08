@@ -1,48 +1,48 @@
 package net;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
 import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.Arrays;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gameObjects.GameAction;
 import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.UserSoundMessageAction;
 import gameObjects.UsertextMessageAction;
-import gameObjects.definition.GameObject;
 import gameObjects.instance.GameInstance;
-import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import io.GameIO;
+import main.Player;
 import util.StringUtils;
 
 public class AsynchronousGameConnection implements Runnable, GameChangeListener{
+	private static final Logger logger = LoggerFactory.getLogger(AsynchronousGameConnection.class);
 	GameInstance gi;
 	Thread outputThread;
 	Thread inputThread;
 	InputStream input;
 	OutputStream output;
 	ArrayDeque<Object> queuedOutputs = new ArrayDeque<>();
-	boolean isUpdating = false;
-	private final int id = (int)System.nanoTime();
+	private final int id = (int)(Math.random() * Integer.MAX_VALUE);
 	private ObjectInputStream objIn;
+	private boolean stopOnError = true;
 
 	@Override
 	public void changeUpdate(GameAction action) {
-		if (action.source != id && !isUpdating)
+		if (Thread.currentThread() != inputThread)
 		{
+			logger.debug("Queue Action != " + inputThread.getName());
 			queueOutput(action);
 		}
 	}
@@ -51,6 +51,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	{
 		synchronized(queuedOutputs)
 		{
+			logger.debug("Addd queue " + id);
 			queuedOutputs.add(output);
 			queuedOutputs.notifyAll();
 		}
@@ -95,22 +96,65 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	
 	public void syncPull()
 	{
-		queueOutput(NetworkString.PULL);
+		queueOutput(new CommandRead(NetworkString.GAME_INSTANCE));
 	}
 	
 	public void syncPush()
 	{
-		queueOutput(NetworkString.PUSH);
+		queueOutput(new CommandWrite(NetworkString.GAME_INSTANCE, -1));
 	}
 	
 	public void start()
 	{
-		if (outputThread == null)
+		if (outputThread == null && inputThread == null)
 		{
-			outputThread = new Thread(this);
+			outputThread = new Thread(this, "Output " + id);
 			outputThread.start();
-			inputThread = new Thread(this);
+			inputThread = new Thread(this, "Input " +id);
 			inputThread.start();
+		}
+		else
+		{
+			throw new RuntimeException("Already running");
+		}
+	}
+	
+	class CommandObject
+	{
+	}
+	
+	
+	class CommandRead
+	{
+		String type;
+		public CommandRead(String type) {
+			this.type = type;
+		}
+	}
+	
+	class CommandWrite
+	{
+		String type;
+		public int id;
+		public CommandWrite(String type, int id) {
+			this.type = type;
+			this.id = id;
+		}
+	}
+	
+	class CommandList
+	{
+		String type;
+		public CommandList(String type) {
+			this.type = type;
+		}
+	}
+	
+	class CommandHash
+	{
+		String type;
+		public CommandHash(String type) {
+			this.type = type;
 		}
 	}
 	
@@ -157,106 +201,115 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}
 				outputObject = queuedOutputs.size() == 0 ? null : queuedOutputs.pop();
 			}
+			if (outputObject == null)
+			{
+				continue;
+			}
+			logger.debug("Next queued object:" + outputObject.toString());
 			try
 			{
-				if (outputObject instanceof String)
+				if (outputObject instanceof CommandWrite)
 				{
-					String command = (String)outputObject;
-					StringUtils.split(command, ' ', split);
-					switch (split.get(1))
-				    {
-				    	case NetworkString.LIST:
-				    	{
-				    		switch (split.get(2))
-				    		{
-				    			case NetworkString.PLAYER:
-				    			{
-				    				strB.append(NetworkString.READBACK).append(' ').append(NetworkString.PLAYER);
-				    				objOut.writeObject(strB.toString());
-				    				objOut.writeObject(gi.getPlayerNames());
-				    				strB.setLength(0);
-				    			}
-				    		}
-				    	}
-				    	case NetworkString.HASH:
-				    	{
-				    		strB.append(NetworkString.READBACK).append(' ').append(NetworkString.HASH).append(' ');
-				    		objOut.writeObject(strB.toString());
-		    				objOut.write(gi.hashCode());
+					strB.append(NetworkString.WRITE).append(' ');
+					int id = ((CommandWrite) outputObject).id;
+		    		switch (((CommandWrite) outputObject).type)
+		    		{
+		    			case NetworkString.GAME_INSTANCE:
+		    			{
+		    				if (byteStream.size() != 0)
+		    				{
+		    					throw new RuntimeException();
+		    				}
+		    				GameIO.writeSnapshotToZip(gi, byteStream);
+		    				//byte data[] = byteStream.toByteArray();
+		    				logger.debug("Write game instance to stream " + byteStream.size());
+		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(byteStream.size());
+		    				objOut.writeObject(strB.toString());
+		    				byteStream.writeTo(objOut);
+		    				byteStream.reset();
 		    				strB.setLength(0);
-				    	}
-				    	case NetworkString.PULL:
-				    	case NetworkString.READ:
-				    	{
-				    		strB.append(split.get(1).equals(NetworkString.PULL) ? NetworkString.PUSH : NetworkString.READBACK).append(' ');
-				    		switch (split.get(1))
-				    		{
-				    			case NetworkString.GAME_INSTANCE:
-				    			{
-				    				GameIO.writeSnapshotToZip(gi, byteStream);
-				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(byteStream.size());
-				    				objOut.writeObject(strB.toString());
-				    				objOut.write(byteStream.toByteArray());
-				    				byteStream.reset();
-				    				strB.setLength(0);
-				    				break;
-				    			}
-				    			case NetworkString.GAME:
-				    			{
-				    				GameIO.writeGameToZip(gi.game, byteStream);
-				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME).append(' ').append(byteStream.size());
-				    				objOut.writeObject(strB.toString());
-				    				objOut.write(byteStream.toByteArray());
-				    				byteStream.reset();
-				    				strB.setLength(0);
-				    				break;
-				    			}
-				    			case NetworkString.GAME_OBJECT:
-				    			{
-				    				GameIO.writeObjectToZip(gi.game, byteStream);
-				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT).append(' ').append(byteStream.size());
-				    				objOut.writeObject(strB.toString());
-				    				objOut.write(byteStream.toByteArray());
-				    				byteStream.reset();
-				    				strB.setLength(0);
-				    				break;
-				    			}
-				    			case NetworkString.GAME_OBJECT_INSTANCE:
-				    			{
-				    				GameIO.writeObjectInstanceToZip(gi.game, byteStream);
-				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT_INSTANCE).append(' ').append(byteStream.size());
-				    				objOut.writeObject(strB.toString());
-				    				objOut.write(byteStream.toByteArray());
-				    				strB.setLength(0);
-				    				byteStream.reset();
-				    				break;
-				    			}
-				    			case NetworkString.PLAYER:
-				    			{
-				    				GameIO.writePlayerToZip(gi.getPlayer(Integer.parseInt(split.get(2))), byteStream);
-				    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.PLAYER).append(' ').append(byteStream.size());
-				    				objOut.write(byteStream.toByteArray());
-				    				strB.setLength(0);
-				    				byteStream.reset();
-				    				break;
-				    			}
-				    		}
-				    	}
-				    }
+		    				break;
+		    			}
+		    			case NetworkString.GAME:
+		    			{
+		    				GameIO.writeGameToZip(gi.game, byteStream);
+		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME).append(' ').append(byteStream.size());
+		    				objOut.writeObject(strB.toString());
+		    				objOut.write(byteStream.toByteArray());
+		    				byteStream.reset();
+		    				strB.setLength(0);
+		    				break;
+		    			}
+		    			case NetworkString.GAME_OBJECT:
+		    			{
+		    				GameIO.writeObjectToZip(gi.game.getObject(Integer.toString(id)), byteStream);
+		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT).append(' ').append(byteStream.size());
+		    				objOut.writeObject(strB.toString());
+		    				objOut.write(byteStream.toByteArray());
+		    				byteStream.reset();
+		    				strB.setLength(0);
+		    				break;
+		    			}
+		    			case NetworkString.GAME_OBJECT_INSTANCE:
+		    			{
+		    				GameIO.writeObjectInstanceToZip(gi.getObjectInstance(id), byteStream);
+		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT_INSTANCE).append(' ').append(byteStream.size());
+		    				objOut.writeObject(strB.toString());
+		    				objOut.writeObject(byteStream.toByteArray());
+		    				//objOut.write(byteStream.toByteArray());
+		    				strB.setLength(0);
+		    				byteStream.reset();
+		    				break;
+		    			}
+		    			case NetworkString.PLAYER:
+		    			{
+		    				GameIO.writePlayerToZip(gi.getPlayer(id), byteStream);
+		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.PLAYER).append(' ').append(byteStream.size());
+		    				objOut.write(byteStream.toByteArray());
+		    				strB.setLength(0);
+		    				byteStream.reset();
+		    				break;
+		    			}
+		    		}	
 				}
-				split.clear();
-				
-				
-				Socket server = null;
-				
-				if (outputObject instanceof GameAction)
+				else if (outputObject instanceof CommandRead)
+				{
+					strB.append(NetworkString.READ).append(' ').append(((CommandRead) outputObject).type);
+    				objOut.writeObject(strB.toString());
+    				strB.setLength(0);
+				}
+				else if (outputObject instanceof CommandList)
+				{
+					switch (split.get(2))
+		    		{
+		    			case NetworkString.PLAYER:
+		    			{
+		    				strB.append(NetworkString.WRITEBACK).append(' ').append(NetworkString.PLAYER);
+		    				objOut.writeObject(strB.toString());
+		    				objOut.writeObject(gi.getPlayerNames());
+		    				strB.setLength(0);
+		    				break;
+		    			}
+		    		}
+				}
+				else if (outputObject instanceof CommandHash)
+				{
+					strB.append(NetworkString.WRITEBACK).append(' ').append(NetworkString.HASH).append(' ');
+		    		objOut.writeObject(strB.toString());
+    				objOut.write(gi.hashCode());
+    				strB.setLength(0);
+				}
+				else if (outputObject instanceof String)
+				{
+				}
+				else if (outputObject instanceof GameAction)
 				{
 					GameAction action = (GameAction)outputObject;
 				    try
 				    {
 					    if (action instanceof GameObjectInstanceEditAction)
 				 		{
-					    	GameIO.writeObjectStateToStream(((GameObjectInstanceEditAction)action).object.state, byteStream);
+					    	GameIO.writeObjectStateToZip(((GameObjectInstanceEditAction)action).object.state, byteStream);
 					 		strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.EDIT).append(' ')
 					 			.append(NetworkString.STATE).append(' ')
@@ -298,23 +351,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					    }
 					}
 				    catch ( Exception e ) {
-				    	e.printStackTrace();
+				    	logger.error("Error at emmiting Game Action", e);
 				    }
-				    finally {
-				    	if ( server != null )
-				    	{
-				    		try { server.close(); } catch ( IOException e ) { }
-				    	}
-				    }
-					//server = new Socket( address, port);
-					
-					//Scanner in  = new Scanner( server.getInputStream() );
-					//PrintWriter out = new PrintWriter( server.getOutputStream(), true );
-				
 			    }
 			}catch(IOException e)
 			{
-				e.printStackTrace();
+		    	logger.error("Error at input Loop", e);
 			}
 		}
 	}
@@ -347,63 +389,145 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		{
 			try {
 				//String line = in.nextLine();
-				String line = (String)objIn.readObject();
+				Object inputObject = null;
+				try
+				{
+					inputObject = objIn.readObject();
+				}catch(OptionalDataException e)
+				{
+					logger.error("Can't extract object", e);
+					if (stopOnError )
+					{
+						return;
+					}
+				}
+				if (!(inputObject instanceof String))
+				{
+					if (inputObject instanceof String[])
+					{
+						logger.error("Input object has wrong type " + Arrays.toString((String[])inputObject));		
+					}
+					else
+					{
+						logger.error("Input object has wrong type " + inputObject.toString());
+					}
+				}
+				else
+				{
+					logger.debug("Got input:" + inputObject.toString());
+				}
+				String line = (String)inputObject;
+				StringUtils.split(line, ' ', split);
 				//System.out.println("inline: " + line);
-				if (line.startsWith(NetworkString.READ))
+				
+				switch(split.get(0))
 				{
-					synchronized(queuedOutputs)
+					case NetworkString.READ:
 					{
-						queuedOutputs.add(line);
-						queuedOutputs.notifyAll();
-					}	
-				}
-				else if (line.startsWith(NetworkString.WRITE))
-				{
-					StringUtils.split(line, ' ', split);
-					String player = split.get(1);
-					int id = Integer.parseInt(split.get(2));
-					String type = split.get(3);
-				}
-				else if (line.startsWith(NetworkString.ACTION + " " + NetworkString.EDIT + " " + NetworkString.STATE))
-				{
-					split.clear();
-					StringUtils.split(line, ' ', split);
-					int sourceId = Integer.parseInt(split.get(4));
-					if (sourceId != id)
-					{
-						int playerId = Integer.parseInt(split.get(5));
-						int objectId = Integer.parseInt(split.get(6));
-						int size = Integer.parseInt(split.get(7));
-						byte data[] = new byte[size];
-						
-						objIn.read(data, 0, size);
-						//byte data[] = objIn.readObject();
-						if (sourceId != id)
+						synchronized(queuedOutputs)
 						{
-							GameIO.editObjectStateFromStream(gi.getObjectInstance(objectId).state, new ByteArrayInputStream(data));
+							int id = -1;
+							if (split.size() > 2)
+							{
+								id = Integer.parseInt(split.get(2));
+							}
+							queuedOutputs.add(new CommandWrite(split.get(1), id));
+							queuedOutputs.notifyAll();
 						}
-						isUpdating = true;
-						gi.update(new GameObjectInstanceEditAction(sourceId, gi.getPlayer(playerId), gi.getObjectInstance(objectId)));
-						isUpdating = false;
+						break;
 					}
-				}
-				else if (line.startsWith("action message"))
-				{
-					StringUtils.split(line, ' ', split);
-					int sourceId = Integer.parseInt(split.get(2));
-					if (sourceId != id)
+					case NetworkString.WRITEBACK:
 					{
-						int playerId = Integer.parseInt(split.get(3));
-						gi.update(new UsertextMessageAction(sourceId, playerId, split.get(4)));
+						if (split.get(1).equals(NetworkString.PLAYER))
+						{
+							String players[] = (String[])objIn.readObject();
+						}
+						break;
 					}
+					case NetworkString.WRITE:
+					{
+						switch(split.get(1))
+						{
+							case NetworkString.ZIP:
+							{
+								switch(split.get(2))
+								{
+									case NetworkString.GAME_INSTANCE:
+									{
+										logger.debug("Do local instance write " + split.get(3));
+										int size = Integer.parseInt(split.get(3));
+										//byte data[] = (byte[])objIn.readObject();
+										byte data[] = new byte[size];
+										objIn.readFully(data, 0, size);
+										GameIO.editGameInstanceFromZip(new ByteArrayInputStream(data), gi, this);
+										break;
+									}
+								}
+								break;
+							}
+							case NetworkString.PLAIN:
+							{
+								String player = split.get(2);
+								int id = Integer.parseInt(split.get(3));
+								String type = split.get(4);
+								break;
+							}
+						}
+						break;
+					}
+					case NetworkString.ACTION:
+					{
+						if (split.get(1).equals(NetworkString.EDIT) && split.get(2).equals(NetworkString.STATE))
+						{
+							int sourceId = Integer.parseInt(split.get(4));
+							if (sourceId != id)
+							{
+								int playerId = Integer.parseInt(split.get(5));
+								int objectId = Integer.parseInt(split.get(6));
+								int size = Integer.parseInt(split.get(7));
+								byte data[] = new byte[size];
+								
+								objIn.readFully(data, 0, size);
+								//byte data[] = objIn.readObject();
+								if (sourceId != id)
+								{
+									GameIO.editObjectStateFromZip(gi.getObjectInstance(objectId).state, new ByteArrayInputStream(data));
+								}
+								Player pl = gi.getPlayer(playerId);
+								if (pl == null)
+								{
+									logger.error("Can't find player: " + playerId);
+								}
+								else
+								{
+									gi.update(new GameObjectInstanceEditAction(sourceId, pl, gi.getObjectInstance(objectId)));
+								}
+							}
+						}
+						else if (split.get(1).equals(NetworkString.MESSAGE))
+						{
+							int sourceId = Integer.parseInt(split.get(2));
+							if (sourceId != id)
+							{
+								int playerId = Integer.parseInt(split.get(3));
+								gi.update(new UsertextMessageAction(sourceId, playerId, split.get(4)));
+							}
+						}
+					}
+					break;
 				}
 			}catch(Exception e) {
-				e.printStackTrace();
+				logger.error("Exception in input loop", e);
+				if (e instanceof EOFException)
+				{
+					return;
+				}
 			}
 			split.clear();
 		}
 	}
 	
+	@Override
 	public void run()
 	{
 		if (Thread.currentThread() == outputThread)
