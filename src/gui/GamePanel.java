@@ -13,7 +13,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.Random;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import gameObjects.GameAction;
 import gameObjects.GameObjectInstanceEditAction;
+import gameObjects.GamePlayerEditAction;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -214,6 +214,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		mouseX = arg0.getX();
 		mouseY = arg0.getY();
 		player.setMousePos(mouseX, mouseY);
+		changeUpdate(new GamePlayerEditAction(id, player, player));
 		activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player,mouseX, mouseY, null);
 		repaint();
 	}
