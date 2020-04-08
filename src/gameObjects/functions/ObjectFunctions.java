@@ -1,6 +1,6 @@
 package gameObjects.functions;
 
-import java.awt.Graphics;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -15,9 +15,12 @@ import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import gui.GamePanel;
+import javafx.util.Pair;
 import main.Player;
-import util.Pair;
 import util.data.IntegerArrayList;
+
+import javax.swing.*;
 
 public class ObjectFunctions {
 
@@ -819,4 +822,50 @@ public class ObjectFunctions {
             g.drawImage(op.filter(img, null), objectInstance.state.posX, objectInstance.state.posY, null);
         }
     }
+
+    public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth) {
+        if (objectInstance != null) {
+            g.setColor(player.color);
+            Graphics2D g2d = (Graphics2D) g.create();
+            g2d.setStroke(new BasicStroke(borderWidth));
+            g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, objectInstance.getWidth(player.id) + borderWidth, objectInstance.getHeight(player.id) + borderWidth);
+        }
+    }
+
+    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth) {
+        if (objectInstance != null) {
+            if(isStackCollected(gameInstance, objectInstance))
+            {
+                drawBorder(g, player, getStackTop(gameInstance, objectInstance), borderWidth);
+            }
+            else
+            {
+                Graphics2D g2d = (Graphics2D) g.create();
+                g.setColor(player.color);
+                g2d.setStroke(new BasicStroke(borderWidth));
+                ObjectInstance stackTop = getStackTop(gameInstance, objectInstance);
+                ObjectInstance stackBottom = getStackBottom(gameInstance, objectInstance);
+                g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackTop.state.posX, stackTop.state.posY + stackTop.getHeight(player.id));
+                g2d.drawLine(stackBottom.state.posX+stackBottom.getWidth(player.id), stackBottom.state.posY, stackBottom.state.posX+stackBottom.getWidth(player.id), stackBottom.state.posY + stackBottom.getHeight(player.id));
+                g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackBottom.state.posX +stackBottom.getWidth(player.id), stackBottom.state.posY);
+                g2d.drawLine(stackTop.state.posX, stackTop.state.posY + stackTop.getHeight(player.id), stackBottom.state.posX +stackBottom.getWidth(player.id), stackBottom.state.posY + stackBottom.getHeight(player.id));
+            }
+        }
+    }
+
+    public static boolean isObjectInHand(Player player, ObjectInstance objectInstance){
+        return objectInstance.state.owner_id == player.id;
+    }
+
+    public static boolean isStackInHand(GameInstance gameInstance, Player player, IntegerArrayList stackIds){
+        for(int id: stackIds)
+        {
+            if(!isObjectInHand(player, gameInstance.objects.get(id)))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
