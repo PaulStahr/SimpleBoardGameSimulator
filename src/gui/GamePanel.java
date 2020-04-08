@@ -13,6 +13,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.Random;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -61,7 +62,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	int zoomFactor = 0;
 	int translateX = 0;
 	int translateY = 0;
+
+
 	ControlPanel controlPanel = new ControlPanel();
+
+	Color mouseColor = Color.black;
+	Color dragColor = Color.red;
+	String infoText = "";
 
 
 	public GamePanel(GameInstance gameInstance)
@@ -89,7 +96,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		p.add(new JLabel("Remove Stack: R"));
 		p.add(new JLabel("Count Objects: C"));
 		p.add(new JLabel("Count Values: Strg + C"));
-
 		this.add(p);
 	}
 	
@@ -104,11 +110,26 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			ObjectInstance oi = gameInstance.objects.get(i);
 			if (ObjectFunctions.isStackBottom(oi)) {
 				ObjectFunctions.drawStack(g, ObjectFunctions.getAboveStack(gameInstance, oi), gameInstance, player.id, zooming, logger);
+				if (ObjectFunctions.isStackInHand(gameInstance, player, ObjectFunctions.getStack(gameInstance, oi))) {
+					g.setColor(player.color);
+					ObjectFunctions.drawStackBorder(gameInstance, g, player, oi, 10);
+				}
 			}
 		}
-		if(activeObject != null && ObjectFunctions.isStackTop(activeObject)) {
+		if(activeObject != null) {
 			ObjectFunctions.drawObject(g, activeObject, player.id, zooming, logger);
+			g.setColor(player.color);
+			ObjectFunctions.drawBorder(g, player, activeObject, 10);
 		}
+
+		g.setColor(mouseColor);
+		for(Player p: gameInstance.players) {
+			g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
+			g.setColor(p.color);
+			g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
+			g.drawString(infoText, p.mouseXPos - 5, p.mouseYPos - 10);
+		}
+
 	}
 
 	@Override
@@ -152,6 +173,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		activeObject = null;
 		mouseX = arg0.getX();
 		mouseY = arg0.getY();
+		mouseColor = player.color;
+		repaint();
 	}
 
 	@Override
@@ -178,12 +201,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			ObjectFunctions.moveObjectTo(id, gameInstance, player, activeObject, objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
 			gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
 		}
+		mouseX = arg0.getX();
+		mouseY = arg0.getY();
+		player.setMousePos(mouseX, mouseY);
+		mouseColor = dragColor;
+		repaint();
 	}
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
 		mouseX = arg0.getX();
 		mouseY = arg0.getY();
+		player.setMousePos(mouseX, mouseY);
+		activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player,mouseX, mouseY, null);
+		repaint();
 	}
 
 	@SuppressWarnings("unused")
@@ -328,12 +359,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			zoomFactor += (int) e.getPreciseWheelRotation();
 		}
-		getGraphics().drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
-		repaint();
-		if(mouseWheelValue < 0) {
+		if(mouseWheelValue <= 0) {
 			mouseWheelValue = 0;
+			infoText = "";
 		}
-		getGraphics().drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
+		else
+			infoText = String.valueOf(mouseWheelValue);
+
+		repaint();
 	}
 
 	@Override
