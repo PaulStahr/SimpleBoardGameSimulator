@@ -253,7 +253,7 @@ public class ObjectFunctions {
 
     //Shuffle the stack containing objectInstance either with objectInstance or not, default is true
     public static void shuffleStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean include) {
-        if (objectInstance != null) {
+        if (objectInstance != null && (isStackInHand(gameInstance, player, getStack(gameInstance, objectInstance)) || isStackNotInHand(gameInstance, player, getStack(gameInstance, objectInstance)))) {
             IntegerArrayList objectStack = getStack(gameInstance, objectInstance);
             if (objectStack.size() > 1) {
                 IntegerArrayList oldX = new IntegerArrayList();
@@ -283,13 +283,15 @@ public class ObjectFunctions {
         }
     }
 
+
+
     public static void shuffleStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         shuffleStack(gamePanelId, gameInstance, player, objectInstance, true);
     }
 
     //Flip an object from one side to the other
     public static void flipObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
-        if (objectInstance != null) {
+        if (objectInstance != null && isObjectInHand(player, objectInstance)) {
             ((GameObjectToken.TokenState) objectInstance.state).side = !((GameObjectToken.TokenState) objectInstance.state).side;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
         }
@@ -297,7 +299,7 @@ public class ObjectFunctions {
 
     //Flip the stack which contains object instance, either including this or not, default true
     public static void flipStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean including) {
-        if (objectInstance != null) {
+        if (objectInstance != null && isStackInHand(gameInstance, player, getStack(gameInstance, objectInstance))) {
             IntegerArrayList objectStack = getStack(gameInstance, objectInstance);
             int size = objectStack.size() - 1;
             for (int i = 0; i< objectStack.size(); ++i) {
@@ -564,7 +566,7 @@ public class ObjectFunctions {
         for(int id: stackIds)
         {
             ObjectInstance currentInstance = gameInstance.objects.get(id);
-            if (player != currentInstance.inHand) {
+            if (player.id != currentInstance.state.owner_id) {
                 currentInstance.state.owner_id = player.id;
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentInstance));
             }
@@ -871,6 +873,17 @@ public class ObjectFunctions {
         for(int id: stackIds)
         {
             if(!isObjectInHand(player, gameInstance.objects.get(id)))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isStackNotInHand(GameInstance gameInstance, Player player, IntegerArrayList stackIds) {
+        for(int id: stackIds)
+        {
+            if(gameInstance.objects.get(id).state.owner_id != -1)
             {
                 return false;
             }
