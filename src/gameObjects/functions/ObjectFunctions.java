@@ -869,6 +869,21 @@ public class ObjectFunctions {
         return objectInstance.state.owner_id == player.id;
     }
 
+
+    public static int getStackOwner(GameInstance gameInstance, IntegerArrayList stackIds){
+        int ownerId = -1;
+        for(int id: stackIds)
+        {
+            if(ownerId == -1 || gameInstance.objects.get(id).state.owner_id == ownerId)
+            {
+                ownerId = gameInstance.objects.get(id).state.owner_id;
+            }
+            else
+                return -1;
+        }
+        return ownerId;
+    }
+
     public static boolean isStackInHand(GameInstance gameInstance, Player player, IntegerArrayList stackIds){
         for(int id: stackIds)
         {

@@ -111,12 +111,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			ObjectInstance oi = gameInstance.objects.get(i);
 			if (ObjectFunctions.isStackBottom(oi)) {
 				ObjectFunctions.drawStack(g, ObjectFunctions.getAboveStack(gameInstance, oi), gameInstance, playerid, zooming, logger);
-				if (player != null)
-				{
-					if (ObjectFunctions.isStackInHand(gameInstance, player, ObjectFunctions.getStack(gameInstance, oi))) {
-						g.setColor(player.color);
-						ObjectFunctions.drawStackBorder(gameInstance, g, player, oi, 10);
-					}
+				int playerId = ObjectFunctions.getStackOwner(gameInstance, ObjectFunctions.getStack(gameInstance, oi));
+				if (playerId != -1) {
+					Player p = gameInstance.getPlayer(playerId);
+					g.setColor(p.color);
+					ObjectFunctions.drawStackBorder(gameInstance, g, p, oi, 10);
+					gameInstance.update(new GamePlayerEditAction(id, player, player));
 				}
 			}
 		}
@@ -131,14 +131,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 		g.setColor(mouseColor);
 		for(Player p: gameInstance.players) {
-			g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
 			g.setColor(p.color);
-			//g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
-			g.drawString(p.name, p.mouseXPos, p.mouseYPos);
+			g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
+			g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
+			//g.drawString(p.name, p.mouseXPos, p.mouseYPos);
 			ObjectFunctions.drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, null), 10);
 		}
 		if (player != null)
 		{
+			g.setColor(player.color);
 			g.drawString(infoText, player.mouseXPos - 5, player.mouseYPos - 10);
 		}
 	}
@@ -188,6 +189,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		activeObject = null;
 		mouseX = arg0.getX();
 		mouseY = arg0.getY();
+		if (player != null) {
+			gameInstance.update(new GamePlayerEditAction(id, player, player));
+		}
 		mouseColor = player.color;
 		repaint();
 	}
@@ -224,6 +228,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		mouseY = arg0.getY();
 		if (player != null)
 		{
+			gameInstance.update(new GamePlayerEditAction(id, player, player));
 			player.setMousePos(mouseX, mouseY);
 		}
 		mouseColor = dragColor;
