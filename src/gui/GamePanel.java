@@ -126,7 +126,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		for(Player p: gameInstance.players) {
 			g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
 			g.setColor(p.color);
-			g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
+			//g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
+			g.drawString(p.name, player.mouseXPos, player.mouseYPos);
 			ObjectFunctions.drawBorder(g, player, ObjectFunctions.getNearestObjectByPosition(gameInstance, player, p.mouseXPos, p.mouseYPos, null), 10);
 		}
 		g.drawString(infoText, player.mouseXPos - 5, player.mouseYPos - 10);
@@ -214,7 +215,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		mouseX = arg0.getX();
 		mouseY = arg0.getY();
 		player.setMousePos(mouseX, mouseY);
-		changeUpdate(new GamePlayerEditAction(id, player, player));
+		gameInstance.update(new GamePlayerEditAction(id, player, player));
 		activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player,mouseX, mouseY, null);
 		repaint();
 	}
