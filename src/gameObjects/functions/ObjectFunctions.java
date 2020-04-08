@@ -299,12 +299,23 @@ public class ObjectFunctions {
     public static void flipStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean including) {
         if (objectInstance != null) {
             IntegerArrayList objectStack = getStack(gameInstance, objectInstance);
-            for (int id : objectStack) {
-                if (id != objectInstance.id || including) {
-                    ObjectInstance currentObject = gameInstance.objects.get(id);
+            int size = objectStack.size() - 1;
+            for (int i = 0; i< objectStack.size(); ++i) {
+                if (objectStack.get(i) != objectInstance.id || including) {
+                    ObjectInstance currentObject = gameInstance.objects.get(objectStack.get(i));
                     int aboveId = currentObject.state.aboveInstanceId;
                     currentObject.state.aboveInstanceId = currentObject.state.belowInstanceId;
                     currentObject.state.belowInstanceId = aboveId;
+                    if(i <= objectStack.size()/2)
+                    {
+                        int posX = currentObject.state.posX;
+                        int posY = currentObject.state.posY;
+
+                        currentObject.state.posX = gameInstance.objects.get(objectStack.get(size - i)).state.posX;
+                        currentObject.state.posY = gameInstance.objects.get(objectStack.get(size - i)).state.posY;
+                        gameInstance.objects.get(objectStack.get(size - i)).state.posX = posX;
+                        gameInstance.objects.get(objectStack.get(size - i)).state.posY = posY;
+                    }
                     flipObject(gamePanelId, gameInstance, player, currentObject);
                 }
             }
