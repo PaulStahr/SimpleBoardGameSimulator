@@ -15,6 +15,7 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gameObjects.GamePlayerEditAction;
 import gameObjects.UsertextMessageAction;
 import gameObjects.definition.GameObject;
 import gameObjects.instance.Game;
@@ -282,7 +283,8 @@ public class GameServer implements Runnable {
 						}
 			    		if (gi.password == null || gi.password.equals("") || (split.size() > 4 && gi.password.equals(split.get(4))))
 			    		{
-			    			gi.addPlayer(new Player(player, id));
+			    			Player pl = gi.addPlayer(new Player(player, id));
+			    			gi.update(new GamePlayerEditAction(0, pl, pl));
 			    		}
 			    		else
 			    		{

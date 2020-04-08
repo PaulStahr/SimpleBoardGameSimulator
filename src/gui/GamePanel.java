@@ -106,20 +106,27 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		double zooming = Math.exp(-zoomFactor * 0.1);
 		g.drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
 		g.drawImage(gameInstance.game.background, 0, 0, getWidth(), getHeight(), Color.BLACK, null);
+		int playerid = player == null ? -1 : player.id;
 		for (int i = 0; i < gameInstance.objects.size(); ++i) {
 			ObjectInstance oi = gameInstance.objects.get(i);
 			if (ObjectFunctions.isStackBottom(oi)) {
-				ObjectFunctions.drawStack(g, ObjectFunctions.getAboveStack(gameInstance, oi), gameInstance, player.id, zooming, logger);
-				if (ObjectFunctions.isStackInHand(gameInstance, player, ObjectFunctions.getStack(gameInstance, oi))) {
-					g.setColor(player.color);
-					ObjectFunctions.drawStackBorder(gameInstance, g, player, oi, 10);
+				ObjectFunctions.drawStack(g, ObjectFunctions.getAboveStack(gameInstance, oi), gameInstance, playerid, zooming, logger);
+				if (player != null)
+				{
+					if (ObjectFunctions.isStackInHand(gameInstance, player, ObjectFunctions.getStack(gameInstance, oi))) {
+						g.setColor(player.color);
+						ObjectFunctions.drawStackBorder(gameInstance, g, player, oi, 10);
+					}
 				}
 			}
 		}
 		if(activeObject != null) {
-			ObjectFunctions.drawObject(g, activeObject, player.id, zooming, logger);
-			g.setColor(player.color);
-			ObjectFunctions.drawBorder(g, player, activeObject, 10);
+			ObjectFunctions.drawObject(g, activeObject, playerid, zooming, logger);
+			if (player != null)
+			{
+				g.setColor(player.color);
+				ObjectFunctions.drawBorder(g, player, activeObject, 10);
+			}
 		}
 
 		g.setColor(mouseColor);
@@ -127,11 +134,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
 			g.setColor(p.color);
 			//g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
-			g.drawString(p.name, player.mouseXPos, player.mouseYPos);
-			ObjectFunctions.drawBorder(g, player, ObjectFunctions.getNearestObjectByPosition(gameInstance, player, p.mouseXPos, p.mouseYPos, null), 10);
+			g.drawString(p.name, p.mouseXPos, p.mouseYPos);
+			ObjectFunctions.drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, null), 10);
 		}
-		g.drawString(infoText, player.mouseXPos - 5, player.mouseYPos - 10);
-
+		if (player != null)
+		{
+			g.drawString(infoText, player.mouseXPos - 5, player.mouseYPos - 10);
+		}
 	}
 
 	@Override
@@ -169,6 +178,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
+		if (player == null)
+		{
+			return;
+		}
 		if (activeObject != null && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
 			ObjectFunctions.releaseObjects(id, gameInstance, player, activeObject);
 		}
@@ -181,6 +194,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
+		if (player == null)
+		{
+			return;
+		}
 		/* Drag only when left mouse down */
 		if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0)) && !isShiftDown && activeObject != null) {
 			/*Drop objects if middle mouse button is not held*/
@@ -205,7 +222,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		mouseX = arg0.getX();
 		mouseY = arg0.getY();
-		player.setMousePos(mouseX, mouseY);
+		if (player != null)
+		{
+			player.setMousePos(mouseX, mouseY);
+		}
 		mouseColor = dragColor;
 		repaint();
 	}
@@ -214,9 +234,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void mouseMoved(MouseEvent arg0) {
 		mouseX = arg0.getX();
 		mouseY = arg0.getY();
-		player.setMousePos(mouseX, mouseY);
-		gameInstance.update(new GamePlayerEditAction(id, player, player));
-		activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player,mouseX, mouseY, null);
+		if (player != null)
+		{
+			player.setMousePos(mouseX, mouseY);
+			gameInstance.update(new GamePlayerEditAction(id, player, player));
+			activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player,mouseX, mouseY, null);
+		}
 		repaint();
 	}
 
