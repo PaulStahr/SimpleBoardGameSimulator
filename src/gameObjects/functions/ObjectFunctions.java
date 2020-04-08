@@ -1,6 +1,8 @@
 package gameObjects.functions;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
@@ -15,12 +17,9 @@ import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import gui.GamePanel;
-import javafx.util.Pair;
 import main.Player;
+import util.Pair;
 import util.data.IntegerArrayList;
-
-import javax.swing.*;
 
 public class ObjectFunctions {
 
