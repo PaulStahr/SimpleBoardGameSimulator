@@ -44,6 +44,7 @@ public class ObjectInstance {
 		state.aboveInstanceId = objectState.aboveInstanceId;
 		state.belowInstanceId = objectState.belowInstanceId;
 		state.value = objectState.value;
+		state.owner_id = objectState.owner_id;
 	}
 	
 	public int owner_id()

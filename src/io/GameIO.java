@@ -38,6 +38,7 @@ import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
 import main.Player;
 import net.AsynchronousGameConnection;
+import util.ArrayUtil;
 
 public class GameIO {
 
@@ -66,20 +67,20 @@ public class GameIO {
 	 */
 	private static void writeStateToElement(ObjectState state, Element elem)
 	{
-		elem.setAttribute("x", Integer.toString(state.posX));
-		elem.setAttribute("y", Integer.toString(state.posY));
-		elem.setAttribute("r", Integer.toString(state.rotation));
-		elem.setAttribute("owner", Integer.toString(state.owner_id));
-		elem.setAttribute("above", Integer.toString(state.aboveInstanceId));
-		elem.setAttribute("below", Integer.toString(state.belowInstanceId));
-		elem.setAttribute("value", Integer.toString(state.value));
+		elem.setAttribute(IOString.X, Integer.toString(state.posX));
+		elem.setAttribute(IOString.Y, Integer.toString(state.posY));
+		elem.setAttribute(IOString.R, Integer.toString(state.rotation));
+		elem.setAttribute(IOString.OWNER_ID, Integer.toString(state.owner_id));
+		elem.setAttribute(IOString.ABOVE, Integer.toString(state.aboveInstanceId));
+		elem.setAttribute(IOString.BELOW, Integer.toString(state.belowInstanceId));
+		elem.setAttribute(IOString.VALUE, Integer.toString(state.value));
 		if (state instanceof TokenState)
     	{
-			elem.setAttribute("side", Boolean.toString(((TokenState)state).side));
+			elem.setAttribute(IOString.SIDE, Boolean.toString(((TokenState)state).side));
     	}
 		if (state instanceof GameObjectFigure.FigureState)
 		{
-			elem.setAttribute("standing", Boolean.toString(((GameObjectFigure.FigureState) state).standing));
+			elem.setAttribute(IOString.STANDING, Boolean.toString(((GameObjectFigure.FigureState) state).standing));
 		}
 	}
 
@@ -91,37 +92,37 @@ public class GameIO {
 	 */
 	private static void editStateFromElement(ObjectState state, Element elem)
 	{
-		state.posX = Integer.parseInt(elem.getAttributeValue("x"));
-		state.posY = Integer.parseInt(elem.getAttributeValue("y"));
-		state.rotation = Integer.parseInt(elem.getAttributeValue("r"));
+		state.posX = Integer.parseInt(elem.getAttributeValue(IOString.X));
+		state.posY = Integer.parseInt(elem.getAttributeValue(IOString.Y));
+		state.rotation = Integer.parseInt(elem.getAttributeValue(IOString.Z));
 
-		String v = elem.getAttributeValue("above");
+		String v = elem.getAttributeValue(IOString.ABOVE);
 		if (v != null)
 		{
 			state.aboveInstanceId = Integer.parseInt(v);
 		}
-		v = elem.getAttributeValue("below");
+		v = elem.getAttributeValue(IOString.BELOW);
 		if (v != null)
 		{
 			state.belowInstanceId = Integer.parseInt(v);
 		}
-		Attribute ownerAttribute = elem.getAttribute("owner_id");
+		Attribute ownerAttribute = elem.getAttribute(IOString.OWNER_ID);
 		if (ownerAttribute != null)
 		{
 	        state.owner_id = Integer.parseInt(ownerAttribute.getValue());
 		}
-		Attribute valueAttribute = elem.getAttribute("value");
+		Attribute valueAttribute = elem.getAttribute(IOString.VALUE);
 		if (valueAttribute != null)
 		{
 			state.value = Integer.parseInt(valueAttribute.getValue());
 		}
-		if (state instanceof TokenState && elem.getAttribute("side") != null)
+		if (state instanceof TokenState && elem.getAttribute(IOString.SIDE) != null)
     	{
-			((TokenState)state).side = Boolean.parseBoolean(elem.getAttributeValue("side"));
+			((TokenState)state).side = Boolean.parseBoolean(elem.getAttributeValue(IOString.SIDE));
     	}
-		if (state instanceof GameObjectFigure.FigureState && elem.getAttribute("standing") != null)
+		if (state instanceof GameObjectFigure.FigureState && elem.getAttribute(IOString.STANDING) != null)
 		{
-			((GameObjectFigure.FigureState)state).standing = Boolean.parseBoolean(elem.getAttributeValue("standing"));
+			((GameObjectFigure.FigureState)state).standing = Boolean.parseBoolean(elem.getAttributeValue(IOString.STANDING));
 		}
 	}
 
@@ -138,20 +139,20 @@ public class GameIO {
 			String name = elem.getName();
 			switch (name)
 			{
-				case "player":
+				case IOString.PLAYER:
 					Player player = createPlayerFromElement(elem);
 					System.out.println(player);
 					gi.addPlayer(player);
 					break;
-				case "name":gi.name = elem.getValue();break;
-				case "object":
-					String uniqueName = elem.getAttributeValue("unique_name");
-					ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue("id")));
+				case IOString.NAME:gi.name = elem.getValue();break;
+				case IOString.OBJECT:
+					String uniqueName = elem.getAttributeValue(IOString.UNIQUE_NAME);
+					ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue(IOString.ID)));
 					editStateFromElement(oi.state, elem);
 					gi.addObjectInstance(oi);
 					break;
-				case "password":gi.password = elem.getValue();break;
-				case "hidden":gi.hidden = Boolean.parseBoolean(elem.getValue());break;
+				case IOString.PASSWORD:gi.password = elem.getValue();break;
+				case IOString.HIDDEN:gi.hidden = Boolean.parseBoolean(elem.getValue());break;
 			}
 		}
 	}
@@ -165,52 +166,52 @@ public class GameIO {
 	 */
 	private static GameObject createGameObjectFromElement(Element elem, HashMap<String, BufferedImage> images)
 	{
-		switch(elem.getAttributeValue("type"))
+		switch(elem.getAttributeValue(IOString.TYPE))
 		{
-			case "card":
+			case IOString.CARD:
 			{
 				int width = 66;
 				int height = 88;
 				int value = 0;
-				if(elem.getAttributeValue("width") != null) {
-					width = Integer.parseInt(elem.getAttributeValue("width"));
+				if(elem.getAttributeValue(IOString.WIDTH) != null) {
+					width = Integer.parseInt(elem.getAttributeValue(IOString.WIDTH));
 				}
-				if(elem.getAttributeValue("height") != null) {
-					height = Integer.parseInt(elem.getAttributeValue("height"));
+				if(elem.getAttributeValue(IOString.HEIGHT) != null) {
+					height = Integer.parseInt(elem.getAttributeValue(IOString.HEIGHT));
 				}
-				if(elem.getAttributeValue("value") != null) {
-					value = Integer.parseInt(elem.getAttributeValue("value"));
+				if(elem.getAttributeValue(IOString.VALUE) != null) {
+					value = Integer.parseInt(elem.getAttributeValue(IOString.VALUE));
 				}
-				return new GameObjectToken(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, images.get(elem.getAttributeValue("front")), images.get(elem.getAttributeValue("back")), value);
+				return new GameObjectToken(elem.getAttributeValue(IOString.UNIQUE_NAME), elem.getAttributeValue(IOString.TYPE), width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value);
 			}
-			case "figure":
+			case IOString.FIGURE:
 			{
 				int width = 20;
 				int height = 40;
-				if(elem.getAttributeValue("width") != null) {
-					width = Integer.parseInt(elem.getAttributeValue("width"));
+				if(elem.getAttributeValue(IOString.WIDTH) != null) {
+					width = Integer.parseInt(elem.getAttributeValue(IOString.WIDTH));
 				}
-				if(elem.getAttributeValue("height") != null) {
-					height = Integer.parseInt(elem.getAttributeValue("height"));
+				if(elem.getAttributeValue(IOString.HEIGHT) != null) {
+					height = Integer.parseInt(elem.getAttributeValue(IOString.HEIGHT));
 				}
-				return new GameObjectFigure(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, images.get(elem.getAttributeValue("standing")));
+				return new GameObjectFigure(elem.getAttributeValue(IOString.UNIQUE_NAME), elem.getAttributeValue(IOString.TYPE), width, height, images.get(elem.getAttributeValue(IOString.STANDING)));
 			}
-			case "dice":
+			case IOString.DICE:
 			{
 				int width = 20;
 				int height = 20;
-				if(elem.getAttributeValue("width") != null) {
-					width = Integer.parseInt(elem.getAttributeValue("width"));
+				if(elem.getAttributeValue(IOString.WIDTH) != null) {
+					width = Integer.parseInt(elem.getAttributeValue(IOString.WIDTH));
 				}
-				if(elem.getAttributeValue("height") != null) {
-					height = Integer.parseInt(elem.getAttributeValue("height"));
+				if(elem.getAttributeValue(IOString.HEIGHT) != null) {
+					height = Integer.parseInt(elem.getAttributeValue(IOString.HEIGHT));
 				}
 				ArrayList<DiceSide> dss = new ArrayList<>();
 				for (Element side : elem.getChildren())
 				{
-					dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue("value")), images.get(side.getValue())));
+					dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), images.get(side.getValue())));
 				}
-				return new GameObjectDice(elem.getAttributeValue("unique_name"), elem.getAttributeValue("type"), width, height, dss.toArray(new DiceSide[dss.size()]));
+				return new GameObjectDice(elem.getAttributeValue(IOString.UNIQUE_NAME), elem.getAttributeValue(IOString.TYPE), width, height, dss.toArray(new DiceSide[dss.size()]));
 			}
 		}
 		return null;
@@ -225,19 +226,19 @@ public class GameIO {
 	private static Player createPlayerFromElement(Element elem)
 	{
 		return new Player(
-				elem.getAttributeValue("name"),
-				Integer.parseInt(elem.getAttributeValue("id")),
-				new Color(Integer.parseInt(elem.getAttributeValue("color"))),
-				Integer.parseInt(elem.getAttributeValue("mouseX")),
-				Integer.parseInt(elem.getAttributeValue("mouseY")));
+				elem.getAttributeValue(IOString.NAME),
+				Integer.parseInt(elem.getAttributeValue(IOString.ID)),
+				new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR))),
+				Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X)),
+				Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y)));
 	}
 
 	private static Player editPlayerFromElement(Element elem, Player player)
 	{
-		player.name = elem.getAttributeValue("name");
-		player.color = new Color(Integer.parseInt(elem.getAttributeValue("color")));
-		player.mouseXPos = Integer.parseInt(elem.getAttributeValue("mouseX"));
-		player.mouseYPos = Integer.parseInt(elem.getAttributeValue("mouseY"));
+		player.name = elem.getAttributeValue(IOString.NAME);
+		player.color = new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR)));
+		player.mouseXPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X));
+		player.mouseYPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y));
 		return player;
 	}
 
@@ -249,9 +250,9 @@ public class GameIO {
 	 */
 	private static Element createElementFromObjectInstance(ObjectInstance objectInstance)
 	{
-		Element elem = new Element("object");
-		elem.setAttribute("unique_name", objectInstance.go.uniqueName);
-		elem.setAttribute("id", Integer.toString(objectInstance.id));
+		Element elem = new Element(IOString.OBJECT);
+		elem.setAttribute(IOString.UNIQUE_NAME, objectInstance.go.uniqueName);
+		elem.setAttribute(IOString.ID, Integer.toString(objectInstance.id));
 		writeStateToElement(objectInstance.state, elem);
 		return elem;
 	}
@@ -267,34 +268,34 @@ public class GameIO {
 	 */
 	private static Element createElementFromGameObject(GameObject gameObject, Game game)
 	{
-		Element elem = new Element("object");
-		elem.setAttribute("type", gameObject.objectType);
-		elem.setAttribute("unique_name", gameObject.uniqueName);
-		elem.setAttribute("width", Integer.toString(gameObject.widthInMM));
-		elem.setAttribute("height", Integer.toString(gameObject.heightInMM));
+		Element elem = new Element(IOString.OBJECT);
+		elem.setAttribute(IOString.TYPE, gameObject.objectType);
+		elem.setAttribute(IOString.UNIQUE_NAME, gameObject.uniqueName);
+		elem.setAttribute(IOString.WIDTH, Integer.toString(gameObject.widthInMM));
+		elem.setAttribute(IOString.HEIGHT, Integer.toString(gameObject.heightInMM));
 		if (gameObject instanceof GameObjectToken)
 		{
 			GameObjectToken token = (GameObjectToken) gameObject;
-			elem.setAttribute("value", Integer.toString(token.value));
-			elem.setAttribute("front", game.getImageKey(token.getUpsideLook()));
+			elem.setAttribute(IOString.VALUE, Integer.toString(token.value));
+			elem.setAttribute(IOString.FRONT, game.getImageKey(token.getUpsideLook()));
 			if (token.getDownsideLook() != null)
 			{
-				elem.setAttribute("back", game.getImageKey(token.getDownsideLook()));
+				elem.setAttribute(IOString.BACK, game.getImageKey(token.getDownsideLook()));
 			}
 
 		}
 		else if (gameObject instanceof GameObjectFigure)
 		{
 			GameObjectFigure figure = (GameObjectFigure) gameObject;
-			elem.setAttribute("standing", game.getImageKey(figure.getStandingLook()));
+			elem.setAttribute(IOString.STANDING, game.getImageKey(figure.getStandingLook()));
 		}
 		else if (gameObject instanceof GameObjectDice)
 		{
 			GameObjectDice dice = (GameObjectDice) gameObject;
 			for (DiceSide side : dice.dss)
 			{
-				Element sideElem = new Element("side");
-				sideElem.setAttribute("value", Integer.toString(side.value));
+				Element sideElem = new Element(IOString.SIDE);
+				sideElem.setAttribute(IOString.VALUE, Integer.toString(side.value));
 				sideElem.setText(game.getImageKey(side.img));
 				elem.addContent(sideElem);
 			}
@@ -308,12 +309,12 @@ public class GameIO {
 	 * @return the created Element
 	 */
 	private static Element createElementFromPlayer(Player player) {
-		Element elem = new Element("player");
-		elem.setAttribute("name", player.name);
-		elem.setAttribute("id", Integer.toString(player.id));
-		elem.setAttribute("color", Integer.toString(player.color.getRGB()));
-		elem.setAttribute("mouseX", Integer.toString(player.mouseXPos));
-		elem.setAttribute("mouseY", Integer.toString(player.mouseYPos));
+		Element elem = new Element(IOString.PLAYER);
+		elem.setAttribute(IOString.NAME, player.name);
+		elem.setAttribute(IOString.ID, Integer.toString(player.id));
+		elem.setAttribute(IOString.COLOR, Integer.toString(player.color.getRGB()));
+		elem.setAttribute(IOString.MOUSE_X, Integer.toString(player.mouseXPos));
+		elem.setAttribute(IOString.MOUSE_Y, Integer.toString(player.mouseYPos));
 		return elem;
 	}
 
@@ -335,49 +336,10 @@ public class GameIO {
 		try
 		{
 			zipOutputStream = new ZipOutputStream(os);
-			Game game = gi.game;
-			//TODO dublicated code (0)
-			// Save all images
-		    for (HashMap.Entry<String, BufferedImage> pair : game.images.entrySet()) {
-		    	String key = pair.getKey();
-			    ZipEntry imageZipOutput = new ZipEntry(key);
-			    zipOutputStream.putNextEntry(imageZipOutput);
-
-			    if (getVersion() < 9)
-		    	{
-		    		MemoryCacheImageOutputStream tmp = new MemoryCacheImageOutputStream(zipOutputStream);
-		    		ImageIO.write(pair.getValue(), key.substring(key.length() - 3), tmp);
-		    		tmp.close();
-		    	}
-			    else
-			    {
-			    	ImageIO.write(pair.getValue(), key.substring(key.length() - 3), zipOutputStream);
-		    	}
-			    zipOutputStream.closeEntry();
-		    }
-		    
-		    // save game.xml
-		    Document doc_game = new Document();
-	    	Element root_game = new Element("xml");
-	    	doc_game.addContent(root_game);
-
-			for (int idx = 0; idx < game.objects.size(); idx++)  {
-	        	GameObject entry = game.objects.get(idx);
-	        	root_game.addContent(createElementFromGameObject(entry, game));
-	        }
-	        
-	        Element elem_back = new Element("background");
-			elem_back.setText(game.getImageKey((BufferedImage) game.background));
-	        root_game.addContent(elem_back);
-	    	
-	    	ZipEntry gameZipOutput = new ZipEntry("game.xml");
-	    	zipOutputStream.putNextEntry(gameZipOutput);
-	    	new XMLOutputter(Format.getPrettyFormat()).output(doc_game, zipOutputStream);
-	    	zipOutputStream.closeEntry();
-
+			writeGameToZip(gi.game, zipOutputStream);
 		    // save game_instance.xml
 	    	Document doc_inst = new Document();
-	    	Element root_inst = new Element("xml");
+	    	Element root_inst = new Element(IOString.XML);
 
 			for (int idx = 0; idx < gi.objects.size(); idx++) {
 	        	ObjectInstance ObjectInstance = gi.objects.get(idx);
@@ -387,20 +349,20 @@ public class GameIO {
 				Player player = gi.players.get(idx);
 				root_inst.addContent(createElementFromPlayer(player));
 			}
-	        Element sessionName = new Element("name");
+	        Element sessionName = new Element(IOString.NAME);
 	        sessionName.setText(gi.name);
 	        root_inst.addContent(sessionName);
 
-			Element hidden = new Element("hidden");
+			Element hidden = new Element(IOString.HIDDEN);
 			hidden.setText(String.valueOf(gi.hidden));
 			root_inst.addContent(hidden);
 
-			Element password = new Element("password");
+			Element password = new Element(IOString.PASSWORD);
 			hidden.setText(String.valueOf(gi.password));
 			root_inst.addContent(password);
 	    	
 	        doc_inst.addContent(root_inst);
-	    	ZipEntry xmlZipOutput = new ZipEntry("game_instance.xml");
+	    	ZipEntry xmlZipOutput = new ZipEntry(IOString.GAME_INSTANCE_XML);
 	    	zipOutputStream.putNextEntry(xmlZipOutput);
 	    	new XMLOutputter(Format.getPrettyFormat()).output(doc_inst, zipOutputStream);
 	    	zipOutputStream.closeEntry();
@@ -413,6 +375,53 @@ public class GameIO {
 			}
 		}
 	}
+	
+	public static void writeGameToZip(Game game, ZipOutputStream zipOutputStream) throws IOException
+	{	
+		// Save all images
+	    for (HashMap.Entry<String, BufferedImage> pair : game.images.entrySet()) {
+	    	String key = pair.getKey();
+		    ZipEntry imageZipOutput = new ZipEntry(key);
+		    zipOutputStream.putNextEntry(imageZipOutput);
+		    int idx = key.lastIndexOf('.');
+		    if (idx != -1)
+		    {
+		    	String suffix = key.substring(idx + 1);
+		    	if (ArrayUtil.firstEqualIndex(ImageIO.getWriterFileSuffixes(), suffix) != -1)
+		    	{
+		    		if (getVersion() < 9)
+			    	{
+			    		MemoryCacheImageOutputStream tmp = new MemoryCacheImageOutputStream(zipOutputStream);
+				    	ImageIO.write(pair.getValue(), suffix, tmp);
+			    		tmp.close();
+			    	}
+				    else
+				    {
+				    	ImageIO.write(pair.getValue(), suffix, zipOutputStream);
+			    	}
+		    	}
+		    }
+		    zipOutputStream.closeEntry();
+	    }
+	    
+		Document doc_game = new Document();
+    	Element root_game = new Element(IOString.XML);
+    	doc_game.addContent(root_game);
+
+        for (int idx = 0; idx < game.objects.size(); idx++) {
+        	GameObject entry = game.objects.get(idx);
+        	root_game.addContent(createElementFromGameObject(entry, game));
+        }
+        
+        Element elem_back = new Element(IOString.BACKGROUND);
+        elem_back.setText(game.getImageKey((BufferedImage) game.background));
+        root_game.addContent(elem_back);
+    	
+        ZipEntry gameZipOutput = new ZipEntry(IOString.GAME_XML);
+    	zipOutputStream.putNextEntry(gameZipOutput);
+    	new XMLOutputter(Format.getPrettyFormat()).output(doc_game, zipOutputStream);
+    	zipOutputStream.closeEntry();
+	}
 
 	/**
 	 * Encodes all fields of @param game to an XML document and puts
@@ -422,48 +431,13 @@ public class GameIO {
 	 * @param game the Game that shall be encoded
 	 * @param os the OutputStream the Game will be written to
 	 */
-	//TODO dublicated code (0)
 	public static void writeGameToZip(Game game, OutputStream os) throws IOException
 	{	
 		ZipOutputStream zipOutputStream = null;
 		try
 		{
 			zipOutputStream = new ZipOutputStream(os);
-			
-			// Save all images
-		    for (String key : game.images.keySet()) {
-
-			    ZipEntry imageZipOutput = new ZipEntry(key);
-			    zipOutputStream.putNextEntry(imageZipOutput);
-
-			    if (key.endsWith(".jpg"))
-			    {
-			    	ImageIO.write(game.images.get(key), "jpg", zipOutputStream);
-			    }
-			    else if (key.endsWith(".png"))
-			    {
-			    	ImageIO.write(game.images.get(key), "png", zipOutputStream);
-			    }
-			    zipOutputStream.closeEntry();
-		    }
-		    
-			Document doc_game = new Document();
-	    	Element root_game = new Element("xml");
-	    	doc_game.addContent(root_game);
-
-	        for (int idx = 0; idx < game.objects.size(); idx++) {
-	        	GameObject entry = game.objects.get(idx);
-	        	root_game.addContent(createElementFromGameObject(entry, game));
-	        }
-	        
-	        Element elem_back = new Element("background");
-	        elem_back.setText(game.getImageKey((BufferedImage) game.background));
-	        root_game.addContent(elem_back);
-	    	
-	        ZipEntry gameZipOutput = new ZipEntry("game.xml");
-	    	zipOutputStream.putNextEntry(gameZipOutput);
-	    	new XMLOutputter(Format.getPrettyFormat()).output(doc_game, zipOutputStream);
-	    	zipOutputStream.closeEntry();
+			writeGameToZip(game, zipOutputStream);
 		}
 		finally
 		{
@@ -483,7 +457,7 @@ public class GameIO {
 	public static void writeObjectStateToStream(ObjectState object, OutputStream output) throws IOException
 	{
 		Document doc = new Document();
-    	Element elem = new Element("object_state");
+    	Element elem = new Element(IOString.OBJECT_STATE);
 		writeStateToElement(object, elem);
 		doc.addContent(elem);
     	new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
@@ -516,7 +490,7 @@ public class GameIO {
 	 * used to create a ZipInputStream via ZipInputStream(in).
 	 * ATTENTION 2: It is expected, that all images used in the game are in the stream.
 	 * Possible image formats are .png and .jpg.
-	 * Besides, two files "game.xml" and "game_instance.xml" are expected, that encode
+	 * Besides, two files IOString.GAME_XML and IOString.GAME_INSTANCE_XML are expected, that encode
 	 * the game itself and the specific instance respectively.
 	 * @param in the InputStream that encodes the snapshot
 	 * @return the GameInstance encodes in @param stream
@@ -548,7 +522,7 @@ public class GameIO {
 	 * GameObject gi.game itself.
 	 * ATTENTION: It is expected, that all images used in the game are in the stream.
 	 * Possible image formats are .png and .jpg.
-	 * Besides, two files "game.xml" and "game_instance.xml" are expected, that encode
+	 * Besides, two files IOString.GAME_XML and IOString.GAME_INSTANCE_XML are expected, that encode
 	 * the game itself and the specific instance respectively.
 	 * @param stream the ZipInputStream that encodes the snapshot
 	 * @return the GameInstance encodes in @param stream
@@ -565,18 +539,26 @@ public class GameIO {
 			while((entry = stream.getNextEntry())!=null)
 			{
 				String name = entry.getName();
-				if (name.endsWith(".png") || name.endsWith(".jpg"))
-				{
-					BufferedImage img = ImageIO.read(stream);
-					images.put(name, img);
-				}
-				else if (name.equals("game.xml"))
+				if (name.equals(IOString.GAME_XML))
 				{
 					copy(stream, gameBuffer);
 				}
-				else if (name.equals("game_instance.xml"))
+				else if (name.equals(IOString.GAME_INSTANCE_XML))
 				{
 					copy(stream, gameInstanceBuffer);
+				}
+				else
+				{
+				    int idx = name.lastIndexOf('.');
+				    if (idx != -1)
+				    {
+				    	String suffix = name.substring(idx + 1);
+				    	if (ArrayUtil.firstEqualIndex(ImageIO.getReaderFileSuffixes(), suffix) != -1)
+				    	{
+				    		BufferedImage img = ImageIO.read(stream);
+							images.put(name, img);
+				    	}
+				    }
 				}
 			}
 		}
@@ -592,15 +574,15 @@ public class GameIO {
 		for (Element elem : root.getChildren())
 		{
 			final String name = elem.getName();
-			if (name.equals("object"))
+			if (name.equals(IOString.OBJECT))
 			{
 				game.objects.add(createGameObjectFromElement(elem, game.images));
 			}
-			else if (name.equals("background"))
+			else if (name.equals(IOString.BACKGROUND))
 			{
 				game.background = images.get(elem.getValue());
 			}
-			else if (name.equals("name"))
+			else if (name.equals(IOString.NAME))
 			{
 				gameName = elem.getValue();
 			}
@@ -700,7 +682,7 @@ public class GameIO {
 		while ((entry = stream.getNextEntry()) != null)
 		{
 			copy(stream, byteStream);
-			if (entry.getName().equals("game_instance.xml"))
+			if (entry.getName().equals(IOString.GAME_INSTANCE_XML))
 			{
 				editGameInstanceFromStream(new ByteArrayInputStream(byteStream.toByteArray()), gi);
 			}
@@ -747,7 +729,7 @@ public class GameIO {
 		while ((entry = stream.getNextEntry()) != null)
 		{
 			copy(stream, byteStream);
-			if (entry.getName().equals("player.xml"))
+			if (entry.getName().equals(IOString.PLAYER_XML))
 			{
 				editPlayerFromStream(new ByteArrayInputStream(byteStream.toByteArray()), player);
 			}
@@ -764,7 +746,7 @@ public class GameIO {
 		while ((entry = stream.getNextEntry()) != null)
 		{
 			copy(stream, byteStream);
-			if (entry.getName().equals("player.xml"))
+			if (entry.getName().equals(IOString.PLAYER_XML))
 			{
 				pl = readPlayerFromStream(new ByteArrayInputStream(byteStream.toByteArray()));
 			}

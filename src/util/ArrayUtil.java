@@ -3,6 +3,7 @@ package util;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+
 import util.data.DoubleList;
 import util.data.IntegerList;
 
@@ -177,6 +178,18 @@ public class ArrayUtil {
 		for (int i = 0; i < data.length; ++i)
 		{
 			if (data[i] == value)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	public static final int firstEqualIndex(Object data[], Object value)
+	{
+		for (int i = 0; i < data.length; ++i)
+		{
+			if (value.equals(data[i]))
 			{
 				return i;
 			}
