@@ -291,7 +291,7 @@ public class ObjectFunctions {
 
     //Flip an object from one side to the other
     public static void flipObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
-        if (objectInstance != null && isObjectInHand(player, objectInstance)) {
+        if (objectInstance != null ) { //&& isObjectInHand(player, objectInstance)
             ((GameObjectToken.TokenState) objectInstance.state).side = !((GameObjectToken.TokenState) objectInstance.state).side;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
         }
@@ -299,7 +299,7 @@ public class ObjectFunctions {
 
     //Flip the stack which contains object instance, either including this or not, default true
     public static void flipStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean including) {
-        if (objectInstance != null && isStackInHand(gameInstance, player, getStack(gameInstance, objectInstance))) {
+        if (objectInstance != null ) {//&& isStackInHand(gameInstance, player, getStack(gameInstance, objectInstance))
             IntegerArrayList objectStack = getStack(gameInstance, objectInstance);
             int size = objectStack.size() - 1;
             for (int i = 0; i< objectStack.size(); ++i) {
@@ -578,7 +578,7 @@ public class ObjectFunctions {
         IntegerArrayList stackIds = getStack(gameInstance, objectInstance);
         for(int id: stackIds) {
             ObjectInstance currentInstance = gameInstance.objects.get(id);
-            if (player != currentInstance.inHand) {
+            if (player.id != currentInstance.state.owner_id) {
                 currentInstance.state.owner_id = -1;
                 flipObject(gamePanelId, gameInstance, player, currentInstance);
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentInstance));

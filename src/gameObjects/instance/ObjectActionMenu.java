@@ -27,7 +27,7 @@ public class ObjectActionMenu {
         this.gameObjectInstance = objectInstance;
         this.gameInstance = gameInstance;
 
-        if (objectInstance.inHand != null && objectInstance.inHand == player)
+        if (objectInstance.state.owner_id != -1 && objectInstance.state.owner_id == player.id)
         {
             discardRecordItem.setText("Discard Card");
         }
@@ -45,13 +45,13 @@ public class ObjectActionMenu {
 
         discardRecordItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (objectInstance.inHand != null && objectInstance.inHand == player)
+                if (objectInstance.state.owner_id != -1 && objectInstance.state.owner_id == player.id)
                 {
-                    objectInstance.inHand = null;
+                    objectInstance.state.owner_id = -1;
                 }
                 else
                 {
-                    objectInstance.inHand = player;
+                    objectInstance.state.owner_id = player.id;
                 }
 
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
