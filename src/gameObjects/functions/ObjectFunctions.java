@@ -10,6 +10,9 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 
+import gameObjects.GamePlayerEditAction;
+import gameObjects.instance.Game;
+import gui.GamePanel;
 import org.slf4j.Logger;
 
 import gameObjects.GameObjectInstanceEditAction;
@@ -292,8 +295,11 @@ public class ObjectFunctions {
     //Flip an object from one side to the other
     public static void flipObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         if (objectInstance != null ) { //&& isObjectInHand(player, objectInstance)
+            player.actionString = "Flipped Card";
+            gameInstance.update(new GamePlayerEditAction(gamePanelId, player, player));
             ((GameObjectToken.TokenState) objectInstance.state).side = !((GameObjectToken.TokenState) objectInstance.state).side;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+
         }
     }
 
@@ -911,6 +917,22 @@ public class ObjectFunctions {
             objectInstance.state.posX = (int) (objectInstance.state.posX * zooming);
             objectInstance.state.posY = (int) (objectInstance.state.posY * zooming);
         }
+    }
+
+
+    public static IntegerArrayList getObjectsInsideBox(GameInstance gameInstance, int posX, int posY, int width, int height) {
+        IntegerArrayList idList = new IntegerArrayList();
+        for (ObjectInstance objectInstance : gameInstance.objects) {
+            Boolean leftIn = (objectInstance.state.posX > posX);
+            Boolean rightIn = (objectInstance.state.posX < (posX + width));
+            Boolean topIn = (objectInstance.state.posY < (posY + height));
+            Boolean bottomIn = (objectInstance.state.posY > (posY));
+
+            if (leftIn && rightIn && topIn && bottomIn) {
+                idList.add(objectInstance.id);
+            }
+        }
+        return idList;
     }
 
 }
