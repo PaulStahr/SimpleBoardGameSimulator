@@ -185,8 +185,8 @@ public class ObjectFunctions {
         relativeY.add(0);
         for (int i = 0; i < idList.size(); i++) {
             if (i != 0) {
-                relativeX.add(gameInstance.objects.get(idList.get(i)).state.posX - gameInstance.objects.get(idList.get(i - 1)).state.posX);
-                relativeY.add(gameInstance.objects.get(idList.get(i)).state.posY - gameInstance.objects.get(idList.get(i - 1)).state.posY);
+                relativeX.add(gameInstance.objects.get(idList.get(i)).state.posX - gameInstance.objects.get(idList.get(0)).state.posX);
+                relativeY.add(gameInstance.objects.get(idList.get(i)).state.posY - gameInstance.objects.get(idList.get(0)).state.posY);
             }
         }
         for (int i = 0; i < idList.size(); i++) {
