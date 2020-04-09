@@ -22,7 +22,9 @@ import net.SynchronousGameClientLobbyConnection;
 
 public class Main {
 	public static final Logger logger = LoggerFactory.getLogger(Main.class);
-    public static final void main (String args[]){
+	
+	/* This is the main() function */
+	public static final void main (String args[]){
     	for (int i = 0; i < args.length; ++i)
     	{
     		if (args[i].equals("--server"))
