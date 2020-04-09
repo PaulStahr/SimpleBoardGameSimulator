@@ -442,20 +442,20 @@ public class ObjectFunctions {
     }
 
     //Get element nearest to xPos, yPos with some inaccuracy
-    public static ObjectInstance getNearestObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos, int maxInaccuracy, ObjectInstance ignoredObject) {
+    public static ObjectInstance getNearestObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, int maxInaccuracy, ObjectInstance ignoredObject) {
         ObjectInstance activeObject = null;
         int distance = Integer.MAX_VALUE;
         Boolean insideObject = false;
         for (int i = 0; i < gameInstance.objects.size(); ++i) {
             ObjectInstance oi = gameInstance.objects.get(i);
             if (oi != ignoredObject) {
-                int xDiff = xPos - (oi.state.posX + oi.getWidth(player.id) / 2), yDiff = yPos - (oi.state.posY + oi.getHeight(player.id) / 2);
+                int xDiff = (int) (xPos - (oi.state.posX*zooming + oi.getWidth(player.id) / 2)), yDiff = (int) (yPos - (oi.state.posY*zooming + oi.getHeight(player.id) / 2));
                 int dist = xDiff * xDiff + yDiff * yDiff;
 
-                Boolean leftIn = (xPos > (oi.state.posX - maxInaccuracy));
-                Boolean rightIn = (xPos < (oi.state.posX + oi.getWidth(player.id) + maxInaccuracy));
-                Boolean topIn = (yPos < (oi.state.posY + oi.getHeight(player.id) + maxInaccuracy));
-                Boolean bottomIn = (yPos > (oi.state.posY - maxInaccuracy));
+                Boolean leftIn = (xPos > (oi.state.posX*zooming - maxInaccuracy));
+                Boolean rightIn = (xPos < (oi.state.posX*zooming + oi.getWidth(player.id) + maxInaccuracy));
+                Boolean topIn = (yPos < (oi.state.posY*zooming + oi.getHeight(player.id) + maxInaccuracy));
+                Boolean bottomIn = (yPos > (oi.state.posY*zooming - maxInaccuracy));
 
                 if (dist < distance) {
                     insideObject = leftIn && rightIn && topIn && bottomIn;
@@ -470,8 +470,8 @@ public class ObjectFunctions {
         return activeObject;
     }
 
-    public static ObjectInstance getNearestObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos, ObjectInstance ignoredObject) {
-        ObjectInstance currentObject = getNearestObjectByPosition(gameInstance, player, xPos, yPos, 0, ignoredObject);
+    public static ObjectInstance getNearestObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, ObjectInstance ignoredObject) {
+        ObjectInstance currentObject = getNearestObjectByPosition(gameInstance, player, xPos, yPos, zooming, 0, ignoredObject);
         if (haveSamePositions(getStackTop(gameInstance, currentObject), getStackBottom(gameInstance, currentObject)))
         {
             return getStackTop(gameInstance, currentObject);
@@ -635,9 +635,9 @@ public class ObjectFunctions {
 
     }
 
-    public static void releaseObjects(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance activeObject, int maxInaccuracy) {
+    public static void releaseObjects(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance activeObject, double zooming, int maxInaccuracy) {
         if(activeObject != null) {
-            ObjectInstance objectInstance = getNearestObjectByPosition(gameInstance, player, activeObject.state.posX, activeObject.state.posY, activeObject);
+            ObjectInstance objectInstance = getNearestObjectByPosition(gameInstance, player, activeObject.state.posX, activeObject.state.posY, zooming, activeObject);
             if (isStackCollected(gameInstance, objectInstance)) {
                 if (objectInstance != activeObject) {
                     ObjectFunctions.mergeStacks(gamePanelId, gameInstance, player, activeObject, objectInstance);
@@ -645,15 +645,15 @@ public class ObjectFunctions {
             }
             else
             {
-                Pair<ObjectInstance, ObjectInstance> insertObjects = getInsertObjects(gameInstance, player, activeObject.state.posX, activeObject.state.posY, activeObject);
+                Pair<ObjectInstance, ObjectInstance> insertObjects = getInsertObjects(gameInstance, player, activeObject.state.posX, activeObject.state.posY, zooming, activeObject);
                 insertIntoStack(gamePanelId, gameInstance, player, activeObject, insertObjects.getKey(), insertObjects.getValue(), activeObject.getWidth(player.id)/2);
             }
         }
     }
 
 
-    public static void releaseObjects(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance activeObject) {
-        releaseObjects(gamePanelId, gameInstance, player, activeObject, activeObject.getWidth(-1) / 3);
+    public static void releaseObjects(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance activeObject, double zooming) {
+        releaseObjects(gamePanelId, gameInstance, player, activeObject, zooming, activeObject.getWidth(player.id) / 3);
     }
 
     public static ObjectInstance findNeighbouredStackTop(GameInstance gameInstance, Player player, ObjectInstance activeObject, int maxInaccuracy) {
@@ -703,8 +703,8 @@ public class ObjectFunctions {
         }
     }
 
-    public static Pair<ObjectInstance, ObjectInstance> getInsertObjects(GameInstance gameInstance, Player player, int posX, int posY, ObjectInstance ignoredObject){
-        ObjectInstance objectInstance = getNearestObjectByPosition(gameInstance, player, posX, posY, ignoredObject);
+    public static Pair<ObjectInstance, ObjectInstance> getInsertObjects(GameInstance gameInstance, Player player, int posX, int posY, double zooming, ObjectInstance ignoredObject){
+        ObjectInstance objectInstance = getNearestObjectByPosition(gameInstance, player, posX, posY, zooming, ignoredObject);
         if (isAboveObject(objectInstance) && isBelowObject(objectInstance))
         {
             if(getDistanceToObjectCenter(getAboveObject(gameInstance, objectInstance), posX, posY, player.id) < getDistanceToObjectCenter(getBelowObject(gameInstance, objectInstance), posX, posY, player.id))
@@ -822,7 +822,7 @@ public class ObjectFunctions {
             if (objectInstance.state == null || img == null) {
                 logger.error("Object state is null");
             } else {
-                g.drawImage(img, (int) (objectInstance.state.posX * zooming), (int) (objectInstance.state.posY * zooming), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+                g.drawImage(img, (int) (objectInstance.state.posX), (int) (objectInstance.state.posY), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
             }
         } else {
             double rotationRequired = Math.toRadians(objectInstance.getRotation());
@@ -904,6 +904,13 @@ public class ObjectFunctions {
             }
         }
         return true;
+    }
+
+    public static void zoomObjects(GameInstance gameInstance, double zooming){
+        for(ObjectInstance objectInstance: gameInstance.objects){
+            objectInstance.state.posX = (int) (objectInstance.state.posX * zooming);
+            objectInstance.state.posY = (int) (objectInstance.state.posY * zooming);
+        }
     }
 
 }

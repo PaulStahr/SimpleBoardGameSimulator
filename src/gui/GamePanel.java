@@ -62,6 +62,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	int zoomFactor = 0;
 	int translateX = 0;
 	int translateY = 0;
+	double zooming = 1;
 
 
 	ControlPanel controlPanel = new ControlPanel();
@@ -102,8 +103,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void paintComponent(Graphics g)
 	{
-		//TODO Florian:sometimes images are drawn twice
-		double zooming = Math.exp(-zoomFactor * 0.1);
+		//TODO Florian:sometimes images are drawn twice (the active object?)
 		g.drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
 		g.drawImage(gameInstance.game.background, 0, 0, getWidth(), getHeight(), Color.BLACK, null);
 		int playerid = player == null ? -1 : player.id;
@@ -135,7 +135,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
 			g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
 			//g.drawString(p.name, p.mouseXPos, p.mouseYPos);
-			ObjectFunctions.drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, null), 10);
+			ObjectFunctions.drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, zooming, null), 10);
 		}
 		if (player != null)
 		{
@@ -184,7 +184,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			return;
 		}
 		if (activeObject != null && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
-			ObjectFunctions.releaseObjects(id, gameInstance, player, activeObject);
+			ObjectFunctions.releaseObjects(id, gameInstance, player, activeObject, zooming);
 		}
 		activeObject = null;
 		mouseX = arg0.getX();
@@ -237,13 +237,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
-		mouseX = arg0.getX();
-		mouseY = arg0.getY();
+		mouseX = (int) (arg0.getX()*zooming);
+		mouseY = (int) (arg0.getY()*zooming);
 		if (player != null)
 		{
-			player.setMousePos(mouseX, mouseY);
+			player.setMousePos((int) (mouseX/zooming), (int) (mouseY/zooming));
 			gameInstance.update(new GamePlayerEditAction(id, player, player));
-			activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player,mouseX, mouseY, null);
+			activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player,mouseX, mouseY, zooming, null);
 		}
 		repaint();
 	}
@@ -300,13 +300,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if(e.getKeyCode() == KeyEvent.VK_F && !loggedKeys[KeyEvent.VK_CONTROL])
 		{
 			loggedKeys[e.getKeyCode()] = true;
-			activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player, mouseX, mouseY, null);
+			activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player, mouseX, mouseY, zooming, null);
 			ObjectFunctions.flipObject(id, gameInstance, player, activeObject);
 		}
 		if(e.getKeyCode() == KeyEvent.VK_S)
 		{
 			loggedKeys[e.getKeyCode()] = true;
-			activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player, mouseX, mouseY, null);
+			activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player, mouseX, mouseY, zooming, null);
 			ObjectFunctions.shuffleStack(id, gameInstance, player, activeObject);
 		}
 		if (loggedKeys[KeyEvent.VK_CONTROL] && loggedKeys[KeyEvent.VK_F])
@@ -326,7 +326,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (e.getKeyCode() == KeyEvent.VK_V)
 		{
 			loggedKeys[e.getKeyCode()] = true;
-			activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player, mouseX, mouseY, null);
+			activeObject = ObjectFunctions.getNearestObjectByPosition(gameInstance, player, mouseX, mouseY, zooming, null);
 			if (activeObject!= null) {
 				if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, activeObject), ObjectFunctions.getStackBottom(gameInstance, activeObject))) {
 					activeObject = ObjectFunctions.getStackTop(gameInstance, activeObject);
@@ -395,6 +395,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (isControlDown)
 		{
 			zoomFactor += (int) e.getPreciseWheelRotation();
+			zooming = Math.exp(-zoomFactor * 0.1);
+			//double zooming = Math.exp(-zoomFactor * 0.1);
+			//ObjectFunctions.zoomObjects(gameInstance, zooming);
 		}
 		if(mouseWheelValue <= 0) {
 			mouseWheelValue = 0;
