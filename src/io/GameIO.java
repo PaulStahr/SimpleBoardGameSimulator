@@ -94,7 +94,7 @@ public class GameIO {
 	{
 		state.posX = Integer.parseInt(elem.getAttributeValue(IOString.X));
 		state.posY = Integer.parseInt(elem.getAttributeValue(IOString.Y));
-		state.rotation = Integer.parseInt(elem.getAttributeValue(IOString.Z));
+		state.rotation = Integer.parseInt(elem.getAttributeValue(IOString.R));
 
 		String v = elem.getAttributeValue(IOString.ABOVE);
 		if (v != null)
