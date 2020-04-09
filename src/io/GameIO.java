@@ -92,9 +92,9 @@ public class GameIO {
 	 */
 	private static void editStateFromElement(ObjectState state, Element elem)
 	{
-		state.posX = Integer.parseInt(elem.getAttributeValue("x"));
-		state.posY = Integer.parseInt(elem.getAttributeValue("y"));
-		state.rotation = Integer.parseInt(elem.getAttributeValue("r"));
+		state.posX = Integer.parseInt(elem.getAttributeValue(IOString.X));
+		state.posY = Integer.parseInt(elem.getAttributeValue(IOString.Y));
+		state.rotation = Integer.parseInt(elem.getAttributeValue(IOString.Z));
 
 		String v = elem.getAttributeValue(IOString.ABOVE);
 		if (v != null)
@@ -339,7 +339,7 @@ public class GameIO {
 			writeGameToZip(gi.game, zipOutputStream);
 		    // save game_instance.xml
 	    	Document doc_inst = new Document();
-	    	Element root_inst = new Element("xml");
+	    	Element root_inst = new Element(IOString.XML);
 
 			for (int idx = 0; idx < gi.objects.size(); idx++) {
 	        	ObjectInstance ObjectInstance = gi.objects.get(idx);
@@ -405,7 +405,7 @@ public class GameIO {
 	    }
 	    
 		Document doc_game = new Document();
-    	Element root_game = new Element("xml");
+    	Element root_game = new Element(IOString.XML);
     	doc_game.addContent(root_game);
 
         for (int idx = 0; idx < game.objects.size(); idx++) {

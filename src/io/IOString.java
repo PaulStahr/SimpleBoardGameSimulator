@@ -34,4 +34,5 @@ public class IOString {
 	public static final String FIGURE = "figure";
 	public static final String DICE = "dice";
 	public static final String CARD = "card";
+	public static final String XML = "xml";
 }
