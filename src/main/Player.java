@@ -9,6 +9,7 @@ public class Player {
 	public Color color;
 	public int mouseXPos = 0;
 	public int mouseYPos = 0;
+	public String actionString = "";
 	
 	public Player(String name, int id)
 	{

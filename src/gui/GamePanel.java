@@ -29,6 +29,7 @@ import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import main.Player;
+import util.data.IntegerArrayList;
 
 //import gameObjects.GameObjectInstanceEditAction;
 
@@ -73,6 +74,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	Color dragColor = Color.red;
 	String infoText = "";
 
+	boolean isSelectStarted = false;
+	IntegerArrayList selectedObjects = new IntegerArrayList();
+	int beginSelectPosX = 0;
+	int beginSelectPosY = 0;
+	int selectWidth = 0;
+	int selectHeight = 0;
+	private Color selectColor = Color.blue;
+
 
 	public GamePanel(GameInstance gameInstance)
 	{
@@ -96,7 +105,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		p.add(new JLabel("Flip Card: F"));
 		p.add(new JLabel("Flip Stack: Strg + F"));
 		p.add(new JLabel("View + Collect Stack: V"));
-		p.add(new JLabel("Collect Objects: M"));
+		p.add(new JLabel("Collect Selected Objects: M"));
+		p.add(new JLabel("Collect All Objects: Strg + M"));
 		p.add(new JLabel("Remove Stack: R"));
 		p.add(new JLabel("Count Objects: C"));
 		p.add(new JLabel("Count Values: Strg + C"));
@@ -133,20 +143,37 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				ObjectFunctions.drawBorder(g, player, activeObject, 10,  1);
 			}
 		}
+		else if (selectWidth > 0 && selectHeight > 0){
+			g.setColor(player.color);
+			g.drawRect(beginSelectPosX, beginSelectPosY, selectWidth, selectHeight);
+		}
 
 		g.setColor(mouseColor);
 		for(Player p: gameInstance.players) {
 			g.setColor(p.color);
 			g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
 			g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
+			g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
 			//g.drawString(p.name, p.mouseXPos, p.mouseYPos);
 			ObjectFunctions.drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, 1);
 		}
 		if (player != null)
 		{
 			g.setColor(player.color);
-			g.drawString(infoText, player.mouseXPos - 5, player.mouseYPos - 10);
+			g.drawString(infoText, player.mouseXPos - 25, player.mouseYPos + 5);
 		}
+
+
+		for(int id: selectedObjects)
+		{
+			ObjectInstance currentObject = gameInstance.objects.get(id);
+			if (ObjectFunctions.isStackBottom(currentObject))
+			{
+				ObjectFunctions.drawStackBorder(gameInstance, g, player, currentObject, 5, (int) zooming);
+			}
+		}
+
+
 	}
 
 	@Override
@@ -175,6 +202,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		isLeftMouseKeyHold = true;
 		pressedXPos = arg0.getX();
 		pressedYPos = arg0.getY();
+		if(!isSelectStarted && activeObject == null)
+		{
+			beginSelectPosX = pressedXPos;
+			beginSelectPosY = pressedYPos;
+			isSelectStarted = true;
+		}
+
 		activeObject = ObjectFunctions.setActiveObjectByMouseAndKey(gameInstance, arg0, loggedKeys, maxInaccuracy);
 		if(activeObject != null) {
 			objOrigPosX = activeObject.state.posX;
@@ -198,6 +232,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			gameInstance.update(new GamePlayerEditAction(id, player, player));
 		}
 		mouseColor = player.color;
+		if(isSelectStarted) {
+			selectedObjects = ObjectFunctions.getObjectsInsideBox(gameInstance, beginSelectPosX, beginSelectPosY, selectWidth, selectHeight);
+			selectHeight = 0;
+			selectWidth = 0;
+			beginSelectPosX = 0;
+			beginSelectPosY = 0;
+			isSelectStarted = false;
+		}
 		repaint();
 	}
 
@@ -218,11 +260,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (!SwingUtilities.isMiddleMouseButton(arg0)) {
 				ObjectFunctions.removeObject(id, gameInstance, player, activeObject);
 			}
+			if(mouseWheelValue > 0)
+			{
+				ObjectFunctions.splitStackAtN(id, gameInstance, player, activeObject, mouseWheelValue - 1);
+			}
 			ObjectFunctions.moveStackTo(id, gameInstance, player, activeObject, objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
 			if (!ObjectFunctions.isStackCollected(gameInstance, activeObject)) {
-				ObjectFunctions.collectStack(this.id, gameInstance, player, activeObject);
+				ObjectFunctions.collectStack(id, gameInstance, player, activeObject);
 				ObjectFunctions.moveStackTo(id, gameInstance, player, activeObject, objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
-				ObjectFunctions.viewBelowObjects(this.id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject), activeObject.getWidth(player.id)/2);
+				ObjectFunctions.viewBelowObjects(id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject), activeObject.getWidth(player.id)/2);
 			}
 		}
 		else if(SwingUtilities.isLeftMouseButton(arg0) && isShiftDown && activeObject != null) {
@@ -233,6 +279,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		mouseX = arg0.getX();
 		mouseY = arg0.getY();
+		if(activeObject == null) {
+			selectWidth = mouseX - beginSelectPosX;
+			selectHeight = mouseY - beginSelectPosY;
+		}
 		if (player != null)
 		{
 			gameInstance.update(new GamePlayerEditAction(id, player, player));
@@ -370,12 +420,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			getGraphics().drawString("Type: " + String.valueOf(activeObject.go.objectType) + " " + "Value: " + String.valueOf(activeObject.go.uniqueName), mouseX, mouseY);
 		}
 
-		if (e.getKeyCode() == KeyEvent.VK_M)
+		if (e.getKeyCode() == KeyEvent.VK_M && isControlDown)
 		{
 			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
 			ObjectFunctions.getAllObjectsOfType(id, gameInstance, player, activeObject);
 		}
+
+		if (e.getKeyCode() == KeyEvent.VK_M && !isControlDown)
+		{
+			loggedKeys[e.getKeyCode()] = true;
+			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, mouseX, mouseY);
+			ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
+		}
+
 	}
 
 
