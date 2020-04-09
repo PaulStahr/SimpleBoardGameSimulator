@@ -81,6 +81,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		setFocusable(true);
 		gameInstance.changeListener.add(this);
 
+		// This is the cheat sheet showing the user how he can interact with the game board
 		JPanel p = new JPanel();
 		p.setLayout(new GridLayout(4, 4, 20, 0));
 		p.add(new JLabel("Move Top Card: Left Click + Drag"));
