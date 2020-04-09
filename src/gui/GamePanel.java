@@ -116,8 +116,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				if (playerId != -1) {
 					Player p = gameInstance.getPlayer(playerId);
 					g.setColor(p.color);
-					ObjectFunctions.drawStackBorder(gameInstance, g, p, oi, 10);
-					gameInstance.update(new GamePlayerEditAction(id, player, player));
+					ObjectFunctions.drawStackBorder(gameInstance, g, p, oi, 10, (int) zooming);
 				}
 			}
 		}
@@ -126,7 +125,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (player != null)
 			{
 				g.setColor(player.color);
-				ObjectFunctions.drawBorder(g, player, activeObject, 10);
+				ObjectFunctions.drawBorder(g, player, activeObject, 10, (int) zooming);
 			}
 		}
 
@@ -136,7 +135,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
 			g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
 			//g.drawString(p.name, p.mouseXPos, p.mouseYPos);
-			ObjectFunctions.drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, zooming, null), 10);
+			ObjectFunctions.drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, zooming, null), 10, (int) zooming);
 		}
 		if (player != null)
 		{
@@ -209,14 +208,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (!SwingUtilities.isMiddleMouseButton(arg0)) {
 				ObjectFunctions.removeObject(id, gameInstance, player, activeObject);
 			}
-			ObjectFunctions.moveObjectTo(id, gameInstance, player, activeObject, objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
-			if (SwingUtilities.isMiddleMouseButton(arg0)) {
-				if (ObjectFunctions.isStackCollected(gameInstance, activeObject))
-					ObjectFunctions.moveBelowStackTo(id, gameInstance, player, activeObject, activeObject, false);
-				else {
-					ObjectFunctions.moveBelowStackTo(id, gameInstance, player, activeObject, activeObject, false);
-					ObjectFunctions.moveAboveStackTo(id, gameInstance, player, activeObject, activeObject, false);
-				}
+			ObjectFunctions.moveStackTo(id, gameInstance, player, activeObject, objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
+			if (!ObjectFunctions.isStackCollected(gameInstance, activeObject)) {
+				ObjectFunctions.collectStack(this.id, gameInstance, player, activeObject);
+				ObjectFunctions.moveStackTo(id, gameInstance, player, activeObject, objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
+				ObjectFunctions.viewBelowObjects(this.id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject), activeObject.getWidth(player.id)/2);
 			}
 		}
 		else if(SwingUtilities.isLeftMouseButton(arg0) && isShiftDown && activeObject != null) {

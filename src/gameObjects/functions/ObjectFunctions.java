@@ -566,7 +566,7 @@ public class ObjectFunctions {
         for(int id: stackIds)
         {
             ObjectInstance currentInstance = gameInstance.objects.get(id);
-            if (player.id != currentInstance.state.owner_id) {
+            if (player.id != currentInstance.state.owner_id && currentInstance.state.owner_id == -1) {
                 currentInstance.state.owner_id = player.id;
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentInstance));
             }
@@ -835,20 +835,20 @@ public class ObjectFunctions {
         }
     }
 
-    public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth) {
+    public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, double zooming) {
         if (objectInstance != null) {
             g.setColor(player.color);
             Graphics2D g2d = (Graphics2D) g.create();
             g2d.setStroke(new BasicStroke(borderWidth));
-            g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, objectInstance.getWidth(player.id) + borderWidth, objectInstance.getHeight(player.id) + borderWidth);
+            g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, (int) ((double) objectInstance.getWidth(player.id) * zooming) + borderWidth, (int) ((double) objectInstance.getHeight(player.id) * zooming) + borderWidth);
         }
     }
 
-    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth) {
+    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, int zooming) {
         if (objectInstance != null) {
             if(isStackCollected(gameInstance, objectInstance))
             {
-                drawBorder(g, player, getStackTop(gameInstance, objectInstance), borderWidth);
+                drawBorder(g, player, getStackTop(gameInstance, objectInstance), borderWidth, zooming);
             }
             else
             {
@@ -857,10 +857,10 @@ public class ObjectFunctions {
                 g2d.setStroke(new BasicStroke(borderWidth));
                 ObjectInstance stackTop = getStackTop(gameInstance, objectInstance);
                 ObjectInstance stackBottom = getStackBottom(gameInstance, objectInstance);
-                g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackTop.state.posX, stackTop.state.posY + stackTop.getHeight(player.id));
-                g2d.drawLine(stackBottom.state.posX+stackBottom.getWidth(player.id), stackBottom.state.posY, stackBottom.state.posX+stackBottom.getWidth(player.id), stackBottom.state.posY + stackBottom.getHeight(player.id));
-                g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackBottom.state.posX +stackBottom.getWidth(player.id), stackBottom.state.posY);
-                g2d.drawLine(stackTop.state.posX, stackTop.state.posY + stackTop.getHeight(player.id), stackBottom.state.posX +stackBottom.getWidth(player.id), stackBottom.state.posY + stackBottom.getHeight(player.id));
+                g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackTop.state.posX, stackTop.state.posY + stackTop.getHeight(player.id)*zooming);
+                g2d.drawLine(stackBottom.state.posX + (stackBottom.getWidth(player.id) * zooming), stackBottom.state.posY, stackBottom.state.posX+stackBottom.getWidth(player.id)*zooming, stackBottom.state.posY + stackBottom.getHeight(player.id)*zooming);
+                g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackBottom.state.posX +stackBottom.getWidth(player.id)*zooming, stackBottom.state.posY);
+                g2d.drawLine(stackTop.state.posX, stackTop.state.posY + stackTop.getHeight(player.id)*zooming, stackBottom.state.posX +stackBottom.getWidth(player.id)*zooming, stackBottom.state.posY + stackBottom.getHeight(player.id)*zooming);
             }
         }
     }
