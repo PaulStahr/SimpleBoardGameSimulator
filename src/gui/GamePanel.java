@@ -247,8 +247,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void mouseDragged(MouseEvent arg0) {
 		if (isControlDown)
 		{
-			translateX += zooming * (arg0.getX() - mouseX);
-			translateY += zooming * (arg0.getY() - mouseY);
+			translateX += (arg0.getX() - mouseX) / zooming;
+			translateY += (arg0.getY() - mouseY) / zooming;
 		}
 		if (player == null)
 		{
