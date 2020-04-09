@@ -64,6 +64,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	int translateX = 0;
 	int translateY = 0;
 	double zooming = 1;
+	double rotation = 0;
 
 
 	ControlPanel controlPanel = new ControlPanel();
@@ -106,7 +107,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void paintComponent(Graphics g)
 	{
 		//TODO Florian:sometimes images are drawn twice (the active object?)
+		((Graphics2D)g).rotate(rotation);
 		((Graphics2D)g).scale(zooming, zooming);
+		((Graphics2D)g).translate(translateX, translateY);
 		g.drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
 		g.drawImage(gameInstance.game.background, 0, 0, getWidth(), getHeight(), Color.BLACK, null);
 		int playerid = player == null ? -1 : player.id;
@@ -123,7 +126,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 		if(activeObject != null) {
-			ObjectFunctions.drawObject(g, activeObject, playerid, zooming, logger);
+			ObjectFunctions.drawObject(g, activeObject, playerid, 1, logger);
 			if (player != null)
 			{
 				g.setColor(player.color);
@@ -137,7 +140,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
 			g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
 			//g.drawString(p.name, p.mouseXPos, p.mouseYPos);
-			ObjectFunctions.drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, zooming, null), 10, (int) zooming);
+			ObjectFunctions.drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, 1);
 		}
 		if (player != null)
 		{
@@ -200,6 +203,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
+		if (isControlDown)
+		{
+			translateX += (arg0.getX() - mouseX) / zooming;
+			translateY += (arg0.getY() - mouseY) / zooming;
+		}
 		if (player == null)
 		{
 			return;
