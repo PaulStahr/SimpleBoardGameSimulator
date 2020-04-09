@@ -208,11 +208,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (!SwingUtilities.isMiddleMouseButton(arg0)) {
 				ObjectFunctions.removeObject(id, gameInstance, player, activeObject);
 			}
+			if(mouseWheelValue > 0)
+			{
+				ObjectFunctions.splitStackAtN(id, gameInstance, player, activeObject, mouseWheelValue - 1);
+			}
 			ObjectFunctions.moveStackTo(id, gameInstance, player, activeObject, objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
 			if (!ObjectFunctions.isStackCollected(gameInstance, activeObject)) {
-				ObjectFunctions.collectStack(this.id, gameInstance, player, activeObject);
+				ObjectFunctions.collectStack(id, gameInstance, player, activeObject);
 				ObjectFunctions.moveStackTo(id, gameInstance, player, activeObject, objOrigPosX - pressedXPos + arg0.getX(), objOrigPosY - pressedYPos + arg0.getY());
-				ObjectFunctions.viewBelowObjects(this.id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject), activeObject.getWidth(player.id)/2);
+				ObjectFunctions.viewBelowObjects(id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject), activeObject.getWidth(player.id)/2);
 			}
 		}
 		else if(SwingUtilities.isLeftMouseButton(arg0) && isShiftDown && activeObject != null) {
