@@ -828,7 +828,7 @@ public class ObjectFunctions {
             if (objectInstance.state == null || img == null) {
                 logger.error("Object state is null");
             } else {
-                g.drawImage(img, (int) (objectInstance.state.posX), (int) (objectInstance.state.posY), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+                g.drawImage(img, (objectInstance.state.posX), (objectInstance.state.posY), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
             }
         } else {
             double rotationRequired = Math.toRadians(objectInstance.getRotation());
@@ -846,11 +846,11 @@ public class ObjectFunctions {
             g.setColor(player.color);
             Graphics2D g2d = (Graphics2D) g.create();
             g2d.setStroke(new BasicStroke(borderWidth));
-            g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, (int) ((double) objectInstance.getWidth(player.id) * zooming) + borderWidth, (int) ((double) objectInstance.getHeight(player.id) * zooming) + borderWidth);
+            g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, (int) (objectInstance.getWidth(player.id) * zooming) + borderWidth, (int) (objectInstance.getHeight(player.id) * zooming) + borderWidth);
         }
     }
 
-    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, int zooming) {
+    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, double zooming) {
         if (objectInstance != null) {
             if(isStackCollected(gameInstance, objectInstance))
             {
@@ -863,10 +863,10 @@ public class ObjectFunctions {
                 g2d.setStroke(new BasicStroke(borderWidth));
                 ObjectInstance stackTop = getStackTop(gameInstance, objectInstance);
                 ObjectInstance stackBottom = getStackBottom(gameInstance, objectInstance);
-                g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackTop.state.posX, stackTop.state.posY + stackTop.getHeight(player.id)*zooming);
-                g2d.drawLine(stackBottom.state.posX + (stackBottom.getWidth(player.id) * zooming), stackBottom.state.posY, stackBottom.state.posX+stackBottom.getWidth(player.id)*zooming, stackBottom.state.posY + stackBottom.getHeight(player.id)*zooming);
-                g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackBottom.state.posX +stackBottom.getWidth(player.id)*zooming, stackBottom.state.posY);
-                g2d.drawLine(stackTop.state.posX, stackTop.state.posY + stackTop.getHeight(player.id)*zooming, stackBottom.state.posX +stackBottom.getWidth(player.id)*zooming, stackBottom.state.posY + stackBottom.getHeight(player.id)*zooming);
+                g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackTop.state.posX, stackTop.state.posY + (int)(stackTop.getHeight(player.id)*zooming));
+                g2d.drawLine(stackBottom.state.posX + (int)(stackBottom.getWidth(player.id) * zooming), stackBottom.state.posY, stackBottom.state.posX+(int)(stackBottom.getWidth(player.id)*zooming), stackBottom.state.posY + (int)(stackBottom.getHeight(player.id)*zooming));
+                g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackBottom.state.posX +(int)(stackBottom.getWidth(player.id)*zooming), stackBottom.state.posY);
+                g2d.drawLine(stackTop.state.posX, stackTop.state.posY + (int)(stackTop.getHeight(player.id)*zooming), stackBottom.state.posX +(int)(stackBottom.getWidth(player.id)*zooming), stackBottom.state.posY + (int)(stackBottom.getHeight(player.id)*zooming));
             }
         }
     }
