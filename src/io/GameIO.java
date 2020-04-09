@@ -38,6 +38,7 @@ import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
 import main.Player;
 import net.AsynchronousGameConnection;
+import util.ArrayUtil;
 
 public class GameIO {
 
@@ -335,46 +336,7 @@ public class GameIO {
 		try
 		{
 			zipOutputStream = new ZipOutputStream(os);
-			Game game = gi.game;
-			//TODO dublicated code (0)
-			// Save all images
-		    for (HashMap.Entry<String, BufferedImage> pair : game.images.entrySet()) {
-		    	String key = pair.getKey();
-			    ZipEntry imageZipOutput = new ZipEntry(key);
-			    zipOutputStream.putNextEntry(imageZipOutput);
-
-			    if (getVersion() < 9)
-		    	{
-		    		MemoryCacheImageOutputStream tmp = new MemoryCacheImageOutputStream(zipOutputStream);
-		    		ImageIO.write(pair.getValue(), key.substring(key.length() - 3), tmp);
-		    		tmp.close();
-		    	}
-			    else
-			    {
-			    	ImageIO.write(pair.getValue(), key.substring(key.length() - 3), zipOutputStream);
-		    	}
-			    zipOutputStream.closeEntry();
-		    }
-		    
-		    // save game.xml
-		    Document doc_game = new Document();
-	    	Element root_game = new Element("xml");
-	    	doc_game.addContent(root_game);
-
-			for (int idx = 0; idx < game.objects.size(); idx++)  {
-	        	GameObject entry = game.objects.get(idx);
-	        	root_game.addContent(createElementFromGameObject(entry, game));
-	        }
-	        
-	        Element elem_back = new Element(IOString.BACKGROUND);
-			elem_back.setText(game.getImageKey((BufferedImage) game.background));
-	        root_game.addContent(elem_back);
-	    	
-	    	ZipEntry gameZipOutput = new ZipEntry(IOString.GAME_XML);
-	    	zipOutputStream.putNextEntry(gameZipOutput);
-	    	new XMLOutputter(Format.getPrettyFormat()).output(doc_game, zipOutputStream);
-	    	zipOutputStream.closeEntry();
-
+			writeGameToZip(gi.game, zipOutputStream);
 		    // save game_instance.xml
 	    	Document doc_inst = new Document();
 	    	Element root_inst = new Element("xml");
@@ -413,6 +375,53 @@ public class GameIO {
 			}
 		}
 	}
+	
+	public static void writeGameToZip(Game game, ZipOutputStream zipOutputStream) throws IOException
+	{	
+		// Save all images
+	    for (HashMap.Entry<String, BufferedImage> pair : game.images.entrySet()) {
+	    	String key = pair.getKey();
+		    ZipEntry imageZipOutput = new ZipEntry(key);
+		    zipOutputStream.putNextEntry(imageZipOutput);
+		    int idx = key.lastIndexOf('.');
+		    if (idx != -1)
+		    {
+		    	String suffix = key.substring(idx + 1);
+		    	if (ArrayUtil.firstEqualIndex(ImageIO.getWriterFileSuffixes(), suffix) != -1)
+		    	{
+		    		if (getVersion() < 9)
+			    	{
+			    		MemoryCacheImageOutputStream tmp = new MemoryCacheImageOutputStream(zipOutputStream);
+				    	ImageIO.write(pair.getValue(), suffix, tmp);
+			    		tmp.close();
+			    	}
+				    else
+				    {
+				    	ImageIO.write(pair.getValue(), suffix, zipOutputStream);
+			    	}
+		    	}
+		    }
+		    zipOutputStream.closeEntry();
+	    }
+	    
+		Document doc_game = new Document();
+    	Element root_game = new Element("xml");
+    	doc_game.addContent(root_game);
+
+        for (int idx = 0; idx < game.objects.size(); idx++) {
+        	GameObject entry = game.objects.get(idx);
+        	root_game.addContent(createElementFromGameObject(entry, game));
+        }
+        
+        Element elem_back = new Element(IOString.BACKGROUND);
+        elem_back.setText(game.getImageKey((BufferedImage) game.background));
+        root_game.addContent(elem_back);
+    	
+        ZipEntry gameZipOutput = new ZipEntry(IOString.GAME_XML);
+    	zipOutputStream.putNextEntry(gameZipOutput);
+    	new XMLOutputter(Format.getPrettyFormat()).output(doc_game, zipOutputStream);
+    	zipOutputStream.closeEntry();
+	}
 
 	/**
 	 * Encodes all fields of @param game to an XML document and puts
@@ -422,48 +431,13 @@ public class GameIO {
 	 * @param game the Game that shall be encoded
 	 * @param os the OutputStream the Game will be written to
 	 */
-	//TODO dublicated code (0)
 	public static void writeGameToZip(Game game, OutputStream os) throws IOException
 	{	
 		ZipOutputStream zipOutputStream = null;
 		try
 		{
 			zipOutputStream = new ZipOutputStream(os);
-			
-			// Save all images
-		    for (String key : game.images.keySet()) {
-
-			    ZipEntry imageZipOutput = new ZipEntry(key);
-			    zipOutputStream.putNextEntry(imageZipOutput);
-
-			    if (key.endsWith(".jpg"))
-			    {
-			    	ImageIO.write(game.images.get(key), "jpg", zipOutputStream);
-			    }
-			    else if (key.endsWith(".png"))
-			    {
-			    	ImageIO.write(game.images.get(key), "png", zipOutputStream);
-			    }
-			    zipOutputStream.closeEntry();
-		    }
-		    
-			Document doc_game = new Document();
-	    	Element root_game = new Element("xml");
-	    	doc_game.addContent(root_game);
-
-	        for (int idx = 0; idx < game.objects.size(); idx++) {
-	        	GameObject entry = game.objects.get(idx);
-	        	root_game.addContent(createElementFromGameObject(entry, game));
-	        }
-	        
-	        Element elem_back = new Element(IOString.BACKGROUND);
-	        elem_back.setText(game.getImageKey((BufferedImage) game.background));
-	        root_game.addContent(elem_back);
-	    	
-	        ZipEntry gameZipOutput = new ZipEntry(IOString.GAME_XML);
-	    	zipOutputStream.putNextEntry(gameZipOutput);
-	    	new XMLOutputter(Format.getPrettyFormat()).output(doc_game, zipOutputStream);
-	    	zipOutputStream.closeEntry();
+			writeGameToZip(game, zipOutputStream);
 		}
 		finally
 		{
@@ -565,18 +539,26 @@ public class GameIO {
 			while((entry = stream.getNextEntry())!=null)
 			{
 				String name = entry.getName();
-				if (name.endsWith(".png") || name.endsWith(".jpg"))
-				{
-					BufferedImage img = ImageIO.read(stream);
-					images.put(name, img);
-				}
-				else if (name.equals(IOString.GAME_XML))
+				if (name.equals(IOString.GAME_XML))
 				{
 					copy(stream, gameBuffer);
 				}
 				else if (name.equals(IOString.GAME_INSTANCE_XML))
 				{
 					copy(stream, gameInstanceBuffer);
+				}
+				else
+				{
+				    int idx = name.lastIndexOf('.');
+				    if (idx != -1)
+				    {
+				    	String suffix = name.substring(idx + 1);
+				    	if (ArrayUtil.firstEqualIndex(ImageIO.getReaderFileSuffixes(), suffix) != -1)
+				    	{
+				    		BufferedImage img = ImageIO.read(stream);
+							images.put(name, img);
+				    	}
+				    }
 				}
 			}
 		}
