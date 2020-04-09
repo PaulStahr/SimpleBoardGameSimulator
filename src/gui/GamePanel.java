@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.KeyEventDispatcher;
 import java.awt.event.ActionEvent;
@@ -105,18 +106,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void paintComponent(Graphics g)
 	{
 		//TODO Florian:sometimes images are drawn twice (the active object?)
+		((Graphics2D)g).scale(zooming, zooming);
 		g.drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
 		g.drawImage(gameInstance.game.background, 0, 0, getWidth(), getHeight(), Color.BLACK, null);
 		int playerid = player == null ? -1 : player.id;
 		for (int i = 0; i < gameInstance.objects.size(); ++i) {
 			ObjectInstance oi = gameInstance.objects.get(i);
 			if (ObjectFunctions.isStackBottom(oi)) {
-				ObjectFunctions.drawStack(g, ObjectFunctions.getAboveStack(gameInstance, oi), gameInstance, playerid, zooming, logger);
+				ObjectFunctions.drawStack(g, ObjectFunctions.getAboveStack(gameInstance, oi), gameInstance, playerid, 1, logger);
 				int playerId = ObjectFunctions.getStackOwner(gameInstance, ObjectFunctions.getStack(gameInstance, oi));
 				if (playerId != -1) {
 					Player p = gameInstance.getPlayer(playerId);
 					g.setColor(p.color);
-					ObjectFunctions.drawStackBorder(gameInstance, g, p, oi, 10, (int) zooming);
+					ObjectFunctions.drawStackBorder(gameInstance, g, p, oi, 10, 1);
 				}
 			}
 		}
@@ -125,7 +127,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (player != null)
 			{
 				g.setColor(player.color);
-				ObjectFunctions.drawBorder(g, player, activeObject, 10, (int) zooming);
+				ObjectFunctions.drawBorder(g, player, activeObject, 10,  1);
 			}
 		}
 
