@@ -1,30 +1,31 @@
 package gameObjects.functions;
 
 import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 
-import gameObjects.GamePlayerEditAction;
-import gameObjects.instance.Game;
-import gui.GamePanel;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gameObjects.GameObjectInstanceEditAction;
+import gameObjects.GamePlayerEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import geometry.Vector2;
 import main.Player;
 import util.Pair;
 import util.data.IntegerArrayList;
 
 public class ObjectFunctions {
+	private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
 
     //Get the top of the stack with with element objectInstance
     public static ObjectInstance getStackTop(GameInstance gameInstance, ObjectInstance objectInstance) {
@@ -259,6 +260,8 @@ public class ObjectFunctions {
         if (objectInstance != null && (isStackInHand(gameInstance, player, getStack(gameInstance, objectInstance)) || isStackNotInHand(gameInstance, player, getStack(gameInstance, objectInstance)))) {
             IntegerArrayList objectStack = getStack(gameInstance, objectInstance);
             if (objectStack.size() > 1) {
+                player.actionString = "Shuffled Objects";
+                gameInstance.update(new GamePlayerEditAction(gamePanelId, player, player));
                 IntegerArrayList oldX = new IntegerArrayList();
                 IntegerArrayList oldY = new IntegerArrayList();
                 for (int id : objectStack) {
@@ -295,7 +298,7 @@ public class ObjectFunctions {
     //Flip an object from one side to the other
     public static void flipObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         if (objectInstance != null ) { //&& isObjectInHand(player, objectInstance)
-            player.actionString = "Flipped Card";
+            player.actionString = "Flipped Object";
             gameInstance.update(new GamePlayerEditAction(gamePanelId, player, player));
             ((GameObjectToken.TokenState) objectInstance.state).side = !((GameObjectToken.TokenState) objectInstance.state).side;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
@@ -327,6 +330,8 @@ public class ObjectFunctions {
                     flipObject(gamePanelId, gameInstance, player, currentObject);
                 }
             }
+            player.actionString = "Flipped Stack";
+            gameInstance.update(new GamePlayerEditAction(gamePanelId, player, player));
         }
     }
 
@@ -593,10 +598,10 @@ public class ObjectFunctions {
     }
 
 
-    public static ObjectInstance setActiveObjectByMouseAndKey(GameInstance gameInstance, MouseEvent arg0, boolean[] loggedKeys, int maxInaccuracy) {
+    public static ObjectInstance setActiveObjectByMouseAndKey(GameInstance gameInstance, Vector2 mouse, boolean[] loggedKeys, int maxInaccuracy) {
         ObjectInstance activeObject = null;
-        int pressedXPos = arg0.getX();
-        int pressedYPos = arg0.getY();
+        int pressedXPos = mouse.getXI();
+        int pressedYPos = mouse.getYI();
         int distance = Integer.MAX_VALUE;
         Boolean insideObject = false;
         for (int i = 0; i < gameInstance.objects.size(); ++i) {
@@ -811,26 +816,26 @@ public class ObjectFunctions {
         }
     }
 
-    public static void drawStack(Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming, Logger logger) {
+    public static void drawStack(Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming) {
         if (haveSamePositions(gameInstance.objects.get(stackList.get(0)), gameInstance.objects.get(stackList.last()))) {
             IntegerArrayList newStackList = new IntegerArrayList();
             newStackList.add(gameInstance.objects.get(stackList.last()).id);
             stackList = newStackList;
         }
         for (int id : stackList) {
-            drawObject(g,gameInstance.objects.get(id), playerId,zooming,logger);
+            drawObject(g,gameInstance.objects.get(id), playerId,zooming);
         }
     }
 
-    public static void drawObject(Graphics g, ObjectInstance objectInstance, int playerId, double zooming, Logger logger) {
+    public static void drawObject(Graphics g, ObjectInstance objectInstance, int playerId, double zooming) {
         BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
-        if (objectInstance.getRotation() == 0) {
+        if (objectInstance.getRotation() == 0) {//TODO: use Graphics rotation if possible
             if (objectInstance.state == null || img == null) {
                 logger.error("Object state is null");
             } else {
                 g.drawImage(img, (objectInstance.state.posX), (objectInstance.state.posY), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
             }
-        } else {
+        } else {//TODO add caching
             double rotationRequired = Math.toRadians(objectInstance.getRotation());
             double locationX = img.getWidth() / 2;
             double locationY = img.getHeight() / 2;
@@ -841,25 +846,26 @@ public class ObjectFunctions {
         }
     }
 
-    public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, double zooming) {
+    public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming) {
         if (objectInstance != null) {
-            g.setColor(player.color);
+            g.setColor(color);
             Graphics2D g2d = (Graphics2D) g.create();
             g2d.setStroke(new BasicStroke(borderWidth));
             g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, (int) (objectInstance.getWidth(player.id) * zooming) + borderWidth, (int) (objectInstance.getHeight(player.id) * zooming) + borderWidth);
         }
     }
 
-    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, double zooming) {
+    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, boolean drawProperStack) {
         if (objectInstance != null) {
             if(isStackCollected(gameInstance, objectInstance))
             {
-                drawBorder(g, player, getStackTop(gameInstance, objectInstance), borderWidth, zooming);
+                if((!drawProperStack || getStack(gameInstance, objectInstance).size() > 1))
+                    drawBorder(g, player, getStackTop(gameInstance, objectInstance), borderWidth, color, zooming);
             }
             else
             {
                 Graphics2D g2d = (Graphics2D) g.create();
-                g.setColor(player.color);
+                g.setColor(color);
                 g2d.setStroke(new BasicStroke(borderWidth));
                 ObjectInstance stackTop = getStackTop(gameInstance, objectInstance);
                 ObjectInstance stackBottom = getStackBottom(gameInstance, objectInstance);
@@ -869,6 +875,10 @@ public class ObjectFunctions {
                 g2d.drawLine(stackTop.state.posX, stackTop.state.posY + (int)(stackTop.getHeight(player.id)*zooming), stackBottom.state.posX +(int)(stackBottom.getWidth(player.id)*zooming), stackBottom.state.posY + (int)(stackBottom.getHeight(player.id)*zooming));
             }
         }
+    }
+
+    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, int zooming) {
+        drawStackBorder(gameInstance, g, player, objectInstance, borderWidth, color, zooming, false);
     }
 
     public static boolean isObjectInHand(Player player, ObjectInstance objectInstance){
