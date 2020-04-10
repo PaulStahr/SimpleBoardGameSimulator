@@ -9,6 +9,9 @@ import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 
+import gameObjects.GamePlayerEditAction;
+import gameObjects.instance.Game;
+import gui.GamePanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -293,15 +296,18 @@ public class ObjectFunctions {
 
     //Flip an object from one side to the other
     public static void flipObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
-        if (objectInstance != null && isObjectInHand(player, objectInstance)) {
+        if (objectInstance != null ) { //&& isObjectInHand(player, objectInstance)
+            player.actionString = "Flipped Card";
+            gameInstance.update(new GamePlayerEditAction(gamePanelId, player, player));
             ((GameObjectToken.TokenState) objectInstance.state).side = !((GameObjectToken.TokenState) objectInstance.state).side;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+
         }
     }
 
     //Flip the stack which contains object instance, either including this or not, default true
     public static void flipStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean including) {
-        if (objectInstance != null && isStackInHand(gameInstance, player, getStack(gameInstance, objectInstance))) {
+        if (objectInstance != null ) {//&& isStackInHand(gameInstance, player, getStack(gameInstance, objectInstance))
             IntegerArrayList objectStack = getStack(gameInstance, objectInstance);
             int size = objectStack.size() - 1;
             for (int i = 0; i< objectStack.size(); ++i) {
@@ -580,7 +586,7 @@ public class ObjectFunctions {
         IntegerArrayList stackIds = getStack(gameInstance, objectInstance);
         for(int id: stackIds) {
             ObjectInstance currentInstance = gameInstance.objects.get(id);
-            if (player != currentInstance.inHand) {
+            if (player.id != currentInstance.state.owner_id) {
                 currentInstance.state.owner_id = -1;
                 flipObject(gamePanelId, gameInstance, player, currentInstance);
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentInstance));
@@ -913,6 +919,22 @@ public class ObjectFunctions {
             objectInstance.state.posX = (int) (objectInstance.state.posX * zooming);
             objectInstance.state.posY = (int) (objectInstance.state.posY * zooming);
         }
+    }
+
+
+    public static IntegerArrayList getObjectsInsideBox(GameInstance gameInstance, int posX, int posY, int width, int height) {
+        IntegerArrayList idList = new IntegerArrayList();
+        for (ObjectInstance objectInstance : gameInstance.objects) {
+            Boolean leftIn = (objectInstance.state.posX > posX);
+            Boolean rightIn = (objectInstance.state.posX < (posX + width));
+            Boolean topIn = (objectInstance.state.posY < (posY + height));
+            Boolean bottomIn = (objectInstance.state.posY > (posY));
+
+            if (leftIn && rightIn && topIn && bottomIn) {
+                idList.add(objectInstance.id);
+            }
+        }
+        return idList;
     }
 
 }
