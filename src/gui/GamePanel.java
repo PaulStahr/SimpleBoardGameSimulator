@@ -121,23 +121,23 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		for (int i = 0; i < gameInstance.objects.size(); ++i) {
 			ObjectInstance oi = gameInstance.objects.get(i);
 			if (ObjectFunctions.isStackBottom(oi)) {
-				ObjectFunctions.drawStack(g, ObjectFunctions.getAboveStack(gameInstance, oi), gameInstance, playerid, zooming, logger);
+				ObjectFunctions.drawStack(g, ObjectFunctions.getAboveStack(gameInstance, oi), gameInstance, playerid, 1, logger);
 				int playerId = ObjectFunctions.getStackOwner(gameInstance, ObjectFunctions.getStack(gameInstance, oi));
 				if (playerId != -1) {
 					Player p = gameInstance.getPlayer(playerId);
-					ObjectFunctions.drawStackBorder(gameInstance, g, p, oi, 10, p.color, (int) zooming);
+					ObjectFunctions.drawStackBorder(gameInstance, g, p, oi, 10, p.color, 1);
 				}
 				else{
 					g.setColor(stackColor);
-					ObjectFunctions.drawStackBorder(gameInstance, g, player, oi, 5, stackColor,(int) zooming, true);
+					ObjectFunctions.drawStackBorder(gameInstance, g, player, oi, 5, stackColor,1, true);
 				}
 			}
 		}
 		if(activeObject != null) {
-			ObjectFunctions.drawObject(g, activeObject, playerid, zooming, logger);
+			ObjectFunctions.drawObject(g, activeObject, playerid, 1, logger);
 			if (player != null)
 			{
-				ObjectFunctions.drawBorder(g, player, activeObject, 10, player.color, (int) zooming);
+				ObjectFunctions.drawBorder(g, player, activeObject, 10, player.color, 1);
 			}
 		}
 		else if (selectWidth > 0 && selectHeight > 0){
