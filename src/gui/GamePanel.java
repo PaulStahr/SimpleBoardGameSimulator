@@ -79,7 +79,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	int beginSelectPosY = 0;
 	int selectWidth = 0;
 	int selectHeight = 0;
-	private Color selectColor = Color.blue;
 
 
 	public GamePanel(GameInstance gameInstance)
@@ -126,8 +125,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				int playerId = ObjectFunctions.getStackOwner(gameInstance, ObjectFunctions.getStack(gameInstance, oi));
 				if (playerId != -1) {
 					Player p = gameInstance.getPlayer(playerId);
-					g.setColor(p.color);
-					ObjectFunctions.drawStackBorder(gameInstance, g, p, oi, 10, player.color, (int) zooming);
+					ObjectFunctions.drawStackBorder(gameInstance, g, p, oi, 10, p.color, (int) zooming);
 				}
 				else{
 					g.setColor(stackColor);
