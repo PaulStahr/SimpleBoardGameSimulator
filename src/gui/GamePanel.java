@@ -70,6 +70,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	Color mouseColor = Color.black;
 	Color dragColor = Color.red;
+	Color stackColor = Color.green;
 	String infoText = "";
 
 	boolean isSelectStarted = false;
@@ -126,7 +127,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				if (playerId != -1) {
 					Player p = gameInstance.getPlayer(playerId);
 					g.setColor(p.color);
-					ObjectFunctions.drawStackBorder(gameInstance, g, p, oi, 10, (int) zooming);
+					ObjectFunctions.drawStackBorder(gameInstance, g, p, oi, 10, player.color, (int) zooming);
+				}
+				else{
+					g.setColor(stackColor);
+					ObjectFunctions.drawStackBorder(gameInstance, g, player, oi, 5, stackColor,(int) zooming, true);
 				}
 			}
 		}
@@ -134,8 +139,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			ObjectFunctions.drawObject(g, activeObject, playerid, zooming, logger);
 			if (player != null)
 			{
-				g.setColor(player.color);
-				ObjectFunctions.drawBorder(g, player, activeObject, 10, (int) zooming);
+				ObjectFunctions.drawBorder(g, player, activeObject, 10, player.color, (int) zooming);
 			}
 		}
 		else if (selectWidth > 0 && selectHeight > 0){
@@ -150,7 +154,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
 			g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
 			//g.drawString(p.name, p.mouseXPos, p.mouseYPos);
-			ObjectFunctions.drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, zooming, null), 10, (int) zooming);
+			ObjectFunctions.drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, zooming, null), 10, p.color, (int) zooming);
 		}
 		if (player != null)
 		{
@@ -164,7 +168,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			ObjectInstance currentObject = gameInstance.objects.get(id);
 			if (ObjectFunctions.isStackBottom(currentObject))
 			{
-				ObjectFunctions.drawStackBorder(gameInstance, g, player, currentObject, 5, (int) zooming);
+				ObjectFunctions.drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, (int) zooming);
 			}
 		}
 
