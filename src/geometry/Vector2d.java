@@ -26,7 +26,7 @@ package geometry;
 * @version 04.02.2012
 */
 
-public final class Vector2d implements Vectord{
+public final class Vector2d implements Vectord, Vector2{
 	public double x, y;
 
 	public Vector2d(){}
@@ -78,11 +78,21 @@ public final class Vector2d implements Vectord{
 		y *= d;
 	}
 	
+	@Override
 	public void set(double x, double y)
 	{
 		this.x = x;
 		this.y = y;
 	}
+	
+	@Override
+	public void set(int x, int y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+	
+	
 	
 	public void add(Vector2d v)
 	{
@@ -101,7 +111,8 @@ public final class Vector2d implements Vectord{
     	return strB.append('(').append(x).append(',').append(y).append(')');
     }
     
-    public final int size()
+    @Override
+	public final int size()
     {
     	return 2;
     }
@@ -116,6 +127,7 @@ public final class Vector2d implements Vectord{
 		data[i + 1] = y;
 	}
 	
+	@Override
 	public final double dot()
 	{
 		return x * x + y * y;
@@ -135,5 +147,25 @@ public final class Vector2d implements Vectord{
 	public final void write(final float[] data, final int i) {
 		data[i] = (float)x;
 		data[i + 1] = (float)y;
+	}
+
+	@Override
+	public double getXD() {
+		return x;
+	}
+
+	@Override
+	public double getYD() {
+		return y;
+	}
+
+	@Override
+	public int getXI() {
+		return (int)x;
+	}
+
+	@Override
+	public int getYI() {
+		return (int)y;
 	}
 }

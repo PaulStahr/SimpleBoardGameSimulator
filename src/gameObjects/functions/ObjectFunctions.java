@@ -4,24 +4,26 @@ import java.awt.BasicStroke;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import geometry.Vector2;
 import main.Player;
 import util.Pair;
 import util.data.IntegerArrayList;
 
 public class ObjectFunctions {
+	private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
 
     //Get the top of the stack with with element objectInstance
     public static ObjectInstance getStackTop(GameInstance gameInstance, ObjectInstance objectInstance) {
@@ -587,10 +589,10 @@ public class ObjectFunctions {
     }
 
 
-    public static ObjectInstance setActiveObjectByMouseAndKey(GameInstance gameInstance, MouseEvent arg0, boolean[] loggedKeys, int maxInaccuracy) {
+    public static ObjectInstance setActiveObjectByMouseAndKey(GameInstance gameInstance, Vector2 mouse, boolean[] loggedKeys, int maxInaccuracy) {
         ObjectInstance activeObject = null;
-        int pressedXPos = arg0.getX();
-        int pressedYPos = arg0.getY();
+        int pressedXPos = mouse.getXI();
+        int pressedYPos = mouse.getYI();
         int distance = Integer.MAX_VALUE;
         Boolean insideObject = false;
         for (int i = 0; i < gameInstance.objects.size(); ++i) {
@@ -805,26 +807,26 @@ public class ObjectFunctions {
         }
     }
 
-    public static void drawStack(Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming, Logger logger) {
+    public static void drawStack(Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming) {
         if (haveSamePositions(gameInstance.objects.get(stackList.get(0)), gameInstance.objects.get(stackList.last()))) {
             IntegerArrayList newStackList = new IntegerArrayList();
             newStackList.add(gameInstance.objects.get(stackList.last()).id);
             stackList = newStackList;
         }
         for (int id : stackList) {
-            drawObject(g,gameInstance.objects.get(id), playerId,zooming,logger);
+            drawObject(g,gameInstance.objects.get(id), playerId,zooming);
         }
     }
 
-    public static void drawObject(Graphics g, ObjectInstance objectInstance, int playerId, double zooming, Logger logger) {
+    public static void drawObject(Graphics g, ObjectInstance objectInstance, int playerId, double zooming) {
         BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
-        if (objectInstance.getRotation() == 0) {
+        if (objectInstance.getRotation() == 0) {//TODO: use Graphics rotation if possible
             if (objectInstance.state == null || img == null) {
                 logger.error("Object state is null");
             } else {
                 g.drawImage(img, (objectInstance.state.posX), (objectInstance.state.posY), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
             }
-        } else {
+        } else {//TODO add caching
             double rotationRequired = Math.toRadians(objectInstance.getRotation());
             double locationX = img.getWidth() / 2;
             double locationY = img.getHeight() / 2;
