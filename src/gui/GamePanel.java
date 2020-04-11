@@ -139,7 +139,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		((Graphics2D)g).scale(zooming, zooming);
 		((Graphics2D)g).rotate(rotation);
 		((Graphics2D)g).translate(translateX, translateY);
-		privateArea.setArea(-getWidth()/4, getHeight()/4, getWidth()/2, 500, translateX, translateY, rotation, zooming);
+		privateArea.setArea(getWidth()/4, getHeight()-250, getWidth()/2, 500, translateX, translateY, rotation, zooming);
 		privateArea.draw(g);
 		int playerid = player == null ? -1 : player.id;
 		for (int i = 0; i < gameInstance.objects.size(); ++i) {
@@ -316,7 +316,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				int xDiff = objOrigPosX - mousePressedGamePos.getXI() + mouseGamePos.getXI();
 				int yDiff = objOrigPosY - mousePressedGamePos.getYI() + mouseGamePos.getYI();
 				mouseToGamePos(mouseX = arg0.getX(), mouseY = arg0.getY(), mouseGamePos);
-				gameInstance.update(new GamePlayerEditAction(id, player, player));
 				player.setMousePos(mousePressedGamePos.getXI(), mousePressedGamePos.getYI());
 				player.setMousePos(mouseGamePos.getXI(), mouseGamePos.getYI());
 				gameInstance.update(new GamePlayerEditAction(id, player, player));

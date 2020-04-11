@@ -5,6 +5,7 @@ import static gameObjects.functions.ObjectFunctions.getStackBottom;
 import static gameObjects.functions.ObjectFunctions.getStackTop;
 import static gameObjects.functions.ObjectFunctions.haveSamePositions;
 import static gameObjects.functions.ObjectFunctions.isStackCollected;
+import static gameObjects.functions.ObjectFunctions.isStackInPrivateArea;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -54,7 +55,6 @@ public class DrawFunctions {
             	((Graphics2D)g).translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming*0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming*0.5);
             	((Graphics2D)g).rotate(Math.toRadians(objectInstance.state.rotation));
                 g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming*0.5),-(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
-                
                 ((Graphics2D)g).setTransform(tmp);
             }
         } else {//TODO add caching
