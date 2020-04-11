@@ -1,5 +1,10 @@
 package gui;
 
+import static gameObjects.functions.DrawFunctions.drawBorder;
+import static gameObjects.functions.DrawFunctions.drawObject;
+import static gameObjects.functions.DrawFunctions.drawStack;
+import static gameObjects.functions.DrawFunctions.drawStackBorder;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -137,23 +142,23 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		for (int i = 0; i < gameInstance.objects.size(); ++i) {
 			ObjectInstance oi = gameInstance.objects.get(i);
 			if (ObjectFunctions.isStackBottom(oi)) {
-				ObjectFunctions.drawStack(g, ObjectFunctions.getAboveStack(gameInstance, oi), gameInstance, playerid, 1);
+				drawStack(g, ObjectFunctions.getAboveStack(gameInstance, oi), gameInstance, playerid, 1);
 				int playerId = ObjectFunctions.getStackOwner(gameInstance, ObjectFunctions.getStack(gameInstance, oi));
 				if (playerId != -1) {
 					Player p = gameInstance.getPlayer(playerId);
-					ObjectFunctions.drawStackBorder(gameInstance, g, p, oi, 10, p.color, 1);
+					drawStackBorder(gameInstance, g, p, oi, 10, p.color, 1);
 				}
 				else{
 					g.setColor(stackColor);
-					ObjectFunctions.drawStackBorder(gameInstance, g, player, oi, 5, stackColor,1, true);
+					drawStackBorder(gameInstance, g, player, oi, 5, stackColor,1, true);
 				}
 			}
 		}
 		if(activeObject != null) {
-			ObjectFunctions.drawObject(g, activeObject, playerid, 1);
+			drawObject(g, activeObject, playerid, 1);
 			if (player != null)
 			{
-				ObjectFunctions.drawBorder(g, player, activeObject, 10, player.color, 1);
+				drawBorder(g, player, activeObject, 10, player.color, 1);
 			}
 		}
 
@@ -164,7 +169,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
 			g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
 			//g.drawString(p.name, p.mouseXPos, p.mouseYPos);
-			ObjectFunctions.drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, p.color, 1);
+			drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, p.color, 1);
 
 		}
 		if (player != null)
@@ -179,7 +184,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			ObjectInstance currentObject = gameInstance.objects.get(id);
 			if (ObjectFunctions.isStackBottom(currentObject))
 			{
-				ObjectFunctions.drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1);
+				drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1);
 			}
 		}
 		((Graphics2D)g).setTransform(new AffineTransform());
