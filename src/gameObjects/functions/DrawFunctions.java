@@ -1,6 +1,18 @@
 package gameObjects.functions;
 
-import java.awt.*;
+import static gameObjects.functions.ObjectFunctions.getStack;
+import static gameObjects.functions.ObjectFunctions.getStackBottom;
+import static gameObjects.functions.ObjectFunctions.getStackTop;
+import static gameObjects.functions.ObjectFunctions.haveSamePositions;
+import static gameObjects.functions.ObjectFunctions.isStackCollected;
+import static gameObjects.functions.ObjectFunctions.isStackInPrivateArea;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
@@ -12,8 +24,6 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import main.Player;
 import util.data.IntegerArrayList;
-
-import static gameObjects.functions.ObjectFunctions.*;
 
 public class DrawFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -45,7 +55,6 @@ public class DrawFunctions {
             	((Graphics2D)g).translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming*0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming*0.5);
             	((Graphics2D)g).rotate(Math.toRadians(objectInstance.state.rotation));
                 g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming*0.5),-(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
-
                 ((Graphics2D)g).setTransform(tmp);
             }
         } else {//TODO add caching
