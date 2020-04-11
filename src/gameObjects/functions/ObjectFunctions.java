@@ -1,15 +1,9 @@
 package gameObjects.functions;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.image.AffineTransformOp;
-import java.awt.image.BufferedImage;
 import java.util.Collections;
 
+import gui.GamePanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -170,19 +164,27 @@ public class ObjectFunctions {
     }
 
     //Move object Instance to xPos, yPos
-    public static void moveObjectTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int posX, int posY) {
+    public static void moveObjectTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int posX, int posY) {
         objectInstance.state.posX = posX;
         objectInstance.state.posY = posY;
-        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+        if(gamePanel.privateArea != null && gamePanel.privateArea.shape.contains(posX, posY))
+        {
+            objectInstance.state.inPrivateArea = true;
+        }
+        else
+        {
+            objectInstance.state.inPrivateArea = false;
+        }
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
     }
 
-    public static void moveObjectTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance targetObjectInstance) {
-        moveObjectTo(gamePanelId, gameInstance, player, objectInstance, targetObjectInstance.state.posX, targetObjectInstance.state.posY);
+    public static void moveObjectTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance targetObjectInstance) {
+        moveObjectTo(gamePanel, gameInstance, player, objectInstance, targetObjectInstance.state.posX, targetObjectInstance.state.posY);
     }
 
 
     //Move the stack given by an id list to posX, posY
-    public static void moveStackTo(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList idList, int posX, int posY) {
+    public static void moveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList idList, int posX, int posY) {
         IntegerArrayList relativeX = new IntegerArrayList();
         IntegerArrayList relativeY = new IntegerArrayList();
         relativeX.add(0);
@@ -195,63 +197,71 @@ public class ObjectFunctions {
         }
         for (int i = 0; i < idList.size(); i++) {
             ObjectInstance currentObject = gameInstance.objects.get(idList.get(i));
-            moveObjectTo(gamePanelId, gameInstance, player, currentObject, posX + relativeX.get(i), posY + relativeY.get(i));
+            moveObjectTo(gamePanel, gameInstance, player, currentObject, posX + relativeX.get(i), posY + relativeY.get(i));
+            if(gamePanel.privateArea != null && gamePanel.privateArea.shape.contains(posX, posY))
+            {
+                currentObject.state.inPrivateArea = true;
+            }
+            else
+            {
+                currentObject.state.inPrivateArea = false;
+            }
         }
     }
 
     //Move the stack given by an id list to objectInstance position
-    public static void moveStackTo(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList idList, ObjectInstance objectInstance) {
+    public static void moveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList idList, ObjectInstance objectInstance) {
         if (objectInstance != null) {
-            moveStackTo(gamePanelId, gameInstance, player, idList, objectInstance.state.posX, objectInstance.state.posY);
+            moveStackTo(gamePanel, gameInstance, player, idList, objectInstance.state.posX, objectInstance.state.posY);
         }
     }
 
     //Move the stack given by an objectInstance to posX, posY
-    public static void moveStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY) {
-        moveStackTo(gamePanelId, gameInstance, player, getStackFromTop(gameInstance, stackObject), posX, posY);
+    public static void moveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY) {
+        moveStackTo(gamePanel, gameInstance, player, getStackFromTop(gameInstance, stackObject), posX, posY);
     }
 
     //Move the stack given by an objectInstance to another objectInstance position
-    public static void moveStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject) {
-        moveStackTo(gamePanelId, gameInstance, player, getStackFromTop(gameInstance, stackObject), baseObject);
+    public static void moveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject) {
+        moveStackTo(gamePanel, gameInstance, player, getStackFromTop(gameInstance, stackObject), baseObject);
     }
 
 
     //Move the stack above objectInstance to posX, posY, with either stackObject is included or not, default is true
-    public static void moveAboveStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY, boolean include) {
-        moveStackTo(gamePanelId, gameInstance, player, getAboveStack(gameInstance, stackObject, include), posX, posY);
+    public static void moveAboveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY, boolean include) {
+        moveStackTo(gamePanel, gameInstance, player, getAboveStack(gameInstance, stackObject, include), posX, posY);
     }
 
-    public static void moveAboveStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY) {
-        moveAboveStackTo(gamePanelId, gameInstance, player, stackObject, posX, posY, true);
+    public static void moveAboveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY) {
+        moveAboveStackTo(gamePanel, gameInstance, player, stackObject, posX, posY, true);
     }
 
     //Move the stack above objectInstance to another objectInstance position, with either stackObject is included or not, default is true
-    public static void moveAboveStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject, boolean include) {
-        moveStackTo(gamePanelId, gameInstance, player, getAboveStack(gameInstance, stackObject, include), baseObject);
+    public static void moveAboveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject, boolean include) {
+        moveStackTo(gamePanel, gameInstance, player, getAboveStack(gameInstance, stackObject, include), baseObject);
     }
 
-    public static void moveAboveStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject) {
-        moveAboveStackTo(gamePanelId, gameInstance, player, stackObject, baseObject, true);
+    public static void moveAboveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject) {
+        moveAboveStackTo(gamePanel, gameInstance, player, stackObject, baseObject, true);
     }
 
 
     //Move the stack below objectInstance to posX, posY, with either stackObject is included or not, default is true
-    public static void moveBelowStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY, boolean include) {
-        moveStackTo(gamePanelId, gameInstance, player, getBelowStack(gameInstance, stackObject, include), posX, posY);
+    public static void moveBelowStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY, boolean include) {
+        moveStackTo(gamePanel, gameInstance, player, getBelowStack(gameInstance, stackObject, include), posX, posY);
     }
 
-    public static void moveBelowStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY) {
-        moveBelowStackTo(gamePanelId, gameInstance, player, stackObject, posX, posY, true);
+    public static void moveBelowStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY) {
+        moveBelowStackTo(gamePanel, gameInstance, player, stackObject, posX, posY, true);
     }
 
     //Move the stack above objectInstance to another objectInstance position, with either stackObject is included or not, default is true
-    public static void moveBelowStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject, boolean include) {
-        moveStackTo(gamePanelId, gameInstance, player, getBelowStack(gameInstance, stackObject, include), baseObject);
+    public static void moveBelowStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject, boolean include) {
+        moveStackTo(gamePanel, gameInstance, player, getBelowStack(gameInstance, stackObject, include), baseObject);
     }
 
-    public static void moveBelowStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject) {
-        moveBelowStackTo(gamePanelId, gameInstance, player, stackObject, baseObject, true);
+    public static void moveBelowStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject) {
+        moveBelowStackTo(gamePanel, gameInstance, player, stackObject, baseObject, true);
     }
 
 
@@ -390,7 +400,7 @@ public class ObjectFunctions {
 
 
     //Remove objectInstance from the Stack
-    public static ObjectInstance removeObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
+    public static ObjectInstance removeObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         ObjectInstance aboveObject = null;
         ObjectInstance belowObject = null;
         if (objectInstance.state.aboveInstanceId != -1) {
@@ -403,19 +413,19 @@ public class ObjectFunctions {
             if (belowObject != null) {
                 aboveObject.state.belowInstanceId = belowObject.id;
                 belowObject.state.aboveInstanceId = aboveObject.id;
-                moveAboveStackTo(gamePanelId, gameInstance, player, objectInstance, objectInstance.state.posX, objectInstance.state.posY, false);
-                gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, belowObject));
+                moveAboveStackTo(gamePanel, gameInstance, player, objectInstance, objectInstance.state.posX, objectInstance.state.posY, false);
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, belowObject));
             } else {
                 aboveObject.state.belowInstanceId = -1;
             }
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, aboveObject));
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, aboveObject));
         } else {
             if (belowObject != null) {
                 belowObject.state.aboveInstanceId = -1;
-                gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, belowObject));
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, belowObject));
             }
         }
-        removeAboveBelow(gamePanelId, gameInstance, player, objectInstance);
+        removeAboveBelow(gamePanel.id, gameInstance, player, objectInstance);
         return objectInstance;
 
     }
@@ -495,7 +505,7 @@ public class ObjectFunctions {
 
 
     //show all objects below element objectInstance
-    public static void viewBelowObjects(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int cardMargin) {
+    public static void displayStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int cardMargin) {
         if (objectInstance != null) {
             IntegerArrayList belowList = getBelowStack(gameInstance, objectInstance);
             if (belowList.size() > 1) {
@@ -504,7 +514,7 @@ public class ObjectFunctions {
 
                 if (haveSamePositions(gameInstance.objects.get(belowList.get(0)), gameInstance.objects.get(belowList.last()))) {
                     for (int i = 0; i < belowList.size(); i++) {
-                        moveObjectTo(gamePanelId, gameInstance, player, gameInstance.objects.get(belowList.get(i)), (int) (posX - (belowList.size() / 2.0 - i) * cardMargin), posY);
+                        moveObjectTo(gamePanel, gameInstance, player, gameInstance.objects.get(belowList.get(i)), (int) (posX - (belowList.size() / 2.0 - i) * cardMargin), posY);
                         //removeFromStack(gamePanelId, gameInstance, player, gameInstance.objects.get(belowList.get(i)));
                     }
                 }
@@ -513,17 +523,17 @@ public class ObjectFunctions {
         }
     }
 
-    public static void viewBelowObjects(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
-        viewBelowObjects(gamePanelId, gameInstance, player, objectInstance, 0);
+    public static void displayStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
+        displayStack(gamePanel, gameInstance, player, objectInstance, 0);
     }
 
     //Move the whole stack to element object instance
-    public static void collectStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
+    public static void collectStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         if (!haveSamePositions(getStackBottom(gameInstance, objectInstance), getStackTop(gameInstance, objectInstance))) {
             IntegerArrayList stack = getStackFromTop(gameInstance, objectInstance);
             for(int id: stack)
             {
-                moveObjectTo(gamePanelId, gameInstance, player, gameInstance.objects.get(id), objectInstance);
+                moveObjectTo(gamePanel, gameInstance, player, gameInstance.objects.get(id), objectInstance);
             }
         }
     }
@@ -635,36 +645,36 @@ public class ObjectFunctions {
     }
 
 
-    public static void mergeStacks(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance topStackInstance, ObjectInstance bottomStackInstance) {
-        moveStackTo(gamePanelId, gameInstance, player, topStackInstance, bottomStackInstance);
+    public static void mergeStacks(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance topStackInstance, ObjectInstance bottomStackInstance) {
+        moveStackTo(gamePanel, gameInstance, player, topStackInstance, bottomStackInstance);
         ObjectInstance topElement = getStackTop(gameInstance, bottomStackInstance);
         ObjectInstance bottomElement = getStackBottom(gameInstance, topStackInstance);
         topElement.state.aboveInstanceId = bottomElement.id;
         bottomElement.state.belowInstanceId = topElement.id;
-        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, topElement));
-        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, bottomElement));
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, topElement));
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, bottomElement));
 
     }
 
-    public static void releaseObjects(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance activeObject, double zooming, int maxInaccuracy) {
+    public static void releaseObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, double zooming, int maxInaccuracy) {
         if(activeObject != null) {
             ObjectInstance objectInstance = getNearestObjectByPosition(gameInstance, player, activeObject.state.posX, activeObject.state.posY, zooming, activeObject);
             if (isStackCollected(gameInstance, objectInstance)) {
                 if (objectInstance != activeObject) {
-                    ObjectFunctions.mergeStacks(gamePanelId, gameInstance, player, activeObject, objectInstance);
+                    ObjectFunctions.mergeStacks(gamePanel, gameInstance, player, activeObject, objectInstance);
                 }
             }
             else
             {
                 Pair<ObjectInstance, ObjectInstance> insertObjects = getInsertObjects(gameInstance, player, activeObject.state.posX, activeObject.state.posY, zooming, activeObject);
-                insertIntoStack(gamePanelId, gameInstance, player, activeObject, insertObjects.getKey(), insertObjects.getValue(), activeObject.getWidth(player.id)/2);
+                insertIntoStack(gamePanel, gameInstance, player, activeObject, insertObjects.getKey(), insertObjects.getValue(), activeObject.getWidth(player.id)/2);
             }
         }
     }
 
 
-    public static void releaseObjects(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance activeObject, double zooming) {
-        releaseObjects(gamePanelId, gameInstance, player, activeObject, zooming, activeObject.getWidth(player.id) / 3);
+    public static void releaseObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, double zooming) {
+        releaseObjects(gamePanel, gameInstance, player, activeObject, zooming, activeObject.getWidth(player.id) / 3);
     }
 
     public static ObjectInstance findNeighbouredStackTop(GameInstance gameInstance, Player player, ObjectInstance activeObject, int maxInaccuracy) {
@@ -744,18 +754,18 @@ public class ObjectFunctions {
         return diffX*diffX + diffY*diffY;
     }
 
-    public static void insertIntoStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance objectAbove, ObjectInstance objectBelow, int cardMargin) {
+    public static void insertIntoStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance objectAbove, ObjectInstance objectBelow, int cardMargin) {
         if (!isStackCollected(gameInstance, objectBelow) || !isStackCollected(gameInstance, objectAbove)) {
             if (objectInstance != null) {
                 if (objectBelow != null) {
                     objectBelow.state.aboveInstanceId = objectInstance.id;
                     objectInstance.state.belowInstanceId = objectBelow.id;
-                    moveObjectTo(gamePanelId, gameInstance, player, objectInstance, objectBelow.state.posX + cardMargin, objectBelow.state.posY);
+                    moveObjectTo(gamePanel, gameInstance, player, objectInstance, objectBelow.state.posX + cardMargin, objectBelow.state.posY);
                     if (objectAbove != null) {
                         objectAbove.state.belowInstanceId = objectInstance.id;
                         objectInstance.state.aboveInstanceId = objectAbove.id;
-                        moveObjectTo(gamePanelId, gameInstance, player, objectInstance, objectAbove);
-                        moveAboveStackTo(gamePanelId, gameInstance, player,objectInstance, objectInstance.state.posX - objectInstance.getWidth(player.id)/2, objectInstance.state.posY, false);
+                        moveObjectTo(gamePanel, gameInstance, player, objectInstance, objectAbove);
+                        moveAboveStackTo(gamePanel, gameInstance, player,objectInstance, objectInstance.state.posX - objectInstance.getWidth(player.id)/2, objectInstance.state.posY, false);
                         //moveAboveStackTo(gameInstance, player, objectInstance);
                         //moveAboveStackTo(gamePanelId, gameInstance, player, objectInstance, objectInstance.state.posX + cardMargin, objectInstance.state.posY, false);
                     }
@@ -880,6 +890,18 @@ public class ObjectFunctions {
             }
         }
         return idList;
+    }
+
+    public static boolean isStackInPrivateArea(GameInstance gameInstance, IntegerArrayList stackIds)
+    {
+        if (stackIds.size()>0) {
+            for (int id : stackIds) {
+                if (!gameInstance.objects.get(id).state.inPrivateArea)
+                    return false;
+            }
+            return true;
+        }
+        return false;
     }
 
 }
