@@ -69,7 +69,6 @@ public class DrawFunctions {
         	((Graphics2D)g).translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming*0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming*0.5);
         	((Graphics2D)g).rotate(Math.toRadians(objectInstance.state.rotation));
             g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming*0.5),-(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
-            
             ((Graphics2D)g).setTransform(tmp);
         }
     }
