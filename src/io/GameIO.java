@@ -209,7 +209,12 @@ public class GameIO {
 				ArrayList<DiceSide> dss = new ArrayList<>();
 				for (Element side : elem.getChildren())
 				{
-					dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), images.get(side.getValue())));
+					BufferedImage img = images.get(side.getValue());
+					if (img == null)
+					{
+						logger.warn("Imege not found: ", side.getValue());
+					}
+					dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img));
 				}
 				return new GameObjectDice(elem.getAttributeValue(IOString.UNIQUE_NAME), elem.getAttributeValue(IOString.TYPE), width, height, dss.toArray(new DiceSide[dss.size()]));
 			}
