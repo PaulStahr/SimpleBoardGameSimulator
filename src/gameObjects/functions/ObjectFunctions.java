@@ -21,7 +21,11 @@ import util.data.IntegerArrayList;
 public class ObjectFunctions {
 	private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
 
-    //Get the top of the stack with with element objectInstance
+    /** Get the top of the stack with with element objectInstance
+     * @param gameInstance Instance of the game
+     * @param objectInstance Instance of the stack
+     * @return top Instance of the stack
+     */
     public static ObjectInstance getStackTop(GameInstance gameInstance, ObjectInstance objectInstance) {
         if (objectInstance != null) {
             ObjectInstance currentTop = objectInstance;
@@ -37,7 +41,11 @@ public class ObjectFunctions {
         }
     }
 
-    //Get the bottom of the stack with with element objectInstance
+    /** Get the bottom of the stack with with element objectInstance
+     * @param gameInstance Instance of the game
+     * @param objectInstance Instance of the stack
+     * @return bottom Instance of the stack
+     */
     public static ObjectInstance getStackBottom(GameInstance gameInstance, ObjectInstance objectInstance) {
         if (objectInstance != null) {
             ObjectInstance currentBottom = objectInstance;
@@ -54,25 +62,39 @@ public class ObjectFunctions {
     }
 
 
-    public static boolean isAboveObject(ObjectInstance objectInstance){
+    /** Checks if above Instance exists
+     * @param objectInstance object Instance
+     * @return true if above Instance exists false otherwise
+     */
+    public static boolean hasAboveObject(ObjectInstance objectInstance){
         if (objectInstance != null)
             return objectInstance.state.aboveInstanceId != -1;
         else
             return false;
     }
 
+    /** gets above instance id
+     * @param objectInstance  object Instance
+     * @return id of above Instance or -1 if it does not exist
+     */
     public static int getAboveObjectId(ObjectInstance objectInstance)
     {
-        if (isAboveObject(objectInstance))
+        if (hasAboveObject(objectInstance))
         {
             return objectInstance.state.aboveInstanceId;
         }
         else
             return -1;
     }
+
+    /**
+     * @param gameInstance Instance of the game
+     * @param objectInstance Instance of an object
+     * @return Instance of above object or null if it does not exist
+     */
     public static ObjectInstance getAboveObject(GameInstance gameInstance, ObjectInstance objectInstance)
     {
-        if (isAboveObject(objectInstance))
+        if (hasAboveObject(objectInstance))
         {
             return gameInstance.objects.get(objectInstance.state.aboveInstanceId);
         }
@@ -81,25 +103,39 @@ public class ObjectFunctions {
     }
 
 
-    public static boolean isBelowObject(ObjectInstance objectInstance){
+    /** Checks if below Instance exists
+     * @param objectInstance Instance of object
+     * @return true if above Instance exists false otherwise
+     */
+    public static boolean hasBelowObject(ObjectInstance objectInstance){
         if (objectInstance != null)
             return objectInstance.state.belowInstanceId != -1;
         else
             return false;
     }
 
+    /** gets below instance id
+     * @param objectInstance  object Instance
+     * @return id of below Instance or -1 if it does not exist
+     */
     public static int getBelowObject(ObjectInstance objectInstance)
     {
-        if (isBelowObject(objectInstance))
+        if (hasBelowObject(objectInstance))
         {
             return objectInstance.state.belowInstanceId;
         }
         else
             return -1;
     }
+
+    /**
+     * @param gameInstance Instance of the game
+     * @param objectInstance Instance of an object
+     * @return Instance of below object or null if it does not exist
+     */
     public static ObjectInstance getBelowObject(GameInstance gameInstance, ObjectInstance objectInstance)
     {
-        if (isBelowObject(objectInstance))
+        if (hasBelowObject(objectInstance))
         {
             return gameInstance.objects.get(objectInstance.state.belowInstanceId);
         }
@@ -107,7 +143,12 @@ public class ObjectFunctions {
             return null;
     }
 
-    //Get the id list of the elements above objectInstance in the stack starting with the bottom id with either objectInstance included or not, default is true
+    /**
+     * @param gameInstance Instance of the game
+     * @param objectInstance Instance of the object
+     * @param included if objectInstance should be included default is true
+     * @return all ids of above Elements in the Stack starting with the bottom id
+     */
     public static IntegerArrayList getAboveStack(GameInstance gameInstance, ObjectInstance objectInstance, boolean included) {
         IntegerArrayList objectStack = new IntegerArrayList();
         if (objectInstance != null) {
@@ -122,13 +163,16 @@ public class ObjectFunctions {
         }
         return objectStack;
     }
-
     public static IntegerArrayList getAboveStack(GameInstance gameInstance, ObjectInstance objectInstance) {
         return getAboveStack(gameInstance, objectInstance, true);
     }
 
-    //Get the id list of the elements below objectInstance in the stack starting with the top id with either objectInstance included or not, default is true
-    public static IntegerArrayList getBelowStack(GameInstance gameInstance, ObjectInstance objectInstance, boolean included) {
+    /**
+     * @param gameInstance Instance of the game
+     * @param objectInstance Instance of the object
+     * @param included if objectInstance should be included default is true
+     * @return all ids of below Elements in the Stack starting with the bottom id
+     */    public static IntegerArrayList getBelowStack(GameInstance gameInstance, ObjectInstance objectInstance, boolean included) {
         IntegerArrayList objectStack = new IntegerArrayList();
         if (objectInstance != null) {
             if (included) {
@@ -142,28 +186,46 @@ public class ObjectFunctions {
         }
         return objectStack;
     }
-
     public static IntegerArrayList getBelowStack(GameInstance gameInstance, ObjectInstance objectInstance) {
         return getBelowStack(gameInstance, objectInstance, true);
     }
 
 
-    /*Get the id list of the stack of element objectInstance starting with the top element*/
+    /**
+     * @param gameInstance Instance of the game
+     * @param objectInstance Instance of the object
+     * @return all ids of stack Elements in the Stack starting with the top id
+     */
     public static IntegerArrayList getStackFromTop(GameInstance gameInstance, ObjectInstance objectInstance) {
         return getBelowStack(gameInstance, getStackTop(gameInstance, objectInstance));
     }
 
-    //Get the id list of the stack of element objectInstance starting with the bottom element
+    /**
+     * @param gameInstance Instance of the game
+     * @param objectInstance Instance of the object
+     * @return all ids of stack Elements in the Stack starting with the bottom id
+     */
     public static IntegerArrayList getStackFromBottom(GameInstance gameInstance, ObjectInstance objectInstance) {
         return getAboveStack(gameInstance, getStackBottom(gameInstance, objectInstance));
     }
 
-    //The same as getStackFromBottom
+    /**
+     * @param gameInstance Instance of the game
+     * @param objectInstance Instance of the object
+     * @return all ids of stack Elements in the Stack starting with the bottom id
+     */
     public static IntegerArrayList getStack(GameInstance gameInstance, ObjectInstance objectInstance) {
         return getAboveStack(gameInstance, getStackBottom(gameInstance, objectInstance));
     }
 
-    //Move object Instance to xPos, yPos
+    /** Moves object to posX, posY
+     * @param gamePanel Game Panel object
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param objectInstance Instance of object
+     * @param posX target x position of object
+     * @param posY target y position of object
+     */
     public static void moveObjectTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int posX, int posY) {
         objectInstance.state.posX = posX;
         objectInstance.state.posY = posY;
@@ -178,12 +240,26 @@ public class ObjectFunctions {
         gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
     }
 
+    /** Moves objectInstance to posX, posY of targetObjectInstance
+     * @param gamePanel Game Panel object
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param objectInstance Instance of object
+     * @param targetObjectInstance Target Instance
+     */
     public static void moveObjectTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance targetObjectInstance) {
         moveObjectTo(gamePanel, gameInstance, player, objectInstance, targetObjectInstance.state.posX, targetObjectInstance.state.posY);
     }
 
 
-    //Move the stack given by an id list to posX, posY
+    /** Moves stack to x, y position
+     * @param gamePanel Game Panel object
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param idList All ids of stack elements
+     * @param posX Target x position
+     * @param posY Target y position
+     */
     public static void moveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList idList, int posX, int posY) {
         IntegerArrayList relativeX = new IntegerArrayList();
         IntegerArrayList relativeY = new IntegerArrayList();
@@ -209,63 +285,114 @@ public class ObjectFunctions {
         }
     }
 
-    //Move the stack given by an id list to objectInstance position
-    public static void moveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList idList, ObjectInstance objectInstance) {
-        if (objectInstance != null) {
-            moveStackTo(gamePanel, gameInstance, player, idList, objectInstance.state.posX, objectInstance.state.posY);
+    /** Moves stack to x, y position of targetObjectInstance
+     * @param gamePanel Game Panel object
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param idList All ids of stack elements
+     * @param targetObjectInstance Target Instance
+     */
+    public static void moveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList idList, ObjectInstance targetObjectInstance) {
+        if (targetObjectInstance != null) {
+            moveStackTo(gamePanel, gameInstance, player, idList, targetObjectInstance.state.posX, targetObjectInstance.state.posY);
         }
     }
 
-    //Move the stack given by an objectInstance to posX, posY
+    /** Moves stack to x, y position of stack object
+     * @param gamePanel Game Panel object
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param stackObject Instance of stack
+     * @param posX Target x position
+     * @param posY Target y position
+     */
     public static void moveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY) {
         moveStackTo(gamePanel, gameInstance, player, getStackFromTop(gameInstance, stackObject), posX, posY);
     }
 
-    //Move the stack given by an objectInstance to another objectInstance position
-    public static void moveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject) {
-        moveStackTo(gamePanel, gameInstance, player, getStackFromTop(gameInstance, stackObject), baseObject);
+    /** Moves stack to x, y position of targetObjectInstance
+     * @param gamePanel Game Panel object
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param stackObject Instance of stack
+     * @param targetObjectInstance Target Instance
+     */
+    public static void moveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance targetObjectInstance) {
+        moveStackTo(gamePanel, gameInstance, player, getStackFromTop(gameInstance, stackObject), targetObjectInstance);
     }
 
 
-    //Move the stack above objectInstance to posX, posY, with either stackObject is included or not, default is true
+    /** Moves stack above stackObject to posX, posY
+     * @param gamePanel Game Panel object
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param stackObject Instance of stack
+     * @param posX Target x position
+     * @param posY Target y position
+     * @param include if stackObject should be inluded default is true
+     */
     public static void moveAboveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY, boolean include) {
         moveStackTo(gamePanel, gameInstance, player, getAboveStack(gameInstance, stackObject, include), posX, posY);
     }
-
     public static void moveAboveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY) {
         moveAboveStackTo(gamePanel, gameInstance, player, stackObject, posX, posY, true);
     }
 
-    //Move the stack above objectInstance to another objectInstance position, with either stackObject is included or not, default is true
-    public static void moveAboveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject, boolean include) {
-        moveStackTo(gamePanel, gameInstance, player, getAboveStack(gameInstance, stackObject, include), baseObject);
+    /** Moves stack above stackObject to posX, posY of targetObjectInstance
+     * @param gamePanel Game Panel object
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param stackObject Instance of stack
+     * @param targetObjectInstance Target object
+     * @param include if stackObject should be inluded default is true
+     */
+    public static void moveAboveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance targetObjectInstance, boolean include) {
+        moveStackTo(gamePanel, gameInstance, player, getAboveStack(gameInstance, stackObject, include), targetObjectInstance);
     }
-
     public static void moveAboveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject) {
         moveAboveStackTo(gamePanel, gameInstance, player, stackObject, baseObject, true);
     }
 
 
-    //Move the stack below objectInstance to posX, posY, with either stackObject is included or not, default is true
+    /** Moves stack below stackObject to posX, posY
+     * @param gamePanel Game Panel object
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param stackObject Instance of stack
+     * @param posX Target x position
+     * @param posY Target y position
+     * @param include if stackObject should be inluded default is true
+     */
     public static void moveBelowStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY, boolean include) {
         moveStackTo(gamePanel, gameInstance, player, getBelowStack(gameInstance, stackObject, include), posX, posY);
     }
-
     public static void moveBelowStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY) {
         moveBelowStackTo(gamePanel, gameInstance, player, stackObject, posX, posY, true);
     }
 
-    //Move the stack above objectInstance to another objectInstance position, with either stackObject is included or not, default is true
-    public static void moveBelowStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject, boolean include) {
-        moveStackTo(gamePanel, gameInstance, player, getBelowStack(gameInstance, stackObject, include), baseObject);
+    /** Moves stack above stackObject to posX, posY of targetObjectInstance
+     * @param gamePanel Game Panel object
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param stackObject Instance of stack
+     * @param targetObjectInstance Target object
+     * @param include if stackObject should be inluded default is true
+     */
+    public static void moveBelowStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance targetObjectInstance, boolean include) {
+        moveStackTo(gamePanel, gameInstance, player, getBelowStack(gameInstance, stackObject, include), targetObjectInstance);
     }
-
     public static void moveBelowStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance baseObject) {
         moveBelowStackTo(gamePanel, gameInstance, player, stackObject, baseObject, true);
     }
 
 
-    //Shuffle the stack containing objectInstance either with objectInstance or not, default is true
+    /** Shuffles the given stack
+     * @param gamePanelId id of game panel
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param objectInstance Instance of Object
+     * @param include if object should be included in shuffling operation, default is true
+     */
     public static void shuffleStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean include) {
         if (objectInstance != null && (isStackInHand(gameInstance, player, getStack(gameInstance, objectInstance)) || isStackNotInHand(gameInstance, player, getStack(gameInstance, objectInstance)))) {
             IntegerArrayList objectStack = getStack(gameInstance, objectInstance);
@@ -298,14 +425,16 @@ public class ObjectFunctions {
             }
         }
     }
-
-
-
     public static void shuffleStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         shuffleStack(gamePanelId, gameInstance, player, objectInstance, true);
     }
 
-    //Flip an object from one side to the other
+    /** Flips the given object
+     * @param gamePanelId id of game panel
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param objectInstance Instance of Object
+     */
     public static void flipObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         if (objectInstance != null ) { //&& isObjectInHand(player, objectInstance)
             player.actionString = "Flipped Object";
@@ -316,13 +445,19 @@ public class ObjectFunctions {
         }
     }
 
-    //Flip the stack which contains object instance, either including this or not, default true
-    public static void flipStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean including) {
+    /** Flips the given object
+     * @param gamePanelId id of game panel
+     * @param gameInstance Instance of Game
+     * @param player Current player
+     * @param objectInstance Instance of Object
+     * @param include if object should be included in flipping, default is true
+     */
+    public static void flipStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean include) {
         if (objectInstance != null ) {//&& isStackInHand(gameInstance, player, getStack(gameInstance, objectInstance))
             IntegerArrayList objectStack = getStack(gameInstance, objectInstance);
             int size = objectStack.size() - 1;
             for (int i = 0; i< objectStack.size(); ++i) {
-                if (objectStack.get(i) != objectInstance.id || including) {
+                if (objectStack.get(i) != objectInstance.id || include) {
                     ObjectInstance currentObject = gameInstance.objects.get(objectStack.get(i));
                     int aboveId = currentObject.state.aboveInstanceId;
                     currentObject.state.aboveInstanceId = currentObject.state.belowInstanceId;
@@ -344,52 +479,72 @@ public class ObjectFunctions {
             gameInstance.update(new GamePlayerEditAction(gamePanelId, player, player));
         }
     }
-
     public static void flipStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         flipStack(gamePanelId, gameInstance, player, objectInstance, true);
     }
 
-    //Count the number of elements in the stack containing objectInstance
-    public static int countStack(GameInstance gameInstance, ObjectInstance objectInstance) {
-        return getStack(gameInstance, objectInstance).size();
+    /** Counts number of elements in stack
+     * @param gameInstance Instance of game
+     * @param stackObject Instance of object in stack
+     * @return number of elements in stack
+     */
+    public static int countStack(GameInstance gameInstance, ObjectInstance stackObject) {
+        return getStack(gameInstance, stackObject).size();
     }
 
-    //Count the number of elements in the stack above objectInstance, either including objectInstance or not, default is true
-    public static int countAboveStack(GameInstance gameInstance, ObjectInstance objectInstance, boolean including) {
-        return getAboveStack(gameInstance, objectInstance, including).size();
+    /** Counts number of elements above stackObject in stack
+     * @param gameInstance Instance of game
+     * @param stackObject Instance of object in stack
+     * @param include if stackObject should be also counted, default true
+     * @return number of elements in stack above stackObject
+     */
+    public static int countAboveStack(GameInstance gameInstance, ObjectInstance stackObject, boolean include) {
+        return getAboveStack(gameInstance, stackObject, include).size();
     }
-
     public static int countAboveStack(GameInstance gameInstance, ObjectInstance objectInstance) {
         return countAboveStack(gameInstance, objectInstance, true);
     }
 
-    //Count the number of elements in the stack below objectInstance, either including objectInstance or not, default is true
-    public static int countBelowStack(GameInstance gameInstance, ObjectInstance objectInstance, boolean including) {
-        return getBelowStack(gameInstance, objectInstance, including).size();
+    /** Counts number of elements below stackObject in stack
+     * @param gameInstance Instance of game
+     * @param stackObject Instance of object in stack
+     * @param include if stackObject should be also counted, default true
+     * @return number of elements in stack below stackObject
+     */
+    public static int countBelowStack(GameInstance gameInstance, ObjectInstance stackObject, boolean include) {
+        return getBelowStack(gameInstance, stackObject, include).size();
     }
-
     public static int countBelowStack(GameInstance gameInstance, ObjectInstance objectInstance) {
         return countBelowStack(gameInstance, objectInstance, true);
     }
 
-    //Add up all the values of objects in stack containing objectInstance either including the value of it or not, default is true
-    public static int countStackValues(GameInstance gameInstance, ObjectInstance objectInstance, boolean including) {
-        IntegerArrayList stackIds = getBelowStack(gameInstance, objectInstance, including);
+    /** Counts values of elements in stack
+     * @param gameInstance Instance of game
+     * @param stackObject Instance of object in stack
+     * @param include if stackObject should be also counted, default true
+     * @return sum of values of elements in stack
+     */
+    public static int countStackValues(GameInstance gameInstance, ObjectInstance stackObject, boolean include) {
+        IntegerArrayList stackIds = getBelowStack(gameInstance, stackObject, include);
         int counter = 0;
         for (int id : stackIds) {
             GameObject currentObject = gameInstance.objects.get(id).go;
-            if (currentObject instanceof GameObjectToken && (id != objectInstance.id || including)) {
+            if (currentObject instanceof GameObjectToken && (id != stackObject.id || include)) {
                 counter += ((GameObjectToken) currentObject).value;
             }
         }
         return counter;
     }
-
     public static int countStackValues(GameInstance gameInstance, ObjectInstance objectInstance) {
         return countStackValues(gameInstance, objectInstance, true);
     }
 
-    //set above and below instance id to -1
+    /** Removes stack relations of object Instance, i.e., set above and below instance id to -1
+     * @param gamePanelId id of game panel
+     * @param gameInstance Instance of game
+     * @param player Instance of player
+     * @param objectInstance Instance of object
+     */
     public static void removeAboveBelow(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         if (objectInstance != null) {
             objectInstance.state.aboveInstanceId = -1;
@@ -399,7 +554,13 @@ public class ObjectFunctions {
     }
 
 
-    //Remove objectInstance from the Stack
+    /** Removes  object from stack
+     * @param gamePanel game panel
+     * @param gameInstance Instance of game
+     * @param player Instance of player
+     * @param objectInstance Instance of object
+     * @return removed object
+     */
     public static ObjectInstance removeObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         ObjectInstance aboveObject = null;
         ObjectInstance belowObject = null;
@@ -431,19 +592,26 @@ public class ObjectFunctions {
     }
 
 
+    /**
+     * @param gameInstance 
+     * @param player
+     * @param xPos
+     * @param yPos
+     * @param maxInaccuracy
+     * @return
+     */
     //Get the top element stack around xPos, yPos with some inaccuracy
-    public static ObjectInstance getTopActiveObjectByPosition(GameInstance gameInstance, int xPos, int yPos, int maxInaccuracy) {
+    public static ObjectInstance getTopActiveObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos, int maxInaccuracy) {
         ObjectInstance activeObject = null;
         int distance = Integer.MAX_VALUE;
         boolean insideObject = false;
-        for (int i = 0; i < gameInstance.objects.size(); ++i) {
-            ObjectInstance oi = gameInstance.objects.get(i);
-            int xDiff = xPos - (oi.state.posX + oi.getWidth(-1) / 2), yDiff = yPos - (oi.state.posY + oi.getHeight(-1) / 2);
+        for (ObjectInstance oi: gameInstance.objects) {
+            int xDiff = xPos - (oi.state.posX + oi.getWidth(player.id) / 2), yDiff = yPos - (oi.state.posY + oi.getHeight(-1) / 2);
             int dist = xDiff * xDiff + yDiff * yDiff;
 
             boolean leftIn = (xPos > (oi.state.posX - maxInaccuracy));
-            boolean rightIn = (xPos < (oi.state.posX + oi.getWidth(-1) + maxInaccuracy));
-            boolean topIn = (yPos < (oi.state.posY + oi.getHeight(-1) + maxInaccuracy));
+            boolean rightIn = (xPos < (oi.state.posX + oi.getWidth(player.id) + maxInaccuracy));
+            boolean topIn = (yPos < (oi.state.posY + oi.getHeight(player.id) + maxInaccuracy));
             boolean bottomIn = (yPos > (oi.state.posY - maxInaccuracy));
 
             if (dist < distance) {
@@ -458,8 +626,8 @@ public class ObjectFunctions {
         return activeObject;
     }
 
-    public static ObjectInstance getTopActiveObjectByPosition(GameInstance gameInstance, int xPos, int yPos) {
-        return getTopActiveObjectByPosition(gameInstance, xPos, yPos, 0);
+    public static ObjectInstance getTopActiveObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos) {
+        return getTopActiveObjectByPosition(gameInstance,player, xPos, yPos, 0);
     }
 
     //Get element nearest to xPos, yPos with some inaccuracy
@@ -467,8 +635,7 @@ public class ObjectFunctions {
         ObjectInstance activeObject = null;
         int distance = Integer.MAX_VALUE;
         boolean insideObject = false;
-        for (int i = 0; i < gameInstance.objects.size(); ++i) {
-            ObjectInstance oi = gameInstance.objects.get(i);
+        for (ObjectInstance oi : gameInstance.objects) {
             if (oi != ignoredObject) {
                 int xDiff = (int) (xPos - (oi.state.posX*zooming + oi.getWidth(player.id) / 2)), yDiff = (int) (yPos - (oi.state.posY*zooming + oi.getHeight(player.id) / 2));
                 int dist = xDiff * xDiff + yDiff * yDiff;
@@ -729,7 +896,7 @@ public class ObjectFunctions {
 
     public static Pair<ObjectInstance, ObjectInstance> getInsertObjects(GameInstance gameInstance, Player player, int posX, int posY, double zooming, ObjectInstance ignoredObject){
         ObjectInstance objectInstance = getNearestObjectByPosition(gameInstance, player, posX, posY, zooming, ignoredObject);
-        if (isAboveObject(objectInstance) && isBelowObject(objectInstance))
+        if (hasAboveObject(objectInstance) && hasBelowObject(objectInstance))
         {
             if(getDistanceToObjectCenter(getAboveObject(gameInstance, objectInstance), posX, posY, player.id) < getDistanceToObjectCenter(getBelowObject(gameInstance, objectInstance), posX, posY, player.id))
             {
@@ -740,11 +907,11 @@ public class ObjectFunctions {
                 return new Pair<>(objectInstance, getBelowObject(gameInstance,objectInstance));
             }
         }
-        else if (isAboveObject(objectInstance))
+        else if (hasAboveObject(objectInstance))
         {
             return new Pair<>(getAboveObject(gameInstance, objectInstance), objectInstance);
         }
-        else if(isBelowObject(objectInstance)){
+        else if(hasBelowObject(objectInstance)){
             return new Pair<>(objectInstance, getBelowObject(gameInstance, objectInstance));
         }
         else
