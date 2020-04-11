@@ -789,13 +789,13 @@ public class ObjectFunctions {
 
     public static IntegerArrayList getTopNObjects(GameInstance gameInstance, ObjectInstance objectInstance, int number) {
         IntegerArrayList objectList = new IntegerArrayList();
-        ObjectInstance topObject = getStackTop(gameInstance, objectInstance);
-        for (int i = 0; i < number; ++i) {
-            int belowId = topObject.state.belowInstanceId;
-            objectList.add(topObject.id);
+        ObjectInstance currentObject = getStackTop(gameInstance, objectInstance);
+        objectList.add(currentObject.id);
+        for (int i = 0; i < number - 1; ++i) {
+            int belowId = currentObject.state.belowInstanceId;
             if (belowId != -1) {
                 objectList.add(belowId);
-                topObject = gameInstance.objects.get(topObject.state.belowInstanceId);
+                currentObject = gameInstance.objects.get(currentObject.state.belowInstanceId);
             } else {
                 break;
             }
@@ -804,7 +804,8 @@ public class ObjectFunctions {
     }
 
     public static void splitStackAtN(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int number) {
-        int splitObjectid = ObjectFunctions.getTopNObjects(gameInstance, objectInstance, number).last();
+        IntegerArrayList topNObjects = ObjectFunctions.getTopNObjects(gameInstance, objectInstance, number);
+        int splitObjectid = topNObjects.last();
         if (gameInstance.objects.get(splitObjectid).state.belowInstanceId == -1) {
             gameInstance.objects.get(splitObjectid).state.belowInstanceId = -1;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, gameInstance.objects.get(splitObjectid)));
