@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 
 import org.jdom2.JDOMException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import gameObjects.instance.GameInstance;
 import gui.GameWindow;
@@ -15,7 +17,7 @@ import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
 
 public class SimpleNetworkServertest {
-    
+    private static final Logger logger = LoggerFactory.getLogger(SimpleNetworkServertest.class);
     public static GameServer startNewServer(int port)
     {
     	GameServer gs = new GameServer(port);
@@ -46,11 +48,17 @@ public class SimpleNetworkServertest {
     	SynchronousGameClientLobbyConnection sclc = new SynchronousGameClientLobbyConnection(address,  port);
     	GameInstance gi = sclc.getGameInstance(gameInstanceId);
     	sclc.addPlayerToGameSession(player, gi.name, gi.password);
-    	GameWindow gw = new GameWindow(gi, player);
+    	gi.players.add(player);
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi);
     	//gi.addPlayer(player);
     	connection.syncPull();
     	connection.start();
+    	Player pl = gi.getPlayer(player.id);
+    	if (pl == null)
+    	{
+    		logger.error("Player " + player.id+ " doesn't exist");
+    	}
+    	GameWindow gw = new GameWindow(gi, pl);
     	gw.setVisible(true);
     	return gw;
     }
@@ -85,7 +93,7 @@ public class SimpleNetworkServertest {
     	}catch(InterruptedException e) {}
     	
     	
-	   	Player player = new Player("Florian", 1);
+	   	Player player = new Player("Florian", 2);
     	//FileInputStream fis = new FileInputStream("Doppelkopf.zip");
 		//GameInstance gi = GameIO.readSnapshotFromZip(fis);
 		//GameInstance gi = new GameInstance(new Game());

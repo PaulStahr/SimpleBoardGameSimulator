@@ -1,10 +1,9 @@
 -Testserver aufsetzen -> Florian
--Testserver implementieren -> Paul
 -Netzwerksynchronisation implementieren -> Paul
 -Zip exporter implementieren -> Rike
--Strings in Gameio in extra java datei auslagern
 -Grafische Oberfläche für laufendes Spiel implementieren -> Florian
 -Grafische Oberflaeche fuer Serverloppy -> Hanno
 -Ein ingame broadcasting chat (kann das Action system fuer Nachrichten nutzen)
 -Ein ingame broadcasting soundchat (kann ebenfalls das Action system nutzen)
 -Ein Stoppuhrenobject implementieren
+-Eine Latex Dokumentation

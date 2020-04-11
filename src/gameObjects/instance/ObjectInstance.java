@@ -10,9 +10,8 @@ public class ObjectInstance {
 	public final GameObject go;
 	public final int id;
 	public double scale = 0.2;
-	public Player inHand = null;
 
-	
+
 	public ObjectInstance(GameObject go, int id)
 	{
 		this.go = go;
@@ -44,6 +43,7 @@ public class ObjectInstance {
 		state.aboveInstanceId = objectState.aboveInstanceId;
 		state.belowInstanceId = objectState.belowInstanceId;
 		state.value = objectState.value;
+		state.owner_id = objectState.owner_id;
 	}
 	
 	public int owner_id()
@@ -58,7 +58,7 @@ public class ObjectInstance {
 	@Override
 	public int hashCode()
 	{
-		return go.hashCode() + state.hashCode() + id + (inHand == null ? 0 : inHand.hashCode()) + state.owner_id;
+		return go.hashCode() + state.hashCode() + id;
 	}
 	
 	public ObjectActionMenu newObjectActionMenu(GameInstance gameInstance, Player player, GamePanel gamePanel){
