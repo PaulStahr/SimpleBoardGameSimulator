@@ -25,6 +25,15 @@ public class SynchronousGameClientLobbyConnection {
 	CommandEncoding ce = CommandEncoding.SERIALIZE;
 	Logger logger = LoggerFactory.getLogger(SynchronousGameClientLobbyConnection.class);
 
+	public void setAdress(String address)
+	{
+		this.address = address;
+	}
+	
+	public void setPort(int port)
+	{
+		this.port = port;
+	}
 
 	public SynchronousGameClientLobbyConnection(String address, int port)
 	{
