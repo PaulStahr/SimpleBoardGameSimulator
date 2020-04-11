@@ -473,10 +473,13 @@ public class ObjectFunctions {
                 int xDiff = (int) (xPos - (oi.state.posX*zooming + oi.getWidth(player.id) / 2)), yDiff = (int) (yPos - (oi.state.posY*zooming + oi.getHeight(player.id) / 2));
                 int dist = xDiff * xDiff + yDiff * yDiff;
 
-                Boolean leftIn = (xPos > (oi.state.posX*zooming - maxInaccuracy));
-                Boolean rightIn = (xPos < (oi.state.posX*zooming + oi.getWidth(player.id) + maxInaccuracy));
-                Boolean topIn = (yPos < (oi.state.posY*zooming + oi.getHeight(player.id) + maxInaccuracy));
-                Boolean bottomIn = (yPos > (oi.state.posY*zooming - maxInaccuracy));
+                double sin = Math.sin(oi.state.rotation), cos = Math.cos(oi.state.rotation);
+                double transformedX = xPos * cos + yPos * sin;
+                double transformedY = -xPos* sin + yPos * cos;
+                Boolean leftIn = (transformedX > (oi.state.posX*zooming - maxInaccuracy));
+                Boolean rightIn = (transformedX < (oi.state.posX*zooming + oi.getWidth(player.id) + maxInaccuracy));
+                Boolean topIn = (transformedY < (oi.state.posY*zooming + oi.getHeight(player.id) + maxInaccuracy));
+                Boolean bottomIn = (transformedY > (oi.state.posY*zooming - maxInaccuracy));
 
                 if (dist < distance) {
                     insideObject = leftIn && rightIn && topIn && bottomIn;

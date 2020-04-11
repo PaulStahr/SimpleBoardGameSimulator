@@ -1,18 +1,17 @@
 package gameObjects.functions;
 
-import gameObjects.instance.GameInstance;
-import gameObjects.instance.ObjectInstance;
-import main.Player;
-import org.slf4j.LoggerFactory;
-import util.data.IntegerArrayList;
-
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
-import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+
 import org.slf4j.Logger;
-import util.data.Stack;
+import org.slf4j.LoggerFactory;
+
+import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectInstance;
+import main.Player;
+import util.data.IntegerArrayList;
 
 import static gameObjects.functions.ObjectFunctions.*;
 
@@ -42,16 +41,27 @@ public class DrawFunctions {
             if (objectInstance.state == null || img == null) {
                 logger.error("Object state is null");
             } else {
-                g.drawImage(img, (objectInstance.state.posX), (objectInstance.state.posY), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+            	AffineTransform tmp = ((Graphics2D)g).getTransform();
+            	((Graphics2D)g).translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming*0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming*0.5);
+            	((Graphics2D)g).rotate(Math.toRadians(objectInstance.state.rotation));
+                g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming*0.5),-(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+
+                ((Graphics2D)g).setTransform(tmp);
             }
         } else {//TODO add caching
-            double rotationRequired = Math.toRadians(objectInstance.getRotation());
-            double locationX = img.getWidth() / 2;
-            double locationY = img.getHeight() / 2;
-            AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX * objectInstance.scale, locationY * objectInstance.scale);
-            tx.scale(objectInstance.scale, objectInstance.scale);
-            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-            g.drawImage(op.filter(img, null), objectInstance.state.posX, objectInstance.state.posY, null);
+            //double rotationRequired = Math.toRadians(objectInstance.getRotation());
+            //double locationX = img.getWidth() / 2;
+           // double locationY = img.getHeight() / 2;
+            //AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX * objectInstance.scale, locationY * objectInstance.scale);
+            //tx.scale(objectInstance.scale, objectInstance.scale);
+            //AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+            //g.drawImage(op.filter(img, null), objectInstance.state.posX, objectInstance.state.posY, null);
+            AffineTransform tmp = ((Graphics2D)g).getTransform();
+        	((Graphics2D)g).translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming*0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming*0.5);
+        	((Graphics2D)g).rotate(Math.toRadians(objectInstance.state.rotation));
+            g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming*0.5),-(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+
+            ((Graphics2D)g).setTransform(tmp);
         }
     }
 
