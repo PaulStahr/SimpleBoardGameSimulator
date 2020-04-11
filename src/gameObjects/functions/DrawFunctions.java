@@ -10,7 +10,10 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
 
 import org.slf4j.Logger;
@@ -23,14 +26,21 @@ import util.data.IntegerArrayList;
 
 public class DrawFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
+
     public static void drawStack(Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming) {
-        if (haveSamePositions(gameInstance.objects.get(stackList.get(0)), gameInstance.objects.get(stackList.last()))) {
-            IntegerArrayList newStackList = new IntegerArrayList();
-            newStackList.add(gameInstance.objects.get(stackList.last()).id);
-            stackList = newStackList;
+        if (isStackInPrivateArea(gameInstance, stackList))
+        {
+
         }
-        for (int id : stackList) {
-            drawObject(g,gameInstance.objects.get(id), playerId,zooming);
+        else {
+            if (haveSamePositions(gameInstance.objects.get(stackList.get(0)), gameInstance.objects.get(stackList.last()))) {
+                IntegerArrayList newStackList = new IntegerArrayList();
+                newStackList.add(gameInstance.objects.get(stackList.last()).id);
+                stackList = newStackList;
+            }
+            for (int id : stackList) {
+                drawObject(g, gameInstance.objects.get(id), playerId, zooming);
+            }
         }
     }
 
@@ -97,6 +107,25 @@ public class DrawFunctions {
 
     public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, int zooming) {
         drawStackBorder(gameInstance, g, player, objectInstance, borderWidth, color, zooming, false);
+    }
+
+    public static Shape setPrivateArea(Graphics g, double posX, double posY, double width, double height, double rotation, double zooming){
+        AffineTransform tx = new AffineTransform();
+        tx.scale(zooming, zooming);
+        Graphics2D graphics = (Graphics2D) g;
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                RenderingHints.VALUE_ANTIALIAS_ON);
+
+        // set background color
+        graphics.setPaint(Color.LIGHT_GRAY);
+        Shape privateArea = new Arc2D.Double(posX, posY, width, height, 0, 180, Arc2D.OPEN);
+
+        // set border color
+        graphics.setColor(Color.GRAY);
+        graphics.setStroke(new BasicStroke(2));
+        graphics.fill(privateArea);
+
+        return tx.createTransformedShape(privateArea);
     }
 
 }
