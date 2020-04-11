@@ -3,7 +3,6 @@ package gameObjects.functions;
 import java.awt.event.KeyEvent;
 import java.util.Collections;
 
-import gui.GamePanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +13,7 @@ import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import geometry.Vector2;
+import gui.GamePanel;
 import main.Player;
 import util.Pair;
 import util.data.IntegerArrayList;
@@ -435,16 +435,16 @@ public class ObjectFunctions {
     public static ObjectInstance getTopActiveObjectByPosition(GameInstance gameInstance, int xPos, int yPos, int maxInaccuracy) {
         ObjectInstance activeObject = null;
         int distance = Integer.MAX_VALUE;
-        Boolean insideObject = false;
+        boolean insideObject = false;
         for (int i = 0; i < gameInstance.objects.size(); ++i) {
             ObjectInstance oi = gameInstance.objects.get(i);
             int xDiff = xPos - (oi.state.posX + oi.getWidth(-1) / 2), yDiff = yPos - (oi.state.posY + oi.getHeight(-1) / 2);
             int dist = xDiff * xDiff + yDiff * yDiff;
 
-            Boolean leftIn = (xPos > (oi.state.posX - maxInaccuracy));
-            Boolean rightIn = (xPos < (oi.state.posX + oi.getWidth(-1) + maxInaccuracy));
-            Boolean topIn = (yPos < (oi.state.posY + oi.getHeight(-1) + maxInaccuracy));
-            Boolean bottomIn = (yPos > (oi.state.posY - maxInaccuracy));
+            boolean leftIn = (xPos > (oi.state.posX - maxInaccuracy));
+            boolean rightIn = (xPos < (oi.state.posX + oi.getWidth(-1) + maxInaccuracy));
+            boolean topIn = (yPos < (oi.state.posY + oi.getHeight(-1) + maxInaccuracy));
+            boolean bottomIn = (yPos > (oi.state.posY - maxInaccuracy));
 
             if (dist < distance) {
                 insideObject = leftIn && rightIn && topIn && bottomIn;
@@ -466,7 +466,7 @@ public class ObjectFunctions {
     public static ObjectInstance getNearestObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, int maxInaccuracy, ObjectInstance ignoredObject) {
         ObjectInstance activeObject = null;
         int distance = Integer.MAX_VALUE;
-        Boolean insideObject = false;
+        boolean insideObject = false;
         for (int i = 0; i < gameInstance.objects.size(); ++i) {
             ObjectInstance oi = gameInstance.objects.get(i);
             if (oi != ignoredObject) {
@@ -476,10 +476,10 @@ public class ObjectFunctions {
                 double sin = Math.sin(oi.state.rotation), cos = Math.cos(oi.state.rotation);
                 double transformedX = xPos * cos + yPos * sin;
                 double transformedY = -xPos* sin + yPos * cos;
-                Boolean leftIn = (transformedX > (oi.state.posX*zooming - maxInaccuracy));
-                Boolean rightIn = (transformedX < (oi.state.posX*zooming + oi.getWidth(player.id) + maxInaccuracy));
-                Boolean topIn = (transformedY < (oi.state.posY*zooming + oi.getHeight(player.id) + maxInaccuracy));
-                Boolean bottomIn = (transformedY > (oi.state.posY*zooming - maxInaccuracy));
+                boolean leftIn = (transformedX > (oi.state.posX*zooming - maxInaccuracy));
+                boolean rightIn = (transformedX < (oi.state.posX*zooming + oi.getWidth(player.id) + maxInaccuracy));
+                boolean topIn = (transformedY < (oi.state.posY*zooming + oi.getHeight(player.id) + maxInaccuracy));
+                boolean bottomIn = (transformedY > (oi.state.posY*zooming - maxInaccuracy));
 
                 if (dist < distance) {
                     insideObject = leftIn && rightIn && topIn && bottomIn;
@@ -616,16 +616,16 @@ public class ObjectFunctions {
         int pressedXPos = mouse.getXI();
         int pressedYPos = mouse.getYI();
         int distance = Integer.MAX_VALUE;
-        Boolean insideObject = false;
+        boolean insideObject = false;
         for (int i = 0; i < gameInstance.objects.size(); ++i) {
             ObjectInstance oi = gameInstance.objects.get(i);
             int xDiff = pressedXPos - (oi.state.posX + oi.getWidth(-1) / 2), yDiff = pressedYPos - (oi.state.posY + oi.getHeight(-1) / 2);
             int dist = xDiff * xDiff + yDiff * yDiff;
 
-            Boolean leftIn = (pressedXPos > (oi.state.posX - maxInaccuracy));
-            Boolean rightIn = (pressedXPos < (oi.state.posX + oi.getWidth(-1) + maxInaccuracy));
-            Boolean topIn = (pressedYPos < (oi.state.posY + oi.getHeight(-1) + maxInaccuracy));
-            Boolean bottomIn = (pressedYPos > (oi.state.posY - maxInaccuracy));
+            boolean leftIn = (pressedXPos > (oi.state.posX - maxInaccuracy));
+            boolean rightIn = (pressedXPos < (oi.state.posX + oi.getWidth(-1) + maxInaccuracy));
+            boolean topIn = (pressedYPos < (oi.state.posY + oi.getHeight(-1) + maxInaccuracy));
+            boolean bottomIn = (pressedYPos > (oi.state.posY - maxInaccuracy));
 
             if (dist < distance) {
                 insideObject = leftIn && rightIn && topIn && bottomIn;
@@ -883,10 +883,10 @@ public class ObjectFunctions {
     public static IntegerArrayList getObjectsInsideBox(GameInstance gameInstance, int posX, int posY, int width, int height) {
         IntegerArrayList idList = new IntegerArrayList();
         for (ObjectInstance objectInstance : gameInstance.objects) {
-            Boolean leftIn = (objectInstance.state.posX > posX);
-            Boolean rightIn = (objectInstance.state.posX < (posX + width));
-            Boolean topIn = (objectInstance.state.posY < (posY + height));
-            Boolean bottomIn = (objectInstance.state.posY > (posY));
+            boolean leftIn = (objectInstance.state.posX > posX);
+            boolean rightIn = (objectInstance.state.posX < (posX + width));
+            boolean topIn = (objectInstance.state.posY < (posY + height));
+            boolean bottomIn = (objectInstance.state.posY > (posY));
 
             if (leftIn && rightIn && topIn && bottomIn) {
                 idList.add(objectInstance.id);

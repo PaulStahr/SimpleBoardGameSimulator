@@ -61,10 +61,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	boolean[] loggedKeys = new boolean[1024];
 
-	Boolean isControlDown = false;
-	Boolean isShiftDown = false;
+	boolean isControlDown = false;
+	boolean isShiftDown = false;
 
-	Boolean isLeftMouseKeyHold = false;
+	boolean isLeftMouseKeyHold = false;
 
 	int mouseX = -1;
 	int mouseY = -1;
