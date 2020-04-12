@@ -63,6 +63,8 @@ public class DrawFunctions {
     {
         for(Player p: gameInstance.players) {
             g.setColor(p.color);
+            Graphics2D g2 = (Graphics2D)g;
+            g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
             g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
             g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
 
@@ -72,7 +74,7 @@ public class DrawFunctions {
             g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
             //g.drawString(p.name, p.mouseXPos, p.mouseYPos);
             drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, p.color, 1);
-
+            g2.scale(gamePanel.zooming, gamePanel.zooming);
         }
         if (player != null)
         {
@@ -83,7 +85,7 @@ public class DrawFunctions {
 
     public static void drawActiveObject(Graphics g, Player player, ObjectInstance activeObject){
         int playerId = player == null ? -1 : player.id;
-        if(activeObject != null) {
+        if(activeObject != null && activeObject.state.owner_id != playerId) {
             drawObject(g, activeObject, playerId, 1);
             if (player != null)
             {
@@ -96,7 +98,7 @@ public class DrawFunctions {
         for(int id: gamePanel.selectedObjects)
         {
             ObjectInstance currentObject = gameInstance.objects.get(id);
-            if (ObjectFunctions.isStackBottom(currentObject))
+            if (ObjectFunctions.isStackBottom(currentObject)&& currentObject.state.owner_id != player.id)
             {
                 drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1);
             }
@@ -190,7 +192,7 @@ public class DrawFunctions {
     }
 
     public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming) {
-        if (objectInstance != null) {
+        if (objectInstance != null && objectInstance.state.owner_id != player.id) {
             g.setColor(color);
             Graphics2D g2d = (Graphics2D) g.create();
             g2d.setStroke(new BasicStroke(borderWidth));

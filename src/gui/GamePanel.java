@@ -79,6 +79,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public int translateY = 0;
 	public double zooming = 1;
 	public double rotation = 0;
+	public boolean mouseInPrivateArea = false;
 
 
 	ControlPanel controlPanel = new ControlPanel();
@@ -154,12 +155,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			e.printStackTrace();
 		}
 		for (ObjectInstance oi : gameInstance.objects) {
-			drawTokenObjects(this, g, gameInstance, oi, player);
+			if (oi.state.owner_id != player.id)
+				drawTokenObjects(this, g, gameInstance, oi, player);
 		}
 		drawActiveObject(g, player, activeObject);
 		drawPlayerMarkers(this, g, gameInstance, player, infoText);
 		drawSelectedObjects(this, g, gameInstance, player);
 		drawTokensInPrivateArea(this, g, gameInstance);
+
 
 	}
 
@@ -307,6 +310,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		mouseX = arg0.getX();
 		mouseY = arg0.getY();;
 		mouseToGamePos(mouseX, mouseY, mouseGamePos);
+		mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, player.mouseXPos, player.mouseYPos);
 		if (player != null)
 		{
 			player.setMousePos(mouseGamePos.getXI(), mouseGamePos.getYI());
@@ -467,7 +471,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
 
-		if (isControlDown)
+		if (isControlDown && !mouseInPrivateArea)
 		{
 			zoomFactor += (int) e.getPreciseWheelRotation();
 			zooming = Math.exp(-zoomFactor * 0.1);
