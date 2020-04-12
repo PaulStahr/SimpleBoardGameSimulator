@@ -13,6 +13,7 @@ public class PrivateArea {
     public int width = 0;
     public int height = 0;
     public Shape shape = null;
+    public int elementNumber = 0;
 
     public PrivateArea(){
     }
