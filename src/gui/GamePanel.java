@@ -25,6 +25,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -144,7 +145,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHints(rh);
         boardTransformation.setTransform(g2.getTransform());
-        inverseBoardTransformation.setTransform(boardTransformation.createInverse());
+        try {
+			inverseBoardTransformation.setTransform(boardTransformation.createInverse());
+		} catch (NoninvertibleTransformException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		drawBoard(this, g, gameInstance);
 		for (ObjectInstance oi : gameInstance.objects) {
 			drawTokenObjects(this, g, gameInstance, oi, player);
