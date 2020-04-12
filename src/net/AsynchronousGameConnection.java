@@ -46,7 +46,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	public void changeUpdate(GameAction action) {
 		if (Thread.currentThread() != inputThread)
 		{
-			logger.debug("Queue Action != " + inputThread.getName());
+			if (logger.isDebugEnabled()){logger.debug("Queue Action != " + inputThread.getName());}
 			queueOutput(action);
 		}
 	}
@@ -55,7 +55,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	{
 		synchronized(queuedOutputs)
 		{
-			logger.debug("Addd queue " + id);
+			if (logger.isDebugEnabled()){logger.debug("Addd queue " + id);}
 			queuedOutputs.add(output);
 			queuedOutputs.notifyAll();
 		}
@@ -209,7 +209,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 			{
 				continue;
 			}
-			logger.debug("Next queued object:" + outputObject.toString());
+			if (logger.isDebugEnabled()){logger.debug("Next queued object:" + outputObject.toString());}
 			try
 			{
 				if (outputObject instanceof CommandWrite)
@@ -226,7 +226,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    				}
 		    				GameIO.writeSnapshotToZip(gi, byteStream);
 		    				//byte data[] = byteStream.toByteArray();
-		    				logger.debug("Write game instance to stream " + byteStream.size());
+		    				if (logger.isDebugEnabled()){logger.debug("Write game instance to stream " + byteStream.size());}
 		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(byteStream.size());
 		    				objOut.writeObject(strB.toString());
 		    				byteStream.writeTo(objOut);
@@ -435,7 +435,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}
 				else
 				{
-					logger.debug("Got input:" + inputObject.toString());
+					if (logger.isDebugEnabled()){logger.debug("Got input:" + inputObject.toString());}
 				}
 				String line = (String)inputObject;
 				StringUtils.split(line, ' ', split);
@@ -475,7 +475,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								{
 									case NetworkString.GAME_INSTANCE:
 									{
-										logger.debug("Do local instance write " + split.get(3));
+										if (logger.isDebugEnabled()){logger.debug("Do local instance write " + split.get(3));}
 										int size = Integer.parseInt(split.get(3));
 										//byte data[] = (byte[])objIn.readObject();
 										data = ArrayUtil.ensureLength(data, size);

@@ -212,15 +212,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 		g2.translate(getWidth() / 2, getHeight());
-		g2.rotate(-Math.PI * 0.5);
-		for (int i = 0; i < inHand.size(); ++i)
+		if (inHand.size() != 0)
 		{
-			ObjectInstance objectInstance = gameInstance.objects.get(i);
-			BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerid);
-			g2.rotate(Math.PI / (inHand.size()));
-			g2.translate(0, -300);
-			g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() *0.5),-(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
-			g2.translate(0, 300);
+			g2.rotate(-Math.PI * 0.5 + Math.PI / (inHand.size() * 2));
+			for (int i = 0; i < inHand.size(); ++i)
+			{
+				ObjectInstance objectInstance = gameInstance.objects.get(i);
+				BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerid);
+				g2.translate(0, -300);
+				g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() *0.5),-(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
+				g2.translate(0, 300);
+				g2.rotate(Math.PI / (inHand.size()));
+			}
 		}
 		
 		g2.setTransform(new AffineTransform());
