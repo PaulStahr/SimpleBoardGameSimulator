@@ -26,7 +26,9 @@ import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
 import io.GameIO;
 import main.Player;
+import util.ArrayUtil;
 import util.StringUtils;
+import util.data.UniqueObjects;
 
 public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	private static final Logger logger = LoggerFactory.getLogger(AsynchronousGameConnection.class);
@@ -44,7 +46,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	public void changeUpdate(GameAction action) {
 		if (Thread.currentThread() != inputThread)
 		{
-			logger.debug("Queue Action != " + inputThread.getName());
+			if (logger.isDebugEnabled()){logger.debug("Queue Action != " + inputThread.getName());}
 			queueOutput(action);
 		}
 	}
@@ -53,7 +55,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	{
 		synchronized(queuedOutputs)
 		{
-			logger.debug("Addd queue " + id);
+			if (logger.isDebugEnabled()){logger.debug("Addd queue " + id);}
 			queuedOutputs.add(output);
 			queuedOutputs.notifyAll();
 		}
@@ -207,7 +209,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 			{
 				continue;
 			}
-			logger.debug("Next queued object:" + outputObject.toString());
+			if (logger.isDebugEnabled()){logger.debug("Next queued object:" + outputObject.toString());}
 			try
 			{
 				if (outputObject instanceof CommandWrite)
@@ -224,7 +226,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    				}
 		    				GameIO.writeSnapshotToZip(gi, byteStream);
 		    				//byte data[] = byteStream.toByteArray();
-		    				logger.debug("Write game instance to stream " + byteStream.size());
+		    				if (logger.isDebugEnabled()){logger.debug("Write game instance to stream " + byteStream.size());}
 		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(byteStream.size());
 		    				objOut.writeObject(strB.toString());
 		    				byteStream.writeTo(objOut);
@@ -237,7 +239,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    				GameIO.writeGameToZip(gi.game, byteStream);
 		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME).append(' ').append(byteStream.size());
 		    				objOut.writeObject(strB.toString());
-		    				objOut.write(byteStream.toByteArray());
+		    				byteStream.writeTo(objOut);
 		    				byteStream.reset();
 		    				strB.setLength(0);
 		    				break;
@@ -247,7 +249,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    				GameIO.writeObjectToZip(gi.game.getObject(Integer.toString(id)), byteStream);
 		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT).append(' ').append(byteStream.size());
 		    				objOut.writeObject(strB.toString());
-		    				objOut.write(byteStream.toByteArray());
+		    				byteStream.writeTo(objOut);
 		    				byteStream.reset();
 		    				strB.setLength(0);
 		    				break;
@@ -257,8 +259,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    				GameIO.writeObjectInstanceToZip(gi.getObjectInstance(id), byteStream);
 		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT_INSTANCE).append(' ').append(byteStream.size());
 		    				objOut.writeObject(strB.toString());
-		    				objOut.writeObject(byteStream.toByteArray());
-		    				//objOut.write(byteStream.toByteArray());
+		    				//objOut.writeObject(byteStream.toByteArray());
+		    				byteStream.writeTo(objOut);
 		    				strB.setLength(0);
 		    				byteStream.reset();
 		    				break;
@@ -267,7 +269,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    			{
 		    				GameIO.writePlayerToStream(gi.getPlayer(id), byteStream);
 		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.PLAYER).append(' ').append(byteStream.size());
-		    				objOut.write(byteStream.toByteArray());
+		    				byteStream.writeTo(objOut);
 		    				strB.setLength(0);
 		    				byteStream.reset();
 		    				break;
@@ -382,6 +384,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	public void inputLoop()
 	{
 		ArrayList<String> split = new ArrayList<>();
+		byte data[] = UniqueObjects.EMPTY_BYTE_ARRAY;
 		//Scanner in = new Scanner( input);
 		if (objIn == null)
 		{
@@ -432,7 +435,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}
 				else
 				{
-					logger.debug("Got input:" + inputObject.toString());
+					if (logger.isDebugEnabled()){logger.debug("Got input:" + inputObject.toString());}
 				}
 				String line = (String)inputObject;
 				StringUtils.split(line, ' ', split);
@@ -472,12 +475,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								{
 									case NetworkString.GAME_INSTANCE:
 									{
-										logger.debug("Do local instance write " + split.get(3));
+										if (logger.isDebugEnabled()){logger.debug("Do local instance write " + split.get(3));}
 										int size = Integer.parseInt(split.get(3));
 										//byte data[] = (byte[])objIn.readObject();
-										byte data[] = new byte[size];
+										data = ArrayUtil.ensureLength(data, size);
 										objIn.readFully(data, 0, size);
-										GameIO.editGameInstanceFromZip(new ByteArrayInputStream(data), gi, this);
+										GameIO.editGameInstanceFromZip(new ByteArrayInputStream(data, 0, size), gi, this);
 										break;
 									}
 								}
@@ -503,14 +506,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								int playerId = Integer.parseInt(split.get(5));
 								int objectId = Integer.parseInt(split.get(6));
 								int size = Integer.parseInt(split.get(7));
-								byte data[] = new byte[size];
-								
+								data = ArrayUtil.ensureLength(data, size);								
 								objIn.readFully(data, 0, size);
 								//byte data[] = objIn.readObject();
 								ObjectInstance inst = gi.getObjectInstance(objectId);
 								if (sourceId != id)
 								{
-									GameIO.editObjectStateFromStream(inst.state, new ByteArrayInputStream(data));
+									GameIO.editObjectStateFromStream(inst.state, new ByteArrayInputStream(data, 0, size));
 								}
 								Player pl = gi.getPlayer(playerId);
 								if (pl == null)
@@ -531,18 +533,18 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								int sourcePlayerId = Integer.parseInt(split.get(5));
 								int playerId = Integer.parseInt(split.get(6));
 								int size = Integer.parseInt(split.get(7));
-								byte data[] = new byte[size];
+								data = ArrayUtil.ensureLength(data, size);
 								
 								objIn.readFully(data, 0, size);
 								//byte data[] = objIn.readObject();
 								Player object = gi.getPlayer(playerId);
 								if (object != null)
 								{
-									GameIO.editPlayerFromStream(new ByteArrayInputStream(data), object);
+									GameIO.editPlayerFromStream(new ByteArrayInputStream(data, 0, size), object);
 								}
 								else
 								{
-									gi.addPlayer(GameIO.readPlayerFromStream(new ByteArrayInputStream(data)));
+									gi.addPlayer(GameIO.readPlayerFromStream(new ByteArrayInputStream(data, 0, size)));
 								}
 								Player sourcePlayer = gi.getPlayer(sourcePlayerId);
 								if (sourcePlayer == null)

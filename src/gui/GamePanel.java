@@ -10,6 +10,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.KeyEventDispatcher;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -22,6 +23,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -135,10 +138,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		//TODO Florian:sometimes images are drawn twice (the active object?)
 		g.drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
 		g.drawImage(gameInstance.game.background, 0, 0, getWidth(), getHeight(), Color.BLACK, null);
-		((Graphics2D)g).translate(getWidth() / 2, getHeight() / 2);
-		((Graphics2D)g).scale(zooming, zooming);
-		((Graphics2D)g).rotate(rotation);
-		((Graphics2D)g).translate(translateX, translateY);
+		Graphics2D g2 = (Graphics2D)g;
+		g2.translate(getWidth() / 2, getHeight() / 2);
+		g2.scale(zooming, zooming);
+		g2.rotate(rotation);
+		g2.translate(translateX, translateY);
+		RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+	    g2.setRenderingHints(rh);
 		privateArea.setArea(getWidth()/4, getHeight()-250, getWidth()/2, 500, translateX, translateY, rotation, zooming);
 		privateArea.draw(g);
 		int playerid = player == null ? -1 : player.id;
@@ -190,11 +196,37 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1);
 			}
 		}
-		((Graphics2D)g).setTransform(new AffineTransform());
+		g2.setTransform(new AffineTransform());
 		if (activeObject == null && selectWidth > 0 && selectHeight > 0){
 			g.setColor(player.color);
 			g.drawRect(beginSelectPosX, beginSelectPosY, selectWidth, selectHeight);
 		}
+		
+		ArrayList<ObjectInstance> inHand = new ArrayList<>();
+		for (int i = 0;i < gameInstance.objects.size(); ++i)
+		{
+			ObjectInstance oi = gameInstance.objects.get(i);
+			if (oi.state.owner_id == playerid)
+			{
+				inHand.add(oi);
+			}
+		}
+		g2.translate(getWidth() / 2, getHeight());
+		if (inHand.size() != 0)
+		{
+			g2.rotate(-Math.PI * 0.5 + Math.PI / (inHand.size() * 2));
+			for (int i = 0; i < inHand.size(); ++i)
+			{
+				ObjectInstance objectInstance = gameInstance.objects.get(i);
+				BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerid);
+				g2.translate(0, -300);
+				g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() *0.5),-(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
+				g2.translate(0, 300);
+				g2.rotate(Math.PI / (inHand.size()));
+			}
+		}
+		
+		g2.setTransform(new AffineTransform());
 	}
 
 	@Override
