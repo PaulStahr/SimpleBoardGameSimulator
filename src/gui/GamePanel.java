@@ -82,7 +82,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	ControlPanel controlPanel = new ControlPanel();
 	private final AffineTransform boardTransformation = new AffineTransform();
-	public PrivateArea privateArea = new PrivateArea(boardTransformation);
+	private final AffineTransform inverseBoardTransformation = new AffineTransform();
+	public PrivateArea privateArea = new PrivateArea(boardTransformation, inverseBoardTransformation);
 	public Color mouseColor = Color.black;
 	public Color dragColor = Color.red;
 	public Color stackColor = Color.green;
@@ -143,6 +144,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHints(rh);
         boardTransformation.setTransform(g2.getTransform());
+        inverseBoardTransformation.setTransform(boardTransformation.createInverse());
 		drawBoard(this, g, gameInstance);
 		for (ObjectInstance oi : gameInstance.objects) {
 			drawTokenObjects(this, g, gameInstance, oi, player);
