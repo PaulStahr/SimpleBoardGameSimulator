@@ -10,6 +10,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.KeyEventDispatcher;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -135,10 +136,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		//TODO Florian:sometimes images are drawn twice (the active object?)
 		g.drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
 		g.drawImage(gameInstance.game.background, 0, 0, getWidth(), getHeight(), Color.BLACK, null);
-		((Graphics2D)g).translate(getWidth() / 2, getHeight() / 2);
-		((Graphics2D)g).scale(zooming, zooming);
-		((Graphics2D)g).rotate(rotation);
-		((Graphics2D)g).translate(translateX, translateY);
+		Graphics2D g2 = (Graphics2D)g;
+		g2.translate(getWidth() / 2, getHeight() / 2);
+		g2.scale(zooming, zooming);
+		g2.rotate(rotation);
+		g2.translate(translateX, translateY);
+		RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+	    g2.setRenderingHints(rh);
 		privateArea.setArea(getWidth()/4, getHeight()-250, getWidth()/2, 500, translateX, translateY, rotation, zooming);
 		privateArea.draw(g);
 		int playerid = player == null ? -1 : player.id;
