@@ -137,7 +137,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void paintComponent(Graphics g)
 	{
-        Graphics2D g2 = (Graphics2D)g;
+		super.paintComponent(g);
+		drawBoard(this, g, gameInstance);
+		Graphics2D g2 = (Graphics2D)g;
         g2.translate(getWidth() / 2, getHeight() / 2);
         g2.scale(zooming, zooming);
         g2.rotate(rotation);
@@ -151,7 +153,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		drawBoard(this, g, gameInstance);
 		for (ObjectInstance oi : gameInstance.objects) {
 			drawTokenObjects(this, g, gameInstance, oi, player);
 		}
