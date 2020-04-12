@@ -119,7 +119,7 @@ public class DrawFunctions {
         for (int i = 0;i < gameInstance.objects.size(); ++i)
         {
             ObjectInstance oi = gameInstance.objects.get(i);
-            if (oi.state.owner_id == playerId && oi.state.inPrivateArea)
+            if (oi.state.owner_id == playerId)
             {
                 inHand.add(oi);
             }
