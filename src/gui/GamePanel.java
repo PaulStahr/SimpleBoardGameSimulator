@@ -23,6 +23,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -194,11 +196,34 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1);
 			}
 		}
-		((Graphics2D)g).setTransform(new AffineTransform());
+		g2.setTransform(new AffineTransform());
 		if (activeObject == null && selectWidth > 0 && selectHeight > 0){
 			g.setColor(player.color);
 			g.drawRect(beginSelectPosX, beginSelectPosY, selectWidth, selectHeight);
 		}
+		
+		ArrayList<ObjectInstance> inHand = new ArrayList<>();
+		for (int i = 0;i < gameInstance.objects.size(); ++i)
+		{
+			ObjectInstance oi = gameInstance.objects.get(i);
+			if (oi.state.owner_id == playerid)
+			{
+				inHand.add(oi);
+			}
+		}
+		g2.translate(getWidth() / 2, getHeight());
+		g2.rotate(-Math.PI * 0.5);
+		for (int i = 0; i < inHand.size(); ++i)
+		{
+			ObjectInstance objectInstance = gameInstance.objects.get(i);
+			BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerid);
+			g2.rotate(Math.PI / (inHand.size()));
+			g2.translate(0, -300);
+			g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming*0.5),-(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+			g2.translate(0, 300);
+		}
+		
+		g2.setTransform(new AffineTransform());
 	}
 
 	@Override
