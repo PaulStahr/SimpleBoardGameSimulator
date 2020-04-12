@@ -219,7 +219,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerid);
 			g2.rotate(Math.PI / (inHand.size()));
 			g2.translate(0, -300);
-			g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming*0.5),-(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+			g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() *0.5),-(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
 			g2.translate(0, 300);
 		}
 		
