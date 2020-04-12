@@ -234,11 +234,11 @@ public class ObjectFunctions {
         objectInstance.state.posY = posY;
         if(gamePanel.privateArea != null && gamePanel.privateArea.contains(posX, posY))
         {
-            objectInstance.state.inPrivateArea = true;
+            objectInstance.state.owner_id = player.id;
         }
         else
         {
-            objectInstance.state.inPrivateArea = false;
+            objectInstance.state.owner_id = -1;
         }
         gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
     }
