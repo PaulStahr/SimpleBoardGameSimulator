@@ -1,5 +1,13 @@
 package gameObjects.functions;
 
+import static gameObjects.functions.ObjectFunctions.getStack;
+import static gameObjects.functions.ObjectFunctions.getStackBottom;
+import static gameObjects.functions.ObjectFunctions.getStackTop;
+import static gameObjects.functions.ObjectFunctions.haveSamePositions;
+import static gameObjects.functions.ObjectFunctions.isInPrivateArea;
+import static gameObjects.functions.ObjectFunctions.isStackCollected;
+import static gameObjects.functions.ObjectFunctions.isStackInPrivateArea;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -19,8 +27,6 @@ import gameObjects.instance.ObjectInstance;
 import gui.GamePanel;
 import main.Player;
 import util.data.IntegerArrayList;
-
-import static gameObjects.functions.ObjectFunctions.*;
 
 public class DrawFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -113,7 +119,7 @@ public class DrawFunctions {
         for (int i = 0;i < gameInstance.objects.size(); ++i)
         {
             ObjectInstance oi = gameInstance.objects.get(i);
-            if (oi.state.owner_id == playerId)
+            if (oi.state.owner_id == playerId && oi.state.inPrivateArea)
             {
                 inHand.add(oi);
             }
@@ -124,7 +130,7 @@ public class DrawFunctions {
             g2.rotate(-Math.PI * 0.5 + Math.PI / (inHand.size() * 2));
             for (int i = 0; i < inHand.size(); ++i)
             {
-                ObjectInstance objectInstance = gameInstance.objects.get(i);
+                ObjectInstance objectInstance = inHand.get(i);
                 BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
                 g2.translate(0, -250);
                 g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() *0.5),-(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
