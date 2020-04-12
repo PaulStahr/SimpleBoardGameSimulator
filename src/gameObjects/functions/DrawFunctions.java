@@ -60,7 +60,7 @@ public class DrawFunctions {
             g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
             g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
 
-            if(isInPrivateArea(gamePanel, g, p.mouseXPos, p.mouseYPos))
+            if(isInPrivateArea(gamePanel, p.mouseXPos, p.mouseYPos))
                 p.actionString = "Private Area";
 
             g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);

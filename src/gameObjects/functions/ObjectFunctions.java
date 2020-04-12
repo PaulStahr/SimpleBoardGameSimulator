@@ -232,7 +232,7 @@ public class ObjectFunctions {
     public static void moveObjectTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int posX, int posY) {
         objectInstance.state.posX = posX;
         objectInstance.state.posY = posY;
-        if(gamePanel.privateArea != null && gamePanel.privateArea.shape.contains(posX, posY))
+        if(gamePanel.privateArea != null && gamePanel.privateArea.contains(posX, posY))
         {
             objectInstance.state.inPrivateArea = true;
         }
@@ -1065,11 +1065,9 @@ public class ObjectFunctions {
         return idList;
     }
 
-    public static boolean isInPrivateArea(GamePanel gamePanel, Graphics g, int posX, int posY)
+    public static boolean isInPrivateArea(GamePanel gamePanel,int posX, int posY)
     {
-        Graphics2D graphics = (Graphics2D) g;
-        AffineTransform transform = graphics.getTransform();
-        return gamePanel.privateArea.shape.contains(posX, posY);
+        return gamePanel.privateArea.contains(posX, posY);
     }
 
 

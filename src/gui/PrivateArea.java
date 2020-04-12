@@ -1,13 +1,9 @@
 package gui;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Point2D;
 
 public class PrivateArea {
     public int width = 0;
@@ -31,7 +27,6 @@ public class PrivateArea {
     {
         Graphics2D graphics = (Graphics2D) g;
         AffineTransform tmp = graphics.getTransform();
-        //graphics.setTransform(new AffineTransform());
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
@@ -42,5 +37,10 @@ public class PrivateArea {
         graphics.setStroke(new BasicStroke(2));
         graphics.fill(this.shape);
         graphics.setTransform(tmp);
+    }
+
+    public boolean contains(int posX, int posY){
+        Point2D transformedPoint = boardTransform.transform(new Point2D.Double(posX, posY), null);
+        return shape.contains(transformedPoint);
     }
 }
