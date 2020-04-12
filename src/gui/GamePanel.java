@@ -1,5 +1,12 @@
 package gui;
 
+import static gameObjects.functions.DrawFunctions.drawActiveObject;
+import static gameObjects.functions.DrawFunctions.drawBoard;
+import static gameObjects.functions.DrawFunctions.drawPlayerMarkers;
+import static gameObjects.functions.DrawFunctions.drawSelectedObjects;
+import static gameObjects.functions.DrawFunctions.drawTokenObjects;
+import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -18,8 +25,6 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -39,8 +44,6 @@ import geometry.Matrix3d;
 import geometry.Vector2d;
 import main.Player;
 import util.data.IntegerArrayList;
-
-import static gameObjects.functions.DrawFunctions.*;
 
 //import gameObjects.GameObjectInstanceEditAction;
 
@@ -78,8 +81,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 
 	ControlPanel controlPanel = new ControlPanel();
-	public PrivateArea privateArea = new PrivateArea();
-
+	private final AffineTransform boardTransformation = new AffineTransform();
+	public PrivateArea privateArea = new PrivateArea(boardTransformation);
 	public Color mouseColor = Color.black;
 	public Color dragColor = Color.red;
 	public Color stackColor = Color.green;
@@ -132,6 +135,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void paintComponent(Graphics g)
 	{
+        Graphics2D g2 = (Graphics2D)g;
+        g2.translate(getWidth() / 2, getHeight() / 2);
+        g2.scale(zooming, zooming);
+        g2.rotate(rotation);
+        g2.translate(translateX, translateY);
+        RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHints(rh);
+        boardTransformation.setTransform(g2.getTransform());
 		drawBoard(this, g, gameInstance);
 		for (ObjectInstance oi : gameInstance.objects) {
 			drawTokenObjects(this, g, gameInstance, oi, player);
