@@ -19,14 +19,8 @@ public class PrivateArea {
     }
 
     public void setArea(double posX, double posY, double width,  double height, int translateX, int translateY, double rotation, double zooming) {
-        AffineTransform tx = new AffineTransform();
-        //tx.translate(-translateX, -translateY);
-        //tx.scale(1/zooming, 1/zooming);
-        //tx.rotate(-rotation);
         Shape privateArea = new Arc2D.Double(posX, posY, width, height, 0, 180, Arc2D.OPEN);
-
-
-        this.shape = tx.createTransformedShape(privateArea);
+        this.shape = privateArea;
     }
 
     public void draw(Graphics g)

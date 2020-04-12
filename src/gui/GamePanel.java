@@ -137,7 +137,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			drawTokenObjects(this, g, gameInstance, oi, player);
 		}
 		drawActiveObject(g, player, activeObject);
-		drawPlayerMarkers(g, gameInstance, player, infoText);
+		drawPlayerMarkers(this, g, gameInstance, player, infoText);
 		drawSelectedObjects(this, g, gameInstance, player);
 		drawTokensInPrivateArea(this, g, gameInstance);
 

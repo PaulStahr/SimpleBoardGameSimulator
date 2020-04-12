@@ -1,6 +1,9 @@
 package gameObjects.functions;
 
+import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.util.Collections;
 
 import org.slf4j.Logger;
@@ -1061,6 +1064,14 @@ public class ObjectFunctions {
         }
         return idList;
     }
+
+    public static boolean isInPrivateArea(GamePanel gamePanel, Graphics g, int posX, int posY)
+    {
+        Graphics2D graphics = (Graphics2D) g;
+        AffineTransform transform = graphics.getTransform();
+        return gamePanel.privateArea.shape.contains(posX, posY);
+    }
+
 
     public static boolean isStackInPrivateArea(GameInstance gameInstance, IntegerArrayList stackIds)
     {

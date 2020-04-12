@@ -1,12 +1,5 @@
 package gameObjects.functions;
 
-import static gameObjects.functions.ObjectFunctions.getStack;
-import static gameObjects.functions.ObjectFunctions.getStackBottom;
-import static gameObjects.functions.ObjectFunctions.getStackTop;
-import static gameObjects.functions.ObjectFunctions.haveSamePositions;
-import static gameObjects.functions.ObjectFunctions.isStackCollected;
-import static gameObjects.functions.ObjectFunctions.isStackInPrivateArea;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -27,6 +20,8 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import main.Player;
 import util.data.IntegerArrayList;
+
+import static gameObjects.functions.ObjectFunctions.*;
 
 public class DrawFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -66,12 +61,16 @@ public class DrawFunctions {
 
     }
 
-    public static void drawPlayerMarkers(Graphics g, GameInstance gameInstance, Player player, String infoText)
+    public static void drawPlayerMarkers(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, String infoText)
     {
         for(Player p: gameInstance.players) {
             g.setColor(p.color);
             g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
             g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
+
+            if(isInPrivateArea(gamePanel, g, p.mouseXPos, p.mouseYPos))
+                p.actionString = "Private Area";
+
             g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
             //g.drawString(p.name, p.mouseXPos, p.mouseYPos);
             drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, p.color, 1);
