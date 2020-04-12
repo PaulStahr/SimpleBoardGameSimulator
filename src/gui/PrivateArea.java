@@ -14,10 +14,12 @@ public class PrivateArea {
     public int height = 0;
     public Shape shape = null;
     public int elementNumber = 0;
-    private final AffineTransform at;
-    
-    public PrivateArea(AffineTransform at){
-    	this.at = at;
+    private final AffineTransform boardTransform;
+    private final AffineTransform inverseBoardTransform;
+       
+    public PrivateArea(AffineTransform boardTransform, AffineTransform inverseBoardTransformation){
+    	this.boardTransform = boardTransform;
+    	this.inverseBoardTransform = inverseBoardTransformation;
     }
 
     public void setArea(double posX, double posY, double width,  double height, int translateX, int translateY, double rotation, double zooming) {
