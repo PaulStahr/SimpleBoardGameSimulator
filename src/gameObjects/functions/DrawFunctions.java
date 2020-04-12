@@ -18,13 +18,12 @@ import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-import com.sun.corba.se.impl.orbutil.graph.Graph;
-import gui.GamePanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import gui.GamePanel;
 import main.Player;
 import util.data.IntegerArrayList;
 
@@ -36,13 +35,6 @@ public class DrawFunctions {
         //TODO Florian:sometimes images are drawn twice (the active object?)
         g.drawString(String.valueOf(gamePanel.mouseWheelValue), gamePanel.mouseX, gamePanel.mouseY);
         g.drawImage(gameInstance.game.background, 0, 0, gamePanel.getWidth(), gamePanel.getHeight(), Color.BLACK, null);
-        Graphics2D g2 = (Graphics2D)g;
-        g2.translate(gamePanel.getWidth() / 2, gamePanel.getHeight() / 2);
-        g2.scale(gamePanel.zooming, gamePanel.zooming);
-        g2.rotate(gamePanel.rotation);
-        g2.translate(gamePanel.translateX, gamePanel.translateY);
-        RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-        g2.setRenderingHints(rh);
 
         int privateAreaHeight = 700;
         int privateAreaWidth = 700;

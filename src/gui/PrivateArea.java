@@ -14,8 +14,10 @@ public class PrivateArea {
     public int height = 0;
     public Shape shape = null;
     public int elementNumber = 0;
-
-    public PrivateArea(){
+    private final AffineTransform at;
+    
+    public PrivateArea(AffineTransform at){
+    	this.at = at;
     }
 
     public void setArea(double posX, double posY, double width,  double height, int translateX, int translateY, double rotation, double zooming) {
@@ -33,7 +35,7 @@ public class PrivateArea {
     {
         Graphics2D graphics = (Graphics2D) g;
         AffineTransform tmp = graphics.getTransform();
-        graphics.setTransform(new AffineTransform());
+        //graphics.setTransform(new AffineTransform());
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
