@@ -769,7 +769,7 @@ public class ObjectFunctions {
         IntegerArrayList stackIds = getStack(gameInstance, objectInstance);
         for(int id: stackIds) {
             ObjectInstance currentInstance = gameInstance.objects.get(id);
-            if (player.id != currentInstance.state.owner_id) {
+            if (player.id == currentInstance.state.owner_id) {
                 currentInstance.state.owner_id = -1;
                 flipObject(gamePanelId, gameInstance, player, currentInstance);
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentInstance));

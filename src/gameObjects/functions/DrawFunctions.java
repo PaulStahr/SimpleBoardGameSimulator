@@ -16,7 +16,10 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
+import com.sun.corba.se.impl.orbutil.graph.Graph;
+import gui.GamePanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,6 +30,120 @@ import util.data.IntegerArrayList;
 
 public class DrawFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
+
+    public static void drawBoard(GamePanel gamePanel, Graphics g, GameInstance gameInstance){
+        g.clearRect(0, 0, gamePanel.getWidth(), gamePanel.getHeight());
+        //TODO Florian:sometimes images are drawn twice (the active object?)
+        g.drawString(String.valueOf(gamePanel.mouseWheelValue), gamePanel.mouseX, gamePanel.mouseY);
+        g.drawImage(gameInstance.game.background, 0, 0, gamePanel.getWidth(), gamePanel.getHeight(), Color.BLACK, null);
+        Graphics2D g2 = (Graphics2D)g;
+        g2.translate(gamePanel.getWidth() / 2, gamePanel.getHeight() / 2);
+        g2.scale(gamePanel.zooming, gamePanel.zooming);
+        g2.rotate(gamePanel.rotation);
+        g2.translate(gamePanel.translateX, gamePanel.translateY);
+        RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+        g2.setRenderingHints(rh);
+
+        int privateAreaHeight = 700;
+        int privateAreaWidth = 700;
+        gamePanel.privateArea.setArea(gamePanel.getWidth()/2 - privateAreaWidth/2, gamePanel.getHeight()-privateAreaHeight/2, privateAreaWidth, privateAreaHeight, gamePanel.translateX, gamePanel.translateY, gamePanel.rotation, gamePanel.zooming);
+        gamePanel.privateArea.draw(g);
+    }
+
+    public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player){
+        if (ObjectFunctions.isStackBottom(objectInstance)) {
+            drawStack(g, ObjectFunctions.getAboveStack(gameInstance, objectInstance), gameInstance, player.id, 1);
+            int playerId = ObjectFunctions.getStackOwner(gameInstance, getStack(gameInstance, objectInstance));
+            if (playerId != -1) {
+                Player p = gameInstance.getPlayer(playerId);
+                drawStackBorder(gameInstance, g, p, objectInstance, 10, p.color, 1);
+            }
+            else{
+                g.setColor(gamePanel.stackColor);
+                drawStackBorder(gameInstance, g, player, objectInstance, 5, gamePanel.stackColor,1, true);
+            }
+        }
+
+    }
+
+    public static void drawPlayerMarkers(Graphics g, GameInstance gameInstance, Player player, String infoText)
+    {
+        for(Player p: gameInstance.players) {
+            g.setColor(p.color);
+            g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
+            g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
+            g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
+            //g.drawString(p.name, p.mouseXPos, p.mouseYPos);
+            drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, p.color, 1);
+
+        }
+        if (player != null)
+        {
+            g.setColor(player.color);
+            g.drawString(infoText, player.mouseXPos - 25, player.mouseYPos + 5);
+        }
+    }
+
+    public static void drawActiveObject(Graphics g, Player player, ObjectInstance activeObject){
+        int playerId = player == null ? -1 : player.id;
+        if(activeObject != null) {
+            drawObject(g, activeObject, playerId, 1);
+            if (player != null)
+            {
+                drawBorder(g, player, activeObject, 10, player.color, 1);
+            }
+        }
+    }
+
+    public static void drawSelectedObjects(GamePanel gamePanel, Graphics g,GameInstance gameInstance, Player player){
+        for(int id: gamePanel.selectedObjects)
+        {
+            ObjectInstance currentObject = gameInstance.objects.get(id);
+            if (ObjectFunctions.isStackBottom(currentObject))
+            {
+                drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1);
+            }
+        }
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setTransform(new AffineTransform());
+        if (gamePanel.activeObject == null && gamePanel.selectWidth > 0 && gamePanel.selectHeight > 0){
+            g.setColor(player.color);
+            g.drawRect(gamePanel.beginSelectPosX, gamePanel.beginSelectPosY, gamePanel.selectWidth, gamePanel.selectHeight);
+        }
+
+    }
+
+    public static void drawTokensInPrivateArea(GamePanel gamePanel, Graphics g, GameInstance gameInstance){
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setTransform(new AffineTransform());
+
+        ArrayList<ObjectInstance> inHand = new ArrayList<>();
+        int playerId = gamePanel.player == null ? -1 : gamePanel.player.id;
+        for (int i = 0;i < gameInstance.objects.size(); ++i)
+        {
+            ObjectInstance oi = gameInstance.objects.get(i);
+            if (oi.state.owner_id == playerId)
+            {
+                inHand.add(oi);
+            }
+        }
+        g2.translate(gamePanel.getWidth() / 2, gamePanel.getHeight());
+        if (inHand.size() != 0)
+        {
+            g2.rotate(-Math.PI * 0.5 + Math.PI / (inHand.size() * 2));
+            for (int i = 0; i < inHand.size(); ++i)
+            {
+                ObjectInstance objectInstance = gameInstance.objects.get(i);
+                BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
+                g2.translate(0, -250);
+                g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() *0.5),-(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
+                g2.translate(0, 250);
+                g2.rotate(Math.PI / (inHand.size()));
+            }
+        }
+        g2.setTransform(new AffineTransform());
+
+    }
 
     public static void drawStack(Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming) {
         if (isStackInPrivateArea(gameInstance, stackList))

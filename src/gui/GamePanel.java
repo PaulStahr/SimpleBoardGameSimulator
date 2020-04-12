@@ -1,10 +1,5 @@
 package gui;
 
-import static gameObjects.functions.DrawFunctions.drawBorder;
-import static gameObjects.functions.DrawFunctions.drawObject;
-import static gameObjects.functions.DrawFunctions.drawStack;
-import static gameObjects.functions.DrawFunctions.drawStackBorder;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -45,6 +40,8 @@ import geometry.Vector2d;
 import main.Player;
 import util.data.IntegerArrayList;
 
+import static gameObjects.functions.DrawFunctions.*;
+
 //import gameObjects.GameObjectInstanceEditAction;
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener, KeyListener, KeyEventDispatcher, MouseWheelListener, ActionListener, ComponentListener{
@@ -54,7 +51,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	private static final long serialVersionUID = 3579141032474558913L;
 	private static final Logger logger = LoggerFactory.getLogger(GamePanel.class);
 	GameInstance gameInstance;
-	ObjectInstance activeObject = null;
+	public ObjectInstance activeObject = null;
 	int objOrigPosX = -1;
 	int objOrigPosY = -1;
 	public Player player;
@@ -69,34 +66,35 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	boolean isLeftMouseKeyHold = false;
 
-	int mouseX = -1;
-	int mouseY = -1;
+	public int mouseX = -1;
+	public int mouseY = -1;
 
-	int mouseWheelValue = 0;
+	public int mouseWheelValue = 0;
 	int zoomFactor = 0;
-	int translateX = 0;
-	int translateY = 0;
-	double zooming = 1;
-	double rotation = 0;
+	public int translateX = 0;
+	public int translateY = 0;
+	public double zooming = 1;
+	public double rotation = 0;
 
 
 	ControlPanel controlPanel = new ControlPanel();
 	public PrivateArea privateArea = new PrivateArea();
 
-	Color mouseColor = Color.black;
-	Color dragColor = Color.red;
-	Color stackColor = Color.green;
-	String infoText = "";
+	public Color mouseColor = Color.black;
+	public Color dragColor = Color.red;
+	public Color stackColor = Color.green;
+	public String infoText = "";
+
 	private final Vector2d mouseGamePos = new Vector2d();
 	private final Vector2d mousePressedGamePos = new Vector2d();
 	private final Matrix3d gameTransform = new Matrix3d();
 
 	boolean isSelectStarted = false;
-	IntegerArrayList selectedObjects = new IntegerArrayList();
-	int beginSelectPosX = 0;
-	int beginSelectPosY = 0;
-	int selectWidth = 0;
-	int selectHeight = 0;
+	public IntegerArrayList selectedObjects = new IntegerArrayList();
+	public int beginSelectPosX = 0;
+	public int beginSelectPosY = 0;
+	public int selectWidth = 0;
+	public int selectHeight = 0;
 
 
 	public GamePanel(GameInstance gameInstance)
@@ -134,99 +132,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void paintComponent(Graphics g)
 	{
-		g.clearRect(0, 0, getWidth(), getHeight());
-		//TODO Florian:sometimes images are drawn twice (the active object?)
-		g.drawString(String.valueOf(mouseWheelValue), mouseX, mouseY);
-		g.drawImage(gameInstance.game.background, 0, 0, getWidth(), getHeight(), Color.BLACK, null);
-		Graphics2D g2 = (Graphics2D)g;
-		g2.translate(getWidth() / 2, getHeight() / 2);
-		g2.scale(zooming, zooming);
-		g2.rotate(rotation);
-		g2.translate(translateX, translateY);
-		RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-	    g2.setRenderingHints(rh);
-		privateArea.setArea(getWidth()/4, getHeight()-250, getWidth()/2, 500, translateX, translateY, rotation, zooming);
-		privateArea.draw(g);
-		int playerid = player == null ? -1 : player.id;
-		for (int i = 0; i < gameInstance.objects.size(); ++i) {
-			ObjectInstance oi = gameInstance.objects.get(i);
-			if (ObjectFunctions.isStackBottom(oi)) {
-				drawStack(g, ObjectFunctions.getAboveStack(gameInstance, oi), gameInstance, playerid, 1);
-				int playerId = ObjectFunctions.getStackOwner(gameInstance, ObjectFunctions.getStack(gameInstance, oi));
-				if (playerId != -1) {
-					Player p = gameInstance.getPlayer(playerId);
-					drawStackBorder(gameInstance, g, p, oi, 10, p.color, 1);
-				}
-				else{
-					g.setColor(stackColor);
-					drawStackBorder(gameInstance, g, player, oi, 5, stackColor,1, true);
-				}
-			}
+		drawBoard(this, g, gameInstance);
+		for (ObjectInstance oi : gameInstance.objects) {
+			drawTokenObjects(this, g, gameInstance, oi, player);
 		}
-		if(activeObject != null) {
-			drawObject(g, activeObject, playerid, 1);
-			if (player != null)
-			{
-				drawBorder(g, player, activeObject, 10, player.color, 1);
-			}
-		}
+		drawActiveObject(g, player, activeObject);
+		drawPlayerMarkers(g, gameInstance, player, infoText);
+		drawSelectedObjects(this, g, gameInstance, player);
+		drawTokensInPrivateArea(this, g, gameInstance);
 
-		g.setColor(mouseColor);
-		for(Player p: gameInstance.players) {
-			g.setColor(p.color);
-			g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
-			g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
-			g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
-			//g.drawString(p.name, p.mouseXPos, p.mouseYPos);
-			drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, p.color, 1);
-
-		}
-		if (player != null)
-		{
-			g.setColor(player.color);
-			g.drawString(infoText, player.mouseXPos - 25, player.mouseYPos + 5);
-		}
-
-
-		for(int id: selectedObjects)
-		{
-			ObjectInstance currentObject = gameInstance.objects.get(id);
-			if (ObjectFunctions.isStackBottom(currentObject))
-			{
-				drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1);
-			}
-		}
-		g2.setTransform(new AffineTransform());
-		if (activeObject == null && selectWidth > 0 && selectHeight > 0){
-			g.setColor(player.color);
-			g.drawRect(beginSelectPosX, beginSelectPosY, selectWidth, selectHeight);
-		}
-		
-		ArrayList<ObjectInstance> inHand = new ArrayList<>();
-		for (int i = 0;i < gameInstance.objects.size(); ++i)
-		{
-			ObjectInstance oi = gameInstance.objects.get(i);
-			if (oi.state.owner_id == playerid)
-			{
-				inHand.add(oi);
-			}
-		}
-		g2.translate(getWidth() / 2, getHeight());
-		if (inHand.size() != 0)
-		{
-			g2.rotate(-Math.PI * 0.5 + Math.PI / (inHand.size() * 2));
-			for (int i = 0; i < inHand.size(); ++i)
-			{
-				ObjectInstance objectInstance = gameInstance.objects.get(i);
-				BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerid);
-				g2.translate(0, -300);
-				g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() *0.5),-(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
-				g2.translate(0, 300);
-				g2.rotate(Math.PI / (inHand.size()));
-			}
-		}
-		
-		g2.setTransform(new AffineTransform());
 	}
 
 	@Override
