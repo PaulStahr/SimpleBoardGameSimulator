@@ -15,6 +15,7 @@ import gameObjects.instance.GameInstance;
 import gui.GameWindow;
 import gui.ServerLobbyWindow;
 import io.GameIO;
+import logging.LockbackUtil;
 import net.AsynchronousGameConnection;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
@@ -25,9 +26,15 @@ public class Main {
 	
 	/* This is the main() function */
 	public static final void main (String args[]){
+		//LockbackUtil.setLoglevel("WARN");
     	for (int i = 0; i < args.length; ++i)
     	{
-    		if (args[i].equals("--server"))
+    		if (args[i].equals("--loglevel"))
+    		{
+       			++i;
+    			LockbackUtil.setLoglevel(args[i].toUpperCase());
+    		}
+    		else if (args[i].equals("--server"))
     		{
     			GameServer gs = new GameServer(Integer.parseInt(args[i + 1]));
     	    	gs.start();
