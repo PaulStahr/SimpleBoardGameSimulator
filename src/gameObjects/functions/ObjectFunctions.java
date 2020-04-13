@@ -1,9 +1,7 @@
 package gameObjects.functions;
 
-import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.util.Collections;
 
 import org.slf4j.Logger;
@@ -232,14 +230,6 @@ public class ObjectFunctions {
     public static void moveObjectTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int posX, int posY) {
         objectInstance.state.posX = posX;
         objectInstance.state.posY = posY;
-        if(gamePanel.privateArea != null && gamePanel.privateArea.contains(posX, posY))
-        {
-            objectInstance.state.owner_id = player.id;
-        }
-        else
-        {
-            objectInstance.state.owner_id = -1;
-        }
         gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
     }
 
@@ -277,14 +267,6 @@ public class ObjectFunctions {
         for (int i = 0; i < idList.size(); i++) {
             ObjectInstance currentObject = gameInstance.objects.get(idList.get(i));
             moveObjectTo(gamePanel, gameInstance, player, currentObject, posX + relativeX.get(i), posY + relativeY.get(i));
-            if(gamePanel.privateArea != null && gamePanel.privateArea.shape.contains(posX, posY))
-            {
-                currentObject.state.inPrivateArea = true;
-            }
-            else
-            {
-                currentObject.state.inPrivateArea = false;
-            }
         }
     }
 
@@ -364,7 +346,7 @@ public class ObjectFunctions {
      * @param stackObject Instance of stack
      * @param posX Target x position
      * @param posY Target y position
-     * @param include if stackObject should be inluded default is true
+     * @param include if stackObject should be included default is true
      */
     public static void moveBelowStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY, boolean include) {
         moveStackTo(gamePanel, gameInstance, player, getBelowStack(gameInstance, stackObject, include), posX, posY);
@@ -379,7 +361,7 @@ public class ObjectFunctions {
      * @param player Current player
      * @param stackObject Instance of stack
      * @param targetObjectInstance Target object
-     * @param include if stackObject should be inluded default is true
+     * @param include if stackObject should be included default is true
      */
     public static void moveBelowStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance targetObjectInstance, boolean include) {
         moveStackTo(gamePanel, gameInstance, player, getBelowStack(gameInstance, stackObject, include), targetObjectInstance);
@@ -634,28 +616,36 @@ public class ObjectFunctions {
     }
 
     //Get element nearest to xPos, yPos with some inaccuracy
-    public static ObjectInstance getNearestObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, int maxInaccuracy, ObjectInstance ignoredObject) {
+    public static ObjectInstance getNearestObjectByPosition(GamePanel gamePanel, GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, int maxInaccuracy, ObjectInstance ignoredObject) {
         ObjectInstance activeObject = null;
         int distance = Integer.MAX_VALUE;
         boolean insideObject = false;
-        for (ObjectInstance oi : gameInstance.objects) {
-            if (oi != ignoredObject) {
-                int xDiff = (int) (xPos - (oi.state.posX*zooming + oi.getWidth(player.id) / 2)), yDiff = (int) (yPos - (oi.state.posY*zooming + oi.getHeight(player.id) / 2));
-                int dist = xDiff * xDiff + yDiff * yDiff;
+        if(isInPrivateArea(gamePanel, xPos, yPos)) {
+            Point2D transformedPoint = gamePanel.privateArea.transformPoint(xPos, yPos);
+            if (gamePanel.privateArea.privateObjects.size() > 0) {
+                activeObject = gameInstance.objects.get(gamePanel.privateArea.getObjectIdByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY()));
+            }
+        }
+        else {
+            for (ObjectInstance oi : gameInstance.objects) {
+                if (oi != ignoredObject) {
+                    int xDiff = (int) (xPos - (oi.state.posX * zooming + oi.getWidth(player.id) / 2)), yDiff = (int) (yPos - (oi.state.posY * zooming + oi.getHeight(player.id) / 2));
+                    int dist = xDiff * xDiff + yDiff * yDiff;
 
-                double sin = Math.sin(oi.state.rotation), cos = Math.cos(oi.state.rotation);
-                double transformedX = xPos * cos + yPos * sin;
-                double transformedY = -xPos* sin + yPos * cos;
-                boolean leftIn = (transformedX > (oi.state.posX*zooming - maxInaccuracy));
-                boolean rightIn = (transformedX < (oi.state.posX*zooming + oi.getWidth(player.id) + maxInaccuracy));
-                boolean topIn = (transformedY < (oi.state.posY*zooming + oi.getHeight(player.id) + maxInaccuracy));
-                boolean bottomIn = (transformedY > (oi.state.posY*zooming - maxInaccuracy));
+                    double sin = Math.sin(oi.state.rotation), cos = Math.cos(oi.state.rotation);
+                    double transformedX = xPos * cos + yPos * sin;
+                    double transformedY = -xPos * sin + yPos * cos;
+                    boolean leftIn = (transformedX > (oi.state.posX * zooming - maxInaccuracy));
+                    boolean rightIn = (transformedX < (oi.state.posX * zooming + oi.getWidth(player.id) + maxInaccuracy));
+                    boolean topIn = (transformedY < (oi.state.posY * zooming + oi.getHeight(player.id) + maxInaccuracy));
+                    boolean bottomIn = (transformedY > (oi.state.posY * zooming - maxInaccuracy));
 
-                if (dist < distance) {
-                    insideObject = leftIn && rightIn && topIn && bottomIn;
-                    if (insideObject) {
-                        activeObject = oi;
-                        distance = dist;
+                    if (dist < distance) {
+                        insideObject = leftIn && rightIn && topIn && bottomIn;
+                        if (insideObject) {
+                            activeObject = oi;
+                            distance = dist;
+                        }
                     }
                 }
             }
@@ -664,8 +654,8 @@ public class ObjectFunctions {
         return activeObject;
     }
 
-    public static ObjectInstance getNearestObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, ObjectInstance ignoredObject) {
-        ObjectInstance currentObject = getNearestObjectByPosition(gameInstance, player, xPos, yPos, zooming, 0, ignoredObject);
+    public static ObjectInstance getNearestObjectByPosition(GamePanel gamePanel, GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, ObjectInstance ignoredObject) {
+        ObjectInstance currentObject = getNearestObjectByPosition(gamePanel, gameInstance, player, xPos, yPos, zooming, 0, ignoredObject);
         if (haveSamePositions(getStackTop(gameInstance, currentObject), getStackBottom(gameInstance, currentObject)))
         {
             return getStackTop(gameInstance, currentObject);
@@ -674,6 +664,11 @@ public class ObjectFunctions {
             return currentObject;
         }
 
+    }
+
+    public static ObjectInstance getNearestObjectInPrivateArea(GamePanel gamePanel, GameInstance gameInstance){
+        ObjectInstance activeObject = null;
+        return activeObject;
     }
 
 
@@ -755,14 +750,15 @@ public class ObjectFunctions {
     }
 
     //take an object in the hand of player
-    public static void takeObjects(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
+    public static void takeObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         IntegerArrayList stackIds = getStack(gameInstance, objectInstance);
         for(int id: stackIds)
         {
             ObjectInstance currentInstance = gameInstance.objects.get(id);
             if (player.id != currentInstance.state.owner_id && currentInstance.state.owner_id == -1) {
                 currentInstance.state.owner_id = player.id;
-                gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentInstance));
+                gamePanel.privateArea.privateObjects.add(currentInstance.id);
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentInstance));
             }
         }
     }
@@ -781,38 +777,13 @@ public class ObjectFunctions {
     }
 
 
-    public static ObjectInstance setActiveObjectByMouseAndKey(GameInstance gameInstance, Vector2 mouse, boolean[] loggedKeys, int maxInaccuracy) {
+    public static ObjectInstance setActiveObjectByMouseAndKey(GamePanel gamePanel, GameInstance gameInstance, Player player, Vector2 mouse, boolean[] loggedKeys, int maxInaccuracy) {
         ObjectInstance activeObject = null;
         int pressedXPos = mouse.getXI();
         int pressedYPos = mouse.getYI();
-        int distance = Integer.MAX_VALUE;
-        boolean insideObject = false;
-        for (int i = 0; i < gameInstance.objects.size(); ++i) {
-            ObjectInstance oi = gameInstance.objects.get(i);
-            int xDiff = pressedXPos - (oi.state.posX + oi.getWidth(-1) / 2), yDiff = pressedYPos - (oi.state.posY + oi.getHeight(-1) / 2);
-            int dist = xDiff * xDiff + yDiff * yDiff;
-
-            boolean leftIn = (pressedXPos > (oi.state.posX - maxInaccuracy));
-            boolean rightIn = (pressedXPos < (oi.state.posX + oi.getWidth(-1) + maxInaccuracy));
-            boolean topIn = (pressedYPos < (oi.state.posY + oi.getHeight(-1) + maxInaccuracy));
-            boolean bottomIn = (pressedYPos > (oi.state.posY - maxInaccuracy));
-
-            if (dist < distance) {
-                insideObject = leftIn && rightIn && topIn && bottomIn;
-                if (insideObject) {
-                    if (!loggedKeys[KeyEvent.VK_SHIFT] && ObjectFunctions.haveSamePositions(oi, ObjectFunctions.getStackTop(gameInstance, oi))) {
-                        activeObject = ObjectFunctions.getStackTop(gameInstance, oi);
-                    } else if (!ObjectFunctions.haveSamePositions(oi, ObjectFunctions.getStackTop(gameInstance, oi))) {
-                        activeObject = oi;
-                    } else {
-                        activeObject = ObjectFunctions.getStackBottom(gameInstance, oi);
-                    }
-                    distance = dist;
-                }
-            }
-        }
-        if (!insideObject) {
-            activeObject = null;
+        activeObject = getNearestObjectByPosition(gamePanel,gameInstance, player,pressedXPos,pressedYPos,1,null);
+        if (loggedKeys[KeyEvent.VK_SHIFT]){
+            activeObject = getStackBottom(gameInstance, activeObject);
         }
         return activeObject;
     }
@@ -829,9 +800,20 @@ public class ObjectFunctions {
 
     }
 
-    public static void releaseObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, double zooming, int maxInaccuracy) {
+    public static void releaseObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
         if(activeObject != null) {
-            ObjectInstance objectInstance = getNearestObjectByPosition(gameInstance, player, activeObject.state.posX, activeObject.state.posY, zooming, activeObject);
+            if (gamePanel.privateArea != null && !gamePanel.privateArea.privateObjects.contains(activeObject.id) &&  gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
+                gamePanel.privateArea.insertObject(activeObject.id, posX, posY);
+                activeObject.state.owner_id = player.id;
+                activeObject.state.inPrivateArea = true;
+            } else if(!gamePanel.privateArea.containsBoardCoordinates(posX, posY)) {
+                activeObject.state.owner_id = -1;
+                activeObject.state.inPrivateArea = false;
+            }
+        }
+
+        if(activeObject != null && activeObject.state.owner_id != player.id) {
+            ObjectInstance objectInstance = getNearestObjectByPosition(gamePanel, gameInstance, player, activeObject.state.posX, activeObject.state.posY, zooming, activeObject);
             if (isStackCollected(gameInstance, objectInstance)) {
                 if (objectInstance != activeObject) {
                     ObjectFunctions.mergeStacks(gamePanel, gameInstance, player, activeObject, objectInstance);
@@ -839,15 +821,15 @@ public class ObjectFunctions {
             }
             else
             {
-                Pair<ObjectInstance, ObjectInstance> insertObjects = getInsertObjects(gameInstance, player, activeObject.state.posX, activeObject.state.posY, zooming, activeObject);
+                Pair<ObjectInstance, ObjectInstance> insertObjects = getInsertObjects(gamePanel, gameInstance, player, activeObject.state.posX, activeObject.state.posY, zooming, activeObject);
                 insertIntoStack(gamePanel, gameInstance, player, activeObject, insertObjects.getKey(), insertObjects.getValue(), activeObject.getWidth(player.id)/2);
             }
         }
     }
 
 
-    public static void releaseObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, double zooming) {
-        releaseObjects(gamePanel, gameInstance, player, activeObject, zooming, activeObject.getWidth(player.id) / 3);
+    public static void releaseObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming) {
+        releaseObjects(gamePanel, gameInstance, player, activeObject, posX, posY, zooming, activeObject.getWidth(player.id) / 3);
     }
 
     public static ObjectInstance findNeighbouredStackTop(GameInstance gameInstance, Player player, ObjectInstance activeObject, int maxInaccuracy) {
@@ -897,8 +879,8 @@ public class ObjectFunctions {
         }
     }
 
-    public static Pair<ObjectInstance, ObjectInstance> getInsertObjects(GameInstance gameInstance, Player player, int posX, int posY, double zooming, ObjectInstance ignoredObject){
-        ObjectInstance objectInstance = getNearestObjectByPosition(gameInstance, player, posX, posY, zooming, ignoredObject);
+    public static Pair<ObjectInstance, ObjectInstance> getInsertObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, int posX, int posY, double zooming, ObjectInstance ignoredObject){
+        ObjectInstance objectInstance = getNearestObjectByPosition(gamePanel, gameInstance, player, posX, posY, zooming, ignoredObject);
         if (hasAboveObject(objectInstance) && hasBelowObject(objectInstance))
         {
             if(getDistanceToObjectCenter(getAboveObject(gameInstance, objectInstance), posX, posY, player.id) < getDistanceToObjectCenter(getBelowObject(gameInstance, objectInstance), posX, posY, player.id))
@@ -939,9 +921,7 @@ public class ObjectFunctions {
                         objectInstance.state.aboveInstanceId = objectAbove.id;
                         moveObjectTo(gamePanel, gameInstance, player, objectInstance, objectAbove);
                         moveAboveStackTo(gamePanel, gameInstance, player,objectInstance, objectInstance.state.posX - objectInstance.getWidth(player.id)/2, objectInstance.state.posY, false);
-                        //moveAboveStackTo(gameInstance, player, objectInstance);
-                        //moveAboveStackTo(gamePanelId, gameInstance, player, objectInstance, objectInstance.state.posX + cardMargin, objectInstance.state.posY, false);
-                    }
+                     }
                 }
             }
         }
@@ -1067,15 +1047,15 @@ public class ObjectFunctions {
 
     public static boolean isInPrivateArea(GamePanel gamePanel,int posX, int posY)
     {
-        return gamePanel.privateArea.contains(posX, posY);
+        return gamePanel.privateArea.containsBoardCoordinates(posX, posY);
     }
 
 
-    public static boolean isStackInPrivateArea(GameInstance gameInstance, IntegerArrayList stackIds)
+    public static boolean isStackInPrivateArea(GamePanel gamePanel, GameInstance gameInstance, IntegerArrayList stackIds)
     {
         if (stackIds.size()>0) {
             for (int id : stackIds) {
-                if (!gameInstance.objects.get(id).state.inPrivateArea)
+                if (!gamePanel.privateArea.privateObjects.contains(id))
                     return false;
             }
             return true;

@@ -1,30 +1,37 @@
 package gui;
 
+import util.data.IntegerArrayList;
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Point2D;
+
+import static java.lang.Integer.max;
 
 public class PrivateArea {
     public int width = 0;
     public int height = 0;
     public Shape shape = null;
     public int elementNumber = 0;
+    public IntegerArrayList privateObjects = new IntegerArrayList();
+    public AffineTransform objectTransform;
     private final AffineTransform boardTransform;
     private final AffineTransform inverseBoardTransform;
-       
-    public PrivateArea(AffineTransform boardTransform, AffineTransform inverseBoardTransformation){
-    	this.boardTransform = boardTransform;
-    	this.inverseBoardTransform = inverseBoardTransformation;
+    public Point2D.Double origin = new Point2D.Double();
+
+    public PrivateArea(AffineTransform boardTransform, AffineTransform inverseBoardTransformation) {
+        this.boardTransform = boardTransform;
+        this.inverseBoardTransform = inverseBoardTransformation;
     }
 
-    public void setArea(double posX, double posY, double width,  double height, int translateX, int translateY, double rotation, double zooming) {
+    public void setArea(double posX, double posY, double width, double height, int translateX, int translateY, double rotation, double zooming) {
         Shape privateArea = new Arc2D.Double(posX, posY, width, height, 0, 180, Arc2D.OPEN);
+        origin.setLocation(posX + width / 2, posY + height / 2);
         this.shape = privateArea;
     }
 
-    public void draw(Graphics g)
-    {
+    public void draw(Graphics g) {
         Graphics2D graphics = (Graphics2D) g;
         AffineTransform tmp = graphics.getTransform();
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -39,8 +46,88 @@ public class PrivateArea {
         graphics.setTransform(tmp);
     }
 
-    public boolean contains(int posX, int posY){
+    public boolean containsBoardCoordinates(int posX, int posY) {
         Point2D transformedPoint = boardTransform.transform(new Point2D.Double(posX, posY), null);
-        return shape.contains(transformedPoint);
+        if (transformedPoint != null) {
+            return shape.contains(transformedPoint);
+        } else
+            return false;
+    }
+    public boolean containsScreenCoordinates(int posX, int posY) {
+        return shape.contains(posX, posY);
+    }
+
+    public void setPrivateObjects(IntegerArrayList objectIds) {
+        this.privateObjects = objectIds;
+    }
+
+    public double getAngle(int posX, int posY) {
+        //Point2D point = new Point2D.Double(posX, posY);
+        Point2D baseLine = new Point2D.Double(1, 0);
+        Point2D point = new Point2D.Double(posX - origin.getX(), origin.getY() - posY);
+        //return point.getY();
+        return 180 - Math.toDegrees(Math.atan2(point.getY() - baseLine.getY(), point.getX() - baseLine.getX()));
+    }
+
+    public int getSectionByPosition(int posX, int posY){
+        if (privateObjects.size() > 0) {
+            double sectionSize = 180 / privateObjects.size();
+            return (int) (getAngle(posX, posY) / sectionSize);
+        } else {
+            return -1;
+        }
+    }
+
+    public int getObjectIdByPosition(int posX, int posY) {
+        if (privateObjects.size() > 0) {
+            return privateObjects.get(getSectionByPosition(posX, posY));
+        } else {
+            return -1;
+        }
+
+    }
+
+    public int getInsertPosition(int posX, int posY) {
+        if (privateObjects.size() > 0) {
+            double sectionSize = 180 / (privateObjects.size()*2);
+            double angle = getAngle(posX, posY);
+            int sectionNum = (int) (angle / sectionSize);
+            return (sectionNum + 1)/2;
+        } else {
+            return -1;
+        }
+
+    }
+
+    public Point2D transformPoint(int posX, int posY) {
+        Point2D transformedPoint = boardTransform.transform(new Point2D.Double(posX, posY), null);
+        return transformedPoint;
+    }
+
+    public void insertObject(int objectId, int posX, int posY) {
+        int index = getInsertPosition(posX, posY);
+        if (privateObjects.size() > 0) {
+            privateObjects.add(privateObjects.last());
+            for (int i = privateObjects.size() - 2; i > index; --i) {
+                privateObjects.set(i, privateObjects.get(i - 1));
+            }
+            if (privateObjects.size() > index) {
+                privateObjects.set(index, objectId);
+            }
+        } else {
+            privateObjects.add(objectId);
+        }
+    }
+
+    public void removeObject(int index) {
+        if(index < privateObjects.size()) {
+            for (int i = index + 1; i < privateObjects.size(); ++i) {
+                privateObjects.set(i-1, privateObjects.get(i));
+            }
+            privateObjects.pop();
+        }
+        else if(privateObjects.size() == 1){
+            privateObjects.pop();
+        }
     }
 }

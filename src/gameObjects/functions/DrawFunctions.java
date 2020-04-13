@@ -4,7 +4,6 @@ import static gameObjects.functions.ObjectFunctions.getStack;
 import static gameObjects.functions.ObjectFunctions.getStackBottom;
 import static gameObjects.functions.ObjectFunctions.getStackTop;
 import static gameObjects.functions.ObjectFunctions.haveSamePositions;
-import static gameObjects.functions.ObjectFunctions.isInPrivateArea;
 import static gameObjects.functions.ObjectFunctions.isStackCollected;
 import static gameObjects.functions.ObjectFunctions.isStackInPrivateArea;
 
@@ -45,7 +44,7 @@ public class DrawFunctions {
 
     public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player){
         if (ObjectFunctions.isStackBottom(objectInstance)) {
-            drawStack(g, ObjectFunctions.getAboveStack(gameInstance, objectInstance), gameInstance, player.id, 1);
+            drawStack(gamePanel, g, ObjectFunctions.getAboveStack(gameInstance, objectInstance), gameInstance, player.id, 1);
             int playerId = ObjectFunctions.getStackOwner(gameInstance, getStack(gameInstance, objectInstance));
             if (playerId != -1) {
                 Player p = gameInstance.getPlayer(playerId);
@@ -61,19 +60,31 @@ public class DrawFunctions {
 
     public static void drawPlayerMarkers(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, String infoText)
     {
+        Graphics2D g2 = (Graphics2D)g;
+        AffineTransform tmp = g2.getTransform();
         for(Player p: gameInstance.players) {
             g.setColor(p.color);
-            Graphics2D g2 = (Graphics2D)g;
+
             g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
-            g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
-            g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
 
-            if(isInPrivateArea(gamePanel, p.mouseXPos, p.mouseYPos))
-                p.actionString = "Private Area";
+            //if(isInPrivateArea(gamePanel, p.mouseXPos, p.mouseYPos))
+                //TODO p.actionString = "Private Area";
 
-            g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
+            if(p.id == player.id)
+            {
+                g2.setTransform(new AffineTransform());
+                g.fillRect(gamePanel.mouseX - 5, gamePanel.mouseY - 5, 10, 10);
+                g.drawString(p.name, gamePanel.mouseX + 15, gamePanel.mouseY + 5);
+                g.drawString(p.actionString, gamePanel.mouseX - 5, gamePanel.mouseY - 20);
+                g2.setTransform(tmp);
+            }
+            else {
+                g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
+                g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
+                g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
+            }
             //g.drawString(p.name, p.mouseXPos, p.mouseYPos);
-            drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, p.color, 1);
+            drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gamePanel, gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, p.color, 1);
             g2.scale(gamePanel.zooming, gamePanel.zooming);
         }
         if (player != null)
@@ -81,16 +92,29 @@ public class DrawFunctions {
             g.setColor(player.color);
             g.drawString(infoText, player.mouseXPos - 25, player.mouseYPos + 5);
         }
+        g2.setTransform(tmp);
     }
 
-    public static void drawActiveObject(Graphics g, Player player, ObjectInstance activeObject){
+    public static void drawActiveObject(GamePanel gamePanel, Graphics g, Player player, ObjectInstance activeObject) {
         int playerId = player == null ? -1 : player.id;
-        if(activeObject != null && activeObject.state.owner_id != playerId) {
+        if (activeObject != null && !activeObject.state.inPrivateArea) {
             drawObject(g, activeObject, playerId, 1);
-            if (player != null)
-            {
+            if (player != null) {
                 drawBorder(g, player, activeObject, 10, player.color, 1);
             }
+        }
+        if (activeObject != null && activeObject.state.inPrivateArea && activeObject.state.owner_id==playerId) {
+            Graphics2D g2d = (Graphics2D)g;
+            AffineTransform tmp = g2d.getTransform();
+            AffineTransform transform = new AffineTransform();
+            transform.translate(gamePanel.getWidth()/2, gamePanel.getHeight());
+            transform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.privateObjects.size() * 2));
+            transform.rotate(gamePanel.privateArea.privateObjects.indexOf(activeObject.id) * Math.PI / (gamePanel.privateArea.privateObjects.size()));
+            transform.translate(-activeObject.getWidth(player.id) / 2, -activeObject.getHeight(player.id) / 2);
+            transform.translate(0, -250);
+
+            drawPrivateAreaBorder(g, player, activeObject, 10, player.color, transform);
+            g2d.setTransform(tmp);
         }
     }
 
@@ -105,7 +129,7 @@ public class DrawFunctions {
         }
         Graphics2D g2 = (Graphics2D)g;
         g2.setTransform(new AffineTransform());
-        if (gamePanel.activeObject == null && gamePanel.selectWidth > 0 && gamePanel.selectHeight > 0){
+        if (gamePanel.activeObject == null && gamePanel.selectWidth > 0 && gamePanel.selectHeight > 0 && !gamePanel.mouseInPrivateArea){
             g.setColor(player.color);
             g.drawRect(gamePanel.beginSelectPosX, gamePanel.beginSelectPosY, gamePanel.selectWidth, gamePanel.selectHeight);
         }
@@ -114,40 +138,29 @@ public class DrawFunctions {
 
     public static void drawTokensInPrivateArea(GamePanel gamePanel, Graphics g, GameInstance gameInstance){
         Graphics2D g2 = (Graphics2D)g;
+        AffineTransform tmp = g2.getTransform();
         g2.setTransform(new AffineTransform());
-
-        ArrayList<ObjectInstance> inHand = new ArrayList<>();
         int playerId = gamePanel.player == null ? -1 : gamePanel.player.id;
-        for (int i = 0;i < gameInstance.objects.size(); ++i)
-        {
-            ObjectInstance oi = gameInstance.objects.get(i);
-            if (oi.state.owner_id == playerId)
-            {
-                inHand.add(oi);
-            }
-        }
         g2.translate(gamePanel.getWidth() / 2, gamePanel.getHeight());
-        if (inHand.size() != 0)
+        if (gamePanel.privateArea.privateObjects.size() != 0)
         {
-            g2.rotate(-Math.PI * 0.5 + Math.PI / (inHand.size() * 2));
-            for (int i = 0; i < inHand.size(); ++i)
+            g2.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.privateObjects.size() * 2));
+            for(int id : gamePanel.privateArea.privateObjects)
             {
-                ObjectInstance objectInstance = inHand.get(i);
+                ObjectInstance objectInstance = gameInstance.objects.get(id);
                 BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
                 g2.translate(0, -250);
-                g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() *0.5),-(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
+                g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() *0.5),-(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
                 g2.translate(0, 250);
-                g2.rotate(Math.PI / (inHand.size()));
+                g2.rotate(Math.PI / (gamePanel.privateArea.privateObjects.size()));
             }
         }
-        g2.setTransform(new AffineTransform());
-
+        g2.setTransform(tmp);
     }
 
-    public static void drawStack(Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming) {
-        if (isStackInPrivateArea(gameInstance, stackList))
+    public static void drawStack(GamePanel gamePanel, Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming) {
+        if (isStackInPrivateArea(gamePanel, gameInstance, stackList))
         {
-
         }
         else {
             if (haveSamePositions(gameInstance.objects.get(stackList.get(0)), gameInstance.objects.get(stackList.last()))) {
@@ -191,13 +204,33 @@ public class DrawFunctions {
         }
     }
 
-    public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming) {
+    public static void drawPrivateAreaBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, AffineTransform transform){
+        if (objectInstance != null) {
+            g.setColor(color);
+            Graphics2D g2d = (Graphics2D) g.create();
+            AffineTransform tmp = g2d.getTransform();
+            if(transform != null)
+                g2d.setTransform(transform);
+            g2d.setStroke(new BasicStroke(borderWidth));
+            g2d.drawRect(-borderWidth/2 ,-borderWidth/2, (int) (objectInstance.getWidth(player.id)) + borderWidth, (int) (objectInstance.getHeight(player.id)) + borderWidth);
+            g2d.setTransform(tmp);
+        }
+    }
+
+    public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, AffineTransform transform) {
         if (objectInstance != null && objectInstance.state.owner_id != player.id) {
             g.setColor(color);
             Graphics2D g2d = (Graphics2D) g.create();
+            AffineTransform tmp = g2d.getTransform();
+            if(transform != null)
+                g2d.setTransform(transform);
             g2d.setStroke(new BasicStroke(borderWidth));
             g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, (int) (objectInstance.getWidth(player.id) * zooming) + borderWidth, (int) (objectInstance.getHeight(player.id) * zooming) + borderWidth);
+            g2d.setTransform(tmp);
         }
+    }
+    public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming) {
+        drawBorder(g, player, objectInstance, borderWidth, color, zooming, null);
     }
 
     public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, boolean drawProperStack) {
@@ -225,24 +258,4 @@ public class DrawFunctions {
     public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, int zooming) {
         drawStackBorder(gameInstance, g, player, objectInstance, borderWidth, color, zooming, false);
     }
-
-    public static Shape setPrivateArea(Graphics g, double posX, double posY, double width, double height, double rotation, double zooming){
-        AffineTransform tx = new AffineTransform();
-        tx.scale(zooming, zooming);
-        Graphics2D graphics = (Graphics2D) g;
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-
-        // set background color
-        graphics.setPaint(Color.LIGHT_GRAY);
-        Shape privateArea = new Arc2D.Double(posX, posY, width, height, 0, 180, Arc2D.OPEN);
-
-        // set border color
-        graphics.setColor(Color.GRAY);
-        graphics.setStroke(new BasicStroke(2));
-        graphics.fill(privateArea);
-
-        return tx.createTransformedShape(privateArea);
-    }
-
 }
