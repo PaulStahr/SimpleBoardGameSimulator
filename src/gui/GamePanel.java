@@ -61,6 +61,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	int objOrigPosY = -1;
 	public Player player;
 	public final int id = (int)System.nanoTime();
+	private final IntegerArrayList ial = new IntegerArrayList();
 
 	int maxInaccuracy = 20;
 
@@ -159,12 +160,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		for (ObjectInstance oi : gameInstance.objects) {
 			if (oi.state.owner_id != player.id)
-				drawTokenObjects(this, g, gameInstance, oi, player);
+				drawTokenObjects(this, g, gameInstance, oi, player, ial);
 		}
 		drawActiveObject(this, g, player, activeObject);
 		drawPlayerMarkers(this, g, gameInstance, player, infoText);
+		drawSelectedObjects(this, g, gameInstance, player, ial);
 		drawTokensInPrivateArea(this, g, gameInstance);
-		drawSelectedObjects(this, g, gameInstance, player);
 
 		g.drawString(outText, 50, 50);
 	}
@@ -242,7 +243,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		mouseColor = player.color;
 		if(isSelectStarted) {
-			selectedObjects = ObjectFunctions.getObjectsInsideBox(gameInstance, beginSelectPosX - translateX - getWidth() / 2, beginSelectPosY - translateY - getHeight() / 2, selectWidth, selectHeight);
+			selectedObjects.clear();
+			ObjectFunctions.getObjectsInsideBox(gameInstance, beginSelectPosX - translateX - getWidth() / 2, beginSelectPosY - translateY - getHeight() / 2, selectWidth, selectHeight, selectedObjects);
 			selectHeight = 0;
 			selectWidth = 0;
 			beginSelectPosX = 0;

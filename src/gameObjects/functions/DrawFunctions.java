@@ -42,20 +42,24 @@ public class DrawFunctions {
         gamePanel.privateArea.draw(g);
     }
 
-    public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player){
+    public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, IntegerArrayList tmp){
         if (ObjectFunctions.isStackBottom(objectInstance)) {
-            drawStack(gamePanel, g, ObjectFunctions.getAboveStack(gameInstance, objectInstance), gameInstance, player.id, 1);
-            int playerId = ObjectFunctions.getStackOwner(gameInstance, getStack(gameInstance, objectInstance));
+         	ObjectFunctions.getAboveStack(gameInstance, objectInstance, tmp);
+            drawStack(gamePanel, g, tmp, gameInstance, player.id, 1);
+            tmp.clear();
+            getStack(gameInstance, objectInstance, tmp);
+            int playerId = ObjectFunctions.getStackOwner(gameInstance, tmp);
+            tmp.clear();
             if (playerId != -1) {
                 Player p = gameInstance.getPlayer(playerId);
-                drawStackBorder(gameInstance, g, p, objectInstance, 10, p.color, 1);
+                drawStackBorder(gameInstance, g, p, objectInstance, 10, p.color, 1, tmp);
             }
             else{
                 g.setColor(gamePanel.stackColor);
-                drawStackBorder(gameInstance, g, player, objectInstance, 5, gamePanel.stackColor,1, true);
+                drawStackBorder(gameInstance, g, player, objectInstance, 5, gamePanel.stackColor,1, true, tmp);
             }
         }
-
+        tmp.clear();
     }
 
     public static void drawPlayerMarkers(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, String infoText)
@@ -118,13 +122,14 @@ public class DrawFunctions {
         }
     }
 
-    public static void drawSelectedObjects(GamePanel gamePanel, Graphics g,GameInstance gameInstance, Player player){
+    public static void drawSelectedObjects(GamePanel gamePanel, Graphics g,GameInstance gameInstance, Player player, IntegerArrayList tmp){
         for(int id: gamePanel.selectedObjects)
         {
             ObjectInstance currentObject = gameInstance.objects.get(id);
             if (ObjectFunctions.isStackBottom(currentObject)&& currentObject.state.owner_id != player.id)
             {
-                drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1);
+                drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1, tmp);
+                tmp.clear();
             }
         }
         Graphics2D g2 = (Graphics2D)g;
@@ -133,7 +138,6 @@ public class DrawFunctions {
             g.setColor(player.color);
             g.drawRect(gamePanel.beginSelectPosX, gamePanel.beginSelectPosY, gamePanel.selectWidth, gamePanel.selectHeight);
         }
-
     }
 
     public static void drawTokensInPrivateArea(GamePanel gamePanel, Graphics g, GameInstance gameInstance){
@@ -233,12 +237,14 @@ public class DrawFunctions {
         drawBorder(g, player, objectInstance, borderWidth, color, zooming, null);
     }
 
-    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, boolean drawProperStack) {
+    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, boolean drawProperStack, IntegerArrayList tmp) {
         if (objectInstance != null) {
             if(isStackCollected(gameInstance, objectInstance))
             {
-                if((!drawProperStack || getStack(gameInstance, objectInstance).size() > 1))
+            	getStack(gameInstance, objectInstance, tmp);
+                if((!drawProperStack || tmp.size() > 1))
                     drawBorder(g, player, getStackTop(gameInstance, objectInstance), borderWidth, color, zooming);
+            	tmp.clear();
             }
             else
             {
@@ -255,7 +261,7 @@ public class DrawFunctions {
         }
     }
 
-    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, int zooming) {
-        drawStackBorder(gameInstance, g, player, objectInstance, borderWidth, color, zooming, false);
+    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, int zooming, IntegerArrayList tmp) {
+        drawStackBorder(gameInstance, g, player, objectInstance, borderWidth, color, zooming, false, tmp);
     }
 }

@@ -53,9 +53,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	
 	private void queueOutput(Object output)
 	{
+		if (logger.isDebugEnabled()){logger.debug("Addd queue " + id);}
 		synchronized(queuedOutputs)
 		{
-			if (logger.isDebugEnabled()){logger.debug("Addd queue " + id);}
 			queuedOutputs.add(output);
 			queuedOutputs.notifyAll();
 		}
@@ -187,24 +187,30 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 			Object outputObject = null;
 			synchronized(queuedOutputs)
 			{
-				if (queuedOutputs.size() == 0)
-				{
-					try {
-						objOut.flush();
-						output.flush();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					try {
-						queuedOutputs.wait();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
 				outputObject = queuedOutputs.size() == 0 ? null : queuedOutputs.pop();
 			}
+			if (outputObject == null)
+			{
+				try {
+					objOut.flush();
+					output.flush();
+				} catch (IOException e1) {
+					logger.error("Error during flushing output", e1);
+				}
+				synchronized(queuedOutputs)
+				{
+					if (queuedOutputs.size() == 0)
+					{					
+						try {
+							queuedOutputs.wait();
+						} catch (InterruptedException e) {
+							logger.error("Unexpected interrupt", e);
+						}
+					}
+					outputObject = queuedOutputs.size() == 0 ? null : queuedOutputs.pop();
+				}
+			}
+			
 			if (outputObject == null)
 			{
 				continue;
@@ -445,16 +451,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				{
 					case NetworkString.READ:
 					{
-						synchronized(queuedOutputs)
+						int id = -1;
+						if (split.size() > 2)
 						{
-							int id = -1;
-							if (split.size() > 2)
-							{
-								id = Integer.parseInt(split.get(2));
-							}
-							queuedOutputs.add(new CommandWrite(split.get(1), id));
-							queuedOutputs.notifyAll();
+							id = Integer.parseInt(split.get(2));
 						}
+						queueOutput(new CommandWrite(split.get(1), id));
 						break;
 					}
 					case NetworkString.WRITEBACK:
