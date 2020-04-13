@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/github/PaulStahr/SimpleBoardGameSimulator.svg?branch=master)](https://travis-ci.com/github/PaulStahr/SimpleBoardGameSimulator)
+[![Build Status](https://api.travis-ci.com/PaulStahr/SimpleBoardGameSimulator.svg?branch=master)](https://travis-ci.com/github/PaulStahr/SimpleBoardGameSimulator)
 
 Server:
 Verwaltet eine Liste von Spielen und Spielern. Bietet auch die Möglichkeit eine Spielsession zu verwalten, was auch der Standardweg ein Spiel miteinander zu spielen sein wird.
