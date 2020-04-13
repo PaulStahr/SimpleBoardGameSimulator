@@ -1,6 +1,11 @@
 package gui;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Point2D;
@@ -19,8 +24,15 @@ public class PrivateArea {
     }
 
     public void setArea(double posX, double posY, double width,  double height, int translateX, int translateY, double rotation, double zooming) {
-        Shape privateArea = new Arc2D.Double(posX, posY, width, height, 0, 180, Arc2D.OPEN);
-        this.shape = privateArea;
+    	if (this.shape instanceof Arc2D.Double)
+    	{
+    		((Arc2D.Double)this.shape).setArc(posX, posY, width, height, 0, 180, Arc2D.OPEN);
+    	}
+    	else
+    	{
+	        Shape privateArea = new Arc2D.Double(posX, posY, width, height, 0, 180, Arc2D.OPEN);
+	        this.shape = privateArea;
+    	}
     }
 
     public void draw(Graphics g)
