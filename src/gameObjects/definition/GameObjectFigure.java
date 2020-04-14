@@ -38,12 +38,34 @@ public class GameObjectFigure extends GameObject{
 
 	public static class FigureState  extends ObjectState
 	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 2412895719581742132L;
 		public boolean standing = true;
 		
+		public FigureState() {}
+		
+		public FigureState(FigureState figureState) {
+			set(figureState);
+		}
+
 		@Override
 		public int hashCode()
 		{
 			return super.hashCode() ^ (standing ? 0xF00BA : 0);
+		}
+		
+		@Override
+		public void set(ObjectState state)
+		{
+			super.set(state);
+			standing = ((FigureState)state).standing;
+		}
+
+		@Override
+		public ObjectState copy() {
+			return new FigureState(this);
 		}
 	}
 	

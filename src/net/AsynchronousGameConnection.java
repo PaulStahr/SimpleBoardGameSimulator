@@ -319,7 +319,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    {
 				    	if (action instanceof GameObjectInstanceEditAction)
 				 		{
-					    	GameIO.writeObjectStateToStream(((GameObjectInstanceEditAction)action).object.state, byteStream);
+					    	//GameIO.writeObjectStateToStreamXml(((GameObjectInstanceEditAction)action).object.state, byteStream);
 					 		strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.EDIT).append(' ')
 					 			.append(NetworkString.STATE).append(' ')
@@ -329,13 +329,15 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append(((GameObjectInstanceEditAction) action).object.id).append(' ')
 					 			.append( byteStream.size());
 					 		objOut.writeObject(strB.toString());
-					 		byteStream.writeTo(objOut);
+					 		GameIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).object.state);
+					 		//objOut.writeObject(((GameObjectInstanceEditAction)action).object.state.copy());
+					 		//byteStream.writeTo(objOut);
 					    	byteStream.reset();
 					     	strB.setLength(0);
 					   }
 				    	else if (action instanceof GamePlayerEditAction)
 				 		{
-					    	GameIO.writePlayerToStream(((GamePlayerEditAction)action).object, byteStream);
+					    	//GameIO.writePlayerToStream(((GamePlayerEditAction)action).object, byteStream);
 					 		strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.EDIT).append(' ')
 					 			.append(NetworkString.PLAYER).append(' ')
@@ -345,8 +347,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append(((GamePlayerEditAction) action).object.id).append(' ')
 					 			.append( byteStream.size());
 					 		objOut.writeObject(strB.toString());
-					 		byteStream.writeTo(objOut);
-					    	byteStream.reset();
+					 		GameIO.writePlayerToStreamObject(objOut, ((GamePlayerEditAction)action).object);
+					 		//byteStream.writeTo(objOut);
+					    	//byteStream.reset();
 					     	strB.setLength(0);
 					   }
 					   else if (action instanceof UsertextMessageAction)
@@ -445,7 +448,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}
 				String line = (String)inputObject;
 				StringUtils.split(line, ' ', split);
-				//System.out.println("inline: " + line);
 				
 				switch(split.get(0))
 				{
@@ -508,14 +510,18 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								int playerId = Integer.parseInt(split.get(5));
 								int objectId = Integer.parseInt(split.get(6));
 								int size = Integer.parseInt(split.get(7));
-								data = ArrayUtil.ensureLength(data, size);								
+								
+								ObjectInstance inst = gi.getObjectInstance(objectId);	
+								//ObjectState state = (ObjectState)objIn.readObject();
+								//inst.state.set(state);
+								GameIO.editStateFromStreamObject(objIn, inst.state);
+								
+								/*data = ArrayUtil.ensureLength(data, size);						
 								objIn.readFully(data, 0, size);
-								//byte data[] = objIn.readObject();
-								ObjectInstance inst = gi.getObjectInstance(objectId);
 								if (sourceId != id)
 								{
 									GameIO.editObjectStateFromStream(inst.state, new ByteArrayInputStream(data, 0, size));
-								}
+								}*/
 								Player pl = gi.getPlayer(playerId);
 								if (pl == null)
 								{
@@ -537,16 +543,19 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								int size = Integer.parseInt(split.get(7));
 								data = ArrayUtil.ensureLength(data, size);
 								
-								objIn.readFully(data, 0, size);
-								//byte data[] = objIn.readObject();
+								//objIn.readFully(data, 0, size);
 								Player object = gi.getPlayer(playerId);
 								if (object != null)
 								{
-									GameIO.editPlayerFromStream(new ByteArrayInputStream(data, 0, size), object);
+									GameIO.editPlayerFromStreamObject(objIn, object);
+									//GameIO.editPlayerFromStreamZip(new ByteArrayInputStream(data, 0, size), object);
 								}
 								else
 								{
-									gi.addPlayer(GameIO.readPlayerFromStream(new ByteArrayInputStream(data, 0, size)));
+									object = new Player("",  playerId);
+									GameIO.editPlayerFromStreamObject(objIn, object);
+									gi.addPlayer(object);
+									//gi.addPlayer(GameIO.readPlayerFromStream(new ByteArrayInputStream(data, 0, size)));
 								}
 								Player sourcePlayer = gi.getPlayer(sourcePlayerId);
 								if (sourcePlayer == null)
