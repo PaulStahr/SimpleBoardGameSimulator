@@ -39,6 +39,7 @@ public class PrivateArea {
 	        Shape privateArea = new Arc2D.Double(posX, posY, width, height, 0, 180, Arc2D.OPEN);
 	        this.shape = privateArea;
     	}
+    	this.origin.setLocation(posX + width/2, posY + height/2);
     }
 
     public void draw(Graphics g) {

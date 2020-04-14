@@ -69,7 +69,7 @@ public class DrawFunctions {
         for(Player p: gameInstance.players) {
             g.setColor(p.color);
 
-            g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
+
 
             //if(isInPrivateArea(gamePanel, p.mouseXPos, p.mouseYPos))
                 //TODO p.actionString = "Private Area";
@@ -77,18 +77,19 @@ public class DrawFunctions {
             if(p.id == player.id)
             {
                 g2.setTransform(new AffineTransform());
-                g.fillRect(gamePanel.mouseX - 5, gamePanel.mouseY - 5, 10, 10);
-                g.drawString(p.name, gamePanel.mouseX + 15, gamePanel.mouseY + 5);
-                g.drawString(p.actionString, gamePanel.mouseX - 5, gamePanel.mouseY - 20);
+                g2.fillRect(gamePanel.mouseX - 5, gamePanel.mouseY - 5, 10, 10);
+                g2.drawString(p.name, gamePanel.mouseX + 15, gamePanel.mouseY + 5);
+                g2.drawString(p.actionString, gamePanel.mouseX - 5, gamePanel.mouseY - 20);
                 g2.setTransform(tmp);
             }
             else {
+                g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
                 g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
                 g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
                 g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
             }
-            //g.drawString(p.name, p.mouseXPos, p.mouseYPos);
-            drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gamePanel, gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, p.color, 1);
+            //g.drawString(p.name, p.mouseXPos, p.mo    useYPos);
+            //drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gamePanel, gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, p.color, 1);
             g2.scale(gamePanel.zooming, gamePanel.zooming);
         }
         if (player != null)
