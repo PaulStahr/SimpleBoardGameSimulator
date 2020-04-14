@@ -50,12 +50,37 @@ public class GameObjectDice extends GameObject{
 
 	public static class DiceState  extends ObjectState
 	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 2534848632779449228L;
 		public int side = 0;
 		
+		public DiceState() {}
+		
+		public DiceState(DiceState diceState) {
+			set(diceState);
+		}
+
+
 		@Override
 		public int hashCode()
 		{
 			return super.hashCode() ^ side;
+		}
+		
+		
+		@Override
+		public void set(ObjectState state)
+		{
+			super.set(state);
+			side = ((DiceState)state).side;
+		}
+
+
+		@Override
+		public ObjectState copy() {
+			return new DiceState(this);
 		}
 	}
 	

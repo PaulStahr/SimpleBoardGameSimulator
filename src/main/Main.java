@@ -26,7 +26,7 @@ public class Main {
 	
 	/* This is the main() function */
 	public static final void main (String args[]){
-		//LockbackUtil.setLoglevel("WARN");
+		LockbackUtil.setLoglevel("WARN");
     	for (int i = 0; i < args.length; ++i)
     	{
     		if (args[i].equals("--loglevel"))
