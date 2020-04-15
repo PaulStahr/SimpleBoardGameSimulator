@@ -1,0 +1,24 @@
+\documentclass[11pt, a4paper, UKenglish, parskip=half+]{scrbook}
+\usepackage{verbatim}
+\usepackage{float}
+
+\newcommand{\slots}{slots}
+\renewcommand{\bf}{\textbf}
+\usepackage[siunitx]{circuitikz}
+\usepackage[margin=15mm]{geometry}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{fit}
+	\title{Simple Online Card Game Simulator}
+\begin{document}
+\maketitle
+\chapter{Introduction}
+This application creates a virtual desk on which everyone can do simple manipulations of objects (moving them around, flipping them, ...). Custom games are defined in a simple format, could be created without programming skills and are automatically distributed to friends who connect together with you to a game session. You can set up your own server, when you want to and your provider allows you to forward the ports to your computer.
+\chapter{Game Definition}
+Game definitions and Snaphsots are saved in a zip-container. This container holds several files which could be devided into two classes, static data, which doesn't change during the game and dynamic data which encodes the current state of the game.
+\section{Static data}
+The file game.xml contains the data which defines the game.
+\section{Dynamic data}
+the file game\_instance.xml contains the information of the current game state.
+\chapter{Network Model}
+\end{document}

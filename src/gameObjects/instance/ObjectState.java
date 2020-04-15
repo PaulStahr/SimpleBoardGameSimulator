@@ -5,6 +5,7 @@ public class ObjectState {
 	public int posY;
 	public int rotation;
 	public int owner_id = -1;
+	public boolean inPrivateArea = false;
 
 	/*stacking objects on top of each other*/
 	public int aboveInstanceId = -1;

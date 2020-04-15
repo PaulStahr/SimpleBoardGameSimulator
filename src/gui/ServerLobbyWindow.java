@@ -18,6 +18,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -52,7 +53,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private static final Logger logger = LoggerFactory.getLogger(ServerLobbyWindow.class);
 	private static final long serialVersionUID = 6569919447688866509L;
 	public final SynchronousGameClientLobbyConnection client;
-	public final JTextField textFieldName = new JTextField();
+	private final JTextField textFieldName = new JTextField();
 	private final JTextField textFieldChat = new JTextField();
 	private final JTextArea textAreaChat = new JTextArea();
 	/*TODOS here:
@@ -90,7 +91,14 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private final JScrollPane scrollPaneOpenGames = new JScrollPane(tableOpenGames);
     private static final DefaultCellEditor checkBoxCellEditor = new DefaultCellEditor(new JCheckBox()); 
     private final JButton buttonPoll = new JButton("Aktualisiere");
-    private final JButton buttonCreateGame = new JButton("CreateGame");
+    private final JButton buttonCreateGame = new JButton("Create Game");
+    private final JTextField textFieldId = new JTextField("1");
+    private final JLabel labelAddress = new JLabel("Address");
+    private final JLabel labelPort = new JLabel("Port");
+    private final JLabel labelName = new JLabel("Name");
+    private final JLabel labelId = new JLabel("Id");
+    private final JTextField textFieldAddress = new JTextField("127.0.0.1");
+    private final JTextField textFieldPort = new JTextField("1234");
 	private boolean isUpdating = false;
 	
     private final AbstractAction tableAction = new AbstractAction() {
@@ -158,10 +166,11 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		{
 			ArrayList<String> al = new ArrayList<>();
 			try {
+				client.setAdress(textFieldAddress.getText());
+				client.setPort(Integer.parseInt(textFieldPort.getText()));
 				client.getGameInstances(al);
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+				JFrameUtils.logErrorAndShow("Can't update information", e1, logger);
 			}
 			ArrayList<GameMetaInfo> gmi = new ArrayList<>();
 			for (int i = 0; i < al.size(); ++i) {
@@ -180,8 +189,8 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				{
 					File file = fileChooser.getSelectedFile();
 					GameInstance gi = GameIO.readSnapshotFromZip(new FileInputStream(file));
-					Player player = new Player("Florian", 1);
-					GameWindow gw = new GameWindow(gi, new Player("Florian", 1));
+					Player player = new Player(textFieldName.getText(), Integer.parseInt(textFieldId.getText()));
+					GameWindow gw = new GameWindow(gi, player);
 			    	client.pushGameSession(gi);
 			    	try {
 						Thread.sleep(1000);
@@ -213,7 +222,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				{
 					try
 					{
-						Player player = new Player("Florian", 1);
+						Player player = new Player(textFieldName.getText(), 1);
 						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.getColumnNumber(ObjectColumnType.ID)));
 				    	client.addPlayerToGameSession(player, gi.name, gi.password);
 				    	GameWindow gw = new GameWindow(gi, player);
@@ -223,8 +232,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				    	connection.start();
 				    	gw.setVisible(true);
 					} catch (IOException | JDOMException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						logger.error("Can't connect to server");
 					}
 		 	    }
 			}
@@ -235,8 +243,36 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	{
 		Container content = getContentPane();
 		GroupLayout layout = new GroupLayout(content);
-		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(scrollPaneOpenGames).addGroup(layout.createSequentialGroup().addComponent(buttonPoll).addComponent(buttonCreateGame)));
-		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(scrollPaneOpenGames).addGroup(layout.createParallelGroup().addComponent(buttonPoll).addComponent(buttonCreateGame)));
+		layout.setHorizontalGroup(layout.createParallelGroup()
+				.addGroup(layout.createSequentialGroup()
+						.addComponent(labelAddress)
+						.addComponent(textFieldAddress)
+						.addComponent(labelPort)
+						.addComponent(textFieldPort)
+						.addComponent(labelName)
+						.addComponent(textFieldName)
+						.addComponent(labelId)
+						.addComponent(textFieldId))
+				.addComponent(scrollPaneOpenGames)
+				.addGroup(layout.createSequentialGroup()
+						.addComponent(buttonPoll)
+						.addComponent(buttonCreateGame)));
+		layout.setVerticalGroup(layout.createSequentialGroup()
+				.addGroup(layout
+						.createParallelGroup()
+						.addComponent(labelAddress)
+						.addComponent(textFieldAddress)
+						.addComponent(labelPort)
+						.addComponent(textFieldPort)
+						.addComponent(labelName)
+						.addComponent(textFieldName)
+						.addComponent(labelId)
+						.addComponent(textFieldId))
+				.addComponent(scrollPaneOpenGames)
+				.addGroup(layout
+						.createParallelGroup()
+						.addComponent(buttonPoll)
+						.addComponent(buttonCreateGame)));
 		setLayout(layout);
 		buttonPoll.addActionListener(this);
 		tableOpenGames.getSelectionModel().addListSelectionListener(this);
