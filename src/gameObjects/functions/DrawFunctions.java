@@ -11,12 +11,8 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +29,7 @@ public class DrawFunctions {
     public static void drawBoard(GamePanel gamePanel, Graphics g, GameInstance gameInstance){
         g.clearRect(0, 0, gamePanel.getWidth(), gamePanel.getHeight());
         //TODO Florian:sometimes images are drawn twice (the active object?)
-        g.drawString(String.valueOf(gamePanel.mouseWheelValue), gamePanel.mouseX, gamePanel.mouseY);
+        g.drawString(String.valueOf(gamePanel.mouseWheelValue), gamePanel.mouseScreenX, gamePanel.mouseScreenY);
         g.drawImage(gameInstance.game.background, 0, 0, gamePanel.getWidth(), gamePanel.getHeight(), Color.BLACK, null);
 
         int privateAreaHeight = 700;
@@ -77,9 +73,9 @@ public class DrawFunctions {
             if(p.id == player.id)
             {
                 g2.setTransform(new AffineTransform());
-                g2.fillRect(gamePanel.mouseX - 5, gamePanel.mouseY - 5, 10, 10);
-                g2.drawString(p.name, gamePanel.mouseX + 15, gamePanel.mouseY + 5);
-                g2.drawString(p.actionString, gamePanel.mouseX - 5, gamePanel.mouseY - 20);
+                g2.fillRect(gamePanel.mouseScreenX - 5, gamePanel.mouseScreenY - 5, 10, 10);
+                g2.drawString(p.name, gamePanel.mouseScreenX + 15, gamePanel.mouseScreenY + 5);
+                g2.drawString(p.actionString, gamePanel.mouseScreenX - 5, gamePanel.mouseScreenY - 20);
                 g2.setTransform(tmp);
             }
             else {
@@ -217,7 +213,7 @@ public class DrawFunctions {
             if(transform != null)
                 g2d.setTransform(transform);
             g2d.setStroke(new BasicStroke(borderWidth));
-            g2d.drawRect(-borderWidth/2 ,-borderWidth/2, (int) (objectInstance.getWidth(player.id)) + borderWidth, (int) (objectInstance.getHeight(player.id)) + borderWidth);
+            g2d.drawRect(-borderWidth/2 ,-borderWidth/2, (objectInstance.getWidth(player.id)) + borderWidth, (objectInstance.getHeight(player.id)) + borderWidth);
             g2d.setTransform(tmp);
         }
     }
