@@ -1,6 +1,5 @@
 package gui;
 
-import util.data.IntegerArrayList;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -11,7 +10,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Point2D;
 
-import static java.lang.Integer.max;
+import util.data.IntegerArrayList;
 
 public class PrivateArea {
     public int width = 0;
@@ -105,7 +104,7 @@ public class PrivateArea {
             int sectionNum = (int) (angle / sectionSize);
             return (sectionNum + 1)/2;
         } else {
-            return -1;
+            return 0;
         }
 
     }
@@ -117,21 +116,12 @@ public class PrivateArea {
 
     public void insertObject(int objectId, int posX, int posY) {
         int index = getInsertPosition(posX, posY);
-        if (privateObjects.size() > 0) {
-            privateObjects.add(privateObjects.last());
-            for (int i = privateObjects.size() - 2; i > index; --i) {
-                privateObjects.set(i, privateObjects.get(i - 1));
-            }
-            if (privateObjects.size() > index) {
-                privateObjects.set(index, objectId);
-            }
-        } else {
-            privateObjects.add(objectId);
-        }
+        privateObjects.add(index, objectId);
     }
 
     public void removeObject(int index) {
-        if(index < privateObjects.size()) {
+    	privateObjects.remove(index);
+        /*if(index < privateObjects.size()) {
             for (int i = index + 1; i < privateObjects.size(); ++i) {
                 privateObjects.set(i-1, privateObjects.get(i));
             }
@@ -139,6 +129,6 @@ public class PrivateArea {
         }
         else if(privateObjects.size() == 1){
             privateObjects.pop();
-        }
+        }*/
     }
 }
