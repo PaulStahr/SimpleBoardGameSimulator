@@ -36,14 +36,7 @@ public class ObjectInstance {
 
 	public void updateState(ObjectState objectState)
 	{
-		state.posX = objectState.posX;
-		state.posY = objectState.posY;
-		state.rotation = objectState.rotation;
-		state.owner_id = objectState.owner_id;
-		state.aboveInstanceId = objectState.aboveInstanceId;
-		state.belowInstanceId = objectState.belowInstanceId;
-		state.value = objectState.value;
-		state.owner_id = objectState.owner_id;
+		state.set(objectState);
 	}
 	
 	public int owner_id()

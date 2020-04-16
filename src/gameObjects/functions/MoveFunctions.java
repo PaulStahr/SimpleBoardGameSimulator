@@ -15,7 +15,7 @@ public class MoveFunctions {
 
     public static void dragTokens(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, MouseEvent arg0, int xDiff, int yDiff, boolean isShiftDown, int mouseWheelValue, Shape privateArea){
         /* Drag when left mouse down or middle mouse button is down and shift is not held*/
-        if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0)) && !isShiftDown && activeObject != null && activeObject.go instanceof GameObjectToken) {
+         if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0)) && !isShiftDown && activeObject != null && activeObject.go instanceof GameObjectToken) {
             /*Remove dragged object from stack if middle mouse button is not held*/
             if (!SwingUtilities.isMiddleMouseButton(arg0)) {
                 ObjectFunctions.removeObject(gamePanel, gameInstance, player, activeObject);
@@ -32,7 +32,7 @@ public class MoveFunctions {
                 ObjectFunctions.displayStack(gamePanel, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject), activeObject.getWidth(player.id)/2);
             }
         }
-        else if(SwingUtilities.isLeftMouseButton(arg0) && isShiftDown && activeObject != null) {
+        else if(SwingUtilities.isLeftMouseButton(arg0) && isShiftDown && activeObject != null && activeObject.state.owner_id != player.id) {
             /*Remove top card*/
             ObjectFunctions.removeObject(gamePanel, gameInstance, player, activeObject);
             ObjectFunctions.moveObjectTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
