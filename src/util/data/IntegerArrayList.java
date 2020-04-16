@@ -54,13 +54,18 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		++length;
 	}
 	
-	@Override
-	public Integer remove(int index)
+	public Integer removeI(int index)
 	{
 		int tmp = data[index];
 		System.arraycopy(data, index + 1, data, index, length - index - 1);
 		--length;
 		return tmp;
+	}
+	
+	@Override
+	public Integer remove(int index)
+	{
+		return removeI(index);
 	}
 	
 	@Override
