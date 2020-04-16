@@ -349,9 +349,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append(NetworkString.TEXTMESSAGE).append(' ')
 					 			.append(((UsertextMessageAction) action).player).append(' ')
 					 			.append(id).append(' ')
-					 			.append(action.source).append(' ')
-					 			.append(((GameObjectInstanceEditAction) action).player.id).append(' ')
-					 			.append(((GameObjectInstanceEditAction) action).object.id).append(' ');
+					 			.append(action.source).append(' ');
 					 		objOut.writeObject(strB.toString());
 					 		objOut.writeObject(((UsertextMessageAction) action).message);
 					     	strB.setLength(0);
@@ -557,13 +555,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								}
 							}
 						}
-						else if (split.get(1).equals(NetworkString.MESSAGE))
+						else if (split.get(1).equals(NetworkString.TEXTMESSAGE))
 						{
 							int sourceId = Integer.parseInt(split.get(2));
 							if (sourceId != id)
 							{
 								int playerId = Integer.parseInt(split.get(3));
-								gi.update(new UsertextMessageAction(sourceId, playerId, split.get(4)));
+								gi.update(new UsertextMessageAction(sourceId, playerId, (String)objIn.readObject()));
 							}
 						}
 					}
