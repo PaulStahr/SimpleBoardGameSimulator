@@ -44,6 +44,31 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		Buffers.fillIntBuffer(buf, data, length);
 	}
 	
+	public void add(int index, int value)
+	{
+		if (length == data.length){
+			data = Arrays.copyOf(data, Math.max(data.length + 1, data.length * 2));
+		}
+		System.arraycopy(data, index, data, index+1, length - index);
+		data[index] = value;
+		++length;
+	}
+	
+	@Override
+	public Integer remove(int index)
+	{
+		int tmp = data[index];
+		System.arraycopy(data, index + 1, data, index, length - index - 1);
+		--length;
+		return tmp;
+	}
+	
+	@Override
+	public void add(int index, Integer value)
+	{
+		add(index, (int)value);
+	}
+	
 	public int pop(){
 		int last = data[length - 1];
 		--length;
@@ -61,6 +86,7 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		return old;
 	}
 	
+	@Override
 	public void setElem(int index, int value)
 	{
 		data[index] = value;
@@ -97,6 +123,7 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		return data[index];
 	}
 	
+	@Override
 	public int getI(int index){
 		if (index >= length)
 			throw new ArrayIndexOutOfBoundsException(index);
@@ -156,6 +183,7 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 			return data[index];
 		}
 		
+		@Override
 		public int getI(int index){
 			if (index >= length)
 				throw new ArrayIndexOutOfBoundsException(index);
