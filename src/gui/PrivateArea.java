@@ -120,7 +120,7 @@ public class PrivateArea {
     }
 
     public void removeObject(int index) {
-    	privateObjects.remove(index);
+    	privateObjects.removeI(index);
         /*if(index < privateObjects.size()) {
             for (int i = index + 1; i < privateObjects.size(); ++i) {
                 privateObjects.set(i-1, privateObjects.get(i));
