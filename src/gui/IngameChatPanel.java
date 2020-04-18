@@ -1,27 +1,24 @@
 package gui;
 
 
-import java.awt.event.ActionListener;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionListener;
+
+import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextPane;
 import javax.swing.JTextField;
-
+import javax.swing.JTextPane;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 // imports for the colored chat area
 import javax.swing.text.StyledDocument;
-import javax.swing.text.SimpleAttributeSet;
-import java.awt.Color;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.BadLocationException;
-
-import javax.swing.BoxLayout;
-
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import gameObjects.GameAction;
 import gameObjects.UsertextMessageAction;
@@ -101,7 +98,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 			String message = textAction.message;
 			Color color = Color.black;
 			for (Player player : game.players) {
-				if (message.indexOf(player.name) == 0) {
+				if (textAction.player == player.id) {
 					color = player.color;
 				}
 			}
@@ -117,6 +114,7 @@ class InputListener implements ActionListener {
 	InputListener(IngameChatPanel panel) {
 		chatPanel = panel;
 	}
+	@Override
 	public void actionPerformed(java.awt.event.ActionEvent evt) {
 		String inputText = chatPanel.messageInput.getText();
 		if(inputText.length() > 0) {
