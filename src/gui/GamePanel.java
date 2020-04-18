@@ -415,18 +415,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			ObjectFunctions.flipObject(id, gameInstance, player, activeObject);
 		}
+		if (loggedKeys[KeyEvent.VK_CONTROL] && loggedKeys[KeyEvent.VK_F])
+		{
+			loggedKeys[e.getKeyCode()] = true;
+			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance,player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
+			ObjectFunctions.flipStack(id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject));
+		}
 		if(e.getKeyCode() == KeyEvent.VK_S)
 		{
 			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			ObjectFunctions.shuffleStack(id, gameInstance, player, activeObject);
 		}
-		if (loggedKeys[KeyEvent.VK_CONTROL] && loggedKeys[KeyEvent.VK_F])
-		{
-			loggedKeys[e.getKeyCode()] = true;
-			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance,player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
-			ObjectFunctions.flipStack(id, gameInstance, player, activeObject);
-		}
+
 		if (loggedKeys[KeyEvent.VK_CONTROL] && loggedKeys[KeyEvent.VK_C])
 		{
 			loggedKeys[e.getKeyCode()] = true;

@@ -160,10 +160,10 @@ public class DrawFunctions {
     }
 
     public static void drawStack(GamePanel gamePanel, Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming) {
-        if (isStackInPrivateArea(gamePanel, gameInstance, stackList))
+        /*if (isStackInPrivateArea(gamePanel, gameInstance, stackList))
         {
-        }
-        else {
+        }*/
+        if(true){
             if (haveSamePositions(gameInstance.objects.get(stackList.get(0)), gameInstance.objects.get(stackList.last()))) {
                 IntegerArrayList newStackList = new IntegerArrayList();
                 newStackList.add(gameInstance.objects.get(stackList.last()).id);
