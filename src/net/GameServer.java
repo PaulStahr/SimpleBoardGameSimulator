@@ -48,17 +48,15 @@ public class GameServer implements Runnable {
 	
 	private GameInstance getGameInstance(String name)
 	{
-		logger.debug("get instance (" + id + ")" + name);
 		for (int i = 0; i < gameInstances.size(); ++i)
 		{
-			System.out.print("\"" + gameInstances.get(i).name + "\" ");
 			if (gameInstances.get(i).name.equals(name))
 			{
-				System.out.println("found");
+				logger.debug("get instance (" + id + ")" + name + " found");
 				return gameInstances.get(i);
 			}
 		}
-		System.out.println("Not found");
+		logger.debug("get instance (" + id + ")" + name + " not found");
 		return null;
 	}
 	
@@ -111,10 +109,17 @@ public class GameServer implements Runnable {
 			    {
 			    	case NetworkString.DELETE:
 			    	{
-			    		GameInstance gi = getGameInstance(split.get(1));
-			    		if (gi != null)
+			    		switch(split.get(1))
 			    		{
-			    			gameInstances.remove(gi);
+				    		case NetworkString.GAME_INSTANCE:
+				    		{
+					    		GameInstance gi = getGameInstance(split.get(2));
+					    		if (gi != null)
+					    		{
+					    			gameInstances.remove(gi);
+					    		}
+					    		break;
+				    		}
 			    		}
 			    		break;
 			    	}
@@ -130,6 +135,7 @@ public class GameServer implements Runnable {
 					    			out.write(gameInstances.get(i).name);
 					    			out.write(' ');
 					    		}
+					    		out.write('\n');
 					    		out.close();
 					    		break;
 			    			}
