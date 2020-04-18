@@ -10,6 +10,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Point2D;
 
+import gameObjects.functions.ObjectFunctions;
+import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectInstance;
 import util.data.IntegerArrayList;
 
 public class PrivateArea {
@@ -22,10 +25,14 @@ public class PrivateArea {
     private final AffineTransform boardTransform;
     private final AffineTransform inverseBoardTransform;
     public Point2D.Double origin = new Point2D.Double();
+    private GameInstance gameInstance = null;
+    private GamePanel gamePanel = null;
 
-    public PrivateArea(AffineTransform boardTransform, AffineTransform inverseBoardTransformation) {
+    public PrivateArea(GamePanel gamePanel, GameInstance gameInstance, AffineTransform boardTransform, AffineTransform inverseBoardTransformation) {
         this.boardTransform = boardTransform;
         this.inverseBoardTransform = inverseBoardTransformation;
+        this.gameInstance = gameInstance;
+        this.gamePanel = gamePanel;
     }
 
     public void setArea(double posX, double posY, double width,  double height, int translateX, int translateY, double rotation, double zooming) {
@@ -72,17 +79,17 @@ public class PrivateArea {
     }
 
     public double getAngle(int posX, int posY) {
-        //Point2D point = new Point2D.Double(posX, posY);
         Point2D baseLine = new Point2D.Double(1, 0);
         Point2D point = new Point2D.Double(posX - origin.getX(), origin.getY() - posY);
-        //return point.getY();
-        return 180 - Math.toDegrees(Math.atan2(point.getY() - baseLine.getY(), point.getX() - baseLine.getX()));
+        double angle = 180 - Math.toDegrees(Math.atan2(point.getY() - baseLine.getY(), point.getX() - baseLine.getX()));
+        return angle;
     }
 
     public int getSectionByPosition(int posX, int posY){
         if (privateObjects.size() > 0) {
             double sectionSize = 180 / privateObjects.size();
-            return (int) (getAngle(posX, posY) / sectionSize);
+            double angle = getAngle(posX, posY);
+            return (int) ( angle/ sectionSize);
         } else {
             return -1;
         }
@@ -90,7 +97,8 @@ public class PrivateArea {
 
     public int getObjectIdByPosition(int posX, int posY) {
         if (privateObjects.size() > 0) {
-            return privateObjects.get(getSectionByPosition(posX, posY));
+            int section = getSectionByPosition(posX, posY);
+            return privateObjects.get(section);
         } else {
             return -1;
         }
@@ -117,18 +125,36 @@ public class PrivateArea {
     public void insertObject(int objectId, int posX, int posY) {
         int index = getInsertPosition(posX, posY);
         privateObjects.add(index, objectId);
+
+        if (gamePanel != null && gameInstance != null){
+            ObjectInstance belowObject = null;
+            ObjectInstance aboveObject = null;
+            if (index - 1 >= 0){
+                belowObject = gameInstance.objects.get(privateObjects.getI(index - 1));
+            }
+            if (privateObjects.size() > index + 1){
+                aboveObject = gameInstance.objects.get(privateObjects.getI(index + 1));
+            }
+            ObjectFunctions.insertIntoStack(gamePanel, gameInstance, gamePanel.player, gameInstance.objects.get(objectId), belowObject, aboveObject,0);
+        }
+    }
+    public void insertObject(int objectId, int index) {
+        privateObjects.add(index, objectId);
+        if (gamePanel != null && gameInstance != null){
+            ObjectInstance belowObject = null;
+            ObjectInstance aboveObject = null;
+            if (index - 1 >= 0){
+                belowObject = gameInstance.objects.get(privateObjects.getI(index - 1));
+            }
+            if (privateObjects.size() > index + 1){
+                aboveObject = gameInstance.objects.get(privateObjects.getI(index + 1));
+            }
+            ObjectFunctions.insertIntoStack(gamePanel, gameInstance, gamePanel.player, gameInstance.objects.get(objectId), belowObject, aboveObject,0);
+        }
     }
 
-    public void removeObject(int index) {
-    	privateObjects.removeI(index);
-        /*if(index < privateObjects.size()) {
-            for (int i = index + 1; i < privateObjects.size(); ++i) {
-                privateObjects.set(i-1, privateObjects.get(i));
-            }
-            privateObjects.pop();
-        }
-        else if(privateObjects.size() == 1){
-            privateObjects.pop();
-        }*/
+        public void removeObject(int index) {
+    	ObjectFunctions.removeObject(gamePanel, gameInstance, gamePanel.player, gameInstance.objects.get(privateObjects.getI(index)));
+        privateObjects.removeI(index);
     }
 }

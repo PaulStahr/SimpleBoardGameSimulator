@@ -40,19 +40,19 @@ public class DrawFunctions {
 
     public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, IntegerArrayList tmp){
         if (ObjectFunctions.isStackBottom(objectInstance)) {
-         	ObjectFunctions.getAboveStack(gameInstance, objectInstance, tmp);
+            ObjectFunctions.getAboveStack(gameInstance, objectInstance, tmp);
             drawStack(gamePanel, g, tmp, gameInstance, player.id, 1);
             tmp.clear();
             getStack(gameInstance, objectInstance, tmp);
             int playerId = ObjectFunctions.getStackOwner(gameInstance, tmp);
-            tmp.clear();
             if (playerId != -1) {
                 Player p = gameInstance.getPlayer(playerId);
-                drawStackBorder(gameInstance, g, p, objectInstance, 10, p.color, 1, tmp);
-            }
-            else{
-                g.setColor(gamePanel.stackColor);
-                drawStackBorder(gameInstance, g, player, objectInstance, 5, gamePanel.stackColor,1, true, tmp);
+                drawStackBorder(gameInstance, g, player, objectInstance, 10, p.color, 1, true, tmp);
+            } else {
+                if (tmp.size() > 1) {
+                    g.setColor(gamePanel.stackColor);
+                    drawStackBorder(gameInstance, g, player, objectInstance, 5, gamePanel.stackColor, 1, true, tmp);
+                }
             }
         }
         tmp.clear();
@@ -98,13 +98,13 @@ public class DrawFunctions {
 
     public static void drawActiveObject(GamePanel gamePanel, Graphics g, Player player, ObjectInstance activeObject) {
         int playerId = player == null ? -1 : player.id;
-        if (activeObject != null && !activeObject.state.inPrivateArea) {
+        if (activeObject != null && activeObject.state.owner_id != playerId) {
             drawObject(g, activeObject, playerId, 1);
             if (player != null) {
                 drawBorder(g, player, activeObject, 10, player.color, 1);
             }
         }
-        if (activeObject != null && activeObject.state.inPrivateArea && activeObject.state.owner_id==playerId) {
+        else if (activeObject != null && activeObject.state.inPrivateArea && activeObject.state.owner_id==playerId) {
             Graphics2D g2d = (Graphics2D)g;
             AffineTransform tmp = g2d.getTransform();
             AffineTransform transform = new AffineTransform();
@@ -160,10 +160,10 @@ public class DrawFunctions {
     }
 
     public static void drawStack(GamePanel gamePanel, Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming) {
-        if (isStackInPrivateArea(gamePanel, gameInstance, stackList))
+        /*if (isStackInPrivateArea(gamePanel, gameInstance, stackList))
         {
-        }
-        else {
+        }*/
+        if(true){
             if (haveSamePositions(gameInstance.objects.get(stackList.get(0)), gameInstance.objects.get(stackList.last()))) {
                 IntegerArrayList newStackList = new IntegerArrayList();
                 newStackList.add(gameInstance.objects.get(stackList.last()).id);
@@ -219,7 +219,7 @@ public class DrawFunctions {
     }
 
     public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, AffineTransform transform) {
-        if (objectInstance != null && objectInstance.state.owner_id != player.id) {
+        if (objectInstance != null) {
             g.setColor(color);
             Graphics2D g2d = (Graphics2D) g.create();
             AffineTransform tmp = g2d.getTransform();
@@ -235,7 +235,7 @@ public class DrawFunctions {
     }
 
     public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, boolean drawProperStack, IntegerArrayList tmp) {
-        if (objectInstance != null) {
+        if (objectInstance != null && player != null) {
             if(isStackCollected(gameInstance, objectInstance))
             {
             	getStack(gameInstance, objectInstance, tmp);

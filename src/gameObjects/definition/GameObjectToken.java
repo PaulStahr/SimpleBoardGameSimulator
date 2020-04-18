@@ -18,7 +18,7 @@ public class GameObjectToken extends GameObject{
 
 	@Override
 	public BufferedImage getLook(ObjectState state, int playerId) {
-		return ((TokenState)state).side != (playerId == state.owner_id)? upsideLook : downsideLook;
+		return ((TokenState)state).side != true? upsideLook : downsideLook;
 	}
 	
 	@Override
