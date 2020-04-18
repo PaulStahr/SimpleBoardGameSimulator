@@ -40,16 +40,16 @@ public class DrawFunctions {
 
     public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, IntegerArrayList tmp){
         if (ObjectFunctions.isStackBottom(objectInstance)) {
-         	ObjectFunctions.getAboveStack(gameInstance, objectInstance, tmp);
+            ObjectFunctions.getAboveStack(gameInstance, objectInstance, tmp);
             drawStack(gamePanel, g, tmp, gameInstance, player.id, 1);
             tmp.clear();
             getStack(gameInstance, objectInstance, tmp);
-            if (tmp.size() > 1) {
-                int playerId = ObjectFunctions.getStackOwner(gameInstance, tmp);
-                if (playerId != -1) {
-                    Player p = gameInstance.getPlayer(playerId);
-                    drawStackBorder(gameInstance, g, player, objectInstance, 10, p.color, 1, true, tmp);
-                } else {
+            int playerId = ObjectFunctions.getStackOwner(gameInstance, tmp);
+            if (playerId != -1) {
+                Player p = gameInstance.getPlayer(playerId);
+                drawStackBorder(gameInstance, g, player, objectInstance, 10, p.color, 1, true, tmp);
+            } else {
+                if (tmp.size() > 1) {
                     g.setColor(gamePanel.stackColor);
                     drawStackBorder(gameInstance, g, player, objectInstance, 5, gamePanel.stackColor, 1, true, tmp);
                 }

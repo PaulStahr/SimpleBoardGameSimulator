@@ -165,9 +165,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         //Draw all objects not in some private area
 		for (ObjectInstance oi : gameInstance.objects) {
-			if (oi.state.owner_id != player.id) {
-				drawTokenObjects(this, g, gameInstance, oi, player, ial);
-			}
+			drawTokenObjects(this, g, gameInstance, oi, player, ial);
 		}
 		drawActiveObject(this, g, player, activeObject);
 		drawPlayerMarkers(this, g, gameInstance, player, infoText);

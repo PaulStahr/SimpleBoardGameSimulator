@@ -657,7 +657,7 @@ public class ObjectFunctions {
         }
         else {
             for (ObjectInstance oi : gameInstance.objects) {
-                if (ignoredObjects == null || !ignoredObjects.contains(oi.id)) {
+                if ((ignoredObjects == null || !ignoredObjects.contains(oi.id)) && !oi.state.inPrivateArea) {
                     int dist = isOnObject(xPos, yPos, oi, player.id, maxInaccuracy);
                     if (dist < distance) {
                         activeObject = oi;
