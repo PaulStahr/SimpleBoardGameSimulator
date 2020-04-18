@@ -831,6 +831,7 @@ public class ObjectFunctions {
                 activeObject.state.owner_id = -1;
                 activeObject.state.inPrivateArea = false;
             }
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, activeObject));
         }
 
         if(activeObject != null && activeObject.state.owner_id != player.id) {
@@ -927,7 +928,6 @@ public class ObjectFunctions {
     }
 
     public static void insertIntoStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance objectAbove, ObjectInstance objectBelow, int cardMargin) {
-        if (!isStackCollected(gameInstance, objectBelow) || !isStackCollected(gameInstance, objectAbove)) {
             if (objectInstance != null) {
                 if (objectBelow != null) {
                     objectBelow.state.aboveInstanceId = objectInstance.id;
@@ -941,7 +941,6 @@ public class ObjectFunctions {
                      }
                 }
             }
-        }
     }
 
     public static void setObjectPosition(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int posX, int posY) {

@@ -98,13 +98,13 @@ public class DrawFunctions {
 
     public static void drawActiveObject(GamePanel gamePanel, Graphics g, Player player, ObjectInstance activeObject) {
         int playerId = player == null ? -1 : player.id;
-        if (activeObject != null && !activeObject.state.inPrivateArea) {
+        if (activeObject != null && activeObject.state.owner_id != playerId) {
             drawObject(g, activeObject, playerId, 1);
             if (player != null) {
                 drawBorder(g, player, activeObject, 10, player.color, 1);
             }
         }
-        if (activeObject != null && activeObject.state.inPrivateArea && activeObject.state.owner_id==playerId) {
+        else if (activeObject != null && activeObject.state.inPrivateArea && activeObject.state.owner_id==playerId) {
             Graphics2D g2d = (Graphics2D)g;
             AffineTransform tmp = g2d.getTransform();
             AffineTransform transform = new AffineTransform();

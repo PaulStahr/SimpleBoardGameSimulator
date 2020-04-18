@@ -91,7 +91,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	ControlPanel controlPanel = new ControlPanel();
 	private final AffineTransform boardTransformation = new AffineTransform();
 	private final AffineTransform inverseBoardTransformation = new AffineTransform();
-	public PrivateArea privateArea = new PrivateArea(boardTransformation, inverseBoardTransformation);
 	public Color mouseColor = Color.black;
 	public Color dragColor = Color.red;
 	public Color stackColor = Color.green;
@@ -108,10 +107,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public String outText = "";
 
+	public PrivateArea privateArea;
+
 
 	public GamePanel(GameInstance gameInstance)
 	{
 		this.gameInstance = gameInstance;
+		this.privateArea = new PrivateArea(this, gameInstance, boardTransformation, inverseBoardTransformation);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
@@ -160,9 +162,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
+        //Draw all objects not in some private area
 		for (ObjectInstance oi : gameInstance.objects) {
-			if (oi.state.owner_id != player.id)
+			if (oi.state.owner_id != player.id) {
 				drawTokenObjects(this, g, gameInstance, oi, player, ial);
+			}
 		}
 		drawActiveObject(this, g, player, activeObject);
 		drawPlayerMarkers(this, g, gameInstance, player, infoText);
@@ -206,13 +211,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			beginSelectPosY = arg0.getY();
 			isSelectStarted = true;
 		}
+		else {
+			selectedObjects.clear();
+		}
 
 		activeObject = ObjectFunctions.setActiveObjectByMouseAndKey(this, gameInstance, player, mouseBoardPos, loggedKeys, maxInaccuracy);
 		if (activeObject != null && this.privateArea.privateObjects.contains(activeObject.id)) {
 			this.privateArea.removeObject(this.privateArea.privateObjects.indexOf(activeObject.id));
-			activeObject.state.owner_id = -1;
 			activeObject.state.posX = player.mouseXPos - activeObject.getWidth(player.id)/2;
 			activeObject.state.posY = player.mouseYPos - activeObject.getHeight(player.id)/2;
+			activeObject.state.owner_id = -1;
+		}
+		if (activeObject != null && activeObject.state.inPrivateArea && !this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY))
+		{
+			activeObject.state.inPrivateArea = false;
 			ObjectFunctions.flipObject(id, gameInstance, player, activeObject);
 		}
 		if(activeObject != null) {
