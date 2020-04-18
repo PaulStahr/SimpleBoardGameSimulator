@@ -646,7 +646,7 @@ public class ObjectFunctions {
     }
     
     //Get element nearest to xPos, yPos with some inaccuracy
-    public static ObjectInstance getNearestObjectByPosition(GamePanel gamePanel, GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, int maxInaccuracy, ObjectInstance ignoredObject) {
+    public static ObjectInstance getNearestObjectByPosition(GamePanel gamePanel, GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, int maxInaccuracy, IntegerArrayList ignoredObjects) {
         ObjectInstance activeObject = null;
         int distance = Integer.MAX_VALUE;
         if(isInPrivateArea(gamePanel, xPos, yPos)) {
@@ -657,7 +657,7 @@ public class ObjectFunctions {
         }
         else {
             for (ObjectInstance oi : gameInstance.objects) {
-                if (oi != ignoredObject) {
+                if (ignoredObjects == null || !ignoredObjects.contains(oi.id)) {
                     int dist = isOnObject(xPos, yPos, oi, player.id, maxInaccuracy);
                     if (dist < distance) {
                         activeObject = oi;
@@ -669,8 +669,8 @@ public class ObjectFunctions {
         return activeObject;
     }
 
-    public static ObjectInstance getNearestObjectByPosition(GamePanel gamePanel, GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, ObjectInstance ignoredObject) {
-        ObjectInstance currentObject = getNearestObjectByPosition(gamePanel, gameInstance, player, xPos, yPos, zooming, 0, ignoredObject);
+    public static ObjectInstance getNearestObjectByPosition(GamePanel gamePanel, GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, IntegerArrayList ignoredObjects) {
+        ObjectInstance currentObject = getNearestObjectByPosition(gamePanel, gameInstance, player, xPos, yPos, zooming, 0, ignoredObjects);
         if (haveSamePositions(getStackTop(gameInstance, currentObject), getStackBottom(gameInstance, currentObject)) && currentObject.state.inPrivateArea==false)
         {
             return getStackTop(gameInstance, currentObject);
@@ -844,15 +844,17 @@ public class ObjectFunctions {
         }
 
         if(activeObject != null && activeObject.state.owner_id != player.id) {
-            ObjectInstance objectInstance = getNearestObjectByPosition(gamePanel, gameInstance, player, activeObject.state.posX + activeObject.getWidth(player.id)/2, activeObject.state.posY + activeObject.getHeight(player.id)/2, zooming, activeObject);
+            IntegerArrayList stackIds = new IntegerArrayList();
+            getStack(gameInstance, activeObject, stackIds);
+            ObjectInstance objectInstance = getNearestObjectByPosition(gamePanel, gameInstance, player, activeObject.state.posX + activeObject.getWidth(player.id)/2, activeObject.state.posY + activeObject.getHeight(player.id)/2, zooming, stackIds);
             if (isStackCollected(gameInstance, objectInstance)) {
                 if (objectInstance != activeObject) {
                     ObjectFunctions.mergeStacks(gamePanel, gameInstance, player, activeObject, objectInstance);
                 }
             }
-            else
+            else if(objectInstance != null)
             {
-                Pair<ObjectInstance, ObjectInstance> insertObjects = getInsertObjects(gamePanel, gameInstance, player, activeObject.state.posX + activeObject.getWidth(player.id)/2, activeObject.state.posY + activeObject.getHeight(player.id)/2, zooming, activeObject);
+                Pair<ObjectInstance, ObjectInstance> insertObjects = getInsertObjects(gamePanel, gameInstance, player, activeObject.state.posX + activeObject.getWidth(player.id)/2, activeObject.state.posY + activeObject.getHeight(player.id)/2, zooming, new IntegerArrayList(activeObject.id));
                 insertIntoStack(gamePanel, gameInstance, player, activeObject, insertObjects.getKey(), insertObjects.getValue(), activeObject.getWidth(player.id)/2);
             }
         }
@@ -906,8 +908,8 @@ public class ObjectFunctions {
         }
     }
 
-    public static Pair<ObjectInstance, ObjectInstance> getInsertObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, int posX, int posY, double zooming, ObjectInstance ignoredObject){
-        ObjectInstance objectInstance = getNearestObjectByPosition(gamePanel, gameInstance, player, posX, posY, zooming, ignoredObject);
+    public static Pair<ObjectInstance, ObjectInstance> getInsertObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, int posX, int posY, double zooming, IntegerArrayList ignoredObjects){
+        ObjectInstance objectInstance = getNearestObjectByPosition(gamePanel, gameInstance, player, posX, posY, zooming, ignoredObjects);
         if (hasAboveObject(objectInstance) && hasBelowObject(objectInstance))
         {
             if(getDistanceToObjectCenter(getAboveObject(gameInstance, objectInstance), posX, posY, player.id) < getDistanceToObjectCenter(getBelowObject(gameInstance, objectInstance), posX, posY, player.id))
@@ -1022,6 +1024,7 @@ public class ObjectFunctions {
 
 
     public static int getStackOwner(GameInstance gameInstance, IntegerArrayList stackIds){
+        /*
         int ownerId = -1;
         for(int id: stackIds)  //TODO: I don't think that this method is doing what it should do
         {
@@ -1031,8 +1034,8 @@ public class ObjectFunctions {
             }
             else if(gameInstance.objects.get(id).state.owner_id != ownerId)
                 return -1;
-        }
-        return ownerId;
+        }*/
+        return gameInstance.objects.get(stackIds.getI(0)).state.owner_id;
     }
 
     public static boolean isStackInHand(GameInstance gameInstance, Player player, IntegerArrayList stackIds){

@@ -44,15 +44,15 @@ public class DrawFunctions {
             drawStack(gamePanel, g, tmp, gameInstance, player.id, 1);
             tmp.clear();
             getStack(gameInstance, objectInstance, tmp);
-            int playerId = ObjectFunctions.getStackOwner(gameInstance, tmp);
-            tmp.clear();
-            if (playerId != -1) {
-                Player p = gameInstance.getPlayer(playerId);
-                drawStackBorder(gameInstance, g, p, objectInstance, 10, p.color, 1, tmp);
-            }
-            else{
-                g.setColor(gamePanel.stackColor);
-                drawStackBorder(gameInstance, g, player, objectInstance, 5, gamePanel.stackColor,1, true, tmp);
+            if (tmp.size() > 1) {
+                int playerId = ObjectFunctions.getStackOwner(gameInstance, tmp);
+                if (playerId != -1) {
+                    Player p = gameInstance.getPlayer(playerId);
+                    drawStackBorder(gameInstance, g, player, objectInstance, 10, p.color, 1, true, tmp);
+                } else {
+                    g.setColor(gamePanel.stackColor);
+                    drawStackBorder(gameInstance, g, player, objectInstance, 5, gamePanel.stackColor, 1, true, tmp);
+                }
             }
         }
         tmp.clear();
@@ -219,7 +219,7 @@ public class DrawFunctions {
     }
 
     public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, AffineTransform transform) {
-        if (objectInstance != null && objectInstance.state.owner_id != player.id) {
+        if (objectInstance != null) {
             g.setColor(color);
             Graphics2D g2d = (Graphics2D) g.create();
             AffineTransform tmp = g2d.getTransform();
@@ -235,7 +235,7 @@ public class DrawFunctions {
     }
 
     public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, boolean drawProperStack, IntegerArrayList tmp) {
-        if (objectInstance != null) {
+        if (objectInstance != null && player != null) {
             if(isStackCollected(gameInstance, objectInstance))
             {
             	getStack(gameInstance, objectInstance, tmp);
