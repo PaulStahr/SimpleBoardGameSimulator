@@ -110,6 +110,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
  	    }
     };
  	private final ButtonColumn connectColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getVisibleColumnNumber(ObjectColumnType.CONNECT));
+ 	private final ButtonColumn deleteColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getVisibleColumnNumber(ObjectColumnType.DELETE));
 
     private final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<GameMetaInfo> objectList, ColumnTypes types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
     {
@@ -177,7 +178,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				gmi.add(new GameMetaInfo(al.get(i)));
 				gmi.get(i).name = al.get(i);
 			}
-			updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn);
+			updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn, deleteColumn);
 			
 		}
 		else if (source == buttonCreateGame)
@@ -232,9 +233,19 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				    	connection.start();
 				    	gw.setVisible(true);
 					} catch (IOException | JDOMException e1) {
-						logger.error("Can't connect to server");
+						JFrameUtils.logErrorAndShow("Can't connect to server", e1, logger);
 					}
 		 	    }
+				else if (GameInstance.TYPES.getCol(col) == ObjectColumnType.DELETE)
+				{
+					GameInstance gi;
+					try {
+						gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.getColumnNumber(ObjectColumnType.ID)));
+						client.deleteGame(gi.name, gi.password);
+					} catch (IOException | JDOMException e2) {
+						JFrameUtils.logErrorAndShow("Can't delete game", e2, logger);
+					}
+				}
 			}
 		}
     }
@@ -279,6 +290,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		tableOpenGames.getModel().addTableModelListener(this);
 		this.client = client;
 		buttonCreateGame.addActionListener(this);
+		textFieldPort.setText(Integer.toString(client.getPort()));
 	}
 	
     @Override

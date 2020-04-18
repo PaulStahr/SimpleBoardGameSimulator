@@ -106,9 +106,18 @@ public class GameServer implements Runnable {
 				}
 				ArrayList<String> split = new ArrayList<>();
 				StringUtils.split(line, ' ', split);
-				logger.debug(line);
+				if (logger.isDebugEnabled()) {logger.debug(line);}
 			    switch (split.get(0))
 			    {
+			    	case NetworkString.DELETE:
+			    	{
+			    		GameInstance gi = getGameInstance(split.get(1));
+			    		if (gi != null)
+			    		{
+			    			gameInstances.remove(gi);
+			    		}
+			    		break;
+			    	}
 			    	case NetworkString.LIST:
 			    	{
 			    		switch (split.get(1))

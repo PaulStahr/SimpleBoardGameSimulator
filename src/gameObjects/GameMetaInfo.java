@@ -13,6 +13,8 @@ public class GameMetaInfo
 	public Object getValue(ObjectColumnType visibleCol) {
 		switch(visibleCol)
 		{
+			case DELETE:
+				return "delete";
 			case CONNECT:
 				return "Connect";
 			case ID:

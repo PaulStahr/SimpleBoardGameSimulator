@@ -7,7 +7,8 @@ import util.data.UniqueObjects;
 public enum ObjectColumnType{
 	ID("id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
-	CONNECT("Connect", ValueColumnTypes.TYPE_BUTTON, "Connect", null);
+	CONNECT("Connect", ValueColumnTypes.TYPE_BUTTON, "Connect", null),
+	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
 	
     private static final ObjectColumnType ct[] = ObjectColumnType.values();
     private static final String[] columnNames = new String[ObjectColumnType.ct.length];
