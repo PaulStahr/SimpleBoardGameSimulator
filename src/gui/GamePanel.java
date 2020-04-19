@@ -409,7 +409,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
 			int count = ObjectFunctions.countStack(gameInstance, activeObject);
-			getGraphics().drawString("Object Number: " + String.valueOf(count), mouseScreenX, mouseScreenY);
+			player.actionString = "Object Number: " + String.valueOf(count);
 		}
 		if(e.getKeyCode() == KeyEvent.VK_F && !loggedKeys[KeyEvent.VK_CONTROL])
 		{
@@ -435,7 +435,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance,player , mouseBoardPos.getXI(), mouseBoardPos.getYI());
 			int count = ObjectFunctions.countStackValues(gameInstance, activeObject);
-			getGraphics().drawString("Value: " + String.valueOf(count), mouseScreenX, mouseScreenY);
+			player.actionString = "Value: " + String.valueOf(count);
 		}
 
 		if (e.getKeyCode() == KeyEvent.VK_V)
