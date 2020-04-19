@@ -149,13 +149,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		super.paintComponent(g);
 		drawBoard(this, g, gameInstance);
 		Graphics2D g2 = (Graphics2D)g;
-        g2.translate(getWidth() / 2, getHeight() / 2);
-        g2.scale(zooming, zooming);
-        g2.rotate(rotation);
-        g2.translate(translateX, translateY);
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHints(rh);
-        boardTransformation.setTransform(g2.getTransform());
+        g2.setTransform(boardTransformation);
         try {
 			inverseBoardTransformation.setTransform(boardTransformation.createInverse());
 		} catch (NoninvertibleTransformException e) {
@@ -277,6 +273,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		gameTransform.scale(1 / zooming);
 		gameTransform.rotateZ(rotation);
 		gameTransform.affineTranslate(-translateX, -translateY);
+		boardTransformation.setToIdentity();
+		boardTransformation.translate(getWidth() / 2, getHeight() / 2);
+		boardTransformation.scale(zooming, zooming);
+		boardTransformation.rotate(rotation);
+		boardTransformation.translate(translateX, translateY);
 	}
 
 	public void screenToBoardPos(int x, int y, Vector2d out)
