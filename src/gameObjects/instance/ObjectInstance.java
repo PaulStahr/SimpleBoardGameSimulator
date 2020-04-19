@@ -70,7 +70,18 @@ public class ObjectInstance {
 		}
 	}
 
-	public Object getValue(TableColumnType visibleCol) {
-		return "";
+	public Object getValue(TableColumnType col) {
+		GameObjectInstanceColumnType tmp = (GameObjectInstanceColumnType)col;
+		switch(tmp)
+		{
+		case DELETE:
+			return "delete";
+		case ID:
+			return id;
+		case NAME:
+			return go.uniqueName;
+		default:
+			return "";
+		}
 	}
 }

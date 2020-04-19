@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
+import javax.swing.GroupLayout;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -20,10 +21,18 @@ import util.jframe.table.TableModel;
 
 public class EditGamePanel extends JPanel implements ActionListener{
 	GameInstance gi;
-	JTable tableGameObjects = new JTable();
-	private final DefaultTableModel tableModelOpenGames = new TableModel(GameInstance.TYPES.getTableColumnTypeList());
+	private final DefaultTableModel tableModelGameObjects= new TableModel(ObjectInstance.TYPES.getTableColumnTypeList());
+	private final JTable tableGameObjects = new JTable(tableModelGameObjects);
+	public String name;
+	private JScrollPane scrollPaneGameObjects = new JScrollPane(tableGameObjects);
 	public EditGamePanel(GameInstance gi) {
 		this.gi = gi;
+		GroupLayout layout = new GroupLayout(this);
+		setLayout(layout);
+		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(scrollPaneGameObjects));
+		layout.setVerticalGroup(layout.createParallelGroup().addComponent(scrollPaneGameObjects));
+		setSize(500, 300);
+		actionPerformed(null);
 	}
     private final AbstractAction tableAction = new AbstractAction() {
     	private static final long serialVersionUID = 3980835476835695337L;
@@ -55,13 +64,9 @@ public class EditGamePanel extends JPanel implements ActionListener{
 	 */
 	private static final long serialVersionUID = 9089357847164495823L;
 
-	public String name;
-	
-	JTable tableGameItems = new JTable();
-	private JScrollPane scrollPaneGameObjects = new JScrollPane(tableGameItems);
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		updateTable(tableGameObjects, scrollPaneGameObjects, gi.objects, GameInstance.TYPES, tableModelOpenGames, deleteColumn);
+		updateTable(tableGameObjects, scrollPaneGameObjects, gi.objects, ObjectInstance.TYPES, tableModelGameObjects, deleteColumn);
 	}
 	
 
