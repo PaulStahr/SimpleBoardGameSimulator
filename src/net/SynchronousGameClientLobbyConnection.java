@@ -177,4 +177,17 @@ public class SynchronousGameClientLobbyConnection {
 	    server.close();
 	    return gi;
 	}
+
+	public void deleteGame(String gameInstanceId, String password) throws UnknownHostException, IOException {
+		Socket server = new Socket(address, port);
+		OutputStream output = server.getOutputStream();
+		StringBuilder strB = new StringBuilder();
+		strB.append(NetworkString.DELETE).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(gameInstanceId);
+		output = writeCommand(strB, output);
+		server.close();
+	}
+
+	public int getPort() {
+		return port;
+	}
 }

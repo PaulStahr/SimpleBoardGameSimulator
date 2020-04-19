@@ -172,10 +172,26 @@ public class ArrayUtil {
          	data[id1] = tmp;
         }
 	}
+
+	public static int reverseLinearSearch(Object data[], int begin, int end, Object value) {
+		for (int i = end - 1; i >= begin; --i)
+		{
+			if (data[i] == value)
+			{
+				return i;
+			}
+		}
+		return -1;	
+	}
 	
 	public static final int linearSearch(Object data[], Object value)
 	{
-		for (int i = 0; i < data.length; ++i)
+		return linearSearch(data, 0, data.length, value);
+	}
+	
+	public static final int linearSearch(Object data[], int begin, int end, Object value)
+	{
+		for (int i = begin; i < end; ++i)
 		{
 			if (data[i] == value)
 			{
@@ -187,7 +203,12 @@ public class ArrayUtil {
 	
 	public static final int firstEqualIndex(Object data[], Object value)
 	{
-		for (int i = 0; i < data.length; ++i)
+		return firstEqualIndex(data, 0, data.length, value);
+	}
+
+	public static final int firstEqualIndex(Object data[], int begin, int end, Object value)
+	{
+		for (int i = begin; i < end; ++i)
 		{
 			if (value.equals(data[i]))
 			{
@@ -196,7 +217,7 @@ public class ArrayUtil {
 		}
 		return -1;
 	}
-
+	
 	public static final float[] setToLength(float[] data, int length) {
 		if (data.length == length)
 		{

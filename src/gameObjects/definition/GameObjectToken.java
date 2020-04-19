@@ -18,7 +18,7 @@ public class GameObjectToken extends GameObject{
 
 	@Override
 	public BufferedImage getLook(ObjectState state, int playerId) {
-		return ((TokenState)state).side != (playerId == state.owner_id)? upsideLook : downsideLook;
+		return ((TokenState)state).side != (state.owner_id != playerId)? upsideLook : downsideLook;
 	}
 	
 	@Override
@@ -31,12 +31,34 @@ public class GameObjectToken extends GameObject{
 
 	public static class TokenState extends ObjectState
 	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -5833198843575301636L;
 		public boolean side = true;
 		
+		public TokenState(TokenState tokenState) {
+			set(tokenState);
+		}
+
+		public TokenState() {}
+
 		@Override
 		public int hashCode()
 		{
 			return super.hashCode() ^ (side ? 0xF00BA : 0);
+		}
+		
+		@Override
+		public void set(ObjectState state)
+		{
+			super.set(state);
+			side = ((TokenState)state).side;
+		}
+
+		@Override
+		public ObjectState copy() {
+			return new TokenState(this);
 		}
 	}
 	

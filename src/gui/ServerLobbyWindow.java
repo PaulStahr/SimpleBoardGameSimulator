@@ -1,7 +1,6 @@
 package gui;
 
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,11 +10,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.AbstractAction;
-import javax.swing.DefaultCellEditor;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -28,23 +24,22 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.ColumnTypes;
+import gameObjects.GameInstanceColumnType;
 import gameObjects.GameMetaInfo;
-import gameObjects.ObjectColumnType;
-import gameObjects.ValueColumnTypes;
 import gameObjects.instance.GameInstance;
-import gui.util.ButtonColumn;
 import io.GameIO;
 import main.Player;
 import net.AsynchronousGameConnection;
 import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
+import util.jframe.table.ButtonColumn;
+import util.jframe.table.ColumnTypes;
+import util.jframe.table.TableModel;
 
 public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener{
 	/**
@@ -63,33 +58,11 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	Connect to an existing game session
 	*/
 	
-	private static final class TableModel extends DefaultTableModel
-	{
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -3379232940335572529L;
-		private final ColumnTypes types;
-		
-		public TableModel(ColumnTypes types)
-		{
-			super(new Object[1][types.colSize()], types.getVisibleColumnNames());
-			this.types = types;
-			
 
-			
-		}
-		
-		@Override
-        public final Class<?> getColumnClass(int columnIndex) {
-            return types.getCol(columnIndex).cl;
-        }
-	}
 	
-	private final DefaultTableModel tableModelOpenGames = new TableModel(GameInstance.TYPES);
+	private final DefaultTableModel tableModelOpenGames = new TableModel(GameInstance.TYPES.getTableColumnTypeList());
 	private final JTable tableOpenGames = new JTable(tableModelOpenGames);
 	private final JScrollPane scrollPaneOpenGames = new JScrollPane(tableOpenGames);
-    private static final DefaultCellEditor checkBoxCellEditor = new DefaultCellEditor(new JCheckBox()); 
     private final JButton buttonPoll = new JButton("Aktualisiere");
     private final JButton buttonCreateGame = new JButton("Create Game");
     private final JTextField textFieldId = new JTextField("1");
@@ -109,55 +82,23 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			ServerLobbyWindow.this.actionPerformed(e);
  	    }
     };
- 	private final ButtonColumn connectColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getVisibleColumnNumber(ObjectColumnType.CONNECT));
+ 	private final ButtonColumn connectColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getColumnNumber(GameInstanceColumnType.CONNECT));
+ 	private final ButtonColumn deleteColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getColumnNumber(GameInstanceColumnType.DELETE));
 
-    private final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<GameMetaInfo> objectList, ColumnTypes types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
+    public static final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<GameMetaInfo> objectList, ColumnTypes types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
     {
-    	Object[][] rowData = new Object[objectList.size()][types.visibleColsSize()];
-    	for (int i = 0; i < rowData.length; ++i)
-    	{
-    		GameMetaInfo obj = objectList.get(i);
-    		for (int j = 0; j < types.visibleColsSize();++j)
-    		{
-    			Object value = obj.getValue(types.getVisibleCol(j));
-    			if (value instanceof Boolean)
-    			{
-    				rowData[i][j] = value;
-    			}
-    			else if (value == null)
-    			{
-    				rowData[i][j] = null;
-    			}
-    			else
-    			{
-    				rowData[i][j] = String.valueOf(value);
-    			}
-    		}
-    	}
-
-    	tm.setDataVector(rowData, types.getVisibleColumnNames());
-		for (int i = 0; i < types.visibleColsSize(); ++i)
-		{
-			ObjectColumnType current = types.getVisibleCol(i); 
-			TableColumn column = table.getColumnModel().getColumn(i);
-		  	if (current.optionType == ValueColumnTypes.TYPE_COMBOBOX)
-		 	{
-		     	JComboBox<String> comboBox = new JComboBox<String>(current.possibleValues.toArray(new String[current.possibleValues.size()]));
-		     	column.setCellEditor(new DefaultCellEditor(comboBox));
-		 	}else if (current.optionType == ValueColumnTypes.TYPE_CHECKBOX)
-		 	{
-		 		column.setCellEditor(checkBoxCellEditor);
-		 	}
-		}
-
-		for (ButtonColumn bc : buttonColumn)
-		{
-			bc.setTable(table);
-		}
-		Dimension dim = table.getPreferredSize();
-		scrollPane.setPreferredSize(new Dimension(dim.width, dim.height + table.getTableHeader().getPreferredSize().height + 8));
-    }
-    
+ 		Object[][] rowData = new Object[objectList.size()][types.colsSize()];
+     	for (int i = 0; i < rowData.length; ++i)
+     	{
+     		GameMetaInfo obj = objectList.get(i);
+     		for (int j = 0; j < types.colsSize();++j)
+     		{
+     			rowData[i][j] = JFrameUtils.toTableEntry(obj.getValue(types.getCol(j)));
+     		}
+     	}
+     	JFrameUtils.updateTable(table, scrollPane, rowData, types.getColumnNames(), types.getList(), tm, buttonColumn);
+ 	}
+ 	
 	@Override
 	public void actionPerformed(ActionEvent e)
     {
@@ -177,7 +118,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				gmi.add(new GameMetaInfo(al.get(i)));
 				gmi.get(i).name = al.get(i);
 			}
-			updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn);
+			updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn, deleteColumn);
 			
 		}
 		else if (source == buttonCreateGame)
@@ -195,8 +136,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			    	try {
 						Thread.sleep(1000);
 					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						logger.error("Unnexpected interrupt", e1);
 					}
 			    	client.addPlayerToGameSession(player, gi.name, gi.password);
 			    	AsynchronousGameConnection connection = client.connectToGameSession(gi);
@@ -218,12 +158,12 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			int row = event.getRow();
 			if (tableSource == tableModelOpenGames)
 			{
-				if (GameInstance.TYPES.getCol(col) == ObjectColumnType.CONNECT)
+				if (GameInstance.TYPES.getCol(col) == GameInstanceColumnType.CONNECT)
 				{
 					try
 					{
 						Player player = new Player(textFieldName.getText(), 1);
-						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.getColumnNumber(ObjectColumnType.ID)));
+						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.getColumnNumber(GameInstanceColumnType.ID)));
 				    	client.addPlayerToGameSession(player, gi.name, gi.password);
 				    	GameWindow gw = new GameWindow(gi, player);
 				    	AsynchronousGameConnection connection = client.connectToGameSession(gi);
@@ -232,9 +172,19 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				    	connection.start();
 				    	gw.setVisible(true);
 					} catch (IOException | JDOMException e1) {
-						logger.error("Can't connect to server");
+						JFrameUtils.logErrorAndShow("Can't connect to server", e1, logger);
 					}
 		 	    }
+				else if (GameInstance.TYPES.getCol(col) == GameInstanceColumnType.DELETE)
+				{
+					GameInstance gi;
+					try {
+						gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.getColumnNumber(GameInstanceColumnType.ID)));
+						client.deleteGame(gi.name, gi.password);
+					} catch (IOException | JDOMException e2) {
+						JFrameUtils.logErrorAndShow("Can't delete game", e2, logger);
+					}
+				}
 			}
 		}
     }
@@ -279,6 +229,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		tableOpenGames.getModel().addTableModelListener(this);
 		this.client = client;
 		buttonCreateGame.addActionListener(this);
+		textFieldPort.setText(Integer.toString(client.getPort()));
 	}
 	
     @Override

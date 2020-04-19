@@ -26,4 +26,5 @@ public class NetworkString {
 	public static final String REQUEST = "request";
 	public static final String TRIGGER = "trigger";
 	public static final String PLAIN = "plain";
+	public static final String DELETE = "delete";
 }

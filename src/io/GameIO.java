@@ -6,6 +6,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +31,9 @@ import org.slf4j.LoggerFactory;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectDice.DiceSide;
+import gameObjects.definition.GameObjectDice.DiceState;
 import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectFigure.FigureState;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.definition.GameObjectToken.TokenState;
 import gameObjects.instance.Game;
@@ -459,7 +463,7 @@ public class GameIO {
 	 * @param object the ObjectState that shall be encoded
 	 * @param output the OutputStream the Game will be written to
 	 */
-	public static void writeObjectStateToStream(ObjectState object, OutputStream output) throws IOException
+	public static void writeObjectStateToStreamXml(ObjectState object, OutputStream output) throws IOException
 	{
 		Document doc = new Document();
     	Element elem = new Element(IOString.OBJECT_STATE);
@@ -710,12 +714,75 @@ public class GameIO {
 		editGameInstanceFromStream(inputStream, gi);
 	}
 
-	public static void editPlayerFromStream(InputStream is, Player gi) throws JDOMException, IOException
+	public static void editPlayerFromStreamZip(InputStream is, Player gi) throws JDOMException, IOException
 	{
 		Document doc = new SAXBuilder().build(is);
     	Element root = doc.getRootElement();
-
 		editPlayerFromElement(root, gi);
+	}
+	
+	public static void editPlayerFromStreamObject(ObjectInputStream is, Player player) throws ClassNotFoundException, IOException
+	{
+		player.name = (String)is.readObject();
+		player.color = new Color(is.readInt());
+		player.mouseXPos = is.readInt();
+		player.mouseYPos = is.readInt();
+	}
+	
+	public static void writePlayerToStreamObject(ObjectOutputStream out, Player player) throws IOException
+	{
+		out.writeObject(player.name);
+		out.writeInt(player.color.getRGB());
+		out.writeInt(player.mouseXPos);
+		out.writeInt(player.mouseYPos);
+	}
+	
+	public static void editStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
+	{
+		state.aboveInstanceId = is.readInt();
+		state.belowInstanceId = is.readInt();
+		state.inPrivateArea = is.readBoolean();
+		state.owner_id = is.readInt();
+		state.posX = is.readInt();
+		state.posY = is.readInt();
+		state.rotation = is.readInt();
+		state.value = is.readInt();
+		if (state instanceof TokenState)
+		{
+			((TokenState)state).side = is.readBoolean();
+		}
+		else if (state instanceof DiceState)
+		{
+			((DiceState)state).side = is.readInt();			
+		}
+		else if (state instanceof FigureState)
+		{
+			
+		}
+	}
+	
+	public static void writeStateToStreamObject(ObjectOutputStream out, ObjectState state) throws IOException
+	{
+		out.writeInt(state.aboveInstanceId);
+		out.writeInt(state.belowInstanceId);
+		out.writeBoolean(state.inPrivateArea);
+		out.writeInt(state.owner_id);
+		out.writeInt(state.posX);
+		out.writeInt(state.posY);
+		out.writeInt(state.rotation);
+		out.writeInt(state.value);
+		if (state instanceof TokenState)
+		{
+			out.writeBoolean(((TokenState)state).side);
+		}
+		else if (state instanceof DiceState)
+		{
+			out.writeInt(((DiceState)state).side);			
+		}
+		else if (state instanceof FigureState)
+		{
+			
+		}
 	}
 
 	public static Player readPlayerFromStream(InputStream is) throws JDOMException, IOException
@@ -736,7 +803,7 @@ public class GameIO {
 			copy(stream, byteStream);
 			if (entry.getName().equals(IOString.PLAYER_XML))
 			{
-				editPlayerFromStream(new ByteArrayInputStream(byteStream.toByteArray()), player);
+				editPlayerFromStreamZip(new ByteArrayInputStream(byteStream.toByteArray()), player);
 			}
 			byteStream.reset();
 		}

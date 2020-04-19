@@ -1,4 +1,4 @@
-package gui.util;
+package util.jframe.table;
 
 import java.awt.*;
 import java.awt.event.*;

@@ -1,11 +1,15 @@
 package gameObjects.instance;
 import java.awt.Image;
 
+import gameObjects.GameObjectInstanceColumnType;
 import gameObjects.definition.GameObject;
 import gui.GamePanel;
 import main.Player;
+import util.jframe.table.ColumnTypes;
+import util.jframe.table.TableColumnType;
 
 public class ObjectInstance {
+	public static final ColumnTypes TYPES = new ColumnTypes(new TableColumnType[]{GameObjectInstanceColumnType.ID, GameObjectInstanceColumnType.NAME, GameObjectInstanceColumnType.DELETE}, new TableColumnType[]{GameObjectInstanceColumnType.ID, GameObjectInstanceColumnType.NAME, GameObjectInstanceColumnType.DELETE});
 	public final ObjectState state;
 	public final GameObject go;
 	public final int id;
@@ -36,14 +40,7 @@ public class ObjectInstance {
 
 	public void updateState(ObjectState objectState)
 	{
-		state.posX = objectState.posX;
-		state.posY = objectState.posY;
-		state.rotation = objectState.rotation;
-		state.owner_id = objectState.owner_id;
-		state.aboveInstanceId = objectState.aboveInstanceId;
-		state.belowInstanceId = objectState.belowInstanceId;
-		state.value = objectState.value;
-		state.owner_id = objectState.owner_id;
+		state.set(objectState);
 	}
 	
 	public int owner_id()
@@ -70,6 +67,21 @@ public class ObjectInstance {
 
 		public CardActionMenu(ObjectInstance gameObject, GameInstance gameInstance, Player player, GamePanel gamePanel) {
 			super(gameObject, gameInstance, player, gamePanel);
+		}
+	}
+
+	public Object getValue(TableColumnType col) {
+		GameObjectInstanceColumnType tmp = (GameObjectInstanceColumnType)col;
+		switch(tmp)
+		{
+		case DELETE:
+			return "delete";
+		case ID:
+			return id;
+		case NAME:
+			return go.uniqueName;
+		default:
+			return "";
 		}
 	}
 }
