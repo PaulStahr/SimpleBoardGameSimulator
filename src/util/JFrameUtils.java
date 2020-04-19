@@ -23,6 +23,7 @@ package util;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -34,20 +35,32 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.function.Supplier;
 
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 
 import org.slf4j.Logger;
+
+import util.data.TableColumnType;
+import util.jframe.ButtonColumn;
+import util.jframe.ValueColumnTypes;
 
 public class JFrameUtils{
 	public static final LayoutManager SINGLE_COLUMN_LAYOUT = new GridLayout(0, 1);
@@ -309,4 +322,34 @@ public class JFrameUtils{
 			JFrameUtils.runByDispatcher(new ShowMessageClass(error + ' ' + ex.toString()));
 		}
 	}
+
+	private static final DefaultCellEditor checkBoxCellEditor = new DefaultCellEditor(new JCheckBox()); 
+
+	
+    public static final void updateTable(JTable table, JScrollPane scrollPane, Object[][] rowData, String names[], List<? extends TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
+    {
+    	tm.setDataVector(rowData,names);
+    	for (int i = 0; i < types.size(); ++i)
+		{
+			TableColumnType current = types.get(i); 
+			TableColumn column = table.getColumnModel().getColumn(i);
+		  	if (current.getOptionType() == ValueColumnTypes.TYPE_COMBOBOX)
+		 	{
+		     	JComboBox<String> comboBox = new JComboBox<String>(current.getPossibleValues());
+		     	column.setCellEditor(new DefaultCellEditor(comboBox));
+		 	}else if (current.getOptionType() == ValueColumnTypes.TYPE_CHECKBOX)
+		 	{
+		 		column.setCellEditor(checkBoxCellEditor);
+		 	}
+		}
+
+		for (ButtonColumn bc : buttonColumn)
+		{
+			bc.setTable(table);
+		}
+		Dimension dim = table.getPreferredSize();
+		scrollPane.setPreferredSize(new Dimension(dim.width, dim.height + table.getTableHeader().getPreferredSize().height + 8));
+    }
+    
+
 }

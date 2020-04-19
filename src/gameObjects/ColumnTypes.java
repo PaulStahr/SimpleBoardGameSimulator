@@ -1,5 +1,8 @@
 package gameObjects;
 
+import java.util.List;
+
+import util.ArrayTools;
 import util.ArrayUtil;
 
 public class ColumnTypes
@@ -7,13 +10,15 @@ public class ColumnTypes
 	ObjectColumnType cols[];
     private final String[] columnNames;
     private final String[] visibleColumnNames;
-	private final ObjectColumnType[] visibleCols;
+    private final List visibleColsList;
+ 	private final ObjectColumnType[] visibleCols;
 	public ColumnTypes(ObjectColumnType cols[], ObjectColumnType visibleCols[])
 	{
 		this.cols = cols;
 		columnNames = new String[cols.length];
 		this.visibleCols = visibleCols;
-		visibleColumnNames = new String[visibleCols.length];
+	    visibleColsList = ArrayTools.unmodifiableList(visibleCols);
+	    visibleColumnNames = new String[visibleCols.length];
 		for (int i = 0; i < cols.length; ++i)
     	{
     		columnNames[i] = cols[i].name;
@@ -59,5 +64,9 @@ public class ColumnTypes
     public final ObjectColumnType getVisibleCol(int index)
     {
     	return visibleCols[index];
-    } 
+    }
+
+	public List<ObjectColumnType> visibleList() {
+		return visibleColsList;
+	} 
 }

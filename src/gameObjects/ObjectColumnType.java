@@ -2,9 +2,11 @@ package gameObjects;
 
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
+import util.data.TableColumnType;
 import util.data.UniqueObjects;
+import util.jframe.ValueColumnTypes;
 
-public enum ObjectColumnType{
+public enum ObjectColumnType implements TableColumnType{
 	ID("id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	CONNECT("Connect", ValueColumnTypes.TYPE_BUTTON, "Connect", null),
@@ -65,5 +67,15 @@ public enum ObjectColumnType{
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public byte getOptionType() {
+		return optionType;
+	}
+
+	@Override
+	public String[] getPossibleValues() {
+		return possibleValues.toArray(new String[possibleValues.size()]);
 	}
 };
