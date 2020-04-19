@@ -834,6 +834,7 @@ public class ObjectFunctions {
                     gamePanel.privateArea.insertObject(currentObject.id, posX, posY);
                     currentObject.state.owner_id = player.id;
                     currentObject.state.inPrivateArea = true;
+                    gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentObject));
                 }
 
             } else if(!gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
@@ -947,15 +948,20 @@ public class ObjectFunctions {
                     if (objectAbove != null) {
                         objectAbove.state.belowInstanceId = objectInstance.id;
                         objectInstance.state.aboveInstanceId = objectAbove.id;
+                        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectAbove));
                         moveObjectTo(gamePanel, gameInstance, player, objectInstance, objectAbove);
                         if (!isStackCollected(gameInstance, objectInstance)) {
                             moveAboveStackTo(gamePanel, gameInstance, player, objectInstance, objectInstance.state.posX - objectInstance.getWidth(player.id) / 2, objectInstance.state.posY, false);
                         }
                     }
+                    gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
+                    gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectBelow));
                 }
                 else if(objectAbove != null) {
                     objectAbove.state.belowInstanceId = objectInstance.id;
                     objectInstance.state.aboveInstanceId = objectAbove.id;
+                    gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
+                    gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectAbove));
                     moveObjectTo(gamePanel, gameInstance, player, objectInstance, objectAbove);
                     if (!isStackCollected(gameInstance, objectInstance)) {
                         moveAboveStackTo(gamePanel, gameInstance, player, objectInstance, objectInstance.state.posX - objectInstance.getWidth(player.id) / 2, objectInstance.state.posY, false);
