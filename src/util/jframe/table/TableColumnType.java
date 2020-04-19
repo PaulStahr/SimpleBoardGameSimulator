@@ -1,4 +1,4 @@
-package util.data;
+package util.jframe.table;
 
 import java.util.List;
 

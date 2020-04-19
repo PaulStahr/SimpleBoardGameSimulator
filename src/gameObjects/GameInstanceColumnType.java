@@ -2,8 +2,9 @@ package gameObjects;
 
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
-import util.data.TableColumnType;
+import util.ArrayUtil;
 import util.data.UniqueObjects;
+import util.jframe.table.TableColumnType;
 import util.jframe.table.ValueColumnTypes;
 
 public enum GameInstanceColumnType implements TableColumnType{
@@ -59,14 +60,8 @@ public enum GameInstanceColumnType implements TableColumnType{
 	}
 	
 	public static GameInstanceColumnType getByName(String name) {
-		for (int i = 0; i < columnNames.length; ++i)
-		{
-			if (columnNames[i].equals(name))
-			{
-				return ct[i];
-			}
-		}
-		return null;
+		int index = ArrayUtil.firstEqualIndex(columnNames, name);
+		return index < 0 ? null : ct[index];
 	}
 
 	@Override

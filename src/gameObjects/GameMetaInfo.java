@@ -1,5 +1,7 @@
 package gameObjects;
 
+import util.jframe.table.TableColumnType;
+
 public class GameMetaInfo
 {
 	String id;
@@ -10,8 +12,9 @@ public class GameMetaInfo
 		this.id = id;
 	}
 	
-	public Object getValue(GameInstanceColumnType visibleCol) {
-		switch(visibleCol)
+	public Object getValue(TableColumnType tableColumnType) {
+		GameInstanceColumnType gigt = (GameInstanceColumnType) tableColumnType;
+		switch(gigt)
 		{
 			case DELETE:
 				return "delete";

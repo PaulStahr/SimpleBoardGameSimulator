@@ -29,7 +29,6 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.ColumnTypes;
 import gameObjects.GameInstanceColumnType;
 import gameObjects.GameMetaInfo;
 import gameObjects.instance.GameInstance;
@@ -39,6 +38,7 @@ import net.AsynchronousGameConnection;
 import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
 import util.jframe.table.ButtonColumn;
+import util.jframe.table.ColumnTypes;
 import util.jframe.table.TableModel;
 
 public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener{
@@ -82,21 +82,21 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			ServerLobbyWindow.this.actionPerformed(e);
  	    }
     };
- 	private final ButtonColumn connectColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getVisibleColumnNumber(GameInstanceColumnType.CONNECT));
- 	private final ButtonColumn deleteColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getVisibleColumnNumber(GameInstanceColumnType.DELETE));
+ 	private final ButtonColumn connectColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getColumnNumber(GameInstanceColumnType.CONNECT));
+ 	private final ButtonColumn deleteColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getColumnNumber(GameInstanceColumnType.DELETE));
 
     public static final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<GameMetaInfo> objectList, ColumnTypes types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
     {
- 		Object[][] rowData = new Object[objectList.size()][types.visibleColsSize()];
+ 		Object[][] rowData = new Object[objectList.size()][types.colsSize()];
      	for (int i = 0; i < rowData.length; ++i)
      	{
      		GameMetaInfo obj = objectList.get(i);
-     		for (int j = 0; j < types.visibleColsSize();++j)
+     		for (int j = 0; j < types.colsSize();++j)
      		{
-     			rowData[i][j] = JFrameUtils.toTableEntry(obj.getValue(types.getVisibleCol(j)));
+     			rowData[i][j] = JFrameUtils.toTableEntry(obj.getValue(types.getCol(j)));
      		}
      	}
-     	JFrameUtils.updateTable(table, scrollPane, rowData, types.getVisibleColumnNames(), types.visibleList(), tm, buttonColumn);
+     	JFrameUtils.updateTable(table, scrollPane, rowData, types.getColumnNames(), types.getList(), tm, buttonColumn);
  	}
  	
 	@Override

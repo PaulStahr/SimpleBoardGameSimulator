@@ -2,24 +2,24 @@ package gameObjects;
 
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
-import util.data.TableColumnType;
 import util.data.UniqueObjects;
+import util.jframe.table.TableColumnType;
 import util.jframe.table.ValueColumnTypes;
 
-public enum GameObjectColumnType implements TableColumnType{
+public enum GameObjectInstanceColumnType implements TableColumnType{
 	ID("id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
 	
-    private static final GameObjectColumnType ct[] = GameObjectColumnType.values();
-    private static final String[] columnNames = new String[GameObjectColumnType.ct.length];
+    private static final GameObjectInstanceColumnType ct[] = GameObjectInstanceColumnType.values();
+    private static final String[] columnNames = new String[GameObjectInstanceColumnType.ct.length];
     
     public static final int size()
     {
     	return ct.length;
     }
     
-    public static final GameObjectColumnType get(int index)
+    public static final GameObjectInstanceColumnType get(int index)
     {
     	return ct[index];
     }
@@ -30,7 +30,7 @@ public enum GameObjectColumnType implements TableColumnType{
 	public final Object defaultValue;
 	public final UnmodifiableArrayList<String> possibleValues;
 	
-	private GameObjectColumnType(String name, byte optionType, Object defaultValue, String possibleValues[]) {
+	private GameObjectInstanceColumnType(String name, byte optionType, Object defaultValue, String possibleValues[]) {
 		this.name = name;
 		this.optionType = optionType;
 		switch (optionType)
@@ -57,7 +57,7 @@ public enum GameObjectColumnType implements TableColumnType{
     	}
 	}
 	
-	public static GameObjectColumnType getByName(String name) {
+	public static GameObjectInstanceColumnType getByName(String name) {
 		for (int i = 0; i < columnNames.length; ++i)
 		{
 			if (columnNames[i].equals(name))

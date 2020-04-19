@@ -10,12 +10,12 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import gameObjects.ColumnTypes;
-import gameObjects.GameInstanceColumnType;
+import gameObjects.GameObjectInstanceColumnType;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import util.JFrameUtils;
 import util.jframe.table.ButtonColumn;
+import util.jframe.table.ColumnTypes;
 import util.jframe.table.TableModel;
 
 public class EditGamePanel extends JPanel implements ActionListener{
@@ -33,20 +33,20 @@ public class EditGamePanel extends JPanel implements ActionListener{
 				EditGamePanel.this.actionPerformed(e);
  	    }
     };
- 	private final ButtonColumn deleteColumn = new ButtonColumn(tableGameObjects,tableAction, GameInstance.TYPES.getVisibleColumnNumber(GameInstanceColumnType.DELETE));
+ 	private final ButtonColumn deleteColumn = new ButtonColumn(tableGameObjects,tableAction, ObjectInstance.TYPES.getColumnNumber(GameObjectInstanceColumnType.DELETE));
 
     public static final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<ObjectInstance> objectList, ColumnTypes types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
     {
- 		Object[][] rowData = new Object[objectList.size()][types.visibleColsSize()];
+ 		Object[][] rowData = new Object[objectList.size()][types.colsSize()];
      	for (int i = 0; i < rowData.length; ++i)
      	{
      		ObjectInstance obj = objectList.get(i);
-     		for (int j = 0; j < types.visibleColsSize();++j)
+     		for (int j = 0; j < types.colsSize();++j)
      		{
-     			rowData[i][j] = JFrameUtils.toTableEntry(obj.getValue(types.getVisibleCol(j)));
+     			rowData[i][j] = JFrameUtils.toTableEntry(obj.getValue(types.getCol(j)));
      		}
      	}
-     	JFrameUtils.updateTable(table, scrollPane, rowData, types.getVisibleColumnNames(), types.visibleList(), tm, buttonColumn);
+     	JFrameUtils.updateTable(table, scrollPane, rowData, types.getColumnNames(), types.getList(), tm, buttonColumn);
  	}
 
 	

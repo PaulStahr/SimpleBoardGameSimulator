@@ -58,8 +58,8 @@ import javax.swing.table.TableColumn;
 
 import org.slf4j.Logger;
 
-import util.data.TableColumnType;
 import util.jframe.table.ButtonColumn;
+import util.jframe.table.TableColumnType;
 import util.jframe.table.ValueColumnTypes;
 
 public class JFrameUtils{

@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.ColumnTypes;
 import gameObjects.GameAction;
 import gameObjects.GameInstanceColumnType;
 import main.Player;
+import util.jframe.table.ColumnTypes;
 
 public class GameInstance {
 	public static final ColumnTypes TYPES = new ColumnTypes(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.CONNECT, GameInstanceColumnType.DELETE}, new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.CONNECT, GameInstanceColumnType.DELETE});

@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.swing.table.DefaultTableModel;
 
-import util.data.TableColumnType;
-
 public final class TableModel extends DefaultTableModel
 {
 	/**
