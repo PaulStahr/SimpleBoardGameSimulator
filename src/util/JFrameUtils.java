@@ -59,8 +59,8 @@ import javax.swing.table.TableColumn;
 import org.slf4j.Logger;
 
 import util.data.TableColumnType;
-import util.jframe.ButtonColumn;
-import util.jframe.ValueColumnTypes;
+import util.jframe.table.ButtonColumn;
+import util.jframe.table.ValueColumnTypes;
 
 public class JFrameUtils{
 	public static final LayoutManager SINGLE_COLUMN_LAYOUT = new GridLayout(0, 1);
@@ -350,6 +350,12 @@ public class JFrameUtils{
 		Dimension dim = table.getPreferredSize();
 		scrollPane.setPreferredSize(new Dimension(dim.width, dim.height + table.getTableHeader().getPreferredSize().height + 8));
     }
+
+	public static Object toTableEntry(Object value) {
+		if (value instanceof Boolean){	return value;}
+			else if (value == null){	return null;}
+			else{						return String.valueOf(value);}
+	}
     
 
 }

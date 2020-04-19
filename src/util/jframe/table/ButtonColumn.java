@@ -1,4 +1,4 @@
-package util.jframe;
+package util.jframe.table;
 
 import java.awt.*;
 import java.awt.event.*;

@@ -4,23 +4,22 @@ import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
 import util.data.TableColumnType;
 import util.data.UniqueObjects;
-import util.jframe.ValueColumnTypes;
+import util.jframe.table.ValueColumnTypes;
 
-public enum ObjectColumnType implements TableColumnType{
+public enum GameObjectColumnType implements TableColumnType{
 	ID("id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
-	CONNECT("Connect", ValueColumnTypes.TYPE_BUTTON, "Connect", null),
 	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
 	
-    private static final ObjectColumnType ct[] = ObjectColumnType.values();
-    private static final String[] columnNames = new String[ObjectColumnType.ct.length];
+    private static final GameObjectColumnType ct[] = GameObjectColumnType.values();
+    private static final String[] columnNames = new String[GameObjectColumnType.ct.length];
     
     public static final int size()
     {
     	return ct.length;
     }
     
-    public static final ObjectColumnType get(int index)
+    public static final GameObjectColumnType get(int index)
     {
     	return ct[index];
     }
@@ -31,7 +30,7 @@ public enum ObjectColumnType implements TableColumnType{
 	public final Object defaultValue;
 	public final UnmodifiableArrayList<String> possibleValues;
 	
-	private ObjectColumnType(String name, byte optionType, Object defaultValue, String possibleValues[]) {
+	private GameObjectColumnType(String name, byte optionType, Object defaultValue, String possibleValues[]) {
 		this.name = name;
 		this.optionType = optionType;
 		switch (optionType)
@@ -58,7 +57,7 @@ public enum ObjectColumnType implements TableColumnType{
     	}
 	}
 	
-	public static ObjectColumnType getByName(String name) {
+	public static GameObjectColumnType getByName(String name) {
 		for (int i = 0; i < columnNames.length; ++i)
 		{
 			if (columnNames[i].equals(name))
@@ -77,5 +76,16 @@ public enum ObjectColumnType implements TableColumnType{
 	@Override
 	public String[] getPossibleValues() {
 		return possibleValues.toArray(new String[possibleValues.size()]);
+	}
+
+	@Override
+	public String getName() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Class<?> getCl() {
+		return cl;
 	}
 };

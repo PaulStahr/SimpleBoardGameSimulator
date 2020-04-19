@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 
 import gameObjects.ColumnTypes;
 import gameObjects.GameAction;
-import gameObjects.ObjectColumnType;
+import gameObjects.GameInstanceColumnType;
 import main.Player;
 
 public class GameInstance {
-	public static final ColumnTypes TYPES = new ColumnTypes(new ObjectColumnType[]{ObjectColumnType.ID, ObjectColumnType.NAME, ObjectColumnType.CONNECT, ObjectColumnType.DELETE}, new ObjectColumnType[]{ObjectColumnType.ID, ObjectColumnType.NAME, ObjectColumnType.CONNECT, ObjectColumnType.DELETE});
+	public static final ColumnTypes TYPES = new ColumnTypes(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.CONNECT, GameInstanceColumnType.DELETE}, new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.CONNECT, GameInstanceColumnType.DELETE});
 	public static final Logger logger = LoggerFactory.getLogger(GameInstance.class);
 	public Game game;
 	public String password;
@@ -124,7 +124,7 @@ public class GameInstance {
 		}
 	}
 
-	public Object getValue(ObjectColumnType col) {
+	public Object getValue(GameInstanceColumnType col) {
 		// TODO Auto-generated method stub
 		return null;
 	}

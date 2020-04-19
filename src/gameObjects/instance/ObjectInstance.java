@@ -1,11 +1,14 @@
 package gameObjects.instance;
 import java.awt.Image;
 
+import gameObjects.ColumnTypes;
+import gameObjects.GameInstanceColumnType;
 import gameObjects.definition.GameObject;
 import gui.GamePanel;
 import main.Player;
 
 public class ObjectInstance {
+	public static final ColumnTypes TYPES = new ColumnTypes(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.DELETE}, new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.DELETE});
 	public final ObjectState state;
 	public final GameObject go;
 	public final int id;
@@ -64,5 +67,9 @@ public class ObjectInstance {
 		public CardActionMenu(ObjectInstance gameObject, GameInstance gameInstance, Player player, GamePanel gamePanel) {
 			super(gameObject, gameInstance, player, gamePanel);
 		}
+	}
+
+	public Object getValue(GameInstanceColumnType visibleCol) {
+		return "";
 	}
 }

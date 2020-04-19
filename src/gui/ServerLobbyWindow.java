@@ -30,15 +30,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.ColumnTypes;
+import gameObjects.GameInstanceColumnType;
 import gameObjects.GameMetaInfo;
-import gameObjects.ObjectColumnType;
 import gameObjects.instance.GameInstance;
 import io.GameIO;
 import main.Player;
 import net.AsynchronousGameConnection;
 import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
-import util.jframe.ButtonColumn;
+import util.jframe.table.ButtonColumn;
+import util.jframe.table.TableModel;
 
 public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener{
 	/**
@@ -57,30 +58,9 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	Connect to an existing game session
 	*/
 	
-	private static final class TableModel extends DefaultTableModel
-	{
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -3379232940335572529L;
-		private final ColumnTypes types;
-		
-		public TableModel(ColumnTypes types)
-		{
-			super(new Object[1][types.colSize()], types.getVisibleColumnNames());
-			this.types = types;
-			
 
-			
-		}
-		
-		@Override
-        public final Class<?> getColumnClass(int columnIndex) {
-            return types.getCol(columnIndex).cl;
-        }
-	}
 	
-	private final DefaultTableModel tableModelOpenGames = new TableModel(GameInstance.TYPES);
+	private final DefaultTableModel tableModelOpenGames = new TableModel(GameInstance.TYPES.getTableColumnTypeList());
 	private final JTable tableOpenGames = new JTable(tableModelOpenGames);
 	private final JScrollPane scrollPaneOpenGames = new JScrollPane(tableOpenGames);
     private final JButton buttonPoll = new JButton("Aktualisiere");
@@ -102,9 +82,8 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			ServerLobbyWindow.this.actionPerformed(e);
  	    }
     };
- 	private final ButtonColumn connectColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getVisibleColumnNumber(ObjectColumnType.CONNECT));
- 	private final ButtonColumn deleteColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getVisibleColumnNumber(ObjectColumnType.DELETE));
-
+ 	private final ButtonColumn connectColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getVisibleColumnNumber(GameInstanceColumnType.CONNECT));
+ 	private final ButtonColumn deleteColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.getVisibleColumnNumber(GameInstanceColumnType.DELETE));
 
     public static final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<GameMetaInfo> objectList, ColumnTypes types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
     {
@@ -114,10 +93,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
      		GameMetaInfo obj = objectList.get(i);
      		for (int j = 0; j < types.visibleColsSize();++j)
      		{
-     			Object value = obj.getValue(types.getVisibleCol(j));
-     			if (value instanceof Boolean){	rowData[i][j] = value;}
-     			else if (value == null){		rowData[i][j] = null;}
-     			else{							rowData[i][j] = String.valueOf(value);}
+     			rowData[i][j] = JFrameUtils.toTableEntry(obj.getValue(types.getVisibleCol(j)));
      		}
      	}
      	JFrameUtils.updateTable(table, scrollPane, rowData, types.getVisibleColumnNames(), types.visibleList(), tm, buttonColumn);
@@ -160,8 +136,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			    	try {
 						Thread.sleep(1000);
 					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						logger.error("Unnexpected interrupt", e1);
 					}
 			    	client.addPlayerToGameSession(player, gi.name, gi.password);
 			    	AsynchronousGameConnection connection = client.connectToGameSession(gi);
@@ -183,12 +158,12 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			int row = event.getRow();
 			if (tableSource == tableModelOpenGames)
 			{
-				if (GameInstance.TYPES.getCol(col) == ObjectColumnType.CONNECT)
+				if (GameInstance.TYPES.getCol(col) == GameInstanceColumnType.CONNECT)
 				{
 					try
 					{
 						Player player = new Player(textFieldName.getText(), 1);
-						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.getColumnNumber(ObjectColumnType.ID)));
+						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.getColumnNumber(GameInstanceColumnType.ID)));
 				    	client.addPlayerToGameSession(player, gi.name, gi.password);
 				    	GameWindow gw = new GameWindow(gi, player);
 				    	AsynchronousGameConnection connection = client.connectToGameSession(gi);
@@ -200,11 +175,11 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						JFrameUtils.logErrorAndShow("Can't connect to server", e1, logger);
 					}
 		 	    }
-				else if (GameInstance.TYPES.getCol(col) == ObjectColumnType.DELETE)
+				else if (GameInstance.TYPES.getCol(col) == GameInstanceColumnType.DELETE)
 				{
 					GameInstance gi;
 					try {
-						gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.getColumnNumber(ObjectColumnType.ID)));
+						gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.getColumnNumber(GameInstanceColumnType.ID)));
 						client.deleteGame(gi.name, gi.password);
 					} catch (IOException | JDOMException e2) {
 						JFrameUtils.logErrorAndShow("Can't delete game", e2, logger);

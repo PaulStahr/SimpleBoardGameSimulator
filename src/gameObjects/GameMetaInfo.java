@@ -10,7 +10,7 @@ public class GameMetaInfo
 		this.id = id;
 	}
 	
-	public Object getValue(ObjectColumnType visibleCol) {
+	public Object getValue(GameInstanceColumnType visibleCol) {
 		switch(visibleCol)
 		{
 			case DELETE:

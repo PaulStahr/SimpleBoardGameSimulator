@@ -4,15 +4,16 @@ import java.util.List;
 
 import util.ArrayTools;
 import util.ArrayUtil;
+import util.data.TableColumnType;
 
 public class ColumnTypes
 {
-	ObjectColumnType cols[];
+	GameInstanceColumnType cols[];
     private final String[] columnNames;
     private final String[] visibleColumnNames;
-    private final List visibleColsList;
- 	private final ObjectColumnType[] visibleCols;
-	public ColumnTypes(ObjectColumnType cols[], ObjectColumnType visibleCols[])
+    private final List<GameInstanceColumnType> visibleColsList;
+ 	private final GameInstanceColumnType[] visibleCols;
+	public ColumnTypes(GameInstanceColumnType cols[], GameInstanceColumnType visibleCols[])
 	{
 		this.cols = cols;
 		columnNames = new String[cols.length];
@@ -29,11 +30,11 @@ public class ColumnTypes
     	}
     }
 
-	public int getVisibleColumnNumber(ObjectColumnType col) {
+	public int getVisibleColumnNumber(GameInstanceColumnType col) {
 		return ArrayUtil.linearSearch(visibleCols, col);
 	}
     
-	public int getColumnNumber(ObjectColumnType col) {
+	public int getColumnNumber(GameInstanceColumnType col) {
 		return ArrayUtil.linearSearch(cols, col);
 	}
     
@@ -42,7 +43,7 @@ public class ColumnTypes
     	return cols.length;
     }
     
-    public final ObjectColumnType getCol(int index)
+    public final GameInstanceColumnType getCol(int index)
     {
     	return cols[index];
     }
@@ -56,17 +57,27 @@ public class ColumnTypes
 		return visibleColumnNames.clone();
 	}
 	
-	public ObjectColumnType[] getVisibleCols()
+	
+	public GameInstanceColumnType[] getVisibleColList()
+	{
+		return visibleCols.clone();
+	}
+	
+	public GameInstanceColumnType[] getVisibleCols()
 	{
 		return visibleCols.clone();
 	}
     
-    public final ObjectColumnType getVisibleCol(int index)
+    public final GameInstanceColumnType getVisibleCol(int index)
     {
     	return visibleCols[index];
     }
 
-	public List<ObjectColumnType> visibleList() {
+	public List<GameInstanceColumnType> visibleList() {
+		return visibleColsList;
+	}
+
+	public List<? extends TableColumnType> getTableColumnTypeList() {
 		return visibleColsList;
 	} 
 }
