@@ -437,7 +437,7 @@ public class ObjectFunctions {
      * @param objectInstance Instance of Object
      */
     public static void flipObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
-        if (objectInstance != null ) { //&& isObjectInHand(player, objectInstance)
+        if (objectInstance != null ) {
             player.actionString = "Flipped Object";
             gameInstance.update(new GamePlayerEditAction(gamePanelId, player, player));
             ((GameObjectToken.TokenState) objectInstance.state).side = !((GameObjectToken.TokenState) objectInstance.state).side;

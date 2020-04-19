@@ -76,6 +76,7 @@ public class DrawFunctions {
                 g2.fillRect(gamePanel.mouseScreenX - 5, gamePanel.mouseScreenY - 5, 10, 10);
                 g2.drawString(p.name, gamePanel.mouseScreenX + 15, gamePanel.mouseScreenY + 5);
                 g2.drawString(p.actionString, gamePanel.mouseScreenX - 5, gamePanel.mouseScreenY - 20);
+                g.drawString(infoText, gamePanel.mouseScreenX - 25, gamePanel.mouseScreenY + 5);
                 g2.setTransform(tmp);
             }
             else {
@@ -87,11 +88,6 @@ public class DrawFunctions {
             //g.drawString(p.name, p.mouseXPos, p.mo    useYPos);
             //drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gamePanel, gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, p.color, 1);
             g2.scale(gamePanel.zooming, gamePanel.zooming);
-        }
-        if (player != null)
-        {
-            g.setColor(player.color);
-            g.drawString(infoText, player.mouseXPos - 25, player.mouseYPos + 5);
         }
         g2.setTransform(tmp);
     }

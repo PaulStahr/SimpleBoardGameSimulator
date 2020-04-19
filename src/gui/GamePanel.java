@@ -165,7 +165,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         //Draw all objects not in some private area
 		for (ObjectInstance oi : gameInstance.objects) {
-			drawTokenObjects(this, g, gameInstance, oi, player, ial);
+			if (oi.state.owner_id != player.id || !oi.state.inPrivateArea) {
+				drawTokenObjects(this, g, gameInstance, oi, player, ial);
+			}
 		}
 		drawActiveObject(this, g, player, activeObject);
 		drawPlayerMarkers(this, g, gameInstance, player, infoText);
@@ -218,12 +220,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			this.privateArea.removeObject(this.privateArea.privateObjects.indexOf(activeObject.id));
 			activeObject.state.posX = player.mouseXPos - activeObject.getWidth(player.id)/2;
 			activeObject.state.posY = player.mouseYPos - activeObject.getHeight(player.id)/2;
-			activeObject.state.owner_id = -1;
-		}
-		if (activeObject != null && activeObject.state.inPrivateArea && !this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY))
-		{
 			activeObject.state.inPrivateArea = false;
-			ObjectFunctions.flipObject(id, gameInstance, player, activeObject);
+		}
+		else if (activeObject != null && activeObject.state.owner_id==player.id)
+		{
+			if(!this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)) {
+				activeObject.state.owner_id = -1;
+				ObjectFunctions.flipObject(id, gameInstance, player, activeObject);
+			}
 		}
 		if(activeObject != null) {
 			objOrigPosX = activeObject.state.posX;
