@@ -80,7 +80,7 @@ public class ArrayTools {
 	
 	public static final <E> E[] push_back(E data[], E obj)
 	{
-		E res[] = (E[])Arrays.copyOf(data, data.length + 1);
+		E res[] = Arrays.copyOf(data, data.length + 1);
 		res[data.length] = obj;
 		return res;
 	}
@@ -242,29 +242,20 @@ public class ArrayTools {
 			return indexOf(o) > -1;
 		}
 		
+		public final int indexOfEqual(Object value)
+		{
+			return ArrayUtil.firstEqualIndex(array, 0, length, value);
+		}
+		
 		@Override
-		public final int indexOf(Object object){
-			if (object == null)
-				for (int i=0;i<length;i++)
-					if (array[i] == null)
-						return i;
-			for (int i=0;i<length;i++)
-				if (object.equals(array[i]))
-					return i;
-			return -1;
+		public final int indexOf(Object value){
+			return ArrayUtil.linearSearch(array, 0, length, value);
 		}
 
 		
 		@Override
-		public final int lastIndexOf(Object object){
-			if (object == null)
-				for (int i=length-1;i>=0;i--)
-					if (array[i] == null)
-						return i;
-			for (int i=length-1;i>=0;i--)
-				if (array[i].equals(object))
-					return i;
-			return -1;
+		public final int lastIndexOf(Object value){
+			return ArrayUtil.reverseLinearSearch(array, 0, length, value);
 		}
 	}
 	
