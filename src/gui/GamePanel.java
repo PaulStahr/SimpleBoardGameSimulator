@@ -70,6 +70,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	boolean isShiftDown = false;
 
 	boolean isLeftMouseKeyHold = false;
+	boolean isRightMouseKeyHold = false;
 
 	public int mouseScreenX = -1;
 	public int mouseScreenY = -1;
@@ -179,17 +180,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-		/* Right Mouse Click on Object */
+		/* Right Mouse Click on Object
 		if(SwingUtilities.isRightMouseButton(arg0))
 		{
 			screenToBoardPos(arg0.getX(), arg0.getY(), mousePressedGamePos);
 			mouseBoardPos.set(mousePressedGamePos);
 			activeObject = ObjectFunctions.setActiveObjectByMouseAndKey(this, gameInstance,player, mouseBoardPos, loggedKeys, maxInaccuracy);
-			/*Show popup menu of active object*/
+			//Show popup menu of active object
 			if (activeObject!=null) {
 				activeObject.newObjectActionMenu(gameInstance, player, this).showPopup(arg0);
 			}
-		}
+		}*/
 	}
 
 	@Override
@@ -200,7 +201,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
-		isLeftMouseKeyHold = true;
+		if(SwingUtilities.isLeftMouseButton(arg0)) {
+			isLeftMouseKeyHold = true;
+		}
+		if(SwingUtilities.isRightMouseButton(arg0)){
+			isRightMouseKeyHold = true;
+		}
 		mouseScreenX  = arg0.getX();
 		mouseScreenY  = arg0.getY();
 		screenToBoardPos(arg0.getX(), arg0.getY(), mousePressedGamePos);
@@ -249,8 +255,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			outText = String.valueOf(this.privateArea.getAngle(mouseScreenX, mouseScreenY));
 		}
-		if (activeObject != null && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
-			ObjectFunctions.releaseObjects(this, gameInstance, player, activeObject, mouseScreenX, mouseScreenY, 1);
+		if (activeObject != null && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
+			ObjectFunctions.releaseObjects(arg0, this, gameInstance, player, activeObject, mouseScreenX, mouseScreenY, 1);
 		}
 		activeObject = null;
 
@@ -502,6 +508,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		isShiftDown = false;
 		loggedKeys[e.getKeyCode()] = false;
 		if(!isLeftMouseKeyHold) {
+			activeObject = null;
+		}
+		if(!isRightMouseKeyHold) {
 			activeObject = null;
 		}
 		repaint();

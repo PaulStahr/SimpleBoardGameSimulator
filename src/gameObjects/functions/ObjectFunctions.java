@@ -1,6 +1,7 @@
 package gameObjects.functions;
 
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Collections;
 
@@ -19,6 +20,8 @@ import gui.GamePanel;
 import main.Player;
 import util.Pair;
 import util.data.IntegerArrayList;
+
+import javax.swing.*;
 
 public class ObjectFunctions {
 	private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -822,7 +825,7 @@ public class ObjectFunctions {
 
     }
 
-    public static void releaseObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
+    public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
         if(activeObject != null) {
             IntegerArrayList stackIds = new IntegerArrayList();
             if (gamePanel.privateArea != null && !gamePanel.privateArea.privateObjects.contains(activeObject.id) &&  gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
@@ -837,9 +840,12 @@ public class ObjectFunctions {
                     gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentObject));
                 }
 
-            } else if(!gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
+            } else if(activeObject.state.owner_id == player.id && !gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                 activeObject.state.owner_id = -1;
                 activeObject.state.inPrivateArea = false;
+                if (SwingUtilities.isLeftMouseButton(arg0)) {
+                    ObjectFunctions.flipObject(gamePanel.id, gameInstance, player, activeObject);
+                }
             }
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, activeObject));
         }
@@ -862,8 +868,8 @@ public class ObjectFunctions {
     }
 
 
-    public static void releaseObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming) {
-        releaseObjects(gamePanel, gameInstance, player, activeObject, posX, posY, zooming, activeObject.getWidth(player.id) / 3);
+    public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming) {
+        releaseObjects(arg0, gamePanel, gameInstance, player, activeObject, posX, posY, zooming, activeObject.getWidth(player.id) / 3);
     }
 
     public static ObjectInstance findNeighbouredStackTop(GameInstance gameInstance, Player player, ObjectInstance activeObject, int maxInaccuracy) {
