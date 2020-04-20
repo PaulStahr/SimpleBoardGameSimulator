@@ -495,7 +495,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (e.getKeyCode() == KeyEvent.VK_M && !isControlDown)
 		{
 			loggedKeys[e.getKeyCode()] = true;
-			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, player, mouseScreenX, mouseScreenY);
 			ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
 		}
 
