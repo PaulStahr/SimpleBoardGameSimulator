@@ -7,18 +7,19 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
+import main.gameObjects.Player;
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.instance.GameInstance;
-import gui.GameWindow;
-import gui.ServerLobbyWindow;
-import io.GameIO;
-import logging.LockbackUtil;
-import net.AsynchronousGameConnection;
-import net.GameServer;
-import net.SynchronousGameClientLobbyConnection;
+import main.gameObjects.instance.GameInstance;
+import main.gui.GameWindow;
+import main.gui.ServerLobbyWindow;
+import main.io.GameIO;
+import main.logging.LockbackUtil;
+import main.net.AsynchronousGameConnection;
+import main.net.GameServer;
+import main.net.SynchronousGameClientLobbyConnection;
 
 
 public class Main {

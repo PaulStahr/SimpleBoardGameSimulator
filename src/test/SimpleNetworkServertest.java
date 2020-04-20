@@ -8,13 +8,13 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.instance.GameInstance;
-import gui.GameWindow;
-import io.GameIO;
-import main.Player;
-import net.AsynchronousGameConnection;
-import net.GameServer;
-import net.SynchronousGameClientLobbyConnection;
+import main.gameObjects.instance.GameInstance;
+import main.gui.GameWindow;
+import main.io.GameIO;
+import main.gameObjects.Player;
+import main.net.AsynchronousGameConnection;
+import main.net.GameServer;
+import main.net.SynchronousGameClientLobbyConnection;
 
 public class SimpleNetworkServertest {
     private static final Logger logger = LoggerFactory.getLogger(SimpleNetworkServertest.class);
