@@ -2,6 +2,7 @@ package gameObjects;
 
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
+import util.ArrayUtil;
 import util.data.UniqueObjects;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.ValueColumnTypes;
@@ -12,7 +13,7 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
 	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
 	
     private static final GameObjectInstanceColumnType ct[] = GameObjectInstanceColumnType.values();
-    private static final String[] columnNames = new String[GameObjectInstanceColumnType.ct.length];
+    private static final String[] columnNames = TableColumnType.getColumnNames(ct);
     
     public static final int size()
     {
@@ -33,39 +34,14 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
 	private GameObjectInstanceColumnType(String name, byte optionType, Object defaultValue, String possibleValues[]) {
 		this.name = name;
 		this.optionType = optionType;
-		switch (optionType)
-		{
-			case ValueColumnTypes.TYPE_CHECKBOX:
-				this.cl = Boolean.class;
-				break;
-			case ValueColumnTypes.TYPE_COLOR:
-			case ValueColumnTypes.TYPE_TEXTFIELD:
-			case ValueColumnTypes.TYPE_COMBOBOX:
-			case ValueColumnTypes.TYPE_BUTTON:
-				this.cl = String.class;
-				break;
-			default:
-				throw new IllegalArgumentException();
-		}
+		this.cl = TableColumnType.getColumnClass(optionType);
 		this.possibleValues = possibleValues == null || possibleValues.length == 0 ? UniqueObjects.EMPTY_STRING_LIST : ArrayTools.unmodifiableList(possibleValues);
 		this.defaultValue = defaultValue;
 	}
-	static {
-		for (int i = 0; i < ct.length; ++i)
-    	{
-    		columnNames[i] = ct[i].name;
-    	}
-	}
 	
 	public static GameObjectInstanceColumnType getByName(String name) {
-		for (int i = 0; i < columnNames.length; ++i)
-		{
-			if (columnNames[i].equals(name))
-			{
-				return ct[i];
-			}
-		}
-		return null;
+		int index = ArrayUtil.firstEqualIndex(columnNames, name);
+		return index < 0 ? null : ct[index];
 	}
 
 	@Override
@@ -80,8 +56,7 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
 
 	@Override
 	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
+		return name;
 	}
 
 	@Override
