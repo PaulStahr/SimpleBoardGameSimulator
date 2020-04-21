@@ -1,15 +1,16 @@
 package gameObjects.instance;
 import java.awt.Image;
+import java.util.List;
 
 import gameObjects.GameObjectInstanceColumnType;
 import gameObjects.definition.GameObject;
 import gui.GamePanel;
 import main.Player;
-import util.jframe.table.ColumnTypes;
+import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 
 public class ObjectInstance {
-	public static final ColumnTypes TYPES = new ColumnTypes(new TableColumnType[]{GameObjectInstanceColumnType.ID, GameObjectInstanceColumnType.NAME, GameObjectInstanceColumnType.DELETE}, new TableColumnType[]{GameObjectInstanceColumnType.ID, GameObjectInstanceColumnType.NAME, GameObjectInstanceColumnType.DELETE});
+	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectInstanceColumnType.ID, GameObjectInstanceColumnType.NAME, GameObjectInstanceColumnType.DELETE});
 	public final ObjectState state;
 	public final GameObject go;
 	public final int id;

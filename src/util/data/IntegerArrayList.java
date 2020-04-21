@@ -54,7 +54,7 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		++length;
 	}
 	
-	public Integer removeI(int index)
+	public int removeI(int index)
 	{
 		int tmp = data[index];
 		System.arraycopy(data, index + 1, data, index, length - index - 1);

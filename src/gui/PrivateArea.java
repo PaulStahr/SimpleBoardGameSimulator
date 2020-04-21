@@ -98,7 +98,7 @@ public class PrivateArea {
     public int getObjectIdByPosition(int posX, int posY) {
         if (privateObjects.size() > 0) {
             int section = getSectionByPosition(posX, posY);
-            return privateObjects.get(section);
+            return privateObjects.getI(section);
         } else {
             return -1;
         }
