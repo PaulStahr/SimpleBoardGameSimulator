@@ -65,10 +65,7 @@ public class PrivateArea {
 
     public boolean containsBoardCoordinates(int posX, int posY) {
         Point2D transformedPoint = boardTransform.transform(new Point2D.Double(posX, posY), null);
-        if (transformedPoint != null) {
-            return shape.contains(transformedPoint);
-        } else
-            return false;
+        return transformedPoint != null && shape.contains(transformedPoint);
     }
     public boolean containsScreenCoordinates(int posX, int posY) {
         return shape.contains(posX, posY);
@@ -130,20 +127,9 @@ public class PrivateArea {
 
     public void insertObject(int objectId, int posX, int posY) {
         int index = getInsertPosition(posX, posY);
-        privateObjects.add(index, objectId);
-
-        if (gamePanel != null && gameInstance != null){
-            ObjectInstance belowObject = null;
-            ObjectInstance aboveObject = null;
-            if (index - 1 >= 0){
-                belowObject = gameInstance.objects.get(privateObjects.getI(index - 1));
-            }
-            if (privateObjects.size() > index + 1){
-                aboveObject = gameInstance.objects.get(privateObjects.getI(index + 1));
-            }
-            ObjectFunctions.insertIntoStack(gamePanel, gameInstance, gamePanel.player, gameInstance.objects.get(objectId), belowObject, aboveObject,0);
-        }
+        insertObject(objectId, index);
     }
+
     public void insertObject(int objectId, int index) {
         privateObjects.add(index, objectId);
         if (gamePanel != null && gameInstance != null){
@@ -159,7 +145,7 @@ public class PrivateArea {
         }
     }
 
-        public void removeObject(int index) {
+    public void removeObject(int index) {
     	ObjectFunctions.removeObject(gamePanel, gameInstance, gamePanel.player, gameInstance.objects.get(privateObjects.getI(index)));
         privateObjects.removeI(index);
     }
