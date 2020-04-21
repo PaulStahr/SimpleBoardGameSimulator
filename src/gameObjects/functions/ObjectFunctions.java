@@ -810,6 +810,9 @@ public class ObjectFunctions {
         if (loggedKeys[KeyEvent.VK_SHIFT]){
             activeObject = getStackBottom(gameInstance, activeObject);
         }
+        if(activeObject != null && activeObject.state.owner_id != -1 && activeObject.state.owner_id!=player.id){
+            return null;
+        }
         return activeObject;
     }
 
