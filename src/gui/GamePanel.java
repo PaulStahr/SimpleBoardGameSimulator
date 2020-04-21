@@ -64,8 +64,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	int maxInaccuracy = 20;
 
-	boolean[] loggedKeys = new boolean[1024];
-
 	boolean isLeftMouseKeyHold = false;
 	boolean isRightMouseKeyHold = false;
 
@@ -215,7 +213,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			selectedObjects.clear();
 		}
 
-		activeObject = ObjectFunctions.setActiveObjectByMouseAndKey(this, gameInstance, player, mouseBoardPos, loggedKeys, maxInaccuracy);
+		activeObject = ObjectFunctions.setActiveObjectByMouseAndKey(this, gameInstance, player, mouseBoardPos, arg0.isShiftDown(), maxInaccuracy);
 		if (activeObject != null && this.privateArea.privateObjects.contains(activeObject.id)) {
 			this.privateArea.removeObject(this.privateArea.privateObjects.indexOf(activeObject.id));
 			activeObject.state.posX = player.mouseXPos - activeObject.getWidth(player.id)/2;
@@ -380,7 +378,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void changeUpdate(GameAction action) {
-		logger.debug("change Update:" + action.source + " " + id);
+		if (logger.isDebugEnabled()) {logger.debug("change Update:" + action.source + " " + id);}
 		if (action instanceof GameObjectInstanceEditAction)
 		{
 			repaint();
@@ -398,53 +396,36 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	}
 	@Override
 	public void keyPressed(KeyEvent e) {
-		System.out.println(e);
-		if (e.isControlDown())
+		boolean controlDown = e.isControlDown();
+		if(e.getKeyCode() == KeyEvent.VK_C && !controlDown)
 		{
-			loggedKeys[e.getKeyCode()] = true;
-		}
-		else if(e.isShiftDown())
-		{
-			loggedKeys[e.getKeyCode()] = true;
-		}
-
-		if(e.getKeyCode() == KeyEvent.VK_C && !loggedKeys[KeyEvent.VK_CONTROL])
-		{
-			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
 			int count = ObjectFunctions.countStack(gameInstance, activeObject);
 			player.actionString = "Object Number: " + String.valueOf(count);
 		}
-		if(e.getKeyCode() == KeyEvent.VK_F && !loggedKeys[KeyEvent.VK_CONTROL])
+		if(e.getKeyCode() == KeyEvent.VK_F && !controlDown)
 		{
-			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			ObjectFunctions.flipObject(id, gameInstance, player, activeObject);
 		}
-		if (loggedKeys[KeyEvent.VK_CONTROL] && loggedKeys[KeyEvent.VK_F])
+		if (controlDown && e.getKeyCode() == KeyEvent.VK_F)
 		{
-			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance,player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			ObjectFunctions.flipStack(id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject));
 		}
 		if(e.getKeyCode() == KeyEvent.VK_S)
 		{
-			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			ObjectFunctions.shuffleStack(id, gameInstance, player, activeObject);
 		}
-
-		if (loggedKeys[KeyEvent.VK_CONTROL] && loggedKeys[KeyEvent.VK_C])
+		if (controlDown && e.getKeyCode() == KeyEvent.VK_C)
 		{
-			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance,player , mouseBoardPos.getXI(), mouseBoardPos.getYI());
 			int count = ObjectFunctions.countStackValues(gameInstance, activeObject);
 			player.actionString = "Value: " + String.valueOf(count);
 		}
-
 		if (e.getKeyCode() == KeyEvent.VK_V)
 		{
-			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			if (activeObject!= null) {
 				if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, activeObject), ObjectFunctions.getStackBottom(gameInstance, activeObject))) {
@@ -457,41 +438,35 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		if (e.getKeyCode() == KeyEvent.VK_R)
 		{
-			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
 			ObjectFunctions.removeStackRelations(id, gameInstance, player, activeObject);
 		}
 		if (e.getKeyCode() == KeyEvent.VK_T)
 		{
-			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance,player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
 			ObjectFunctions.takeObjects(this, gameInstance, player, activeObject);
 		}
 
 		if (e.getKeyCode() == KeyEvent.VK_D)
 		{
-			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance,player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
 			ObjectFunctions.dropObjects(id, gameInstance, player, activeObject);
 		}
 
 		if (e.getKeyCode() == KeyEvent.VK_P)
 		{
-			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
 			getGraphics().drawString("Type: " + String.valueOf(activeObject.go.objectType) + " " + "Value: " + String.valueOf(activeObject.go.uniqueName), mouseBoardPos.getXI(), mouseBoardPos.getYI());
 		}
 
 		if (e.getKeyCode() == KeyEvent.VK_M && e.isControlDown())
 		{
-			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
 			ObjectFunctions.getAllObjectsOfType(id, gameInstance, player, activeObject);
 		}
 
 		if (e.getKeyCode() == KeyEvent.VK_M && !e.isControlDown())
 		{
-			loggedKeys[e.getKeyCode()] = true;
 			ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
 		}
 
@@ -500,7 +475,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		loggedKeys[e.getKeyCode()] = false;
 		if(!isLeftMouseKeyHold) {
 			activeObject = null;
 		}
