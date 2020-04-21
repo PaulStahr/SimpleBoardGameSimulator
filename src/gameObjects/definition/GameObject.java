@@ -2,7 +2,6 @@ package gameObjects.definition;
 
 import java.awt.image.BufferedImage;
 
-import gameObjects.GameInstanceColumnType;
 import gameObjects.instance.ObjectState;
 
 public abstract class GameObject {
@@ -38,9 +37,5 @@ public abstract class GameObject {
 	public int hashCode()
 	{
 		return widthInMM ^ heightInMM ^ uniqueName.hashCode();
-	}
-
-	public Object getValue(GameInstanceColumnType visibleCol) {
-		return "";
 	}
 }

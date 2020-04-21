@@ -8,7 +8,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
@@ -39,8 +38,6 @@ import net.AsynchronousGameConnection;
 import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
 import util.jframe.table.ButtonColumn;
-import util.jframe.table.ColumnTypes;
-import util.jframe.table.TableColumnType;
 import util.jframe.table.TableModel;
 
 public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener{
@@ -86,20 +83,6 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
     };
  	private final ButtonColumn connectColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.CONNECT));
  	private final ButtonColumn deleteColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.DELETE));
-
-    public static final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<GameMetaInfo> objectList, List<TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
-    {
- 		Object[][] rowData = new Object[objectList.size()][types.size()];
-     	for (int i = 0; i < rowData.length; ++i)
-     	{
-     		GameMetaInfo obj = objectList.get(i);
-     		for (int j = 0; j < types.size();++j)
-     		{
-     			rowData[i][j] = JFrameUtils.toTableEntry(obj.getValue(types.get(j)));
-     		}
-     	}
-     	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, buttonColumn);
- 	}
  	
 	@Override
 	public void actionPerformed(ActionEvent e)
@@ -120,7 +103,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				gmi.add(new GameMetaInfo(al.get(i)));
 				gmi.get(i).name = al.get(i);
 			}
-			updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn, deleteColumn);
+			JFrameUtils.updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn, deleteColumn);
 			
 		}
 		else if (source == buttonCreateGame)

@@ -2,7 +2,6 @@ package gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -18,7 +17,6 @@ import gameObjects.instance.ObjectInstance;
 import util.ArrayTools;
 import util.JFrameUtils;
 import util.jframe.table.ButtonColumn;
-import util.jframe.table.ColumnTypes;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.TableModel;
 
@@ -51,35 +49,6 @@ public class EditGamePanel extends JPanel implements ActionListener{
     };
  	private final ButtonColumn deleteObjectColumn = new ButtonColumn(tableGameObjects,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
  	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableGameObjects,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
-
-    public static final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<ObjectInstance> objectList, List<TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
-    {
- 		Object[][] rowData = new Object[objectList.size()][types.size()];
-     	for (int i = 0; i < rowData.length; ++i)
-     	{
-     		ObjectInstance obj = objectList.get(i);
-     		for (int j = 0; j < types.size();++j)
-     		{
-     			rowData[i][j] = JFrameUtils.toTableEntry(obj.getValue(types.get(j)));
-     		}
-     	}
-     	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, buttonColumn);
- 	}
-
-    public static final void updateImageTable(JTable table, JScrollPane scrollPane, ArrayList<ObjectInstance> objectList, List<TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
-    {
- 		Object[][] rowData = new Object[objectList.size()][types.size()];
-     	for (int i = 0; i < rowData.length; ++i)
-     	{
-     		ObjectInstance obj = objectList.get(i);
-     		for (int j = 0; j < types.size();++j)
-     		{
-     			rowData[i][j] = JFrameUtils.toTableEntry(obj.getValue(types.get(j)));
-     		}
-     	}
-     	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, buttonColumn);
- 	}
-
 	
 	/**
 	 * 
@@ -88,7 +57,7 @@ public class EditGamePanel extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		updateTable(tableGameObjects, scrollPaneGameObjects, gi.objects, ObjectInstance.TYPES, tableModelGameObjects, deleteObjectColumn);
+		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.objects, ObjectInstance.TYPES, tableModelGameObjects, deleteObjectColumn);
 	}
 	
 

@@ -70,19 +70,4 @@ public class ObjectInstance {
 			super(gameObject, gameInstance, player, gamePanel);
 		}
 	}
-
-	public Object getValue(TableColumnType col) {
-		GameObjectInstanceColumnType tmp = (GameObjectInstanceColumnType)col;
-		switch(tmp)
-		{
-		case DELETE:
-			return "delete";
-		case ID:
-			return id;
-		case NAME:
-			return go.uniqueName;
-		default:
-			return "";
-		}
-	}
 }
