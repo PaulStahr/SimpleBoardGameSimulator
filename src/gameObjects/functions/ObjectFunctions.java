@@ -1,9 +1,10 @@
 package gameObjects.functions;
 
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import java.util.Collections;
+
+import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +21,6 @@ import gui.GamePanel;
 import main.Player;
 import util.Pair;
 import util.data.IntegerArrayList;
-
-import javax.swing.*;
 
 public class ObjectFunctions {
 	private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -802,12 +801,12 @@ public class ObjectFunctions {
     }
 
 
-    public static ObjectInstance setActiveObjectByMouseAndKey(GamePanel gamePanel, GameInstance gameInstance, Player player, Vector2 mouse, boolean[] loggedKeys, int maxInaccuracy) {
+    public static ObjectInstance setActiveObjectByMouseAndKey(GamePanel gamePanel, GameInstance gameInstance, Player player, Vector2 mouse, boolean isShiftDown, int maxInaccuracy) {
         ObjectInstance activeObject = null;
         int pressedXPos = mouse.getXI();
         int pressedYPos = mouse.getYI();
         activeObject = getNearestObjectByPosition(gamePanel,gameInstance, player,pressedXPos,pressedYPos,1,null);
-        if (loggedKeys[KeyEvent.VK_SHIFT]){
+        if (isShiftDown){
             activeObject = getStackBottom(gameInstance, activeObject);
         }
         if(activeObject != null && activeObject.state.owner_id != -1 && activeObject.state.owner_id!=player.id){
