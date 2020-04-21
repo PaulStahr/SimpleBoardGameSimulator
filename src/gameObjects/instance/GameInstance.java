@@ -1,6 +1,7 @@
 package gameObjects.instance;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,10 +9,11 @@ import org.slf4j.LoggerFactory;
 import gameObjects.GameAction;
 import gameObjects.GameInstanceColumnType;
 import main.Player;
-import util.jframe.table.ColumnTypes;
+import util.ArrayTools;
+import util.jframe.table.TableColumnType;
 
 public class GameInstance {
-	public static final ColumnTypes TYPES = new ColumnTypes(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.CONNECT, GameInstanceColumnType.DELETE}, new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.CONNECT, GameInstanceColumnType.DELETE});
+	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.CONNECT, GameInstanceColumnType.DELETE});
 	public static final Logger logger = LoggerFactory.getLogger(GameInstance.class);
 	public Game game;
 	public String password;

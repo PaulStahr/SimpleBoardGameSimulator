@@ -3,6 +3,7 @@ package gui;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
@@ -17,12 +18,15 @@ import gameObjects.instance.ObjectInstance;
 import util.JFrameUtils;
 import util.jframe.table.ButtonColumn;
 import util.jframe.table.ColumnTypes;
+import util.jframe.table.TableColumnType;
 import util.jframe.table.TableModel;
 
 public class EditGamePanel extends JPanel implements ActionListener{
 	GameInstance gi;
-	private final DefaultTableModel tableModelGameObjects= new TableModel(ObjectInstance.TYPES.getTableColumnTypeList());
+	private final DefaultTableModel tableModelGameObjects= new TableModel(ObjectInstance.TYPES);
+	private final DefaultTableModel tableModelImages= new TableModel(ObjectInstance.TYPES);
 	private final JTable tableGameObjects = new JTable(tableModelGameObjects);
+	private final JTable tableImages = new JTable(tableModelImages);
 	public String name;
 	private JScrollPane scrollPaneGameObjects = new JScrollPane(tableGameObjects);
 	public EditGamePanel(GameInstance gi) {
@@ -42,20 +46,20 @@ public class EditGamePanel extends JPanel implements ActionListener{
 				EditGamePanel.this.actionPerformed(e);
  	    }
     };
- 	private final ButtonColumn deleteColumn = new ButtonColumn(tableGameObjects,tableAction, ObjectInstance.TYPES.getColumnNumber(GameObjectInstanceColumnType.DELETE));
+ 	private final ButtonColumn deleteColumn = new ButtonColumn(tableGameObjects,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
 
-    public static final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<ObjectInstance> objectList, ColumnTypes types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
+    public static final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<ObjectInstance> objectList, List<TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
     {
- 		Object[][] rowData = new Object[objectList.size()][types.colsSize()];
+ 		Object[][] rowData = new Object[objectList.size()][types.size()];
      	for (int i = 0; i < rowData.length; ++i)
      	{
      		ObjectInstance obj = objectList.get(i);
-     		for (int j = 0; j < types.colsSize();++j)
+     		for (int j = 0; j < types.size();++j)
      		{
-     			rowData[i][j] = JFrameUtils.toTableEntry(obj.getValue(types.getCol(j)));
+     			rowData[i][j] = JFrameUtils.toTableEntry(obj.getValue(types.get(j)));
      		}
      	}
-     	JFrameUtils.updateTable(table, scrollPane, rowData, types.getColumnNames(), types.getList(), tm, buttonColumn);
+     	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, buttonColumn);
  	}
 
 	
