@@ -28,6 +28,11 @@ import main.Player;
 
 
 public class IngameChatPanel extends JPanel implements GameChangeListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8779142095973760951L;
+
 	private static final Logger logger = LoggerFactory.getLogger(GamePanel.class);
 
 	public static final int preferredWidth = 60;
@@ -96,13 +101,8 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		{
 			UsertextMessageAction textAction = (UsertextMessageAction) action;
 			String message = textAction.message;
-			Color color = Color.black;
-			for (Player player : game.players) {
-				if (textAction.player == player.id) {
-					color = player.color;
-				}
-			}
-			appendColorMessage(message, color);
+			Player pl = game.getPlayer(textAction.player);
+			appendColorMessage(message, pl == null ? Color.BLACK : pl.color);
 		}
 	}
 	
