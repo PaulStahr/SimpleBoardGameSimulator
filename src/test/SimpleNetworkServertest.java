@@ -81,7 +81,7 @@ public class SimpleNetworkServertest {
     	}
     	{
     	   	Player player = new Player("Paul", 1);
-    	   	FileInputStream fis = new FileInputStream("Wizard.zip");
+    	   	FileInputStream fis = new FileInputStream("PrivateGames/Wizard.zip");
 			GameInstance gi = GameIO.readSnapshotFromZip(fis);
 			gi.name = "Testsession";
 			gi.players.add(player);
