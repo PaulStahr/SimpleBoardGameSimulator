@@ -14,7 +14,7 @@ public enum GameInstanceColumnType implements TableColumnType{
 	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
 	
     private static final GameInstanceColumnType ct[] = GameInstanceColumnType.values();
-    private static final String[] columnNames = new String[GameInstanceColumnType.ct.length];
+    private static final String[] columnNames = TableColumnType.getColumnNames(ct);
     
     public static final int size()
     {
@@ -35,28 +35,9 @@ public enum GameInstanceColumnType implements TableColumnType{
 	private GameInstanceColumnType(String name, byte optionType, Object defaultValue, String possibleValues[]) {
 		this.name = name;
 		this.optionType = optionType;
-		switch (optionType)
-		{
-			case ValueColumnTypes.TYPE_CHECKBOX:
-				this.cl = Boolean.class;
-				break;
-			case ValueColumnTypes.TYPE_COLOR:
-			case ValueColumnTypes.TYPE_TEXTFIELD:
-			case ValueColumnTypes.TYPE_COMBOBOX:
-			case ValueColumnTypes.TYPE_BUTTON:
-				this.cl = String.class;
-				break;
-			default:
-				throw new IllegalArgumentException();
-		}
+		this.cl = TableColumnType.getColumnClass(optionType);
 		this.possibleValues = possibleValues == null || possibleValues.length == 0 ? UniqueObjects.EMPTY_STRING_LIST : ArrayTools.unmodifiableList(possibleValues);
 		this.defaultValue = defaultValue;
-	}
-	static {
-		for (int i = 0; i < ct.length; ++i)
-    	{
-    		columnNames[i] = ct[i].name;
-    	}
 	}
 	
 	public static GameInstanceColumnType getByName(String name) {
