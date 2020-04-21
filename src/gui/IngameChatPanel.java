@@ -4,7 +4,7 @@ package gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
-import javax.swing.event.ChangeListener;
+
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -12,11 +12,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
-
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JViewport;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -33,8 +33,10 @@ import main.Player;
 
 
 public class IngameChatPanel extends JPanel implements GameChangeListener {
-	private static final long serialVersionUID = -6824674997054841715L;
-
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8779142095973760951L;
 	private static final Logger logger = LoggerFactory.getLogger(GamePanel.class);
 
 	private static final Dimension chatTextMinDimension =  new Dimension(200,50);
@@ -140,8 +142,9 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		if (action instanceof UsertextMessageAction)
 		{
 			UsertextMessageAction textAction = (UsertextMessageAction) action;
+			Player pl = game.getPlayer(textAction.player);
 			String rawMessage = textAction.message;
-			Color color = Color.black;
+			Color color = pl == null ? Color.BLACK : pl.color;
 			for (Player player : game.players) {
 				if (textAction.player == player.id) {
 					color = player.color;
@@ -183,7 +186,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 				JTextPane chatPane = (JTextPane) viewPort.getView();
 			
 				appendColorMessage(chatPane, sender + ": "+ message, color);
-			}		
+			}
 		}
 	}
 	
