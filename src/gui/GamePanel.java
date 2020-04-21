@@ -66,9 +66,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	boolean[] loggedKeys = new boolean[1024];
 
-	boolean isControlDown = false;
-	boolean isShiftDown = false;
-
 	boolean isLeftMouseKeyHold = false;
 	boolean isRightMouseKeyHold = false;
 
@@ -197,6 +194,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
+		requestFocus();
 		if(SwingUtilities.isLeftMouseButton(arg0)) {
 			isLeftMouseKeyHold = true;
 		}
@@ -331,7 +329,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				player.setMousePos(mouseBoardPos.getXI(), mouseBoardPos.getYI());
 				gameInstance.update(new GamePlayerEditAction(id, player, player));
 				/*Handle all drags of Token Objects*/
-				MoveFunctions.dragTokens(this, gameInstance, player,activeObject, arg0, xDiff, yDiff, isShiftDown, mouseWheelValue, privateArea.shape);
+				MoveFunctions.dragTokens(this, gameInstance, player,activeObject, arg0, xDiff, yDiff, arg0.isShiftDown(), mouseWheelValue, privateArea.shape);
 
 				if(activeObject == null && !SwingUtilities.isMiddleMouseButton(arg0) && !mouseInPrivateArea) {
 					selectWidth = mouseScreenX - beginSelectPosX;
@@ -400,15 +398,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	}
 	@Override
 	public void keyPressed(KeyEvent e) {
+		System.out.println(e);
 		if (e.isControlDown())
 		{
 			loggedKeys[e.getKeyCode()] = true;
-			isControlDown = true;
 		}
 		else if(e.isShiftDown())
 		{
 			loggedKeys[e.getKeyCode()] = true;
-			isShiftDown = true;
 		}
 
 		if(e.getKeyCode() == KeyEvent.VK_C && !loggedKeys[KeyEvent.VK_CONTROL])
@@ -485,14 +482,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			getGraphics().drawString("Type: " + String.valueOf(activeObject.go.objectType) + " " + "Value: " + String.valueOf(activeObject.go.uniqueName), mouseBoardPos.getXI(), mouseBoardPos.getYI());
 		}
 
-		if (e.getKeyCode() == KeyEvent.VK_M && isControlDown)
+		if (e.getKeyCode() == KeyEvent.VK_M && e.isControlDown())
 		{
 			loggedKeys[e.getKeyCode()] = true;
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
 			ObjectFunctions.getAllObjectsOfType(id, gameInstance, player, activeObject);
 		}
 
-		if (e.getKeyCode() == KeyEvent.VK_M && !isControlDown)
+		if (e.getKeyCode() == KeyEvent.VK_M && !e.isControlDown())
 		{
 			loggedKeys[e.getKeyCode()] = true;
 			ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
@@ -503,9 +500,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		//System.out.println("keyReleased: "+e);
-		isControlDown = false;
-		isShiftDown = false;
 		loggedKeys[e.getKeyCode()] = false;
 		if(!isLeftMouseKeyHold) {
 			activeObject = null;
@@ -523,8 +517,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-
-		if (isControlDown && !mouseInPrivateArea)
+		if (e.isControlDown() && !mouseInPrivateArea)
 		{
 			zoomFactor += (int) e.getPreciseWheelRotation();
 			zooming = Math.exp(-zoomFactor * 0.1);
