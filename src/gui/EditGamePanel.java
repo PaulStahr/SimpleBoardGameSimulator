@@ -12,6 +12,7 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import gameObjects.GameObjectInstanceColumnType;
+import gameObjects.ImageColumnType;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import util.ArrayTools;
@@ -21,21 +22,21 @@ import util.jframe.table.TableColumnType;
 import util.jframe.table.TableModel;
 
 public class EditGamePanel extends JPanel implements ActionListener{
-	public static final List<TableColumnType> IMAGE_TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectInstanceColumnType.ID, GameObjectInstanceColumnType.NAME, GameObjectInstanceColumnType.DELETE});
-
+	public static final List<TableColumnType> IMAGE_TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{ImageColumnType.ID, ImageColumnType.WIDTH, ImageColumnType.HEIGHT, ImageColumnType.DELETE});
 	GameInstance gi;
 	private final DefaultTableModel tableModelGameObjects= new TableModel(ObjectInstance.TYPES);
-	private final DefaultTableModel tableModelImages= new TableModel(ObjectInstance.TYPES);
+	private final DefaultTableModel tableModelImages= new TableModel(IMAGE_TYPES);
 	private final JTable tableGameObjects = new JTable(tableModelGameObjects);
 	private final JTable tableImages = new JTable(tableModelImages);
 	public String name;
-	private JScrollPane scrollPaneGameObjects = new JScrollPane(tableGameObjects);
+	private final JScrollPane scrollPaneGameObjects = new JScrollPane(tableGameObjects);
+	private final JScrollPane scrollPaneImages = new JScrollPane(tableImages);
 	public EditGamePanel(GameInstance gi) {
 		this.gi = gi;
 		GroupLayout layout = new GroupLayout(this);
 		setLayout(layout);
-		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(scrollPaneGameObjects));
-		layout.setVerticalGroup(layout.createParallelGroup().addComponent(scrollPaneGameObjects));
+		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(scrollPaneGameObjects).addComponent(scrollPaneImages));
+		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(scrollPaneGameObjects).addComponent(scrollPaneImages));
 		setSize(500, 300);
 		actionPerformed(null);
 	}
@@ -48,7 +49,7 @@ public class EditGamePanel extends JPanel implements ActionListener{
  	    }
     };
  	private final ButtonColumn deleteObjectColumn = new ButtonColumn(tableGameObjects,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
- 	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableGameObjects,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
+ 	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableImages,tableAction, IMAGE_TYPES.indexOf(ImageColumnType.DELETE));
 	
 	/**
 	 * 
@@ -58,6 +59,7 @@ public class EditGamePanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.objects, ObjectInstance.TYPES, tableModelGameObjects, deleteObjectColumn);
+		JFrameUtils.updateTable(tableImages, scrollPaneImages, gi.game.images.values().toArray(), IMAGE_TYPES, tableModelImages, deleteImageColumn);
 	}
 	
 

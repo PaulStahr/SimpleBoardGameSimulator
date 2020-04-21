@@ -65,7 +65,6 @@ public class ObjectInstance {
 
 	public static class CardActionMenu extends ObjectActionMenu
 	{
-
 		public CardActionMenu(ObjectInstance gameObject, GameInstance gameInstance, Player player, GamePanel gamePanel) {
 			super(gameObject, gameInstance, player, gamePanel);
 		}

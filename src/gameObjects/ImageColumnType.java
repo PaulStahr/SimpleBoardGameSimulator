@@ -1,6 +1,7 @@
 package gameObjects;
 
-import gameObjects.instance.ObjectInstance;
+import java.awt.image.BufferedImage;
+
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
 import util.ArrayUtil;
@@ -8,12 +9,13 @@ import util.data.UniqueObjects;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.ValueColumnTypes;
 
-public enum GameObjectInstanceColumnType implements TableColumnType{
+public enum ImageColumnType implements TableColumnType{
 	ID("id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
-	NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
+	WIDTH("width", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
+	HEIGHT("height", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
 	
-    private static final GameObjectInstanceColumnType ct[] = GameObjectInstanceColumnType.values();
+    private static final ImageColumnType ct[] = ImageColumnType.values();
     private static final String[] columnNames = TableColumnType.getColumnNames(ct);
     
     public static final int size()
@@ -21,7 +23,7 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
     	return ct.length;
     }
     
-    public static final GameObjectInstanceColumnType get(int index)
+    public static final ImageColumnType get(int index)
     {
     	return ct[index];
     }
@@ -32,7 +34,7 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
 	public final Object defaultValue;
 	public final UnmodifiableArrayList<String> possibleValues;
 	
-	private GameObjectInstanceColumnType(String name, byte optionType, Object defaultValue, String possibleValues[]) {
+	private ImageColumnType(String name, byte optionType, Object defaultValue, String possibleValues[]) {
 		this.name = name;
 		this.optionType = optionType;
 		this.cl = TableColumnType.getColumnClass(optionType);
@@ -40,7 +42,7 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
 		this.defaultValue = defaultValue;
 	}
 	
-	public static GameObjectInstanceColumnType getByName(String name) {
+	public static ImageColumnType getByName(String name) {
 		int index = ArrayUtil.firstEqualIndex(columnNames, name);
 		return index < 0 ? null : ct[index];
 	}
@@ -67,12 +69,13 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
 	
 	@Override
 	public Object getValue(Object obj) {
-		ObjectInstance gi = (ObjectInstance)obj;
+		BufferedImage gi = (BufferedImage)obj;
 		switch (this)
 		{
 			case DELETE:	return "Delete";
-			case ID:		return gi.id;
-			case NAME:		return gi.go.uniqueName;
+			case WIDTH:		return gi.getWidth();
+			case HEIGHT:	return gi.getHeight();
+			case ID:		return "id";
 			default:throw new IllegalArgumentException(getName());
 		}
 	}

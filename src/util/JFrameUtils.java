@@ -327,6 +327,21 @@ public class JFrameUtils{
 
 	private static final DefaultCellEditor checkBoxCellEditor = new DefaultCellEditor(new JCheckBox()); 
 
+
+    public static final void updateTable(JTable table, JScrollPane scrollPane, Object objectList[], List<TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
+    {
+ 		Object[][] rowData = new Object[objectList.length][types.size()];
+     	for (int i = 0; i < rowData.length; ++i)
+     	{
+     		Object obj = objectList[i];
+     		for (int j = 0; j < types.size();++j)
+     		{
+     			rowData[i][j] = JFrameUtils.toTableEntry(types.get(j).getValue(obj));
+     		}
+     	}
+     	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, buttonColumn);
+ 	}
+	
     public static final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<? extends Object> objectList, List<TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
     {
  		Object[][] rowData = new Object[objectList.size()][types.size()];
