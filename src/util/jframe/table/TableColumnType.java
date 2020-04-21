@@ -10,6 +10,8 @@ public interface TableColumnType {
 	
 	String getName();
 
+	public Object getValue(Object obj);
+
 	public static String[] getColumnNames(TableColumnType[] ct2) {
 		String names[] = new String[ct2.length];
 		for (int i = 0; i < ct2.length; ++i)

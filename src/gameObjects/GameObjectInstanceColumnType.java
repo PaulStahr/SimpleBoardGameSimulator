@@ -1,5 +1,6 @@
 package gameObjects;
 
+import gameObjects.definition.GameObject;
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
 import util.ArrayUtil;
@@ -62,5 +63,17 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
 	@Override
 	public Class<?> getCl() {
 		return cl;
+	}
+	
+	@Override
+	public Object getValue(Object obj) {
+		GameObject gi = (GameObject)obj;
+		switch (this)
+		{
+			case DELETE:	return "Delete";
+			case ID:		return gi.uniqueName;
+			case NAME:		return gi.uniqueName;
+			default:throw new IllegalArgumentException(getName());
+		}
 	}
 };

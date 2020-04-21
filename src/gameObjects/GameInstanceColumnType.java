@@ -1,5 +1,6 @@
 package gameObjects;
 
+import gameObjects.instance.GameInstance;
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
 import util.ArrayUtil;
@@ -11,7 +12,8 @@ public enum GameInstanceColumnType implements TableColumnType{
 	ID("id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	CONNECT("Connect", ValueColumnTypes.TYPE_BUTTON, "Connect", null),
-	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
+	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null), 
+	NUM_PLAYERS("Players", ValueColumnTypes.TYPE_TEXTFIELD, "0", null);
 	
     private static final GameInstanceColumnType ct[] = GameInstanceColumnType.values();
     private static final String[] columnNames = TableColumnType.getColumnNames(ct);
@@ -63,5 +65,20 @@ public enum GameInstanceColumnType implements TableColumnType{
 	@Override
 	public Class<?> getCl() {
 		return cl;
+	}
+	
+	
+	@Override
+	public Object getValue(Object obj) {
+		GameInstance gi = (GameInstance)obj;
+		switch (this)
+		{
+			case CONNECT: 		return "Connect";
+			case DELETE:		return "Delete";
+			case ID:			return gi.name;
+			case NAME:			return gi.name;
+			case NUM_PLAYERS:	return gi.players.size();
+			default:throw new IllegalArgumentException(getName());
+		}
 	}
 };

@@ -35,6 +35,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -59,6 +60,7 @@ import javax.swing.table.TableColumn;
 import org.slf4j.Logger;
 
 import util.jframe.table.ButtonColumn;
+import util.jframe.table.ColumnTypes;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.ValueColumnTypes;
 
@@ -325,6 +327,19 @@ public class JFrameUtils{
 
 	private static final DefaultCellEditor checkBoxCellEditor = new DefaultCellEditor(new JCheckBox()); 
 
+    public static final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<? extends Object> objectList, List<TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
+    {
+ 		Object[][] rowData = new Object[objectList.size()][types.size()];
+     	for (int i = 0; i < rowData.length; ++i)
+     	{
+     		Object obj = objectList.get(i);
+     		for (int j = 0; j < types.size();++j)
+     		{
+     			rowData[i][j] = JFrameUtils.toTableEntry(types.get(j).getValue(obj));
+     		}
+     	}
+     	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, buttonColumn);
+ 	}
 	
     public static final void updateTable(JTable table, JScrollPane scrollPane, Object[][] rowData, String names[], List<? extends TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
     {
