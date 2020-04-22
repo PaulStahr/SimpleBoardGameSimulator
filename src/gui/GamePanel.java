@@ -105,7 +105,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public PrivateArea privateArea;
 
-	public float cardOverlap = 1/3;
+	public float cardOverlap = (float) (2/3.0);
 
 
 	public GamePanel(GameInstance gameInstance)
