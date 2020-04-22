@@ -1023,14 +1023,16 @@ public class ObjectFunctions {
     public static void insertIntoStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList stackIds, int insertId, int cardMargin) {
         ObjectInstance aboveInstance = null;
         ObjectInstance belowInstance = null;
-        if (insertId < 0) {
+        if (insertId <= 0) {
             insertId = 0;
         }
+
         if (insertId < stackIds.size() - 1) {
             aboveInstance = gameInstance.objects.get(stackIds.getI(insertId));
         } else {
-            insertId = stackIds.size() - 1;
+            insertId = stackIds.size();
         }
+
         if (insertId > 0 && stackIds.size() > 0) {
             belowInstance = gameInstance.objects.get(stackIds.getI(insertId - 1));
         }
@@ -1044,6 +1046,8 @@ public class ObjectFunctions {
         objectInstance.state.inPrivateArea = true;
         insertIntoStack(gamePanel,gameInstance,player,objectInstance,idList,insertId,cardMargin);
         gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
+        idList.clear();
+        getOwnedStack(gameInstance,player, idList);
         gamePanel.privateArea.updatePrivateObjects(idList);
     }
 
