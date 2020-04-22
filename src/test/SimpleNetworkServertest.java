@@ -104,5 +104,18 @@ public class SimpleNetworkServertest {
     		Thread.sleep(500);
     	}catch(InterruptedException e) {}
     	//gi.update(new GameObjectInstanceEditAction(0, gi.players.get(0), gi.objects.get(0)));    	
-    }
+
+
+		Player player2 = new Player("Melissa", 3);
+    	//FileInputStream fis = new FileInputStream("Doppelkopf.zip");
+		//GameInstance gi = GameIO.readSnapshotFromZip(fis);
+		//GameInstance gi = new GameInstance(new Game());
+		//gi.name = "Testsession";
+		//gi.players.add(player);
+	    GameWindow gw2 = connectAndJoinGame(address, port, player2, "Testsession");
+    	try {
+    		Thread.sleep(500);
+    	}catch(InterruptedException e) {}
+
+	}
 }
