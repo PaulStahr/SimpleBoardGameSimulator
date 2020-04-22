@@ -44,8 +44,7 @@ public class GameObjectDice extends GameObject{
 	@Override
 	public ObjectState newObjectState()
 	{
-		DiceState state = new DiceState();
-		return state;
+		return new DiceState();
 	}
 
 	public static class DiceState  extends ObjectState

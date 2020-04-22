@@ -170,7 +170,10 @@ public class GameIO {
 	 */
 	private static GameObject createGameObjectFromElement(Element elem, HashMap<String, BufferedImage> images)
 	{
-		switch(elem.getAttributeValue(IOString.TYPE))
+		String uniqueName = elem.getAttributeValue(IOString.UNIQUE_NAME);
+		String type = elem.getAttributeValue(IOString.TYPE);
+		GameObject result = null;
+		switch(type)
 		{
 			case IOString.CARD:
 			{
@@ -186,7 +189,8 @@ public class GameIO {
 				if(elem.getAttributeValue(IOString.VALUE) != null) {
 					value = Integer.parseInt(elem.getAttributeValue(IOString.VALUE));
 				}
-				return new GameObjectToken(elem.getAttributeValue(IOString.UNIQUE_NAME), elem.getAttributeValue(IOString.TYPE), width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value);
+				result = new GameObjectToken(uniqueName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value);
+				break;
 			}
 			case IOString.FIGURE:
 			{
@@ -198,7 +202,8 @@ public class GameIO {
 				if(elem.getAttributeValue(IOString.HEIGHT) != null) {
 					height = Integer.parseInt(elem.getAttributeValue(IOString.HEIGHT));
 				}
-				return new GameObjectFigure(elem.getAttributeValue(IOString.UNIQUE_NAME), elem.getAttributeValue(IOString.TYPE), width, height, images.get(elem.getAttributeValue(IOString.STANDING)));
+				result = new GameObjectFigure(uniqueName, type, width, height, images.get(elem.getAttributeValue(IOString.STANDING)));
+				break;
 			}
 			case IOString.DICE:
 			{
@@ -213,17 +218,30 @@ public class GameIO {
 				ArrayList<DiceSide> dss = new ArrayList<>();
 				for (Element side : elem.getChildren())
 				{
-					BufferedImage img = images.get(side.getValue());
-					if (img == null)
+					if (side.getName().equals(IOString.SIDE))
 					{
-						logger.warn("Imege not found: ", side.getValue());
+						BufferedImage img = images.get(side.getValue());
+						if (img == null)
+						{
+							logger.warn("Imege not found: ", side.getValue());
+						}
+						dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img));
 					}
-					dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img));
 				}
-				return new GameObjectDice(elem.getAttributeValue(IOString.UNIQUE_NAME), elem.getAttributeValue(IOString.TYPE), width, height, dss.toArray(new DiceSide[dss.size()]));
+				result = new GameObjectDice(uniqueName, type, width, height, dss.toArray(new DiceSide[dss.size()]));
+				break;
 			}
 		}
-		return null;
+		ArrayList<String> groups = new ArrayList<String>();
+		for (Element child : elem.getChildren())
+		{
+			if (child.getName().equals(IOString.GROUP))
+			{
+				groups.add(child.getText());
+			}
+		}
+		result.groups = groups.toArray(new String[groups.size()]);
+		return result;
 	}
 
 	/**
@@ -282,6 +300,10 @@ public class GameIO {
 		elem.setAttribute(IOString.UNIQUE_NAME, gameObject.uniqueName);
 		elem.setAttribute(IOString.WIDTH, Integer.toString(gameObject.widthInMM));
 		elem.setAttribute(IOString.HEIGHT, Integer.toString(gameObject.heightInMM));
+		for (String group : gameObject.groups)
+		{
+			elem.addContent(new Element(IOString.GROUP).setText(group));
+		}
 		if (gameObject instanceof GameObjectToken)
 		{
 			GameObjectToken token = (GameObjectToken) gameObject;
