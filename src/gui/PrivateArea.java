@@ -26,14 +26,10 @@ public class PrivateArea {
     private final AffineTransform boardTransform;
     private final AffineTransform inverseBoardTransform;
     public Point2D.Double origin = new Point2D.Double();
-    private GameInstance gameInstance = null;
-    private GamePanel gamePanel = null;
 
     public PrivateArea(GamePanel gamePanel, GameInstance gameInstance, AffineTransform boardTransform, AffineTransform inverseBoardTransformation) {
         this.boardTransform = boardTransform;
         this.inverseBoardTransform = inverseBoardTransformation;
-        this.gameInstance = gameInstance;
-        this.gamePanel = gamePanel;
     }
 
     public void setArea(double posX, double posY, double width,  double height, int translateX, int translateY, double rotation, double zooming) {
