@@ -40,10 +40,9 @@ public class DrawFunctions {
 
     public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, IntegerArrayList tmp){
         if (ObjectFunctions.isStackBottom(objectInstance)) {
+            tmp.clear();
             ObjectFunctions.getAboveStack(gameInstance, objectInstance, tmp);
             drawStack(gamePanel, g, tmp, gameInstance, player.id, 1);
-            tmp.clear();
-            getStack(gameInstance, objectInstance, tmp);
             int playerId = ObjectFunctions.getStackOwner(gameInstance, tmp);
             if (playerId != -1) {
                 Player p = gameInstance.getPlayer(playerId);
@@ -234,7 +233,6 @@ public class DrawFunctions {
         if (objectInstance != null && player != null) {
             if(isStackCollected(gameInstance, objectInstance))
             {
-            	getStack(gameInstance, objectInstance, tmp);
                 if((!drawProperStack || tmp.size() > 1))
                     drawBorder(g, player, getStackTop(gameInstance, objectInstance), borderWidth, color, zooming);
             	tmp.clear();

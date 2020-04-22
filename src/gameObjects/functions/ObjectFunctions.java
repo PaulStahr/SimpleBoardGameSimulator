@@ -165,6 +165,7 @@ public class ObjectFunctions {
      */
     public static void getAboveStack(GameInstance gameInstance, ObjectInstance objectInstance, boolean included, IntegerArrayList objectStack) {
        if (objectInstance != null) {
+           objectStack.clear();
             if (included) {
                 objectStack.add(objectInstance.id);
             }
@@ -174,7 +175,7 @@ public class ObjectFunctions {
                 currentObjectInstance = gameInstance.objects.get(currentObjectInstance.state.aboveInstanceId);
                 if (gameInstance.objects.size() < objectStack.size())
                 {
-                	throw new RuntimeException("Circle in stack");
+                	throw new RuntimeException("Circle in stack" + gameInstance.objects.size() + objectStack.size());
                 }
             }
         }
@@ -191,6 +192,7 @@ public class ObjectFunctions {
      */   
     public static void getBelowStack(GameInstance gameInstance, ObjectInstance objectInstance, boolean included, IntegerArrayList objectStack) {
         if (objectInstance != null) {
+            objectStack.clear();
             if (included) {
                 objectStack.add(objectInstance.id);
             }
@@ -882,7 +884,7 @@ public class ObjectFunctions {
                     stackIds.clear();
                     getStack(gameInstance,objectInstance,stackIds);
                     if (stackIds.size() == 2){
-                        displayStack(gamePanel,gameInstance,player,getStackTop(gameInstance,objectInstance),objectInstance.getWidth(player.id)/2);
+                        displayStack(gamePanel,gameInstance,player,getStackTop(gameInstance,objectInstance), (int) (objectInstance.getWidth(player.id) * gamePanel.cardOverlap));
                     }
                 }
 
@@ -892,14 +894,14 @@ public class ObjectFunctions {
                 stackIds.clear();
                 getStack(gameInstance,activeObject,stackIds);
                 Pair<ObjectInstance, ObjectInstance> insertObjects = getInsertObjects(gamePanel, gameInstance, player, activeObject.state.posX + activeObject.getWidth(player.id)/2, activeObject.state.posY + activeObject.getHeight(player.id)/2, zooming, stackIds);
-                insertIntoStack(gamePanel, gameInstance, player, activeObject, insertObjects.getKey(), insertObjects.getValue(), activeObject.getWidth(player.id)/2);
+                insertIntoStack(gamePanel, gameInstance, player, activeObject, insertObjects.getKey(), insertObjects.getValue(), (int) (activeObject.getWidth(player.id) * gamePanel.cardOverlap));
             }
         }
     }
 
 
     public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming) {
-        releaseObjects(arg0, gamePanel, gameInstance, player, activeObject, posX, posY, zooming, activeObject.getWidth(player.id) / 3);
+        releaseObjects(arg0, gamePanel, gameInstance, player, activeObject, posX, posY, zooming, 0);
     }
 
     public static ObjectInstance findNeighbouredStackTop(GameInstance gameInstance, Player player, ObjectInstance activeObject, int maxInaccuracy) {
@@ -1019,7 +1021,6 @@ public class ObjectFunctions {
     }
 
     public static void insertIntoStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList stackIds, int insertId, int cardMargin) {
-        getStack(gameInstance, objectInstance, stackIds);
         ObjectInstance aboveInstance = null;
         ObjectInstance belowInstance = null;
         if (insertId < 0) {

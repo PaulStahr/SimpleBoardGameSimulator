@@ -29,7 +29,7 @@ public class MoveFunctions {
             ObjectFunctions.moveStackTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
             /*Display uncollected stack*/
             if (!ObjectFunctions.isStackCollected(gameInstance, activeObject)) {
-                ObjectFunctions.displayStack(gamePanel, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject), activeObject.getWidth(player.id)/2);
+                ObjectFunctions.displayStack(gamePanel, gameInstance, player, activeObject, (int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap));
             }
         }
         else if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0)) && isShiftDown && activeObject != null && activeObject.state.owner_id != player.id) {
