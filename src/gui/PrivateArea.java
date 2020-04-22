@@ -75,15 +75,11 @@ public class PrivateArea {
     public void setPrivateObjects(IntegerArrayList objectIds) {
         this.privateObjects = objectIds;
     }
-
-    public void updatePrivateObjects(GameInstance gameInstance, Player player){
-        for (ObjectInstance objectInstance:gameInstance.objects){
-            if (ObjectFunctions.isStackBottom(objectInstance) && player != null && objectInstance.state.owner_id == player.id){
-                privateObjects.clear();
-                IntegerArrayList stackIds = new IntegerArrayList();
-                ObjectFunctions.getStack(gameInstance,objectInstance, stackIds);
-                privateObjects=stackIds;
-            }
+    public void updatePrivateObjects(IntegerArrayList objectIds) {
+        privateObjects.clear();
+        for (int id: objectIds)
+        {
+            privateObjects.add(id);
         }
     }
 
@@ -135,30 +131,5 @@ public class PrivateArea {
     public Point2D transformPoint(int posX, int posY) {
         Point2D transformedPoint = boardTransform.transform(new Point2D.Double(posX, posY), null);
         return transformedPoint;
-    }
-
-    public void insertObject(int objectId, int posX, int posY) {
-        int index = getInsertPosition(posX, posY);
-        insertObject(objectId, index);
-    }
-
-    public void insertObject(int objectId, int index) {
-        privateObjects.add(index, objectId);
-        if (gamePanel != null && gameInstance != null){
-            ObjectInstance belowObject = null;
-            ObjectInstance aboveObject = null;
-            if (index - 1 >= 0){
-                belowObject = gameInstance.objects.get(privateObjects.getI(index - 1));
-            }
-            if (privateObjects.size() > index + 1){
-                aboveObject = gameInstance.objects.get(privateObjects.getI(index + 1));
-            }
-            ObjectFunctions.insertIntoStack(gamePanel, gameInstance, gamePanel.player, gameInstance.objects.get(objectId), belowObject, aboveObject,0);
-        }
-    }
-
-    public void removeObject(int index) {
-    	ObjectFunctions.removeObject(gamePanel, gameInstance, gamePanel.player, gameInstance.objects.get(privateObjects.getI(index)));
-        privateObjects.removeI(index);
     }
 }

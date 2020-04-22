@@ -105,6 +105,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public PrivateArea privateArea;
 
+	public float cardOverlap = 1/3;
+
 
 	public GamePanel(GameInstance gameInstance)
 	{
@@ -220,7 +222,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 		activeObject = ObjectFunctions.setActiveObjectByMouseAndKey(this, gameInstance, player, mouseBoardPos, arg0.isShiftDown(), maxInaccuracy);
 		if (activeObject != null && this.privateArea.privateObjects.contains(activeObject.id)) {
-			this.privateArea.removeObject(this.privateArea.privateObjects.indexOf(activeObject.id));
+			ObjectFunctions.removeFromOwnStack(this,gameInstance,player,activeObject.id);
 			activeObject.state.posX = player.mouseXPos - activeObject.getWidth(player.id)/2;
 			activeObject.state.posY = player.mouseYPos - activeObject.getHeight(player.id)/2;
 			activeObject.state.inPrivateArea = false;
@@ -435,7 +437,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (activeObject!= null) {
 				if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, activeObject), ObjectFunctions.getStackBottom(gameInstance, activeObject))) {
 					activeObject = ObjectFunctions.getStackTop(gameInstance, activeObject);
-					ObjectFunctions.displayStack(this, gameInstance, player, activeObject, activeObject.getWidth(player.id) / 2);
+					ObjectFunctions.displayStack(this, gameInstance, player, activeObject, (int) (activeObject.getWidth(player.id) * cardOverlap));
 				} else {
 					ObjectFunctions.collectStack(this, gameInstance, player, activeObject);
 				}
