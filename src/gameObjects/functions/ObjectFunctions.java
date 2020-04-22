@@ -416,7 +416,7 @@ public class ObjectFunctions {
         getStack(gameInstance, objectInstance, objectStack);
         if (objectInstance != null && (isStackInHand(gameInstance, player, objectStack) || isStackNotInHand(gameInstance, player, objectStack))) {
             if (objectStack.size() > 1) {
-                player.actionString = "Shuffled Objects";
+                player.actionString = "Objects Shuffled";
                 gameInstance.update(new GamePlayerEditAction(gamePanelId, player, player));
                 IntegerArrayList oldX = new IntegerArrayList();
                 IntegerArrayList oldY = new IntegerArrayList();
@@ -456,7 +456,7 @@ public class ObjectFunctions {
      */
     public static void flipObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         if (objectInstance != null ) {
-            player.actionString = "Flipped Object";
+            player.actionString = "Object Flipped";
             gameInstance.update(new GamePlayerEditAction(gamePanelId, player, player));
             ((GameObjectToken.TokenState) objectInstance.state).side = !((GameObjectToken.TokenState) objectInstance.state).side;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
@@ -496,7 +496,7 @@ public class ObjectFunctions {
                     flipObject(gamePanelId, gameInstance, player, currentObject);
                 }
             }
-            player.actionString = "Flipped Stack";
+            player.actionString = "Stack Flipped";
             gameInstance.update(new GamePlayerEditAction(gamePanelId, player, player));
         }
     }
@@ -795,7 +795,7 @@ public class ObjectFunctions {
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentInstance));
             }
         }
-        ObjectFunctions.displayStack(gamePanel,gameInstance,player,objectInstance,objectInstance.getWidth(player.id)/2);
+        ObjectFunctions.displayStack(gamePanel,gameInstance,player,objectInstance, (int) (objectInstance.getWidth(player.id)*gamePanel.cardOverlap));
     }
 
     //drop an object from the hand of player
@@ -813,12 +813,12 @@ public class ObjectFunctions {
     }
 
 
-    public static ObjectInstance setActiveObjectByMouseAndKey(GamePanel gamePanel, GameInstance gameInstance, Player player, Vector2 mouse, boolean isShiftDown, int maxInaccuracy) {
+    public static ObjectInstance setActiveObjectByMouseAndKey(GamePanel gamePanel, GameInstance gameInstance, Player player, MouseEvent arg0, Vector2 mouse, int maxInaccuracy) {
         ObjectInstance activeObject = null;
         int pressedXPos = mouse.getXI();
         int pressedYPos = mouse.getYI();
         activeObject = getNearestObjectByPosition(gamePanel,gameInstance, player,pressedXPos,pressedYPos,1,null);
-        if (isShiftDown){
+        if (arg0.isShiftDown()){
             activeObject = getStackBottom(gameInstance, activeObject);
         }
         if(activeObject != null && activeObject.state.owner_id != -1 && activeObject.state.owner_id!=player.id){
@@ -860,7 +860,7 @@ public class ObjectFunctions {
                 {
                     ObjectInstance currentObject = gameInstance.objects.get(id);
                     int index = gamePanel.privateArea.getInsertPosition(posX, posY);
-                    insertIntoOwnStack(gamePanel,gameInstance,player,currentObject,index,currentObject.getWidth(player.id)/2);
+                    insertIntoOwnStack(gamePanel,gameInstance,player,currentObject,index, (int) (currentObject.getWidth(player.id)*gamePanel.cardOverlap));
                     //TODO insert into stack and update private objects
 
                 }
@@ -963,14 +963,14 @@ public class ObjectFunctions {
         }
         else if (hasAboveObject(objectInstance))
         {
-            if (posX > objectInstance.state.posX + objectInstance.getWidth(player.id)/2)
+            if (posX > objectInstance.state.posX + objectInstance.getWidth(player.id) * gamePanel.cardOverlap)
             {
                 return new Pair<>(objectInstance, null);
             }
             return new Pair<>(getAboveObject(gameInstance, objectInstance), objectInstance);
         }
         else if(hasBelowObject(objectInstance)){
-            if (posX < objectInstance.state.posX + objectInstance.getWidth(player.id)/2)
+            if (posX < objectInstance.state.posX + objectInstance.getWidth(player.id)*gamePanel.cardOverlap)
             {
                 return new Pair<>(null, objectInstance);
             }
@@ -994,14 +994,15 @@ public class ObjectFunctions {
                 if (objectBelow != null) {
                     objectBelow.state.aboveInstanceId = objectInstance.id;
                     objectInstance.state.belowInstanceId = objectBelow.id;
-                    moveObjectTo(gamePanel, gameInstance, player, objectInstance, objectBelow.state.posX + cardMargin, objectBelow.state.posY);
+                    moveObjectTo(gamePanel, gameInstance, player, objectInstance, objectBelow.state.posX - cardMargin, objectBelow.state.posY);
                     if (objectAbove != null) {
                         objectAbove.state.belowInstanceId = objectInstance.id;
                         objectInstance.state.aboveInstanceId = objectAbove.id;
                         gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectAbove));
                         moveObjectTo(gamePanel, gameInstance, player, objectInstance, objectAbove);
                         if (!isStackCollected(gameInstance, objectInstance)) {
-                            moveAboveStackTo(gamePanel, gameInstance, player, objectInstance, objectInstance.state.posX - objectInstance.getWidth(player.id) / 2, objectInstance.state.posY, false);
+                            moveAboveStackTo(gamePanel, gameInstance, player, objectInstance, objectInstance.state.posX-cardMargin, objectInstance.state.posY, false);
+                            //moveBelowStackTo(gamePanel, gameInstance, player, objectInstance, objectInstance.state.posX+cardMargin/2, objectInstance.state.posY, false);
                         }
                     }
                     gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
@@ -1014,7 +1015,7 @@ public class ObjectFunctions {
                     gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectAbove));
                     moveObjectTo(gamePanel, gameInstance, player, objectInstance, objectAbove);
                     if (!isStackCollected(gameInstance, objectInstance)) {
-                        moveAboveStackTo(gamePanel, gameInstance, player, objectInstance, objectInstance.state.posX - objectInstance.getWidth(player.id) / 2, objectInstance.state.posY, false);
+                        moveAboveStackTo(gamePanel, gameInstance, player, objectInstance, (int) (objectInstance.state.posX - objectInstance.getWidth(player.id) * gamePanel.cardOverlap), objectInstance.state.posY, false);
                     }
                 }
             }

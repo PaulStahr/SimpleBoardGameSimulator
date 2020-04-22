@@ -168,10 +168,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 			}
 		}
-		drawActiveObject(this, g, player, activeObject);
+
 		drawPlayerMarkers(this, g, gameInstance, player, infoText);
 		drawSelectedObjects(this, g, gameInstance, player, ial);
 		drawTokensInPrivateArea(this, g, gameInstance);
+		drawActiveObject(this, g, player, activeObject);
 
 		g.drawString(outText, 50, 50);
 	}
@@ -220,7 +221,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			selectedObjects.clear();
 		}
 
-		activeObject = ObjectFunctions.setActiveObjectByMouseAndKey(this, gameInstance, player, mouseBoardPos, arg0.isShiftDown(), maxInaccuracy);
+		activeObject = ObjectFunctions.setActiveObjectByMouseAndKey(this, gameInstance, player,  arg0, mouseBoardPos, maxInaccuracy);
 		if (activeObject != null && this.privateArea.privateObjects.contains(activeObject.id)) {
 			ObjectFunctions.removeFromOwnStack(this,gameInstance,player,activeObject.id);
 			activeObject.state.owner_id = player.id;
@@ -330,11 +331,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				int xDiff = objOrigPosX - mousePressedGamePos.getXI() + mouseBoardPos.getXI();
 				int yDiff = objOrigPosY - mousePressedGamePos.getYI() + mouseBoardPos.getYI();
 				screenToBoardPos(mouseScreenX = arg0.getX(), mouseScreenY = arg0.getY(), mouseBoardPos);
+				screenToBoardPos(mouseScreenX = arg0.getX(), mouseScreenY = arg0.getY(), mouseBoardPos);
 				player.setMousePos(mousePressedGamePos.getXI(), mousePressedGamePos.getYI());
 				player.setMousePos(mouseBoardPos.getXI(), mouseBoardPos.getYI());
 				gameInstance.update(new GamePlayerEditAction(id, player, player));
 				/*Handle all drags of Token Objects*/
-				MoveFunctions.dragTokens(this, gameInstance, player,activeObject, arg0, xDiff, yDiff, arg0.isShiftDown(), mouseWheelValue, privateArea.shape);
+				MoveFunctions.dragTokens(this, gameInstance, player, activeObject, arg0, xDiff, yDiff, mouseWheelValue);
 
 				if(activeObject == null && !SwingUtilities.isMiddleMouseButton(arg0) && !mouseInPrivateArea) {
 					selectWidth = mouseScreenX - beginSelectPosX;
