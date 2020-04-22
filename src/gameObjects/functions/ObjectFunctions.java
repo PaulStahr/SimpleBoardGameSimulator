@@ -33,10 +33,15 @@ public class ObjectFunctions {
     public static ObjectInstance getStackTop(GameInstance gameInstance, ObjectInstance objectInstance) {
         if (objectInstance != null) {
             ObjectInstance currentTop = objectInstance;
+            int i = 0;
             while (currentTop.state.aboveInstanceId != -1) {
                 currentTop = gameInstance.objects.get(currentTop.state.aboveInstanceId);
                 if (objectInstance == currentTop) {
                     throw new RuntimeException();
+                }
+                if (++i > gameInstance.objects.size())
+                {
+                	throw new RuntimeException("Circle in Card Stack");
                 }
             }
             return currentTop;
@@ -53,10 +58,15 @@ public class ObjectFunctions {
     public static ObjectInstance getStackBottom(GameInstance gameInstance, ObjectInstance objectInstance) {
         if (objectInstance != null) {
             ObjectInstance currentBottom = objectInstance;
+            int i = 0;
             while (currentBottom.state.belowInstanceId != -1) {
                 currentBottom = gameInstance.objects.get(currentBottom.state.belowInstanceId);
                 if (objectInstance == currentBottom) {
                     throw new RuntimeException();
+                }
+                if (++i > gameInstance.objects.size())
+                {
+                	throw new RuntimeException("Circle in Card Stack");
                 }
             }
             return currentBottom;
@@ -162,6 +172,10 @@ public class ObjectFunctions {
             while (currentObjectInstance.state.aboveInstanceId != -1) {
                 objectStack.add(currentObjectInstance.state.aboveInstanceId);
                 currentObjectInstance = gameInstance.objects.get(currentObjectInstance.state.aboveInstanceId);
+                if (gameInstance.objects.size() < objectStack.size())
+                {
+                	throw new RuntimeException("Circle in stack");
+                }
             }
         }
     }
