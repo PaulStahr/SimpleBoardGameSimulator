@@ -11,6 +11,7 @@ public abstract class ObjectState implements Serializable {
 	public int posY;
 	public int rotation;
 	public int owner_id = -1;
+	transient public boolean isActive = false;
 	public boolean inPrivateArea = false;
 
 	/*stacking objects on top of each other*/

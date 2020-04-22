@@ -93,15 +93,15 @@ public class DrawFunctions {
 
     public static void drawActiveObject(GamePanel gamePanel, Graphics g, Player player, ObjectInstance activeObject) {
         int playerId = player == null ? -1 : player.id;
-        if (activeObject != null && activeObject.state.owner_id != playerId) {
-            drawObject(g, activeObject, playerId, 1, true);
-            if (player != null) {
-
+        if (activeObject != null) {
+            if (activeObject.state.isActive) {
+                drawObject(g, activeObject, playerId, 1);
+            }
+            if (player != null && (activeObject.state.owner_id != playerId || activeObject.state.isActive)) {
                 drawBorder(g, player, activeObject, 10, player.color, 1);
-
             }
         }
-        else if (activeObject != null && activeObject.state.inPrivateArea && activeObject.state.owner_id==playerId) {
+        if (activeObject != null && !activeObject.state.isActive && activeObject.state.owner_id == playerId) {
             Graphics2D g2d = (Graphics2D)g;
             AffineTransform tmp = g2d.getTransform();
             AffineTransform transform = new AffineTransform();
@@ -146,11 +146,13 @@ public class DrawFunctions {
             for(int id : gamePanel.privateArea.privateObjects)
             {
                 ObjectInstance objectInstance = gameInstance.objects.get(id);
-                BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
-                g2.translate(0, -250);
-                g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() *0.5),-(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
-                g2.translate(0, 250);
-                g2.rotate(Math.PI / (gamePanel.privateArea.privateObjects.size()));
+                if (!objectInstance.state.isActive) {
+                    BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
+                    g2.translate(0, -250);
+                    g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * 0.5), -(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
+                    g2.translate(0, 250);
+                    g2.rotate(Math.PI / (gamePanel.privateArea.privateObjects.size()));
+                }
             }
         }
         g2.setTransform(tmp);
@@ -172,7 +174,7 @@ public class DrawFunctions {
         }
     }
 
-    public static void drawObject(Graphics g, ObjectInstance objectInstance, int playerId, double zooming, boolean active) {
+    public static void drawObject(Graphics g, ObjectInstance objectInstance, int playerId, double zooming) {
         BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
         if (objectInstance.getRotation() == 0) {//TODO: use Graphics rotation if possible
             if (objectInstance.state == null || img == null) {
@@ -180,9 +182,6 @@ public class DrawFunctions {
             } else {
             	Graphics2D g2 = (Graphics2D)g;
             	AffineTransform tmp = g2.getTransform();
-            	if (active){
-            	    g2.setTransform(new AffineTransform());
-                }
             	g2.translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming*0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming*0.5);
             	g2.rotate(Math.toRadians(objectInstance.state.rotation));
                 g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming*0.5),-(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
@@ -203,10 +202,6 @@ public class DrawFunctions {
             g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming*0.5),-(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
             g2.setTransform(tmp);
         }
-    }
-
-    public static void drawObject(Graphics g, ObjectInstance objectInstance, int playerId, double zooming) {
-        drawObject(g,objectInstance,playerId,zooming,false);
     }
 
     public static void drawPrivateAreaBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, AffineTransform transform){

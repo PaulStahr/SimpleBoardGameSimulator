@@ -10,6 +10,7 @@ public abstract class GameObject {
 	public String uniqueName;
 	public String objectType;
 
+
 	public GameObject(String uniqueName, String objectType, int widthInMM, int heightInMM)
 	{
 		this.uniqueName = uniqueName;
