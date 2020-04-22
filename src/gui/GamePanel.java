@@ -355,7 +355,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, player.mouseXPos, player.mouseYPos);
 		if (mouseInPrivateArea)
 		{
-			outText = String.valueOf(mouseScreenY);
+			//outText = String.valueOf(mouseScreenY);
 			//outText = String.valueOf(this.privateArea.getAngle(mouseGamePos.getXI(), mouseGamePos.getYI()));
 		}
 
@@ -364,8 +364,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			gameInstance.update(new GamePlayerEditAction(id, player, player));
 			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			if(activeObject != null) {
-				player.actionString = String.valueOf(activeObject.id);
-				outText = String.valueOf(activeObject.id);
+				//player.actionString = String.valueOf(activeObject.id);
+				//outText = String.valueOf(activeObject.id);
 			}
 		}
 		repaint();
