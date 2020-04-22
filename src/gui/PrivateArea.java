@@ -13,6 +13,7 @@ import java.awt.geom.Point2D;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import main.Player;
 import util.data.IntegerArrayList;
 
 public class PrivateArea {
@@ -76,6 +77,17 @@ public class PrivateArea {
 
     public void setPrivateObjects(IntegerArrayList objectIds) {
         this.privateObjects = objectIds;
+    }
+
+    public void updatePrivateObjects(GameInstance gameInstance, Player player){
+        for (ObjectInstance objectInstance:gameInstance.objects){
+            if (ObjectFunctions.isStackBottom(objectInstance) && player != null && objectInstance.state.owner_id == player.id){
+                privateObjects.clear();
+                IntegerArrayList stackIds = new IntegerArrayList();
+                ObjectFunctions.getStack(gameInstance,objectInstance, stackIds);
+                privateObjects=stackIds;
+            }
+        }
     }
 
     public double getAngle(int posX, int posY) {
@@ -144,6 +156,7 @@ public class PrivateArea {
             ObjectFunctions.insertIntoStack(gamePanel, gameInstance, gamePanel.player, gameInstance.objects.get(objectId), belowObject, aboveObject,0);
         }
     }
+
     public void insertObject(int objectId, int index) {
         privateObjects.add(index, objectId);
         if (gamePanel != null && gameInstance != null){

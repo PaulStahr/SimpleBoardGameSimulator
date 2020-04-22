@@ -784,6 +784,7 @@ public class ObjectFunctions {
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentInstance));
             }
         }
+        ObjectFunctions.displayStack(gamePanel,gameInstance,player,objectInstance,objectInstance.getWidth(player.id)/2);
     }
 
     //drop an object from the hand of player
@@ -836,6 +837,11 @@ public class ObjectFunctions {
                 for(int id: stackIds)
                 {
                     ObjectInstance currentObject = gameInstance.objects.get(id);
+
+                    int index = gamePanel.privateArea.getInsertPosition(posX, posY);
+
+                    //TODO insert into stack and update private objects
+
                     gamePanel.privateArea.insertObject(currentObject.id, posX, posY);
                     currentObject.state.owner_id = player.id;
                     currentObject.state.inPrivateArea = true;
@@ -859,7 +865,13 @@ public class ObjectFunctions {
             if (isStackCollected(gameInstance, objectInstance)) {
                 if (objectInstance != activeObject) {
                     ObjectFunctions.mergeStacks(gamePanel, gameInstance, player, activeObject, objectInstance);
+                    stackIds.clear();
+                    getStack(gameInstance,objectInstance,stackIds);
+                    if (stackIds.size() == 2){
+                        displayStack(gamePanel,gameInstance,player,getStackTop(gameInstance,objectInstance),objectInstance.getWidth(player.id)/2);
+                    }
                 }
+
             }
             else if(objectInstance != null)
             {
@@ -917,6 +929,7 @@ public class ObjectFunctions {
         }
     }
 
+    //TODO here are some errors
     public static Pair<ObjectInstance, ObjectInstance> getInsertObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, int posX, int posY, double zooming, IntegerArrayList ignoredObjects){
         ObjectInstance objectInstance = getNearestObjectByPosition(gamePanel, gameInstance, player, posX, posY, zooming, ignoredObjects);
         if (hasAboveObject(objectInstance) && hasBelowObject(objectInstance))
@@ -947,7 +960,10 @@ public class ObjectFunctions {
         return diffX*diffX + diffY*diffY;
     }
 
-    public static void insertIntoStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance objectAbove, ObjectInstance objectBelow, int cardMargin) {
+
+
+
+        public static void insertIntoStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance objectAbove, ObjectInstance objectBelow, int cardMargin) {
             if (objectInstance != null) {
                 if (objectBelow != null) {
                     objectBelow.state.aboveInstanceId = objectInstance.id;
@@ -976,6 +992,25 @@ public class ObjectFunctions {
                     }
                 }
             }
+    }
+
+    public static void insertIntoStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int insertId, int cardMargin) {
+        IntegerArrayList stackIds = new IntegerArrayList();
+        getStack(gameInstance, objectInstance, stackIds);
+        ObjectInstance aboveInstance = null;
+        ObjectInstance belowInstance = null;
+        if (insertId < 0) {
+            insertId = 0;
+        }
+        if (insertId < stackIds.size() - 1) {
+            aboveInstance = gameInstance.objects.get(insertId);
+        } else {
+            insertId = stackIds.size() - 1;
+        }
+        if (insertId > 0) {
+            belowInstance = gameInstance.objects.get(insertId - 1);
+        }
+        insertIntoStack(gamePanel, gameInstance, player, objectInstance, aboveInstance,belowInstance,cardMargin);
     }
 
     public static void setObjectPosition(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int posX, int posY) {
