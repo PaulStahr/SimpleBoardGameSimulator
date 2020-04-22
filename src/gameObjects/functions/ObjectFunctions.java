@@ -864,7 +864,7 @@ public class ObjectFunctions {
                     //TODO insert into stack and update private objects
 
                 }
-            }else if (gamePanel.privateArea != null && activeObject.state.owner_id == player.id && activeObject.state.isActive){
+            }else if (gamePanel.privateArea != null && activeObject.state.owner_id == player.id && activeObject.state.isActive && gamePanel.privateArea.containsScreenCoordinates(posX, posY)){
                 removeFromOwnStack(gamePanel,gameInstance,player,activeObject.id);
                 int index = gamePanel.privateArea.getInsertPosition(posX, posY);
                 insertIntoOwnStack(gamePanel,gameInstance,player,activeObject,index, (int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap));
@@ -1033,7 +1033,7 @@ public class ObjectFunctions {
             insertId = 0;
         }
 
-        if (insertId < stackIds.size() - 1) {
+        if (insertId <= stackIds.size() - 1) {
             aboveInstance = gameInstance.objects.get(stackIds.getI(insertId));
         } else {
             insertId = stackIds.size();
@@ -1068,7 +1068,7 @@ public class ObjectFunctions {
     }
 
 
-        public static void setObjectPosition(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int posX, int posY) {
+    public static void setObjectPosition(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int posX, int posY) {
         objectInstance.state.posX = posX;
         objectInstance.state.posY = posY;
         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
