@@ -1,6 +1,7 @@
 package gameObjects;
 
 import java.awt.image.BufferedImage;
+import java.util.Map.Entry;
 
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
@@ -69,14 +70,34 @@ public enum ImageColumnType implements TableColumnType{
 	
 	@Override
 	public Object getValue(Object obj) {
-		BufferedImage gi = (BufferedImage)obj;
-		switch (this)
+		if (obj instanceof BufferedImage)
 		{
-			case DELETE:	return "Delete";
-			case WIDTH:		return gi.getWidth();
-			case HEIGHT:	return gi.getHeight();
-			case ID:		return "id";
-			default:throw new IllegalArgumentException(getName());
+			BufferedImage gi = (BufferedImage)obj;
+			switch (this)
+			{
+				case DELETE:	return "Delete";
+				case WIDTH:		return gi.getWidth();
+				case HEIGHT:	return gi.getHeight();
+				case ID:		return "id";
+				default:throw new IllegalArgumentException(getName());
+			}
+		}
+		else if (obj instanceof Entry<?, ?>)
+		{
+			@SuppressWarnings("unchecked")
+			Entry<String, BufferedImage> entry = (Entry<String, BufferedImage>)obj;
+			switch (this)
+			{
+				case DELETE:	return "Delete";
+				case WIDTH:		return entry.getValue().getWidth();
+				case HEIGHT:	return entry.getValue().getHeight();
+				case ID:		return entry.getKey();
+				default:throw new IllegalArgumentException(getName());
+			}
+		}
+		else
+		{
+			throw new IllegalArgumentException();
 		}
 	}
 };
