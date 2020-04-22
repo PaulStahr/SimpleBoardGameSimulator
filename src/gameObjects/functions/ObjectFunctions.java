@@ -852,10 +852,8 @@ public class ObjectFunctions {
 
     public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
         if(activeObject != null) {
-            activeObject.state.isActive = false;
-            IntegerArrayList stackIds = new IntegerArrayList();
-            if (gamePanel.privateArea != null && activeObject.state.owner_id != player.id && !stackIds.contains(activeObject.id) && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
-                stackIds.clear();
+            if (gamePanel.privateArea != null && activeObject.state.owner_id != player.id && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
+                IntegerArrayList stackIds = new IntegerArrayList();
                 ObjectFunctions.getStack(gameInstance, activeObject, stackIds);
                 removeStackRelations(gamePanel.id, gameInstance, player, activeObject);
                 for(int id: stackIds)
@@ -866,12 +864,18 @@ public class ObjectFunctions {
                     //TODO insert into stack and update private objects
 
                 }
-            } else if(activeObject.state.owner_id == player.id && !gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
+            }else if (gamePanel.privateArea != null && activeObject.state.owner_id == player.id && activeObject.state.isActive){
+                removeFromOwnStack(gamePanel,gameInstance,player,activeObject.id);
+                int index = gamePanel.privateArea.getInsertPosition(posX, posY);
+                insertIntoOwnStack(gamePanel,gameInstance,player,activeObject,index, (int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap));
+            }
+            else if(activeObject.state.owner_id == player.id && !gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                 removeFromOwnStack(gamePanel,gameInstance,player,activeObject.id);
                 if (SwingUtilities.isLeftMouseButton(arg0)) {
                     ObjectFunctions.flipObject(gamePanel.id, gameInstance, player, activeObject);
                 }
             }
+            activeObject.state.isActive = false;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, activeObject));
         }
 
