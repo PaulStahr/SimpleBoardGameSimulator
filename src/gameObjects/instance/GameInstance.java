@@ -134,4 +134,9 @@ public class GameInstance {
 		}
 		return names;
 	}
+
+	public void remove(ObjectInstance objectInstance) {
+		objects.remove(objectInstance);
+		//TODO clean up references
+	}
 }

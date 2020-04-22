@@ -2,7 +2,9 @@ package gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
@@ -37,8 +39,8 @@ public class EditGamePanel extends JPanel implements ActionListener{
 		setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(scrollPaneGameObjects).addComponent(scrollPaneImages));
 		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(scrollPaneGameObjects).addComponent(scrollPaneImages));
+		updateTables();
 		setSize(500, 300);
-		actionPerformed(null);
 	}
     private final AbstractAction tableAction = new AbstractAction() {
     	private static final long serialVersionUID = 3980835476835695337L;
@@ -56,10 +58,31 @@ public class EditGamePanel extends JPanel implements ActionListener{
 	 */
 	private static final long serialVersionUID = 9089357847164495823L;
 
-	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	private void updateTables()
+	{
 		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.objects, ObjectInstance.TYPES, tableModelGameObjects, deleteObjectColumn);
-		JFrameUtils.updateTable(tableImages, scrollPaneImages, gi.game.images.values().toArray(), IMAGE_TYPES, tableModelImages, deleteImageColumn);
+		JFrameUtils.updateTable(tableImages, scrollPaneImages, gi.game.images.entrySet().toArray(), IMAGE_TYPES, tableModelImages, deleteImageColumn);
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent ae) {
+		if (ae instanceof ButtonColumn.TableButtonActionEvent)
+		{
+			ButtonColumn.TableButtonActionEvent event = (ButtonColumn.TableButtonActionEvent)ae;
+			Object tableSource = event.getSource();
+			int col = event.getCol();
+			int row = event.getRow();
+			if (tableSource== tableModelGameObjects)
+			{
+				gi.remove(gi.objects.get(row));
+			}
+			else if (tableSource == tableModelImages)
+			{
+				Entry<String, BufferedImage> entry = (Entry<String, BufferedImage>)gi.game.images.entrySet().toArray()[row];
+				gi.game.images.remove(entry.getKey(), entry.getValue());
+			}
+		}
+		updateTables();
 	}
 	
 
