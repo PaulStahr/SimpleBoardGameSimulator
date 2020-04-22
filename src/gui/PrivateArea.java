@@ -10,10 +10,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Point2D;
 
-import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
-import gameObjects.instance.ObjectInstance;
-import main.Player;
 import util.data.IntegerArrayList;
 
 public class PrivateArea {
@@ -73,10 +70,7 @@ public class PrivateArea {
     }
     public void updatePrivateObjects(IntegerArrayList objectIds) {
         privateObjects.clear();
-        for (int id: objectIds)
-        {
-            privateObjects.add(id);
-        }
+        privateObjects.add(objectIds);
     }
 
     public double getAngle(int posX, int posY) {

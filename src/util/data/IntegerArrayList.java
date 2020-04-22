@@ -111,6 +111,26 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		return true;
 	}
 	
+
+	public void add(IntegerArrayList objectIds) {
+		add(objectIds.data, 0, objectIds.length);
+	}
+	
+	private void enlargeTo(int length)
+	{
+		if (length > data.length)
+		{
+			this.data = Arrays.copyOf(this.data, Math.max(this.data.length, data.length * 2));
+		}
+	}
+	
+	public void add(int data[], int begin, int end)
+	{
+		enlargeTo(length + end - begin);
+		System.arraycopy(data, begin, this.data, length, end - begin);
+		length += end - begin;
+	}
+	
 	public void add(int value0, int value1, int value2)
 	{
 		if (length + 2 >= data.length){
@@ -235,5 +255,6 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 	public void write(int[] out, int begin) {
 		System.arraycopy(data, 0, out, begin, size());
 	}
+
 
 }
