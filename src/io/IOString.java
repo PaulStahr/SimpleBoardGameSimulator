@@ -30,9 +30,10 @@ public class IOString {
 	public static final String GAME_XML = "game.xml";
 	public static final String GAME_INSTANCE_XML = "game_instance.xml";
 	public static final String OBJECT_STATE = "object_state";
-	public static final Object PLAYER_XML = "player.xml";
+	public static final String PLAYER_XML = "player.xml";
 	public static final String FIGURE = "figure";
 	public static final String DICE = "dice";
 	public static final String CARD = "card";
 	public static final String XML = "xml";
+	public static final String GROUP = "group";
 }

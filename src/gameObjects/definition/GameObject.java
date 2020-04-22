@@ -3,12 +3,14 @@ package gameObjects.definition;
 import java.awt.image.BufferedImage;
 
 import gameObjects.instance.ObjectState;
+import util.data.UniqueObjects;
 
 public abstract class GameObject {
 	public int widthInMM;
 	public int heightInMM;
 	public String uniqueName;
 	public String objectType;
+	public String groups[] = UniqueObjects.EMPTY_STRING_ARRAY;
 
 
 	public GameObject(String uniqueName, String objectType, int widthInMM, int heightInMM)
