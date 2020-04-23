@@ -19,10 +19,12 @@ import gameObjects.GameObjectColumnType;
 import gameObjects.GameObjectInstanceColumnType;
 import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.ImageColumnType;
+import gameObjects.PlayerColumnType;
 import gameObjects.definition.GameObject;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
+import main.Player;
 import util.ArrayTools;
 import util.JFrameUtils;
 import util.jframe.table.ButtonColumn;
@@ -35,9 +37,11 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final DefaultTableModel tableModelGameObjectInstances= new TableModel(ObjectInstance.TYPES);
 	private final DefaultTableModel tableModelGameObjects= new TableModel(GameObject.TYPES);
 	private final DefaultTableModel tableModelImages= new TableModel(IMAGE_TYPES);
+	private final DefaultTableModel tableModelPlayer = new TableModel(Player.TYPES);
 	private final JTable tableGameObjectInstances = new JTable(tableModelGameObjectInstances);
 	private final JTable tableGameObjects = new JTable(tableModelGameObjects);
 	private final JTable tableImages = new JTable(tableModelImages);
+	private final JTable tablePlayer = new JTable(tableModelPlayer);
 	public String name;
 	private final JScrollPane scrollPaneGameObjectInstances = new JScrollPane(tableGameObjectInstances);
 	private final JScrollPane scrollPaneGameObjects = new JScrollPane(tableGameObjects);
@@ -52,6 +56,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		tabPane.addTab("GameObjects", scrollPaneGameObjects);
 		tabPane.addTab("GameObjectInstances", scrollPaneGameObjectInstances);
 		tabPane.addTab("Images", scrollPaneImages);
+		tabPane.addTab("Player", tablePlayer);
 		updateTables();
 		gi.changeListener.add(this);
 	}
@@ -66,6 +71,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  	private final ButtonColumn deleteObjectColumn = new ButtonColumn(tableGameObjects,tableAction, GameObject.TYPES.indexOf(GameObjectColumnType.DELETE));
  	private final ButtonColumn deleteObjectInstanceColumn = new ButtonColumn(tableGameObjects,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
  	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableImages,tableAction, IMAGE_TYPES.indexOf(ImageColumnType.DELETE));
+ 	private final ButtonColumn deletePlayerColumn = new ButtonColumn(tablePlayer,tableAction, Player.TYPES.indexOf(PlayerColumnType.DELETE));
 	
 	/**
 	 * 
@@ -77,6 +83,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, deleteObjectColumn);
 		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.objects, ObjectInstance.TYPES, tableModelGameObjectInstances, deleteObjectInstanceColumn);
 		JFrameUtils.updateTable(tableImages, scrollPaneImages, gi.game.images.entrySet().toArray(), IMAGE_TYPES, tableModelImages, deleteImageColumn);
+		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.players, Player.TYPES, tableModelPlayer, deletePlayerColumn);
 	}
 	
 	@Override
@@ -97,6 +104,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				gi.game.images.remove(entry.getKey(), entry.getValue());
 			}
 			else if (tableSource == tableModelGameObjectInstances)
+			{
+				
+			}
+			else if (tableSource == tableModelPlayer)
 			{
 				
 			}
