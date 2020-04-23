@@ -19,13 +19,13 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
+import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,15 +122,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		p.add(new JLabel("Move Top Card: Left Click + Drag"));
 		p.add(new JLabel("Move Stack: Middle Click + Drag"));
 		p.add(new JLabel("Take Objects to Hand: T"));
-		p.add(new JLabel("Drop All Object on Hand: D"));
+		p.add(new JLabel("Drop All Object from Hand: D"));
 		p.add(new JLabel("Get Bottom Card: Shift + Grab"));
 		p.add(new JLabel("Shuffle Stack: S"));
-		p.add(new JLabel("Flip Card: F"));
-		p.add(new JLabel("Flip Stack: Strg + F"));
+		p.add(new JLabel("Flip Card/Roll Dice: F"));
+		p.add(new JLabel("Flip Card Stack: Strg + F"));
 		p.add(new JLabel("View + Collect Stack: V"));
 		p.add(new JLabel("Collect Selected Objects: M"));
 		p.add(new JLabel("Collect All Objects: Strg + M"));
-		p.add(new JLabel("Remove Stack: R"));
+		p.add(new JLabel("Dissolve Stack: R"));
 		p.add(new JLabel("Count Objects: C"));
 		p.add(new JLabel("Count Values: Strg + C"));
 		this.add(p);
@@ -199,46 +199,44 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void mousePressed(MouseEvent arg0) {
 		requestFocus();
-		if(SwingUtilities.isLeftMouseButton(arg0)) {
-			isLeftMouseKeyHold = true;
-		}
-		if(SwingUtilities.isRightMouseButton(arg0)){
-			isRightMouseKeyHold = true;
-		}
-		mouseScreenX  = arg0.getX();
-		mouseScreenY  = arg0.getY();
-		screenToBoardPos(arg0.getX(), arg0.getY(), mousePressedGamePos);
-		mouseBoardPos.set(mousePressedGamePos);
-		if(!isSelectStarted && activeObject == null)
-		{
-			beginSelectPosX = arg0.getX();
-			beginSelectPosY = arg0.getY();
-			isSelectStarted = true;
-		}
-		else {
-			selectedObjects.clear();
-		}
-
-		activeObject = ObjectFunctions.setActiveObjectByMouseAndKey(this, gameInstance, player,  arg0, mouseBoardPos, maxInaccuracy);
-		if (activeObject!=null) {
-			activeObject.state.isActive = true;
-		}
-		if (activeObject != null && this.privateArea.privateObjects.contains(activeObject.id)) {
-			activeObject.state.posX = player.mouseXPos - activeObject.getWidth(player.id)/2;
-			activeObject.state.posY = player.mouseYPos - activeObject.getHeight(player.id)/2;
-		}
-		else if (activeObject != null && activeObject.state.owner_id==player.id)
-		{
-			if(!this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)) {
-				activeObject.state.owner_id = -1;
-				ObjectFunctions.flipTokenObject(id, gameInstance, player, activeObject);
+		if (arg0.getClickCount() < 2) {
+			if (SwingUtilities.isLeftMouseButton(arg0)) {
+				isLeftMouseKeyHold = true;
 			}
+			if (SwingUtilities.isRightMouseButton(arg0)) {
+				isRightMouseKeyHold = true;
+			}
+			mouseScreenX = arg0.getX();
+			mouseScreenY = arg0.getY();
+			screenToBoardPos(arg0.getX(), arg0.getY(), mousePressedGamePos);
+			mouseBoardPos.set(mousePressedGamePos);
+			if (!isSelectStarted && activeObject == null) {
+				beginSelectPosX = arg0.getX();
+				beginSelectPosY = arg0.getY();
+				isSelectStarted = true;
+			} else {
+				selectedObjects.clear();
+			}
+
+			activeObject = ObjectFunctions.setActiveObjectByMouseAndKey(this, gameInstance, player, arg0, mouseBoardPos, maxInaccuracy);
+			if (activeObject != null) {
+				activeObject.state.isActive = true;
+			}
+			if (activeObject != null && this.privateArea.privateObjects.contains(activeObject.id)) {
+				activeObject.state.posX = player.mouseXPos - activeObject.getWidth(player.id) / 2;
+				activeObject.state.posY = player.mouseYPos - activeObject.getHeight(player.id) / 2;
+			} else if (activeObject != null && activeObject.state.owner_id == player.id) {
+				if (!this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)) {
+					activeObject.state.owner_id = -1;
+					ObjectFunctions.flipTokenObject(id, gameInstance, player, activeObject);
+				}
+			}
+			if (activeObject != null) {
+				objOrigPosX = activeObject.state.posX;
+				objOrigPosY = activeObject.state.posY;
+			}
+			repaint();
 		}
-		if(activeObject != null) {
-			objOrigPosX = activeObject.state.posX;
-			objOrigPosY = activeObject.state.posY;
-		}
-		repaint();
 	}
 
 	@Override
@@ -250,18 +248,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		mouseScreenX = arg0.getX();
 		mouseScreenY = arg0.getY();
 		mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, player.mouseXPos, player.mouseYPos);
-		if (mouseInPrivateArea)
-		{
-			outText = String.valueOf(this.privateArea.getAngle(mouseScreenX, mouseScreenY));
-		}
 		if (activeObject != null && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
 			ObjectFunctions.releaseObjects(arg0, this, gameInstance, player, activeObject, mouseScreenX, mouseScreenY, 1);
+			if (activeObject.go instanceof GameObjectDice && SwingUtilities.isMiddleMouseButton(arg0)){
+				ObjectFunctions.rollTheDice(id,gameInstance,player,activeObject);
+			}
 		}
 		activeObject = null;
-
-		if (player != null) {
-			gameInstance.update(new GamePlayerEditAction(id, player, player));
-		}
+		gameInstance.update(new GamePlayerEditAction(id, player, player));
 		mouseColor = player.color;
 		if(isSelectStarted) {
 			selectedObjects.clear();
@@ -406,76 +400,90 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void keyPressed(KeyEvent e) {
 		boolean controlDown = e.isControlDown();
+		ArrayList<ObjectInstance> activeObjects = new ArrayList<>();
+
+		//Get active or selected objects
+		activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
+		if (selectedObjects.size() > 0){
+			for (int id:selectedObjects){
+				activeObjects.add(gameInstance.objects.get(id));
+			}
+		}
+		else {
+			if (activeObject != null) {
+				activeObjects.add(activeObject);
+			}
+		}
+
 		if(e.getKeyCode() == KeyEvent.VK_C && !controlDown)
 		{
-			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
-			int count = ObjectFunctions.countStack(gameInstance, activeObject);
+			int count = 0;
+			for (ObjectInstance oi:activeObjects) {
+				count += ObjectFunctions.countStack(gameInstance, oi);
+			}
 			player.actionString = "Object Number: " + String.valueOf(count);
 		}
-		if(e.getKeyCode() == KeyEvent.VK_F && !controlDown)
+		else if(e.getKeyCode() == KeyEvent.VK_F && !controlDown)
 		{
-			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
-			ObjectFunctions.flipTokenObject(id, gameInstance, player, activeObject);
-			ObjectFunctions.rollTheDice(id, gameInstance, player, activeObject);
+			for (ObjectInstance oi:activeObjects) {
+				ObjectFunctions.flipTokenObject(id, gameInstance, player, oi);
+				ObjectFunctions.rollTheDice(id, gameInstance, player, oi);
+			}
 		}
-		if (controlDown && e.getKeyCode() == KeyEvent.VK_F)
+		else if (controlDown && e.getKeyCode() == KeyEvent.VK_F)
 		{
-			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance,player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
-			ObjectFunctions.flipTokenStack(id, gameInstance, player, ObjectFunctions.getTokenStack(gameInstance, activeObject));
+			for (ObjectInstance oi:activeObjects) {
+				ObjectFunctions.flipTokenStack(id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, oi));
+			}
 		}
-		if(e.getKeyCode() == KeyEvent.VK_S)
-		{
-			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
-			ObjectFunctions.shuffleStack(id, gameInstance, player, activeObject);
+		else if(e.getKeyCode() == KeyEvent.VK_S) {
+			for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
+				ObjectFunctions.shuffleStack(id, gameInstance, player, oi);
+			}
+
 		}
-		if (controlDown && e.getKeyCode() == KeyEvent.VK_C)
+		else if (controlDown && e.getKeyCode() == KeyEvent.VK_C)
 		{
-			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance,player , mouseBoardPos.getXI(), mouseBoardPos.getYI());
-			int count = ObjectFunctions.countStackValues(gameInstance, activeObject);
+			int count = 0;
+			for (ObjectInstance oi:activeObjects) {
+				count += ObjectFunctions.countStackValues(gameInstance, oi);
+			}
 			player.actionString = "Value: " + String.valueOf(count);
 		}
-		if (e.getKeyCode() == KeyEvent.VK_V)
-		{
-			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
-			if (activeObject!= null) {
-				if (ObjectFunctions.haveSamePositions(ObjectFunctions.getTokenStack(gameInstance, activeObject), ObjectFunctions.getTokenStackBottom(gameInstance, activeObject))) {
-					activeObject = ObjectFunctions.getTokenStack(gameInstance, activeObject);
-					ObjectFunctions.displayStack(this, gameInstance, player, activeObject, (int) (activeObject.getWidth(player.id) * cardOverlap));
+		else if (e.getKeyCode() == KeyEvent.VK_V) {
+			for (ObjectInstance oi:ObjectFunctions.getStackRepresentatives(gameInstance,activeObjects)) {
+				if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, oi), ObjectFunctions.getStackBottom(gameInstance, oi))) {
+					ObjectFunctions.displayStack(this, gameInstance, player, oi, (int) (activeObject.getWidth(player.id) * cardOverlap));
 				} else {
-					ObjectFunctions.collectStack(this, gameInstance, player, activeObject);
+					ObjectFunctions.collectStack(this, gameInstance, player, oi);
 				}
 			}
 		}
-		if (e.getKeyCode() == KeyEvent.VK_R)
+		else if (e.getKeyCode() == KeyEvent.VK_R)
 		{
-			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
-			ObjectFunctions.removeStackRelations(id, gameInstance, player, activeObject);
+			for (ObjectInstance oi:activeObjects) {
+				ObjectFunctions.removeStackRelations(id, gameInstance, player, oi);
+			}
 		}
-		if (e.getKeyCode() == KeyEvent.VK_T)
+		else if (e.getKeyCode() == KeyEvent.VK_T)
 		{
-			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance,player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
-			ObjectFunctions.takeObjects(this, gameInstance, player, activeObject);
+			for (ObjectInstance oi:activeObjects) {
+				ObjectFunctions.takeObjects(this, gameInstance, player, oi);
+			}
 		}
-
-		if (e.getKeyCode() == KeyEvent.VK_D)
+		else if (e.getKeyCode() == KeyEvent.VK_D)
 		{
-			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance,player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
-			ObjectFunctions.dropObjects(this, gameInstance, player, activeObject);
+			for (ObjectInstance oi:activeObjects) {
+				ObjectFunctions.dropObjects(this, gameInstance, player, oi);
+			}
 		}
-
-		if (e.getKeyCode() == KeyEvent.VK_P)
+		else if (e.getKeyCode() == KeyEvent.VK_M && e.isControlDown())
 		{
-			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
-			getGraphics().drawString("Type: " + String.valueOf(activeObject.go.objectType) + " " + "Value: " + String.valueOf(activeObject.go.uniqueName), mouseBoardPos.getXI(), mouseBoardPos.getYI());
+			for (ObjectInstance oi:activeObjects) {
+				ObjectFunctions.getAllObjectsOfType(id, gameInstance, player, oi);
+			}
 		}
-
-		if (e.getKeyCode() == KeyEvent.VK_M && e.isControlDown())
-		{
-			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
-			ObjectFunctions.getAllObjectsOfType(id, gameInstance, player, activeObject);
-		}
-
-		if (e.getKeyCode() == KeyEvent.VK_M && !e.isControlDown())
+		else if (e.getKeyCode() == KeyEvent.VK_M && !e.isControlDown())
 		{
 			ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
 		}

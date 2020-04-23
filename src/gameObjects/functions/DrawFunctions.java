@@ -1,7 +1,7 @@
 package gameObjects.functions;
 
-import static gameObjects.functions.ObjectFunctions.getTokenStackBottom;
-import static gameObjects.functions.ObjectFunctions.getTokenStack;
+import static gameObjects.functions.ObjectFunctions.getStackBottom;
+import static gameObjects.functions.ObjectFunctions.getStackTop;
 import static gameObjects.functions.ObjectFunctions.haveSamePositions;
 import static gameObjects.functions.ObjectFunctions.isStackCollected;
 
@@ -12,6 +12,8 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,10 +124,14 @@ public class DrawFunctions {
         for(int id: gamePanel.selectedObjects)
         {
             ObjectInstance currentObject = gameInstance.objects.get(id);
-            if (ObjectFunctions.isStackBottom(currentObject)&& currentObject.state.owner_id != player.id)
-            {
-                drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1, tmp);
-                tmp.clear();
+            if (currentObject.go instanceof GameObjectToken) {
+                if (ObjectFunctions.isStackBottom(currentObject) && currentObject.state.owner_id != player.id) {
+                    drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1, tmp);
+                    tmp.clear();
+                }
+            }
+            else if (currentObject.go instanceof GameObjectDice){
+                drawBorder(g, player, currentObject, 5, player.color, 1);
             }
         }
         Graphics2D g2 = (Graphics2D)g;
@@ -249,7 +255,7 @@ public class DrawFunctions {
             if(isStackCollected(gameInstance, objectInstance))
             {
                 if((!drawProperStack || tmp.size() > 1))
-                    drawBorder(g, player, getTokenStack(gameInstance, objectInstance), borderWidth, color, zooming);
+                    drawBorder(g, player, getStackTop(gameInstance, objectInstance), borderWidth, color, zooming);
             	tmp.clear();
             }
             else
@@ -257,8 +263,8 @@ public class DrawFunctions {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g.setColor(color);
                 g2d.setStroke(new BasicStroke(borderWidth));
-                ObjectInstance stackTop = getTokenStack(gameInstance, objectInstance);
-                ObjectInstance stackBottom = getTokenStackBottom(gameInstance, objectInstance);
+                ObjectInstance stackTop = getStackTop(gameInstance, objectInstance);
+                ObjectInstance stackBottom = getStackBottom(gameInstance, objectInstance);
                 g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackTop.state.posX, stackTop.state.posY + (int)(stackTop.getHeight(player.id)*zooming));
                 g2d.drawLine(stackBottom.state.posX + (int)(stackBottom.getWidth(player.id) * zooming), stackBottom.state.posY, stackBottom.state.posX+(int)(stackBottom.getWidth(player.id)*zooming), stackBottom.state.posY + (int)(stackBottom.getHeight(player.id)*zooming));
                 g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackBottom.state.posX +(int)(stackBottom.getWidth(player.id)*zooming), stackBottom.state.posY);

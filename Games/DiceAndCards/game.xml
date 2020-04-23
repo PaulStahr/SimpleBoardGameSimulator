@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<xml>
+
+<object type="dice" unique_name="sechserwuerfel" width="30" height="30">
+<side value="1">wuerfel1.png</side>
+<side value="2">wuerfel2.png</side>
+<side value="3">wuerfel3.png</side>
+<side value="4">wuerfel4.png</side>
+<side value="5">wuerfel5.png</side>
+<side value="6">wuerfel6.png</side>
+
+
+</object>
+<object type="card" unique_name="caro10" front="caro10.jpg" back="back.jpg"/>
+<object type="card" unique_name="carobube" front="carobube.jpg" back="back.jpg"/>
+<object type="card" unique_name="carodame" front="carodame.jpg" back="back.jpg"/>
+<object type="card" unique_name="carokoenig" front="carokoenig.jpg" back="back.jpg"/>
+<object type="card" unique_name="caroass" front="caroass.jpg" back="back.jpg"/>
+
+<object type="card" unique_name="herz10" front="herz10.jpg" back="back.jpg"/>
+<object type="card" unique_name="herzbube" front="herzbube.jpg" back="back.jpg"/>
+<object type="card" unique_name="herzdame" front="herzdame.jpg" back="back.jpg"/>
+<object type="card" unique_name="herzkoenig" front="herzkoenig.jpg" back="back.jpg"/>
+<object type="card" unique_name="herzass" front="herzass.jpg" back="back.jpg"/>
+
+<object type="card" unique_name="pik10" front="pik10.jpg" back="back.jpg"/>
+<object type="card" unique_name="pikbube" front="pikbube.jpg" back="back.jpg"/>
+<object type="card" unique_name="pikdame" front="pikdame.jpg" back="back.jpg"/>
+<object type="card" unique_name="pikkoenig" front="pikkoenig.jpg" back="back.jpg"/>
+<object type="card" unique_name="pikass" front="pikass.jpg" back="back.jpg"/>
+
+<object type="card" unique_name="kreuz10" front="kreuz10.jpg" back="back.jpg"/>
+<object type="card" unique_name="kreuzbube" front="kreuzbube.jpg" back="back.jpg"/>
+<object type="card" unique_name="kreuzdame" front="kreuzdame.jpg" back="back.jpg"/>
+<object type="card" unique_name="kreuzkoenig" front="kreuzkoenig.jpg" back="back.jpg"/>
+<object type="card" unique_name="kreuzass" front="kreuzass.jpg" back="back.jpg"/>
+<background>background.jpg</background>
+</xml>

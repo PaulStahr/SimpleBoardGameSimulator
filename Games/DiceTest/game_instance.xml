@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xml>
+<name>DiceTest</name>
+<object unique_name="sechserwuerfel" id="0" x="100" y="100" r="0"/>
+</xml>

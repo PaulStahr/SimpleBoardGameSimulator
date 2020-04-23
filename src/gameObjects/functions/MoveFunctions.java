@@ -1,6 +1,7 @@
 package gameObjects.functions;
 
 import gameObjects.GameObjectInstanceEditAction;
+import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -29,7 +30,7 @@ public class MoveFunctions {
             ObjectFunctions.moveStackTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
             /*Display uncollected stack*/
             if (!ObjectFunctions.isStackCollected(gameInstance, activeObject)) {
-                ObjectFunctions.displayStack(gamePanel, gameInstance, player, ObjectFunctions.getTokenStack(gameInstance, activeObject), (int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap));
+                ObjectFunctions.displayStack(gamePanel, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject), (int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap));
             }
         }
         else if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0)) && arg0.isShiftDown() && activeObject != null && activeObject.state.owner_id != player.id) {
@@ -41,7 +42,7 @@ public class MoveFunctions {
     }
 
     public static void dragDices(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, MouseEvent arg0, int xDiff, int yDiff, int mouseWheelValue) {
-        if (activeObject != null && SwingUtilities.isLeftMouseButton(arg0)) {
+        if (activeObject != null && (activeObject.go instanceof GameObjectDice) && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
             ObjectFunctions.moveObjectTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, activeObject));
         }
