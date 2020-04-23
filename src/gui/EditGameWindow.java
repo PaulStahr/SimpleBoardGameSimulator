@@ -13,6 +13,7 @@ public class EditGameWindow extends JFrame{
 	public EditGameWindow(GameInstance gi) {
 		this.gi = gi;
 		setContentPane(new EditGamePanel(gi));
+		setSize(500, 400);
 	}
 
 }

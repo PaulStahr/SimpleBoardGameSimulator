@@ -16,7 +16,6 @@ public class ObjectInstance {
 	public final int id;
 	public double scale = 0.2;
 
-
 	public ObjectInstance(GameObject go, int id)
 	{
 		this.go = go;
