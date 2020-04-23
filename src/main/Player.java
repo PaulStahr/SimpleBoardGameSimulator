@@ -1,9 +1,15 @@
 package main;
 
 import java.awt.Color;
+import java.util.List;
 import java.util.Random;
 
+import gameObjects.PlayerColumnType;
+import util.ArrayTools;
+import util.jframe.table.TableColumnType;
+
 public class Player {
+	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{PlayerColumnType.ID, PlayerColumnType.NAME, PlayerColumnType.DELETE});
 	public String name;
 	public final int id;
 	public Color color;
