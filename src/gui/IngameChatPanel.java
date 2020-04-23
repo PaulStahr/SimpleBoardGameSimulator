@@ -4,7 +4,8 @@ package gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
-
+import javax.swing.event.ChangeListener;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -81,16 +82,24 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 
 		}
 		JComboBox<String> sendTo = new JComboBox<String>(sendToNames);
-
+		chatPanes.addChangeListener(new TabListener(chatPanes,sendTo));
 		sendTo.addActionListener(new SendToListener(this));
 		JPanel sendToPanel = new JPanel();
-		sendToPanel.add(new JLabel("Send to:"));
+		sendToPanel.setLayout(new BoxLayout(sendToPanel, BoxLayout.X_AXIS));
+		sendToPanel.add(new JLabel("Send to: "));
 		sendToPanel.add(sendTo);
+		sendToPanel.add(Box.createHorizontalGlue());
 		this.add(sendToPanel);
 
 		messageInput = new JTextField();
 		messageInput.addActionListener(new InputListener(this));
-		this.add(messageInput);
+
+		JPanel messagePanel = new JPanel();
+		messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.X_AXIS));
+		messagePanel.add(new JLabel("Message: "));
+		messagePanel.add(messageInput);
+	
+		this.add(messagePanel);
 
 	}
 
@@ -166,6 +175,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 					// Create a new tab.
 					createChatPane(tabName);
 					chatIndex = chatPanes.getTabCount() -1;
+					chatPanes.setSelectedIndex(chatIndex);
 				}
 
 				JScrollPane scrollPane =(JScrollPane) chatPanes.getComponentAt(chatIndex);
@@ -197,6 +207,10 @@ class InputListener implements ActionListener {
 
 }
 
+/*
+* When a different recipient is selected in the combo box,
+* switch to the corresponding dialog in the tabbed pane.
+*/
 class SendToListener implements ActionListener {
 	private IngameChatPanel chatPanel;
 
@@ -210,12 +224,32 @@ class SendToListener implements ActionListener {
 		chatPanel.receiverPlayerName = (String) sendTo.getSelectedItem();
 
 		int receiverIndex = chatPanel.chatPanes.indexOfTab(chatPanel.receiverPlayerName);
-		if (receiverIndex > 0) {
+		if (receiverIndex >= 0) {
 			// When a player sends a private message for the first time, the chat tab does not yet exist.
 			chatPanel.chatPanes.setSelectedIndex(receiverIndex);
 		}
 	}
 
 
+}
+
+/*
+ * When a tab changes, update the combobox 
+ * such that the next send message will go to the dialog selected in the tabbed pane.
+ */
+class TabListener implements ChangeListener {
+	private JTabbedPane tabPane;
+	private JComboBox sendToBox;
+
+	TabListener(JTabbedPane tabs, JComboBox box) {
+		tabPane = tabs;
+		sendToBox = box;
+	}
+
+	@Override
+	public void stateChanged(javax.swing.event.ChangeEvent evt) {
+		String toWhom = tabPane.getTitleAt(tabPane.getSelectedIndex());
+		sendToBox.setSelectedItem(toWhom);
+	}
 }
 
