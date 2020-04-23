@@ -37,8 +37,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	 * 
 	 */
 	private static final long serialVersionUID = -8779142095973760951L;
-	private static final Logger logger = LoggerFactory.getLogger(GamePanel.class);
-
+	private static final Logger logger = LoggerFactory.getLogger(IngameChatPanel.class);
 	private static final Dimension chatTextMinDimension =  new Dimension(200,50);
 	private static final Dimension chatTextPrefDimension = new Dimension(500,10000);
 	//private static final Dimension chatTextMaxDimension =  new Dimension(10000,10000);
@@ -145,11 +144,6 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 			Player pl = game.getPlayer(textAction.player);
 			String rawMessage = textAction.message;
 			Color color = pl == null ? Color.BLACK : pl.color;
-			for (Player player : game.players) {
-				if (textAction.player == player.id) {
-					color = player.color;
-				}
-			}
 			String recipient = rawMessage.substring(0, rawMessage.indexOf(":"));
 			// chop off the recipient part from the message
 			rawMessage = rawMessage.substring(rawMessage.indexOf(":")+1);
