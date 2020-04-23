@@ -217,7 +217,7 @@ class SendToListener implements ActionListener {
 
 	@Override
 	public void actionPerformed(java.awt.event.ActionEvent evt) {
-		JComboBox sendTo = (JComboBox) evt.getSource();
+		JComboBox<?> sendTo = (JComboBox<?>) evt.getSource();
 		chatPanel.receiverPlayerName = (String) sendTo.getSelectedItem();
 
 		int receiverIndex = chatPanel.chatPanes.indexOfTab(chatPanel.receiverPlayerName);
@@ -236,9 +236,9 @@ class SendToListener implements ActionListener {
  */
 class TabListener implements ChangeListener {
 	private JTabbedPane tabPane;
-	private JComboBox sendToBox;
+	private JComboBox<String> sendToBox;
 
-	TabListener(JTabbedPane tabs, JComboBox box) {
+	TabListener(JTabbedPane tabs, JComboBox<String> box) {
 		tabPane = tabs;
 		sendToBox = box;
 	}

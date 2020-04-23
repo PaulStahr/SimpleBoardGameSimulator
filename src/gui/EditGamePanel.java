@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
@@ -92,7 +93,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		{
 			ButtonColumn.TableButtonActionEvent event = (ButtonColumn.TableButtonActionEvent)ae;
 			Object tableSource = event.getSource();
-			int col = event.getCol();
+			//int col = event.getCol();
 			int row = event.getRow();
 			if (tableSource== tableModelGameObjectInstances)
 			{
@@ -100,7 +101,9 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			else if (tableSource == tableModelImages)
 			{
-				Entry<String, BufferedImage> entry = (Entry<String, BufferedImage>)gi.game.images.entrySet().toArray()[row];
+				Set<Entry<String, BufferedImage>> entrySet = gi.game.images.entrySet();
+				@SuppressWarnings("unchecked")
+				Entry<String, BufferedImage> entry = entrySet.toArray(new Entry[entrySet.size()])[row];
 				gi.game.images.remove(entry.getKey(), entry.getValue());
 			}
 			else if (tableSource == tableModelGameObjectInstances)
