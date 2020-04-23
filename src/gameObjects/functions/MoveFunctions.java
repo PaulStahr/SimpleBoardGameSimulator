@@ -8,7 +8,6 @@ import gui.GamePanel;
 import main.Player;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseEvent;
 
 public class MoveFunctions {
@@ -26,16 +25,23 @@ public class MoveFunctions {
                 ObjectFunctions.splitStackAtN(gamePanel.id, gameInstance, player, activeObject, mouseWheelValue);
             }
             /*Move the dragged objects to the position*/
-             player.actionString = "Took " + ObjectFunctions.countStack(gameInstance, activeObject) + " objects ";
+             player.actionString = "Took " + ObjectFunctions.countStack(gameInstance, activeObject) + (ObjectFunctions.countStack(gameInstance, activeObject) > 1 ?" objects " : " object");
             ObjectFunctions.moveStackTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
             /*Display uncollected stack*/
             if (!ObjectFunctions.isStackCollected(gameInstance, activeObject)) {
-                ObjectFunctions.displayStack(gamePanel, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject), (int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap));
+                ObjectFunctions.displayStack(gamePanel, gameInstance, player, ObjectFunctions.getTokenStack(gameInstance, activeObject), (int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap));
             }
         }
         else if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0)) && arg0.isShiftDown() && activeObject != null && activeObject.state.owner_id != player.id) {
             /*Remove top card*/
             ObjectFunctions.removeObject(gamePanel, gameInstance, player, activeObject);
+            ObjectFunctions.moveObjectTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, activeObject));
+        }
+    }
+
+    public static void dragDices(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, MouseEvent arg0, int xDiff, int yDiff, int mouseWheelValue) {
+        if (activeObject != null && SwingUtilities.isLeftMouseButton(arg0)) {
             ObjectFunctions.moveObjectTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, activeObject));
         }

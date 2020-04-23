@@ -1,11 +1,9 @@
 package gameObjects.functions;
 
-import static gameObjects.functions.ObjectFunctions.getStack;
-import static gameObjects.functions.ObjectFunctions.getStackBottom;
-import static gameObjects.functions.ObjectFunctions.getStackTop;
+import static gameObjects.functions.ObjectFunctions.getTokenStackBottom;
+import static gameObjects.functions.ObjectFunctions.getTokenStack;
 import static gameObjects.functions.ObjectFunctions.haveSamePositions;
 import static gameObjects.functions.ObjectFunctions.isStackCollected;
-import static gameObjects.functions.ObjectFunctions.isStackInPrivateArea;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -57,6 +55,10 @@ public class DrawFunctions {
         tmp.clear();
     }
 
+    public static void drawDiceObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming){
+        drawObject(g, gameInstance.objects.get(oi.id), player.id, zooming);
+    }
+
     public static void drawPlayerMarkers(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, String infoText)
     {
         Graphics2D g2 = (Graphics2D)g;
@@ -98,7 +100,7 @@ public class DrawFunctions {
                 drawObject(g, activeObject, playerId, 1);
             }
             if (player != null && (activeObject.state.owner_id != playerId || activeObject.state.isActive)) {
-                drawBorder(g, player, activeObject, 10, player.color, 1);
+                drawBorder(g, player, activeObject, 5, player.color, 1);
             }
         }
         if (activeObject != null && !activeObject.state.isActive && activeObject.state.owner_id == playerId) {
@@ -111,7 +113,7 @@ public class DrawFunctions {
             transform.translate(-activeObject.getWidth(player.id) / 2, -activeObject.getHeight(player.id) / 2);
             transform.translate(0, -250);
 
-            drawPrivateAreaBorder(g, player, activeObject, 10, player.color, transform);
+            drawPrivateAreaBorder(g, player, activeObject, 5, player.color, transform);
             g2d.setTransform(tmp);
         }
     }
@@ -247,7 +249,7 @@ public class DrawFunctions {
             if(isStackCollected(gameInstance, objectInstance))
             {
                 if((!drawProperStack || tmp.size() > 1))
-                    drawBorder(g, player, getStackTop(gameInstance, objectInstance), borderWidth, color, zooming);
+                    drawBorder(g, player, getTokenStack(gameInstance, objectInstance), borderWidth, color, zooming);
             	tmp.clear();
             }
             else
@@ -255,8 +257,8 @@ public class DrawFunctions {
                 Graphics2D g2d = (Graphics2D) g.create();
                 g.setColor(color);
                 g2d.setStroke(new BasicStroke(borderWidth));
-                ObjectInstance stackTop = getStackTop(gameInstance, objectInstance);
-                ObjectInstance stackBottom = getStackBottom(gameInstance, objectInstance);
+                ObjectInstance stackTop = getTokenStack(gameInstance, objectInstance);
+                ObjectInstance stackBottom = getTokenStackBottom(gameInstance, objectInstance);
                 g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackTop.state.posX, stackTop.state.posY + (int)(stackTop.getHeight(player.id)*zooming));
                 g2d.drawLine(stackBottom.state.posX + (int)(stackBottom.getWidth(player.id) * zooming), stackBottom.state.posY, stackBottom.state.posX+(int)(stackBottom.getWidth(player.id)*zooming), stackBottom.state.posY + (int)(stackBottom.getHeight(player.id)*zooming));
                 g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackBottom.state.posX +(int)(stackBottom.getWidth(player.id)*zooming), stackBottom.state.posY);

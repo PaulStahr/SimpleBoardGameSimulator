@@ -39,7 +39,7 @@ public class ObjectActionMenu {
 
         flipItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ObjectFunctions.flipObject(gamePanel.id, gameInstance, player, objectInstance);
+                ObjectFunctions.flipTokenObject(gamePanel.id, gameInstance, player, objectInstance);
             }
         });
 
@@ -68,7 +68,7 @@ public class ObjectActionMenu {
         flipStackItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ObjectFunctions.flipStack(gamePanel.id, gameInstance, player, objectInstance);
+                ObjectFunctions.flipTokenStack(gamePanel.id, gameInstance, player, objectInstance);
             }
         });
 

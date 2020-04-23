@@ -1,12 +1,5 @@
 package gui;
 
-import static gameObjects.functions.DrawFunctions.drawActiveObject;
-import static gameObjects.functions.DrawFunctions.drawBoard;
-import static gameObjects.functions.DrawFunctions.drawPlayerMarkers;
-import static gameObjects.functions.DrawFunctions.drawSelectedObjects;
-import static gameObjects.functions.DrawFunctions.drawTokenObjects;
-import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -31,6 +24,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +40,8 @@ import geometry.Matrix3d;
 import geometry.Vector2d;
 import main.Player;
 import util.data.IntegerArrayList;
+
+import static gameObjects.functions.DrawFunctions.*;
 
 //import gameObjects.GameObjectInstanceEditAction;
 
@@ -124,8 +121,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		p.setLayout(new GridLayout(4, 4, 20, 0));
 		p.add(new JLabel("Move Top Card: Left Click + Drag"));
 		p.add(new JLabel("Move Stack: Middle Click + Drag"));
-		p.add(new JLabel("Take Object: T"));
-		p.add(new JLabel("Drop Object: D"));
+		p.add(new JLabel("Take Objects to Hand: T"));
+		p.add(new JLabel("Drop All Object on Hand: D"));
 		p.add(new JLabel("Get Bottom Card: Shift + Grab"));
 		p.add(new JLabel("Shuffle Stack: S"));
 		p.add(new JLabel("Flip Card: F"));
@@ -162,6 +159,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (oi.state.owner_id != player.id || !oi.state.inPrivateArea) {
 				try {
 					drawTokenObjects(this, g, gameInstance, oi, player, ial);
+					drawDiceObjects(this, g, gameInstance, oi, player, 1);
 				}catch(Exception e)
 				{
 					logger.error("Error in drawing Tokens", e);
@@ -171,7 +169,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		drawActiveObject(this, g, player, activeObject);
 		drawPlayerMarkers(this, g, gameInstance, player, infoText);
 		drawSelectedObjects(this, g, gameInstance, player, ial);
-
 		drawTokensInPrivateArea(this, g, gameInstance);
 
 
@@ -234,7 +231,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			if(!this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)) {
 				activeObject.state.owner_id = -1;
-				ObjectFunctions.flipObject(id, gameInstance, player, activeObject);
+				ObjectFunctions.flipTokenObject(id, gameInstance, player, activeObject);
 			}
 		}
 		if(activeObject != null) {
@@ -339,6 +336,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				gameInstance.update(new GamePlayerEditAction(id, player, player));
 				/*Handle all drags of Token Objects*/
 				MoveFunctions.dragTokens(this, gameInstance, player, activeObject, arg0, xDiff, yDiff, mouseWheelValue);
+				MoveFunctions.dragDices(this, gameInstance, player, activeObject, arg0, xDiff, yDiff, mouseWheelValue);
 
 				if(activeObject == null && !SwingUtilities.isMiddleMouseButton(arg0) && !mouseInPrivateArea) {
 					selectWidth = mouseScreenX - beginSelectPosX;
@@ -417,12 +415,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if(e.getKeyCode() == KeyEvent.VK_F && !controlDown)
 		{
 			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
-			ObjectFunctions.flipObject(id, gameInstance, player, activeObject);
+			ObjectFunctions.flipTokenObject(id, gameInstance, player, activeObject);
+			ObjectFunctions.rollTheDice(id, gameInstance, player, activeObject);
 		}
 		if (controlDown && e.getKeyCode() == KeyEvent.VK_F)
 		{
 			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance,player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
-			ObjectFunctions.flipStack(id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject));
+			ObjectFunctions.flipTokenStack(id, gameInstance, player, ObjectFunctions.getTokenStack(gameInstance, activeObject));
 		}
 		if(e.getKeyCode() == KeyEvent.VK_S)
 		{
@@ -439,8 +438,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			if (activeObject!= null) {
-				if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, activeObject), ObjectFunctions.getStackBottom(gameInstance, activeObject))) {
-					activeObject = ObjectFunctions.getStackTop(gameInstance, activeObject);
+				if (ObjectFunctions.haveSamePositions(ObjectFunctions.getTokenStack(gameInstance, activeObject), ObjectFunctions.getTokenStackBottom(gameInstance, activeObject))) {
+					activeObject = ObjectFunctions.getTokenStack(gameInstance, activeObject);
 					ObjectFunctions.displayStack(this, gameInstance, player, activeObject, (int) (activeObject.getWidth(player.id) * cardOverlap));
 				} else {
 					ObjectFunctions.collectStack(this, gameInstance, player, activeObject);
@@ -461,7 +460,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (e.getKeyCode() == KeyEvent.VK_D)
 		{
 			activeObject = ObjectFunctions.getTopActiveObjectByPosition(gameInstance,player, mouseBoardPos.getXI(), mouseBoardPos.getYI());
-			ObjectFunctions.dropObjects(id, gameInstance, player, activeObject);
+			ObjectFunctions.dropObjects(this, gameInstance, player, activeObject);
 		}
 
 		if (e.getKeyCode() == KeyEvent.VK_P)

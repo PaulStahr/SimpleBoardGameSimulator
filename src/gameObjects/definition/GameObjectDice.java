@@ -21,7 +21,7 @@ public class GameObjectDice extends GameObject{
 	
 	public GameObjectDice(String uniqueName, String objectType, int widthInMM, int heightInMM, DiceSide sides[]) {
 		super(uniqueName, objectType, widthInMM, heightInMM);
-		//this.dss = sides;
+		this.dss = sides;
 	}
 
 	@Override
