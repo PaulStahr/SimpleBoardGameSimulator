@@ -5,6 +5,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
@@ -15,6 +16,7 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gameObjects.GameMetaInfo;
 import gameObjects.GamePlayerEditAction;
 import gameObjects.UsertextMessageAction;
 import gameObjects.definition.GameObject;
@@ -122,6 +124,32 @@ public class GameServer implements Runnable {
 				    		}
 			    		}
 			    		break;
+			    	}
+			    	case NetworkString.META:
+			    	{
+			    		switch (split.get(1))
+			    		{
+			    			case NetworkString.GAME_INSTANCE: 
+			    			{
+			    				ObjectOutputStream out;
+			    				if (!(output instanceof ObjectOutputStream))
+			    				{
+			    					out = new ObjectOutputStream(output);
+			    				}
+			    				else
+			    				{
+			    					out = (ObjectOutputStream)output;
+			    				}
+		    					GameMetaInfo gmi[] = new GameMetaInfo[gameInstances.size()];
+			    				for (int i = 0; i < gameInstances.size(); ++i)
+					    		{
+			    					gmi[i] = new GameMetaInfo(gameInstances.get(i));
+					    		}
+				    			out.writeObject(gmi);
+					    		out.close();
+					    		break;
+			    			}
+			    		}
 			    	}
 			    	case NetworkString.LIST:
 			    	{
