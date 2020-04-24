@@ -827,7 +827,7 @@ public class ObjectFunctions {
 
     //check if two objects have the same position
     public static boolean haveSamePositions(ObjectInstance objectInstanceA, ObjectInstance objectInstanceB) {
-        if (objectInstanceA != null && objectInstanceB != null)
+        if (objectInstanceA != null && objectInstanceB != null && objectInstanceA.go instanceof GameObjectToken && objectInstanceB.go instanceof GameObjectToken)
             return (objectInstanceA.state.posX == objectInstanceB.state.posX && objectInstanceA.state.posY == objectInstanceB.state.posY);
         else
             return false;
@@ -1222,14 +1222,14 @@ public class ObjectFunctions {
     }
 
 
-    public static void getObjectsInsideBox(GameInstance gameInstance, int posX, int posY, int width, int height, IntegerArrayList idList) {
+    public static void getObjectsInsideBox(GameInstance gameInstance, Player player, int posX, int posY, int width, int height, IntegerArrayList idList) {
         for (ObjectInstance objectInstance : gameInstance.objects) {
             boolean leftIn = (objectInstance.state.posX > posX);
             boolean rightIn = (objectInstance.state.posX < (posX + width));
             boolean topIn = (objectInstance.state.posY < (posY + height));
             boolean bottomIn = (objectInstance.state.posY > (posY));
 
-            if (leftIn && rightIn && topIn && bottomIn) {
+            if (leftIn && rightIn && topIn && bottomIn && objectInstance.state.owner_id!=player.id) {
                 idList.add(objectInstance.id);
             }
         }
@@ -1254,9 +1254,11 @@ public class ObjectFunctions {
     public static IntegerArrayList getStackRepresentatives(GameInstance gameInstance, IntegerArrayList objectIds) {
         IntegerArrayList ial = new IntegerArrayList();
         for (int id : objectIds) {
-            int topId = getStackTop(gameInstance, gameInstance.objects.get(id)).id;
-            if (!ial.contains(topId)) {
-                ial.add(topId);
+            if (gameInstance.objects.get(id).go instanceof GameObjectToken) {
+                int topId = getStackTop(gameInstance, gameInstance.objects.get(id)).id;
+                if (!ial.contains(topId)) {
+                    ial.add(topId);
+                }
             }
         }
         return ial;
@@ -1266,7 +1268,9 @@ public class ObjectFunctions {
         ArrayList<ObjectInstance> objectInstances1 = new ArrayList<>();
         IntegerArrayList ial = new IntegerArrayList();
         for (ObjectInstance oi : objectInstances) {
-            ial.add(oi.id);
+            if (oi.go instanceof GameObjectToken) {
+                ial.add(oi.id);
+            }
         }
         for (int id : getStackRepresentatives(gameInstance, ial)) {
             objectInstances1.add(gameInstance.objects.get(id));
