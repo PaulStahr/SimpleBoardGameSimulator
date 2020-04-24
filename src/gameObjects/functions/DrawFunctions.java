@@ -13,6 +13,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,6 +136,9 @@ public class DrawFunctions {
                 }
             }
             else if (currentObject.go instanceof GameObjectDice){
+                drawBorder(g, player, currentObject, 5, player.color, 1);
+            }
+            else if (currentObject.go instanceof GameObjectFigure){
                 drawBorder(g, player, currentObject, 5, player.color, 1);
             }
         }
