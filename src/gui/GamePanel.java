@@ -291,7 +291,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					counter+=1;
 				}
 
-				if(activeObject == null && !SwingUtilities.isMiddleMouseButton(arg0) && !mouseInPrivateArea) {
+				if(activeObject == null && selectedObjects.size()==0 && !SwingUtilities.isMiddleMouseButton(arg0) && !mouseInPrivateArea) {
 					selectWidth = mouseScreenX - beginSelectPosX;
 					selectHeight = mouseScreenY - beginSelectPosY;
 				}
