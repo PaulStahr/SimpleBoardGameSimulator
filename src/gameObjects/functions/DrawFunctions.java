@@ -4,6 +4,8 @@ import static gameObjects.functions.ObjectFunctions.getStackBottom;
 import static gameObjects.functions.ObjectFunctions.getStackTop;
 import static gameObjects.functions.ObjectFunctions.haveSamePositions;
 import static gameObjects.functions.ObjectFunctions.isStackCollected;
+import static java.lang.Integer.min;
+import static java.lang.Math.abs;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -144,9 +146,9 @@ public class DrawFunctions {
         }
         Graphics2D g2 = (Graphics2D)g;
         g2.setTransform(new AffineTransform());
-        if (gamePanel.activeObject == null && gamePanel.selectWidth > 0 && gamePanel.selectHeight > 0 && !gamePanel.mouseInPrivateArea){
+        if (gamePanel.activeObject == null  && !gamePanel.mouseInPrivateArea){
             g.setColor(player.color);
-            g.drawRect(gamePanel.beginSelectPosX, gamePanel.beginSelectPosY, gamePanel.selectWidth, gamePanel.selectHeight);
+            g.drawRect(min(gamePanel.beginSelectPosX, gamePanel.beginSelectPosX+gamePanel.selectWidth),min(gamePanel.beginSelectPosY, gamePanel.beginSelectPosY+gamePanel.selectHeight), abs(gamePanel.selectWidth), abs(gamePanel.selectHeight));
         }
     }
 
