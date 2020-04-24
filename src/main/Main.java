@@ -64,7 +64,7 @@ public class Main {
     		else if (args[i].equals("--create"))
     		{
 				try {
-	    			FileInputStream fis = new FileInputStream("Doppelkopf.zip");
+	    			FileInputStream fis = new FileInputStream("PrivateGames/Wizard.zip");
 			 		GameInstance game0 = GameIO.readSnapshotFromZip(fis);
 	            	fis.close();
 	            	game0.name = "Testsession";
