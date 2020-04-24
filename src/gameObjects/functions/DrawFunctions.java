@@ -146,7 +146,7 @@ public class DrawFunctions {
         g2.setTransform(new AffineTransform());
         if (gamePanel.activeObject == null && gamePanel.selectWidth > 0 && gamePanel.selectHeight > 0 && !gamePanel.mouseInPrivateArea){
             g.setColor(player.color);
-            g.drawRect(gamePanel.beginSelectPosX, gamePanel.beginSelectPosY, gamePanel.selectWidth, gamePanel.selectHeight);
+            g.drawRect(gamePanel.beginSelectPosScreenX, gamePanel.beginSelectPosScreenY, gamePanel.selectWidth, gamePanel.selectHeight);
         }
     }
 

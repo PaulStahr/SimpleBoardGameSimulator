@@ -1,6 +1,7 @@
 package gameObjects.functions;
 
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -8,13 +9,13 @@ import java.util.Random;
 
 import javax.swing.SwingUtilities;
 
-import gameObjects.definition.GameObjectDice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.GamePlayerEditAction;
 import gameObjects.definition.GameObject;
+import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -1222,12 +1223,19 @@ public class ObjectFunctions {
     }
 
 
-    public static void getObjectsInsideBox(GameInstance gameInstance, Player player, int posX, int posY, int width, int height, IntegerArrayList idList) {
+    public static void getObjectsInsideBox(GameInstance gameInstance, Player player, int posX, int posY, int width, int height, IntegerArrayList idList, AffineTransform boardToScreenTransformation) {
+        Point2D point = new Point2D.Double();
+        int lowX = Math.min(posX, posX + width);
+        int lowY = Math.min(posY, posY + height);
+        int highX = Math.max(posX, posX + width);
+        int highY = Math.max(posY, posY + height);
         for (ObjectInstance objectInstance : gameInstance.objects) {
-            boolean leftIn = (objectInstance.state.posX > posX);
-            boolean rightIn = (objectInstance.state.posX < (posX + width));
-            boolean topIn = (objectInstance.state.posY < (posY + height));
-            boolean bottomIn = (objectInstance.state.posY > (posY));
+    		point.setLocation(objectInstance.state.posX, objectInstance.state.posY);
+    		boardToScreenTransformation.transform(point, point);
+            boolean leftIn = point.getX() > lowX;
+            boolean rightIn = point.getX() < highX;
+            boolean topIn = point.getY() < highY;
+            boolean bottomIn = point.getY() > lowY;
 
             if (leftIn && rightIn && topIn && bottomIn && objectInstance.state.owner_id!=player.id) {
                 idList.add(objectInstance.id);
