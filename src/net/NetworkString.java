@@ -27,4 +27,5 @@ public class NetworkString {
 	public static final String TRIGGER = "trigger";
 	public static final String PLAIN = "plain";
 	public static final String DELETE = "delete";
+	public static final String META = "meta";
 }

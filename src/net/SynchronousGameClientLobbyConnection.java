@@ -2,6 +2,7 @@ package net;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -13,6 +14,7 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gameObjects.GameMetaInfo;
 import gameObjects.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import io.GameIO;
@@ -126,6 +128,21 @@ public class SynchronousGameClientLobbyConnection {
 	    String answer = in.nextLine();
 	    StringUtils.split(answer, ' ', result);
 	    in.close();
+	    server.close();
+	}
+	
+	public void getGameInstanceMeta(ArrayList<GameMetaInfo> result) throws UnknownHostException, IOException, ClassNotFoundException
+	{
+		Socket server = new Socket( address, port);
+	    StringBuilder strB = new StringBuilder();
+	    strB.append(NetworkString.META).append(' ').append(NetworkString.GAME_INSTANCE);
+	    writeCommand(strB, server.getOutputStream());
+	    ObjectInputStream ois = new ObjectInputStream(server.getInputStream());
+	    GameMetaInfo gmi[] = (GameMetaInfo[])ois.readObject();
+	    for (GameMetaInfo tmp : gmi)
+	    {
+	    	result.add(tmp);
+	    }
 	    server.close();
 	}
 	

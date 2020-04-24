@@ -1,5 +1,14 @@
 package gui;
 
+import static gameObjects.functions.DrawFunctions.drawActiveObject;
+import static gameObjects.functions.DrawFunctions.drawBoard;
+import static gameObjects.functions.DrawFunctions.drawDiceObjects;
+import static gameObjects.functions.DrawFunctions.drawFigureObjects;
+import static gameObjects.functions.DrawFunctions.drawPlayerMarkers;
+import static gameObjects.functions.DrawFunctions.drawSelectedObjects;
+import static gameObjects.functions.DrawFunctions.drawTokenObjects;
+import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -25,13 +34,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import gameObjects.definition.GameObjectDice;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.GameAction;
 import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.GamePlayerEditAction;
+import gameObjects.definition.GameObjectDice;
 import gameObjects.functions.MoveFunctions;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
@@ -40,8 +49,6 @@ import geometry.Matrix3d;
 import geometry.Vector2d;
 import main.Player;
 import util.data.IntegerArrayList;
-
-import static gameObjects.functions.DrawFunctions.*;
 
 //import gameObjects.GameObjectInstanceEditAction;
 
@@ -83,8 +90,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 
 	ControlPanel controlPanel = new ControlPanel();
-	private final AffineTransform boardTransformation = new AffineTransform();
-	private final AffineTransform inverseBoardTransformation = new AffineTransform();
+	private final AffineTransform boardToScreenTransformation = new AffineTransform();
+	private final AffineTransform screenToBoardTransformation = new AffineTransform();
 	public Color mouseColor = Color.black;
 	public Color dragColor = Color.red;
 	public Color stackColor = Color.green;
@@ -94,8 +101,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	boolean isSelectStarted = false;
 	public IntegerArrayList selectedObjects = new IntegerArrayList();
-	public int beginSelectPosX = 0;
-	public int beginSelectPosY = 0;
+	public int beginSelectPosScreenX = 0;
+	public int beginSelectPosScreenY = 0;
 	public int selectWidth = 0;
 	public int selectHeight = 0;
 
@@ -109,7 +116,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public GamePanel(GameInstance gameInstance)
 	{
 		this.gameInstance = gameInstance;
-		this.privateArea = new PrivateArea(this, gameInstance, boardTransformation, inverseBoardTransformation);
+		this.privateArea = new PrivateArea(this, gameInstance, boardToScreenTransformation, screenToBoardTransformation);
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
@@ -147,9 +154,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		Graphics2D g2 = (Graphics2D)g;
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHints(rh);
-        g2.setTransform(boardTransformation);
+        g2.setTransform(boardToScreenTransformation);
         try {
-			inverseBoardTransformation.setTransform(boardTransformation.createInverse());
+			screenToBoardTransformation.setTransform(boardToScreenTransformation.createInverse());
 		} catch (NoninvertibleTransformException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -240,8 +247,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			screenToBoardPos(arg0.getX(), arg0.getY(), mousePressedGamePos);
 			mouseBoardPos.set(mousePressedGamePos);
 			if (!isSelectStarted && activeObject == null) {
-					beginSelectPosX = arg0.getX();
-					beginSelectPosY = arg0.getY();
+					beginSelectPosScreenX = arg0.getX();
+					beginSelectPosScreenY = arg0.getY();
 					isSelectStarted = true;
 			} else {
 				selectedObjects.clear();
@@ -294,8 +301,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 
 				if(activeObject == null && selectedObjects.size()==0 && !SwingUtilities.isMiddleMouseButton(arg0) && !mouseInPrivateArea) {
-					selectWidth = mouseScreenX - beginSelectPosX;
-					selectHeight = mouseScreenY - beginSelectPosY;
+					selectWidth = mouseScreenX - beginSelectPosScreenX;
+					selectHeight = mouseScreenY - beginSelectPosScreenY;
 				}
 			}
 			else {
@@ -324,11 +331,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		if(isSelectStarted) {
 			selectedObjects.clear();
-			ObjectFunctions.getObjectsInsideBox(gameInstance, player,beginSelectPosX - translateX - getWidth() / 2, beginSelectPosY - translateY - getHeight() / 2, selectWidth, selectHeight, selectedObjects);
+			updateGameTransform();
+			ObjectFunctions.getObjectsInsideBox(gameInstance, player,beginSelectPosScreenX, beginSelectPosScreenY, selectWidth, selectHeight, selectedObjects, boardToScreenTransformation);
 			selectHeight = 0;
 			selectWidth = 0;
-			beginSelectPosX = 0;
-			beginSelectPosY = 0;
+			beginSelectPosScreenX = 0;
+			beginSelectPosScreenY = 0;
 			isSelectStarted = false;
 		}
 		activeObject = null;
@@ -521,11 +529,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		gameTransform.scale(1 / zooming);
 		gameTransform.rotateZ(rotation);
 		gameTransform.affineTranslate(-translateX, -translateY);
-		boardTransformation.setToIdentity();
-		boardTransformation.translate(getWidth() / 2, getHeight() / 2);
-		boardTransformation.scale(zooming, zooming);
-		boardTransformation.rotate(rotation);
-		boardTransformation.translate(translateX, translateY);
+		boardToScreenTransformation.setToIdentity();
+		boardToScreenTransformation.translate(getWidth() / 2, getHeight() / 2);
+		boardToScreenTransformation.scale(zooming, zooming);
+		boardToScreenTransformation.rotate(rotation);
+		boardToScreenTransformation.translate(translateX, translateY);
 	}
 
 	public void screenToBoardPos(int x, int y, Vector2d out)

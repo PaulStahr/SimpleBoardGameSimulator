@@ -91,20 +91,16 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		Object source = e.getSource();
 		if (source == buttonPoll)
 		{
-			ArrayList<String> al = new ArrayList<>();
 			try {
 				client.setAdress(textFieldAddress.getText());
 				client.setPort(Integer.parseInt(textFieldPort.getText()));
-				client.getGameInstances(al);
-			} catch (IOException e1) {
+				ArrayList<GameMetaInfo> gmi = new ArrayList<>();
+				client.getGameInstanceMeta(gmi);
+				JFrameUtils.updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn, deleteColumn);
+			} catch (IOException | ClassNotFoundException e1) {
 				JFrameUtils.logErrorAndShow("Can't update information", e1, logger);
 			}
-			ArrayList<GameMetaInfo> gmi = new ArrayList<>();
-			for (int i = 0; i < al.size(); ++i) {
-				gmi.add(new GameMetaInfo(al.get(i)));
-				gmi.get(i).name = al.get(i);
-			}
-			JFrameUtils.updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn, deleteColumn);
+			
 			
 		}
 		else if (source == buttonCreateGame)
