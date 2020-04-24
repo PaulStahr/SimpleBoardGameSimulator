@@ -160,7 +160,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (oi.state.owner_id != player.id || !oi.state.inPrivateArea) {
 				try {
 					drawTokenObjects(this, g, gameInstance, oi, player, ial);
-					drawDiceObjects(this, g, gameInstance, oi, player, 1);
+					drawDiceObjects(g, gameInstance, oi, player, 1);
+					drawFigureObjects(g, gameInstance, oi, player, 1);
 				}catch(Exception e)
 				{
 					logger.error("Error in drawing Tokens", e);
@@ -288,6 +289,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				for (ObjectInstance oi: activeObjects) {
 					MoveFunctions.dragTokens(this, gameInstance, player, oi, arg0, objOrigPosX.get(counter)- mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter)- mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
 					MoveFunctions.dragDices(this, gameInstance, player, oi, arg0,  objOrigPosX.get(counter)- mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter)- mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
+					MoveFunctions.dragFigures(this, gameInstance, player, oi, arg0,  objOrigPosX.get(counter)- mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter)- mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
 					counter+=1;
 				}
 

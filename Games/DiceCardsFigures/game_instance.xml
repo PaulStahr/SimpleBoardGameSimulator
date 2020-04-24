@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xml>
+<name>NeuesSpiel</name>
+<object unique_name="sechserwuerfel" id="0" x="150" y="150" r="0"/>
+<object unique_name="sechserwuerfel" id="1" x="160" y="170" r="0"/>
+<object unique_name="sechserwuerfel" id="2" x="170" y="160" r="0"/>
+<object unique_name="caro10" id="3" x="100" y="100" r="0"/>
+<object unique_name="carobube" id="4" x="100" y="100" r="0"/>
+<object unique_name="carodame" id="5" x="100" y="100" r="0"/>
+<object unique_name="monster" id="6" x="0" y="-100" r="0"/>
+<object unique_name="monster1" id="7" x="0" y="-100" r="0"/>
+</xml>

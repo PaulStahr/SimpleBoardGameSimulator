@@ -57,7 +57,11 @@ public class DrawFunctions {
         tmp.clear();
     }
 
-    public static void drawDiceObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming){
+    public static void drawDiceObjects(Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming){
+        drawObject(g, gameInstance.objects.get(oi.id), player.id, zooming);
+    }
+
+    public static void drawFigureObjects(Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming){
         drawObject(g, gameInstance.objects.get(oi.id), player.id, zooming);
     }
 

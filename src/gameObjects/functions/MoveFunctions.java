@@ -2,6 +2,7 @@ package gameObjects.functions;
 
 import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -43,6 +44,13 @@ public class MoveFunctions {
 
     public static void dragDices(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, MouseEvent arg0, int xDiff, int yDiff, int mouseWheelValue) {
         if (activeObject != null && (activeObject.go instanceof GameObjectDice) && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
+            ObjectFunctions.moveObjectTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, activeObject));
+        }
+    }
+
+    public static void dragFigures(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, MouseEvent arg0, int xDiff, int yDiff, int mouseWheelValue) {
+        if (activeObject != null && (activeObject.go instanceof GameObjectFigure) && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
             ObjectFunctions.moveObjectTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, activeObject));
         }

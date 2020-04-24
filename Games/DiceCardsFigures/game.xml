@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xml>
+<object type="dice" unique_name="sechserwuerfel" width="30" height="30">
+<side value="1">wuerfel1.png</side>
+<side value="2">wuerfel2.png</side>
+<side value="3">wuerfel3.png</side>
+<side value="4">wuerfel4.png</side>
+<side value="5">wuerfel5.png</side>
+<side value="6">wuerfel6.png</side>
+</object>
+<object type="card" unique_name="caro10" front="caro10.jpg" back="back.jpg"/>
+<object type="card" unique_name="carobube" front="carobube.jpg" back="back.jpg"/>
+<object type="card" unique_name="carodame" front="carodame.jpg" back="back.jpg"/>
+<object type="figure" unique_name="monster" standing="figure.png" width="100" height="100"/>
+<object type="figure" unique_name="monster1" standing="figureblue.png" width="100" height="100"/>
+<background>background.jpg</background>
+</xml>
