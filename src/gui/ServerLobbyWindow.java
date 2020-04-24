@@ -37,6 +37,7 @@ import main.Player;
 import net.AsynchronousGameConnection;
 import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
+import util.jframe.JFileChooserRecentFiles;
 import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableModel;
 
@@ -108,7 +109,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		}
 		else if (source == buttonCreateGame)
 		{
-			JFileChooser fileChooser = new JFileChooser();
+			JFileChooser fileChooser = new JFileChooserRecentFiles();
 			if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
 			{
 				try
