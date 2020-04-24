@@ -57,6 +57,7 @@ public class GameWindow extends JFrame implements ActionListener{
 		menuFile.add(menuItemExit);
 		menuFile.add(menuItemEditGame);
 		menuFile.add(menuItemSaveGame);
+		gi.addPlayer(player);
 		gamePanel = new GamePanel(gi);
 		gamePanel.player = player;
 		chatPanel = new IngameChatPanel(gi, player);
