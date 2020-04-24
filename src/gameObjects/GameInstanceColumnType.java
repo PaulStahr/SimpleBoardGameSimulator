@@ -1,6 +1,5 @@
 package gameObjects;
 
-import gameObjects.instance.GameInstance;
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
 import util.ArrayUtil;
@@ -70,14 +69,14 @@ public enum GameInstanceColumnType implements TableColumnType{
 	
 	@Override
 	public Object getValue(Object obj) {
-		GameInstance gi = (GameInstance)obj;
+		GameMetaInfo gi = (GameMetaInfo)obj;
 		switch (this)
 		{
 			case CONNECT: 		return "Connect";
 			case DELETE:		return "Delete";
 			case ID:			return gi.name;
 			case NAME:			return gi.name;
-			case NUM_PLAYERS:	return gi.players.size();
+			case NUM_PLAYERS:	return gi.connectedPlayerCount;
 			default:throw new IllegalArgumentException(getName());
 		}
 	}
