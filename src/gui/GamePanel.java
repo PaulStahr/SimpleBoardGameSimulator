@@ -331,7 +331,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		if(isSelectStarted) {
 			selectedObjects.clear();
-			updateGameTransform();
 			ObjectFunctions.getObjectsInsideBox(gameInstance, player,beginSelectPosScreenX, beginSelectPosScreenY, selectWidth, selectHeight, selectedObjects, boardToScreenTransformation);
 			selectHeight = 0;
 			selectWidth = 0;
