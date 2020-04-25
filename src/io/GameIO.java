@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -547,7 +549,87 @@ public class GameIO {
 	      total += r;
 	    }
 	    return total;
-	  }	
+	}	
+	
+	private static class GameSnapshotreader
+	{
+		ByteArrayOutputStream gameBuffer = new ByteArrayOutputStream();
+		ByteArrayOutputStream gameInstanceBuffer = new ByteArrayOutputStream();
+		GameInstance result;
+		Game game;
+		
+		void put (String name, InputStream content) throws IOException
+		{
+			if (name.equals(IOString.GAME_XML))
+			{
+				copy(content, gameBuffer);
+			}
+			else if (name.equals(IOString.GAME_INSTANCE_XML))
+			{
+				copy(content, gameInstanceBuffer);
+			}
+			else
+			{
+			    int idx = name.lastIndexOf('.');
+			    if (idx != -1)
+			    {
+			    	String suffix = name.substring(idx + 1);
+			    	if (ArrayUtil.firstEqualIndex(ImageIO.getReaderFileSuffixes(), suffix) != -1)
+			    	{
+			    		BufferedImage img = ImageIO.read(content);
+						game.images.put(name, img);
+			    	}
+			    }
+			}
+		}
+		
+		void run() throws JDOMException, IOException
+		{
+			Document doc = new SAXBuilder().build(new ByteArrayInputStream(gameBuffer.toByteArray()));
+			Element root = doc.getRootElement();
+
+			String gameName = null;
+			for (Element elem : root.getChildren())
+			{
+				final String name = elem.getName();
+				if (name.equals(IOString.OBJECT))
+				{
+					game.objects.add(createGameObjectFromElement(elem, game.images));
+				}
+				else if (name.equals(IOString.BACKGROUND))
+				{
+					game.background = game.images.get(elem.getValue());
+				}
+				else if (name.equals(IOString.NAME))
+				{
+					gameName = elem.getValue();
+				}
+			}
+			if (gameName == null)
+			{
+				logger.warn("Name not set");
+				gameName=String.valueOf(Math.random());
+			}
+			result = new GameInstance(game, gameName);
+			editGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
+			
+		}
+	}
+	
+	public static GameInstance readSnapshotFromFolder(File folder) throws IOException, JDOMException
+	{
+		GameSnapshotreader gsr = new GameSnapshotreader();
+		gsr.game  = new Game();
+		for (File subfile : folder.listFiles())
+		{
+			FileInputStream input = new FileInputStream(subfile);
+			gsr.put(subfile.getName(), input);
+			input.close();
+		}
+		gsr.run();
+		return gsr.result;
+	}
+	
 	/**
 	 * Reads a snapshot of a GameInstance encoded into @param stream incl. the
 	 * GameObject gi.game itself.
@@ -560,72 +642,23 @@ public class GameIO {
 	 */
 	public static GameInstance readSnapshotFromZip(ZipInputStream stream) throws IOException, JDOMException
 	{
-		Game game = new Game();
-		HashMap<String, BufferedImage> images = game.images;
-		ByteArrayOutputStream gameBuffer = new ByteArrayOutputStream();
-		ByteArrayOutputStream gameInstanceBuffer = new ByteArrayOutputStream();
+		GameSnapshotreader gsr = new GameSnapshotreader();
+		gsr.game  = new Game();
 		try
 		{
 			ZipEntry entry;
 			while((entry = stream.getNextEntry())!=null)
 			{
 				String name = entry.getName();
-				if (name.equals(IOString.GAME_XML))
-				{
-					copy(stream, gameBuffer);
-				}
-				else if (name.equals(IOString.GAME_INSTANCE_XML))
-				{
-					copy(stream, gameInstanceBuffer);
-				}
-				else
-				{
-				    int idx = name.lastIndexOf('.');
-				    if (idx != -1)
-				    {
-				    	String suffix = name.substring(idx + 1);
-				    	if (ArrayUtil.firstEqualIndex(ImageIO.getReaderFileSuffixes(), suffix) != -1)
-				    	{
-				    		BufferedImage img = ImageIO.read(stream);
-							images.put(name, img);
-				    	}
-				    }
-				}
+				gsr.put(name, stream);
 			}
 		}
 		finally
 		{
 			stream.close();
 		}
-		Document doc = new SAXBuilder().build(new ByteArrayInputStream(gameBuffer.toByteArray()));
-		Element root = doc.getRootElement();
-
-
-		String gameName = null;
-		for (Element elem : root.getChildren())
-		{
-			final String name = elem.getName();
-			if (name.equals(IOString.OBJECT))
-			{
-				game.objects.add(createGameObjectFromElement(elem, game.images));
-			}
-			else if (name.equals(IOString.BACKGROUND))
-			{
-				game.background = images.get(elem.getValue());
-			}
-			else if (name.equals(IOString.NAME))
-			{
-				gameName = elem.getValue();
-			}
-		}
-		if (gameName == null)
-		{
-			logger.warn("Name not set");
-			gameName=String.valueOf(Math.random());
-		}
-		GameInstance result = new GameInstance(game, gameName);
-		editGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
-		return result;
+		gsr.run();
+		return gsr.result;
 	}
 
 	// TODO Fragen
