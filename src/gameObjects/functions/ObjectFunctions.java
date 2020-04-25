@@ -1003,19 +1003,24 @@ public class ObjectFunctions {
     }
 
     public static void makeStack(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList stackElements) {
-        for (int i = 0; i < stackElements.size(); ++i) {
-            if (i == 0 && stackElements.size() > 1) {
-                gameInstance.objects.get(stackElements.get(i)).state.belowInstanceId = -1;
-                gameInstance.objects.get(stackElements.get(i)).state.aboveInstanceId = gameInstance.objects.get(stackElements.get(i + 1)).id;
-                gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, gameInstance.objects.get(stackElements.get(i))));
-            } else if (i == stackElements.size() - 1 && stackElements.size() > 1) {
-                gameInstance.objects.get(stackElements.get(i)).state.aboveInstanceId = -1;
-                gameInstance.objects.get(stackElements.get(i)).state.belowInstanceId = gameInstance.objects.get(stackElements.get(i - 1)).id;
-                setObjectPosition(gamePanelId, gameInstance, player, gameInstance.objects.get(stackElements.get(i)), gameInstance.objects.get(stackElements.get(i - 1)));
-            } else {
-                gameInstance.objects.get(stackElements.get(i)).state.aboveInstanceId = gameInstance.objects.get(stackElements.get(i + 1)).id;
-                gameInstance.objects.get(stackElements.get(i)).state.belowInstanceId = gameInstance.objects.get(stackElements.get(i - 1)).id;
-                setObjectPosition(gamePanelId, gameInstance, player, gameInstance.objects.get(stackElements.get(i)), gameInstance.objects.get(stackElements.get(i - 1)));
+        if (stackElements.size() > 1) {
+            for (int i = 0; i < stackElements.size(); ++i) {
+                ObjectInstance currentObject = gameInstance.objects.get(stackElements.get(i));
+                if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1) {
+                    if (i == 0 && stackElements.size() > 1) {
+                        currentObject.state.belowInstanceId = -1;
+                        currentObject.state.aboveInstanceId = gameInstance.objects.get(stackElements.get(i + 1)).id;
+                        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
+                    } else if (i == stackElements.size() - 1 && stackElements.size() > 1) {
+                        currentObject.state.aboveInstanceId = -1;
+                        currentObject.state.belowInstanceId = gameInstance.objects.get(stackElements.get(i - 1)).id;
+                        setObjectPosition(gamePanelId, gameInstance, player, currentObject, gameInstance.objects.get(stackElements.get(i - 1)));
+                    } else {
+                        currentObject.state.aboveInstanceId = gameInstance.objects.get(stackElements.get(i + 1)).id;
+                        currentObject.state.belowInstanceId = gameInstance.objects.get(stackElements.get(i - 1)).id;
+                        setObjectPosition(gamePanelId, gameInstance, player, currentObject, gameInstance.objects.get(stackElements.get(i - 1)));
+                    }
+                }
             }
         }
     }
@@ -1134,12 +1139,20 @@ public class ObjectFunctions {
         setObjectPosition(gamePanelId, gameInstance, player, objectInstance, targetObjectInstance.state.posX, targetObjectInstance.state.posY);
     }
 
-    public static void getAllObjectsOfType(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
-        String objectType = objectInstance.go.objectType;
+    public static void getAllObjectsOfGroup(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         IntegerArrayList objectTypeList = new IntegerArrayList();
         objectTypeList.add(objectInstance.id);
+        String objectGroup = objectInstance.go.objectType;
+        if (objectInstance.go.groups.length > 0) {
+            objectGroup = objectInstance.go.groups[0];
+        }
         for (int i = 0; i < gameInstance.objects.size(); ++i) {
-            if (gameInstance.objects.get(i).go.objectType.equals(objectType) && i != objectInstance.id) {
+            ObjectInstance oi = gameInstance.objects.get(i);
+            String oiGroup = oi.go.objectType;
+            if (oi.go.groups.length > 0) {
+                oiGroup = oi.go.groups[0];
+            }
+            if (oiGroup.equals(objectGroup) && i != objectInstance.id && oi.state.owner_id==-1) {
                 objectTypeList.add(i);
             }
         }
@@ -1237,7 +1250,7 @@ public class ObjectFunctions {
             boolean topIn = point.getY() < highY;
             boolean bottomIn = point.getY() > lowY;
 
-            if (leftIn && rightIn && topIn && bottomIn && objectInstance.state.owner_id!=player.id) {
+            if (leftIn && rightIn && topIn && bottomIn && objectInstance.state.owner_id==-1) {
                 idList.add(objectInstance.id);
             }
         }

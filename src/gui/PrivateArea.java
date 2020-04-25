@@ -49,9 +49,10 @@ public class PrivateArea {
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
         // set background color
-        graphics.setPaint(Color.LIGHT_GRAY);
+        Color privateAreaBackgound = new Color(255,153,153,127);
+        graphics.setPaint(privateAreaBackgound);
         // set border color
-        graphics.setColor(Color.GRAY);
+        graphics.setColor(privateAreaBackgound);
         graphics.setStroke(new BasicStroke(2));
         graphics.fill(this.shape);
         graphics.setTransform(tmp);

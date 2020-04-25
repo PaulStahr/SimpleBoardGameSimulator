@@ -14,11 +14,11 @@ import java.awt.event.MouseEvent;
 
 public class MoveFunctions {
 
-    public static void dragTokens(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, MouseEvent arg0, int xDiff, int yDiff, int mouseWheelValue){
+    public static void dragTokens(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, MouseEvent arg0, int xDiff, int yDiff, int mouseWheelValue, boolean selectedDrag){
         /* Drag when left mouse down or middle mouse button is down and shift is not held*/
          if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0)) && !arg0.isShiftDown() && activeObject != null && activeObject.go instanceof GameObjectToken) {
             /*Remove dragged object from stack if middle mouse button is not held*/
-            if (!SwingUtilities.isMiddleMouseButton(arg0)) {
+            if (!SwingUtilities.isMiddleMouseButton(arg0) && !selectedDrag) {
                 ObjectFunctions.removeObject(gamePanel, gameInstance, player, activeObject);
             }
             /*Remove top N dragged objects from stack if middle mouse button is held*/

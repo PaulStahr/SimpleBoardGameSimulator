@@ -192,7 +192,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, player.mouseXPos, player.mouseYPos);
 		if (mouseInPrivateArea)
 		{
-			//outText = String.valueOf(mouseScreenY);
+			outText = String.valueOf(mouseScreenY);
 			//outText = String.valueOf(this.privateArea.getAngle(mouseGamePos.getXI(), mouseGamePos.getYI()));
 		}
 
@@ -202,7 +202,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			if(activeObject != null) {
 				//player.actionString = String.valueOf(activeObject.id);
-				//outText = String.valueOf(activeObject.id);
+				outText = String.valueOf(activeObject.id);
 			}
 		}
 		repaint();
@@ -294,7 +294,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				/*Handle all drags of Token Objects*/
 				int counter = 0;
 				for (ObjectInstance oi: activeObjects) {
-					MoveFunctions.dragTokens(this, gameInstance, player, oi, arg0, objOrigPosX.get(counter)- mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter)- mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
+					boolean selectedDrag = false;
+					if (activeObjects.size()>1){
+						selectedDrag = true;
+					}
+					MoveFunctions.dragTokens(this, gameInstance, player, oi, arg0, objOrigPosX.get(counter)- mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter)- mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue, selectedDrag);
 					MoveFunctions.dragDices(this, gameInstance, player, oi, arg0,  objOrigPosX.get(counter)- mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter)- mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
 					MoveFunctions.dragFigures(this, gameInstance, player, oi, arg0,  objOrigPosX.get(counter)- mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter)- mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
 					counter+=1;
@@ -323,10 +327,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		mouseScreenX = arg0.getX();
 		mouseScreenY = arg0.getY();
 		mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, player.mouseXPos, player.mouseYPos);
-		if (activeObject != null && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
-			ObjectFunctions.releaseObjects(arg0, this, gameInstance, player, activeObject, mouseScreenX, mouseScreenY, 1);
-			if (activeObject.go instanceof GameObjectDice && SwingUtilities.isMiddleMouseButton(arg0)){
-				ObjectFunctions.rollTheDice(id,gameInstance,player,activeObject);
+		if (activeObjects.size() > 0 && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
+			for (ObjectInstance oi:activeObjects) {
+				ObjectFunctions.releaseObjects(arg0, this, gameInstance, player, oi, mouseScreenX, mouseScreenY, 1);
+				if (oi.go instanceof GameObjectDice && SwingUtilities.isMiddleMouseButton(arg0)) {
+					ObjectFunctions.rollTheDice(id, gameInstance, player, oi);
+				}
 			}
 		}
 		if(isSelectStarted) {
@@ -446,7 +452,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		else if (e.getKeyCode() == KeyEvent.VK_M && e.isControlDown())
 		{
 			for (ObjectInstance oi:activeObjects) {
-				ObjectFunctions.getAllObjectsOfType(id, gameInstance, player, oi);
+				ObjectFunctions.getAllObjectsOfGroup(id, gameInstance, player, oi);
 			}
 		}
 		else if (e.getKeyCode() == KeyEvent.VK_M && !e.isControlDown())
