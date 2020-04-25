@@ -82,9 +82,9 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private void updateTables()
 	{
 		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, deleteObjectColumn);
-		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.objects, ObjectInstance.TYPES, tableModelGameObjectInstances, deleteObjectInstanceColumn);
+		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, deleteObjectInstanceColumn);
 		JFrameUtils.updateTable(tableImages, scrollPaneImages, gi.game.images.entrySet().toArray(), IMAGE_TYPES, tableModelImages, deleteImageColumn);
-		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.players, Player.TYPES, tableModelPlayer, deletePlayerColumn);
+		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(), Player.TYPES, tableModelPlayer, deletePlayerColumn);
 	}
 	
 	@Override
@@ -97,7 +97,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			int row = event.getRow();
 			if (tableSource== tableModelGameObjectInstances)
 			{
-				gi.remove(gi.objects.get(row));
+				gi.remove(gi.getObjectInstanceByIndex(row));
 			}
 			else if (tableSource == tableModelImages)
 			{

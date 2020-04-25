@@ -35,7 +35,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -342,7 +341,7 @@ public class JFrameUtils{
      	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, buttonColumn);
  	}
 	
-    public static final void updateTable(JTable table, JScrollPane scrollPane, ArrayList<? extends Object> objectList, List<TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
+    public static final void updateTable(JTable table, JScrollPane scrollPane, List<? extends Object> objectList, List<TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
     {
  		Object[][] rowData = new Object[objectList.size()][types.size()];
      	for (int i = 0; i < rowData.length; ++i)

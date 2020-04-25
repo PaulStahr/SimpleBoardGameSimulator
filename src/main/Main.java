@@ -75,7 +75,7 @@ public class Main {
 			 		GameIO.readSnapshotFromZip(fis, game0);
 	            	fis.close();
 	            	game0.name = "Testsession";
-	            	game0.players.add(new Player(args[i + 3], Integer.parseInt(args[i + 4])));
+	            	game0.addPlayer(new Player(args[i + 3], Integer.parseInt(args[i + 4])));
 	            	test.SimpleNetworkServertest.connectAndStartGame(args[i + 1], Integer.parseInt(args[i + 2]), game0.getPlayerById(Integer.parseInt(args[i + 4])), game0);
 	    		} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
@@ -188,8 +188,8 @@ public class Main {
 		    	AsynchronousGameConnection sgc1 = new AsynchronousGameConnection(game1, socket2.getInputStream(), socket2.getOutputStream());
 		    	sgc1.start();
 		    	GameWindow gw2 = new GameWindow(game1);
+		       	player = game1.addPlayer(player);    	
 		       	gw2.gamePanel.player = player;
-		       	game1.players.add(player);    	
 		       	gw2.setVisible(true);
 		    }
 			
@@ -197,9 +197,9 @@ public class Main {
 	        AsynchronousGameConnection sgc = new AsynchronousGameConnection(game0, socket[0].getInputStream(), socket[0].getOutputStream());
 	    	sgc.start();
 	    	GameWindow gw0 = new GameWindow(game0);
+	    	player = game0.addPlayer(player);
 	    	gw0.gamePanel.player = player;
-	    	game0.players.add(player);
-		    	//GameWindow gw1 = new GameWindow(game0);
+	    		//GameWindow gw1 = new GameWindow(game0);
 	    	
 	    	gw0.setVisible(true);
 	    	//gw1.setVisible(true);
