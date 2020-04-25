@@ -107,14 +107,29 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		else if (source == buttonCreateGame)
 		{
 			JFileChooser fileChooser = new JFileChooserRecentFiles();
+			fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
 			{
 				try
 				{
 					File file = fileChooser.getSelectedFile();
 					GameInstance gi = new GameInstance(new Game(), null);
-					GameIO.readSnapshotFromZip(new FileInputStream(file), gi);
-					gi.name = "Tadada";
+					if (file.isDirectory())
+					{
+						GameIO.readSnapshotFromFolder(file, gi);
+					}
+					else if(file.getName().endsWith(".zip"))
+					{
+						GameIO.readSnapshotFromZip(new FileInputStream(file), gi);
+					}
+					else
+					{
+						JFrameUtils.logErrorAndShow("Can't interpret Game", new IOException(), logger);
+					}
+					if (gi.name == null)
+					{
+						gi.name = "Unnamed";
+					}
 					Player player = new Player(textFieldName.getText(), Integer.parseInt(textFieldId.getText()));
 					GameWindow gw = new GameWindow(gi, player);
 			    	client.pushGameSession(gi);
