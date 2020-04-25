@@ -1006,18 +1006,20 @@ public class ObjectFunctions {
         if (stackElements.size() > 1) {
             for (int i = 0; i < stackElements.size(); ++i) {
                 ObjectInstance currentObject = gameInstance.objects.get(stackElements.get(i));
-                if (i == 0 && stackElements.size() > 1) {
-                    currentObject.state.belowInstanceId = -1;
-                    currentObject.state.aboveInstanceId = gameInstance.objects.get(stackElements.get(i + 1)).id;
-                    gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
-                } else if (i == stackElements.size() - 1 && stackElements.size() > 1) {
-                    currentObject.state.aboveInstanceId = -1;
-                    currentObject.state.belowInstanceId = gameInstance.objects.get(stackElements.get(i - 1)).id;
-                    setObjectPosition(gamePanelId, gameInstance, player, currentObject, gameInstance.objects.get(stackElements.get(i - 1)));
-                } else {
-                    currentObject.state.aboveInstanceId = gameInstance.objects.get(stackElements.get(i + 1)).id;
-                    currentObject.state.belowInstanceId = gameInstance.objects.get(stackElements.get(i - 1)).id;
-                    setObjectPosition(gamePanelId, gameInstance, player, currentObject, gameInstance.objects.get(stackElements.get(i - 1)));
+                if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1) {
+                    if (i == 0 && stackElements.size() > 1) {
+                        currentObject.state.belowInstanceId = -1;
+                        currentObject.state.aboveInstanceId = gameInstance.objects.get(stackElements.get(i + 1)).id;
+                        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
+                    } else if (i == stackElements.size() - 1 && stackElements.size() > 1) {
+                        currentObject.state.aboveInstanceId = -1;
+                        currentObject.state.belowInstanceId = gameInstance.objects.get(stackElements.get(i - 1)).id;
+                        setObjectPosition(gamePanelId, gameInstance, player, currentObject, gameInstance.objects.get(stackElements.get(i - 1)));
+                    } else {
+                        currentObject.state.aboveInstanceId = gameInstance.objects.get(stackElements.get(i + 1)).id;
+                        currentObject.state.belowInstanceId = gameInstance.objects.get(stackElements.get(i - 1)).id;
+                        setObjectPosition(gamePanelId, gameInstance, player, currentObject, gameInstance.objects.get(stackElements.get(i - 1)));
+                    }
                 }
             }
         }
@@ -1150,7 +1152,7 @@ public class ObjectFunctions {
             if (oi.go.groups.length > 0) {
                 oiGroup = oi.go.groups[0];
             }
-            if (oiGroup.equals(objectGroup) && i != objectInstance.id) {
+            if (oiGroup.equals(objectGroup) && i != objectInstance.id && oi.state.owner_id==-1) {
                 objectTypeList.add(i);
             }
         }
