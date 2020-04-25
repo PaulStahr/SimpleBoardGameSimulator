@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.action.GameAction;
+import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
@@ -50,7 +52,29 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	protected final SimpleAttributeSet textStyle;
 	protected JTextField messageInput;
 	protected String receiverPlayerName = "all";
+	private final JComboBox<String> sendTo = new JComboBox<String>();
 
+	void updatePlayerList()
+	{
+		String[] playerNames = game.getPlayerNames();
+		String[] sendToNames = new String[playerNames.length];
+		// The first option in the sendTo combobox is to send the message to everybody "all"
+		sendToNames[0] = "all";
+
+		int targetIndex = 1;
+		for(int playerIndex=0; playerIndex<game.getPlayerNumber(); playerIndex++) {
+			// copy all player names to the combobox. 
+			// Omit the own name, since you don't want to send messages to yourself.
+			if (!playerNames[playerIndex].matches(player.name)) {
+				sendToNames[targetIndex] = playerNames[playerIndex];
+				targetIndex++;
+			}
+
+		}
+		Object selected = sendTo.getSelectedItem();
+		sendTo.setModel(new DefaultComboBoxModel<String>(sendToNames));
+		sendTo.setSelectedItem(selected);
+	}
 
 	public IngameChatPanel(GameInstance game, Player player)
 	{
@@ -67,22 +91,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		this.add(chatPanes);
 		createChatPane("all");
 
-		String[] playerNames = game.getPlayerNames();
-		String[] sendToNames = new String[playerNames.length];
-		// The first option in the sendTo combobox is to send the message to everybody "all"
-		sendToNames[0] = "all";
-
-		int targetIndex = 1;
-		for(int playerIndex=0; playerIndex<game.getPlayerNumber(); playerIndex++) {
-			// copy all player names to the combobox. 
-			// Omit the own name, since you don't want to send messages to yourself.
-			if (!playerNames[playerIndex].matches(player.name)) {
-				sendToNames[targetIndex] = playerNames[playerIndex];
-				targetIndex++;
-			}
-
-		}
-		JComboBox<String> sendTo = new JComboBox<String>(sendToNames);
+		updatePlayerList();
 		chatPanes.addChangeListener(new TabListener(chatPanes,sendTo));
 		sendTo.addActionListener(new SendToListener(this));
 		JPanel sendToPanel = new JPanel();
@@ -138,7 +147,11 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 
 	@Override
 	public void changeUpdate(GameAction action) {
-		if (action instanceof UsertextMessageAction)
+		if (action instanceof GamePlayerEditAction)
+		{
+			updatePlayerList();
+		}
+		else if (action instanceof UsertextMessageAction)
 		{
 			UsertextMessageAction textAction = (UsertextMessageAction) action;
 			Player pl = game.getPlayerById(textAction.player);
