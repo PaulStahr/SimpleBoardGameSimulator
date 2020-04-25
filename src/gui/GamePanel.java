@@ -122,7 +122,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		addKeyListener(this);
 		addMouseWheelListener(this);
 		setFocusable(true);
-		gameInstance.changeListener.add(this);
+		gameInstance.addChangeListener(this);
 
 		// This is the cheat sheet showing the user how he can interact with the game board
 		JPanel p = new JPanel();
@@ -163,7 +163,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 
         //Draw all objects not in some private area
-		for (ObjectInstance oi : gameInstance.objects) {
+		for (int idx = 0; idx < gameInstance.getObjectNumber(); ++ idx) {
+			ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
 			if (oi.state.owner_id != player.id || !oi.state.inPrivateArea) {
 				try {
 					drawTokenObjects(this, g, gameInstance, oi, player, ial);
@@ -574,7 +575,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		activeObjects.clear();
 		if (selectedObjects.size() > 0){
 			for (int id:selectedObjects){
-				activeObjects.add(gameInstance.objects.get(id));
+				activeObjects.add(gameInstance.getObjectInstanceById(id));
 			}
 		}
 		else {

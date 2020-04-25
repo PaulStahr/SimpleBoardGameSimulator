@@ -59,7 +59,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		tabPane.addTab("Images", scrollPaneImages);
 		tabPane.addTab("Player", tablePlayer);
 		updateTables();
-		gi.changeListener.add(this);
+		gi.addChangeListener(this);
 	}
     private final AbstractAction tableAction = new AbstractAction() {
     	private static final long serialVersionUID = 3980835476835695337L;

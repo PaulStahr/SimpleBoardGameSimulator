@@ -61,25 +61,22 @@ public class DrawFunctions {
     }
 
     public static void drawDiceObjects(Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming){
-        drawObject(g, gameInstance.objects.get(oi.id), player.id, zooming);
+        drawObject(g, gameInstance.getObjectInstanceById(oi.id), player.id, zooming);
     }
 
     public static void drawFigureObjects(Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming){
-        drawObject(g, gameInstance.objects.get(oi.id), player.id, zooming);
+        drawObject(g, gameInstance.getObjectInstanceById(oi.id), player.id, zooming);
     }
 
     public static void drawPlayerMarkers(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, String infoText)
     {
         Graphics2D g2 = (Graphics2D)g;
         AffineTransform tmp = g2.getTransform();
-        for(Player p: gameInstance.players) {
+        for(int pIdx = 0;pIdx < gameInstance.getPlayerNumber();++pIdx) {
+            Player p = gameInstance.getPlayerByIndex(pIdx);
             g.setColor(p.color);
-
-
-
             //if(isInPrivateArea(gamePanel, p.mouseXPos, p.mouseYPos))
                 //TODO p.actionString = "Private Area";
-
             if(p.id == player.id)
             {
                 g2.setTransform(new AffineTransform());
@@ -130,7 +127,7 @@ public class DrawFunctions {
     public static void drawSelectedObjects(GamePanel gamePanel, Graphics g,GameInstance gameInstance, Player player, IntegerArrayList tmp){
         for(int id: gamePanel.selectedObjects)
         {
-            ObjectInstance currentObject = gameInstance.objects.get(id);
+            ObjectInstance currentObject = gameInstance.getObjectInstanceById(id);
             if (currentObject.go instanceof GameObjectToken) {
                 if (ObjectFunctions.isStackBottom(currentObject) && currentObject.state.owner_id != player.id) {
                     drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1, tmp);
@@ -163,7 +160,7 @@ public class DrawFunctions {
             int activeObjectCount = 0;
             for(int id : gamePanel.privateArea.privateObjects)
             {
-                ObjectInstance objectInstance = gameInstance.objects.get(id);
+                ObjectInstance objectInstance = gameInstance.getObjectInstanceById(id);
                 if (objectInstance.state.isActive) {
                     activeObjectCount+=1;
                 }
@@ -172,7 +169,7 @@ public class DrawFunctions {
             g2.rotate(-Math.PI * 0.5 + Math.PI / ((gamePanel.privateArea.privateObjects.size()-activeObjectCount) * 2));
             for(int id : gamePanel.privateArea.privateObjects)
             {
-                ObjectInstance objectInstance = gameInstance.objects.get(id);
+                ObjectInstance objectInstance = gameInstance.getObjectInstanceById(id);
                 if (!objectInstance.state.isActive) {
                     BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
                     g2.translate(0, -250);
@@ -190,13 +187,13 @@ public class DrawFunctions {
         {
         }*/
         if(true){
-            if (haveSamePositions(gameInstance.objects.get(stackList.get(0)), gameInstance.objects.get(stackList.last()))) {
+            if (haveSamePositions(gameInstance.getObjectInstanceById(stackList.get(0)), gameInstance.getObjectInstanceById(stackList.last()))) {
                 IntegerArrayList newStackList = new IntegerArrayList();
-                newStackList.add(gameInstance.objects.get(stackList.last()).id);
+                newStackList.add(gameInstance.getObjectInstanceById(stackList.last()).id);
                 stackList = newStackList;
             }
             for (int id : stackList) {
-                drawObject(g, gameInstance.objects.get(id), playerId, zooming);
+                drawObject(g, gameInstance.getObjectInstanceById(id), playerId, zooming);
             }
         }
     }

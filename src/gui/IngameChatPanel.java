@@ -55,7 +55,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	public IngameChatPanel(GameInstance game, Player player)
 	{
 		this.game = game;
-		game.changeListener.add(this);
+		game.addChangeListener(this);
 		this.player = player;
 
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -73,7 +73,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		sendToNames[0] = "all";
 
 		int targetIndex = 1;
-		for(int playerIndex=0; playerIndex<game.players.size(); playerIndex++) {
+		for(int playerIndex=0; playerIndex<game.getPlayerNumber(); playerIndex++) {
 			// copy all player names to the combobox. 
 			// Omit the own name, since you don't want to send messages to yourself.
 			if (!playerNames[playerIndex].matches(player.name)) {

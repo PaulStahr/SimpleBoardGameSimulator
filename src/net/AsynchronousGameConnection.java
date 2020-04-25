@@ -75,7 +75,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	public AsynchronousGameConnection(GameInstance gi, ObjectInputStream input, OutputStream output)
 	{
 		this.gi = gi;
-		gi.changeListener.add(this);
+		gi.addChangeListener(this);
 		this.objIn = input;
 		this.output = output;
 	}
@@ -89,7 +89,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	public AsynchronousGameConnection(GameInstance gi, InputStream input, OutputStream output)
 	{
 		this.gi = gi;
-		gi.changeListener.add(this);
+		gi.addChangeListener(this);
 		/*if (!(input instanceof ObjectInputStream))
 		{
 			throw new RuntimeException();
@@ -262,7 +262,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    			}
 		    			case NetworkString.GAME_OBJECT_INSTANCE:
 		    			{
-		    				GameIO.writeObjectInstanceToZip(gi.getObjectInstance(id), byteStream);
+		    				GameIO.writeObjectInstanceToZip(gi.getObjectInstanceById(id), byteStream);
 		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT_INSTANCE).append(' ').append(byteStream.size());
 		    				objOut.writeObject(strB.toString());
 		    				//objOut.writeObject(byteStream.toByteArray());
@@ -509,7 +509,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								int objectId = Integer.parseInt(split.get(6));
 								int size = Integer.parseInt(split.get(7));
 								
-								ObjectInstance inst = gi.getObjectInstance(objectId);	
+								ObjectInstance inst = gi.getObjectInstanceById(objectId);
 								//ObjectState state = (ObjectState)objIn.readObject();
 								//inst.state.set(state);
 								GameIO.editStateFromStreamObject(objIn, inst.state);

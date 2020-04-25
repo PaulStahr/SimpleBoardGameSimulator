@@ -172,9 +172,9 @@ public class GameServer implements Runnable {
 			    				PrintWriter out = new PrintWriter(output, true);
 			    				String gameinstanceName = split.get(2);
 			    				GameInstance gi = getGameInstance(gameinstanceName);
-			    				for (int i = 0; i < gi.players.size(); ++i)
+			    				for (int i = 0; i < gi.getPlayerNumber(); ++i)
 			    				{
-			    					out.write(gi.players.get(i).name);
+			    					out.write(gi.getPlayerByIndex(i).name);
 			    				}
 			    				out.close();
 			    				break;
@@ -304,7 +304,7 @@ public class GameServer implements Runnable {
 			    			case NetworkString.GAME_OBJECT_INSTANCE:
 			    			{
 			    				GameInstance gi = getGameInstance(split.get(2));
-			    				ObjectInstance oi = gi.getObjectInstance(Integer.parseInt(split.get(2)));
+			    				ObjectInstance oi = gi.getObjectInstanceById(Integer.parseInt(split.get(2)));
 			    				//GameIO.saveGameObjectInstance(go, output);
 			    				break;
 			    			}

@@ -166,4 +166,8 @@ public class GameInstance {
 		objects.remove(objectInstance);
 		//TODO clean up references
 	}
+
+	public void addChangeListener(GameChangeListener listener) {
+		changeListener.add(listener);
+	}
 }
