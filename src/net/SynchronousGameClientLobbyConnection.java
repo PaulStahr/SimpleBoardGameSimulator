@@ -164,7 +164,7 @@ public class SynchronousGameClientLobbyConnection {
 	{
 		Socket server = new Socket( address, port);
 	    StringBuilder strB = new StringBuilder();
-	    strB.append(NetworkString.JOIN).append(' ').append(player.name).append(' ').append(player.id).append(' ').append(name);
+	    strB.append(NetworkString.JOIN).append(' ').append(player.getName()).append(' ').append(player.id).append(' ').append(name);
 	    if (password != null)
 	    {
 	    	strB.append(' ').append(password);

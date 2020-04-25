@@ -82,7 +82,7 @@ public class GameInstance {
 	{
 		for (int i = 0; i < players.size(); ++i)
 		{
-			if (players.get(i).name.equals(name))
+			if (players.get(i).getName().equals(name))
 			{
 				return players.get(i);
 			}
@@ -158,7 +158,7 @@ public class GameInstance {
 		String names[] = new String[players.size()];
 		for (int i = 0; i < players.size(); ++i)
 		{
-			names[i] = players.get(i).name;
+			names[i] = players.get(i).getName();
 		}
 		return names;
 	}

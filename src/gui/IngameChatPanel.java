@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -55,40 +54,31 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	protected JTextField messageInput;
 	protected String receiverPlayerName = "all";
 	private final JComboBox<String> sendTo = new JComboBox<String>();
-
+	private	 int playerModCount = 0;
+	
 	void updatePlayerList()
 	{
-		ComboBoxModel<String> model = sendTo.getModel();
-		if (model.getSize() == game.getPlayerNumber())
+		int modCount = game.getPlayerNumber();
+		for (int i = 0; i < game.getPlayerNumber(); ++i)
 		{
-			allEqual:
-			{
-				for (int i = 1, j = 0; i < model.getSize(); ++j)
-				{
-					Player current = game.getPlayerByIndex(j);
-					if (!current.name.equals(player.name))
-					{
-						if (!model.getElementAt(j).equals(current.name))
-						{
-							break allEqual;
-						}
-						++j;
-					}
-				}
-				return;
-			}
+			modCount += game.getPlayerByIndex(i).getNameModCount();
 		}
-		String[] playerNames = game.getPlayerNames();
-		String[] sendToNames = new String[playerNames.length];
+		if (modCount == playerModCount)
+		{
+			return;
+		}
+		playerModCount = modCount;
+		String[] sendToNames = new String[game.getPlayerNumber()];
 		// The first option in the sendTo combobox is to send the message to everybody "all"
 		sendToNames[0] = "all";
 
 		int targetIndex = 1;
 		for(int playerIndex=0; playerIndex<game.getPlayerNumber(); playerIndex++) {
+			String name = game.getPlayerByIndex(playerIndex).getName();
 			// copy all player names to the combobox. 
 			// Omit the own name, since you don't want to send messages to yourself.
-			if (!playerNames[playerIndex].equals(player.name)) {
-				sendToNames[targetIndex] = playerNames[playerIndex];
+			if (!name.equals(player.getName())) {
+				sendToNames[targetIndex] = name;
 				targetIndex++;
 			}
 		}
@@ -193,14 +183,14 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 			// chop off the sender part from the message:			
 			String message = rawMessage.substring(rawMessage.indexOf(":")+1);
 			String tabName;
-			if ( sender.matches(player.name) | recipient.matches(player.name)  | recipient.matches("all")) {
+			if ( sender.matches(player.getName()) | recipient.matches(player.getName())  | recipient.matches("all")) {
 				// The message was sent by me or it was sent to me or it was sent to all (which means also to me)
 
 				// Find the tab to add the message to
 				int chatIndex = -1;
 				if (recipient.matches("all")) {
 					tabName = "all";
-				} else if (sender.matches(player.name)) {
+				} else if (sender.equals(player.getName())) {
 					// I sent the message. Look for a tab named with the reciver
 					tabName = recipient;
 				} else {
@@ -238,7 +228,7 @@ class InputListener implements ActionListener {
 	public void actionPerformed(java.awt.event.ActionEvent evt) {
 		String inputText = chatPanel.messageInput.getText();
 		if(inputText.length() > 0) {
-			String message = chatPanel.receiverPlayerName +":"+ chatPanel.player.name + ":"+ inputText +"\n";
+			String message = chatPanel.receiverPlayerName +":"+ chatPanel.player.getName() + ":"+ inputText +"\n";
 			chatPanel.messageInput.setText("");
 			chatPanel.send(message);
 		}
