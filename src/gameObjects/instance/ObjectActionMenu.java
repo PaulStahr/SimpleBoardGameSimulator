@@ -1,6 +1,6 @@
 package gameObjects.instance;
 
-import gameObjects.GameObjectInstanceEditAction;
+import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.functions.ObjectFunctions;
 import gui.GamePanel;
 import main.Player;

@@ -15,12 +15,12 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import gameObjects.GameAction;
 import gameObjects.GameObjectColumnType;
 import gameObjects.GameObjectInstanceColumnType;
-import gameObjects.GameObjectInstanceEditAction;
 import gameObjects.ImageColumnType;
 import gameObjects.PlayerColumnType;
+import gameObjects.action.GameAction;
+import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;

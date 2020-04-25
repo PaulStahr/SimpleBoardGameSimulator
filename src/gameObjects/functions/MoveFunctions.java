@@ -1,6 +1,6 @@
 package gameObjects.functions;
 
-import gameObjects.GameObjectInstanceEditAction;
+import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;

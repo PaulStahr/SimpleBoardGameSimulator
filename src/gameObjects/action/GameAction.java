@@ -1,4 +1,4 @@
-package gameObjects;
+package gameObjects.action;
 
 public abstract class GameAction {
 	public final int source;

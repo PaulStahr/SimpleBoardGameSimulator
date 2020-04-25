@@ -1,4 +1,4 @@
-package gameObjects;
+package gameObjects.action;
 
 import gameObjects.instance.ObjectInstance;
 import main.Player;

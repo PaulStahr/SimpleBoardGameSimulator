@@ -37,9 +37,9 @@ import javax.swing.SwingUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.GameAction;
-import gameObjects.GameObjectInstanceEditAction;
-import gameObjects.GamePlayerEditAction;
+import gameObjects.action.GameAction;
+import gameObjects.action.GameObjectInstanceEditAction;
+import gameObjects.action.GamePlayerEditAction;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.functions.MoveFunctions;
 import gameObjects.functions.ObjectFunctions;
