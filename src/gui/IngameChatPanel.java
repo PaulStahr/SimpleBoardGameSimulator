@@ -230,7 +230,8 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		public void actionPerformed(java.awt.event.ActionEvent evt) {
 			JComboBox<?> sendTo = (JComboBox<?>) evt.getSource();
 			receiverPlayerName = (String) sendTo.getSelectedItem();
-			receiverPlayerId = game.getPlayerByName(receiverPlayerName).id;
+			Player pl = game.getPlayerByName(receiverPlayerName);
+			receiverPlayerId = pl == null ? -1 : pl.id;
 
 			int receiverIndex = chatPanes.indexOfTab(receiverPlayerName);
 			if (receiverIndex >= 0) {
