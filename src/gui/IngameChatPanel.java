@@ -55,6 +55,8 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	protected String receiverPlayerName = "all";
 	private final JComboBox<String> sendTo = new JComboBox<String>();
 	private	 int playerModCount = 0;
+	private int receiverPlayerId;
+
 	
 	void updatePlayerList()
 	{
@@ -113,7 +115,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		this.add(sendToPanel);
 
 		messageInput = new JTextField();
-		messageInput.addActionListener(new InputListener(this));
+		messageInput.addActionListener(new InputListener());
 
 		JPanel messagePanel = new JPanel();
 		messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.X_AXIS));
@@ -151,9 +153,9 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		}
 	}
 
-	protected void send(String message)
+	protected void send(String message, int toPlayer)
 	{
-		game.update(new UsertextMessageAction(id, player.id, -1, message));
+		game.update(new UsertextMessageAction(id, player.id, toPlayer, message));
 	}
 	
 	private Runnable updatePlayerListRunnable = new Runnable() {
@@ -216,51 +218,46 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		}
 	}
 	
-	
-}
-
-class InputListener implements ActionListener {
-	private IngameChatPanel chatPanel;
-	InputListener(IngameChatPanel panel) {
-		chatPanel = panel;
-	}
-	@Override
-	public void actionPerformed(java.awt.event.ActionEvent evt) {
-		String inputText = chatPanel.messageInput.getText();
-		if(inputText.length() > 0) {
-			String message = chatPanel.receiverPlayerName +":"+ chatPanel.player.getName() + ":"+ inputText +"\n";
-			chatPanel.messageInput.setText("");
-			chatPanel.send(message);
+	/*
+	* When a different recipient is selected in the combo box,
+	* switch to the corresponding dialog in the tabbed pane.
+	*/
+	class SendToListener implements ActionListener {
+			SendToListener(IngameChatPanel panel) {
 		}
-	}
 
-}
+		@Override
+		public void actionPerformed(java.awt.event.ActionEvent evt) {
+			JComboBox<?> sendTo = (JComboBox<?>) evt.getSource();
+			receiverPlayerName = (String) sendTo.getSelectedItem();
+			receiverPlayerId = game.getPlayerByName(receiverPlayerName).id;
 
-/*
-* When a different recipient is selected in the combo box,
-* switch to the corresponding dialog in the tabbed pane.
-*/
-class SendToListener implements ActionListener {
-	private IngameChatPanel chatPanel;
-
-	SendToListener(IngameChatPanel panel) {
-		chatPanel = panel;
-	}
-
-	@Override
-	public void actionPerformed(java.awt.event.ActionEvent evt) {
-		JComboBox<?> sendTo = (JComboBox<?>) evt.getSource();
-		chatPanel.receiverPlayerName = (String) sendTo.getSelectedItem();
-
-		int receiverIndex = chatPanel.chatPanes.indexOfTab(chatPanel.receiverPlayerName);
-		if (receiverIndex >= 0) {
-			// When a player sends a private message for the first time, the chat tab does not yet exist.
-			chatPanel.chatPanes.setSelectedIndex(receiverIndex);
+			int receiverIndex = chatPanes.indexOfTab(receiverPlayerName);
+			if (receiverIndex >= 0) {
+				// When a player sends a private message for the first time, the chat tab does not yet exist.
+				chatPanes.setSelectedIndex(receiverIndex);
+			}
 		}
+
+
 	}
 
+	class InputListener implements ActionListener {
+		InputListener() {}
+		@Override
+		public void actionPerformed(java.awt.event.ActionEvent evt) {
+			String inputText = messageInput.getText();
+			if(inputText.length() > 0) {
+				String message = receiverPlayerName +":"+ player.getName() + ":"+ inputText +"\n";
+				messageInput.setText("");
+				send(message, receiverPlayerId);
+			}
+		}
 
+	}
 }
+
+
 
 /*
  * When a tab changes, update the combobox 
