@@ -263,7 +263,7 @@ public class GameIO {
 
 	private static Player editPlayerFromElement(Element elem, Player player)
 	{
-		player.name = elem.getAttributeValue(IOString.NAME);
+		player.setName(elem.getAttributeValue(IOString.NAME));
 		player.color = new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR)));
 		player.mouseXPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X));
 		player.mouseYPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y));
@@ -342,7 +342,7 @@ public class GameIO {
 	 */
 	private static Element createElementFromPlayer(Player player) {
 		Element elem = new Element(IOString.PLAYER);
-		elem.setAttribute(IOString.NAME, player.name);
+		elem.setAttribute(IOString.NAME, player.getName());
 		elem.setAttribute(IOString.ID, Integer.toString(player.id));
 		elem.setAttribute(IOString.COLOR, Integer.toString(player.color.getRGB()));
 		elem.setAttribute(IOString.MOUSE_X, Integer.toString(player.mouseXPos));
@@ -777,7 +777,7 @@ public class GameIO {
 	
 	public static void editPlayerFromStreamObject(ObjectInputStream is, Player player) throws ClassNotFoundException, IOException
 	{
-		player.name = (String)is.readObject();
+		player.setName((String)is.readObject());
 		player.color = new Color(is.readInt());
 		player.mouseXPos = is.readInt();
 		player.mouseYPos = is.readInt();
@@ -785,7 +785,7 @@ public class GameIO {
 	
 	public static void writePlayerToStreamObject(ObjectOutputStream out, Player player) throws IOException
 	{
-		out.writeObject(player.name);
+		out.writeObject(player.getName());
 		out.writeInt(player.color.getRGB());
 		out.writeInt(player.mouseXPos);
 		out.writeInt(player.mouseYPos);

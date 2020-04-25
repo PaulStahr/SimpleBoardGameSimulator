@@ -10,12 +10,32 @@ import util.jframe.table.TableColumnType;
 
 public class Player {
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{PlayerColumnType.ID, PlayerColumnType.NAME, PlayerColumnType.DELETE});
-	public String name;
+	private String name;
 	public final int id;
 	public Color color;
 	public int mouseXPos = 0;
 	public int mouseYPos = 0;
 	public String actionString = "";
+	private transient int nameModCount = 0;
+	
+	public String getName()
+	{
+		return name;
+	}
+	
+	public int getNameModCount()
+	{
+		return nameModCount;
+	}
+	
+	public void setName(String name)
+	{
+		if (!this.name.equals(name))
+		{
+			++nameModCount;
+		}
+		this.name = name;
+	}
 	
 	public Player(String name, int id)
 	{

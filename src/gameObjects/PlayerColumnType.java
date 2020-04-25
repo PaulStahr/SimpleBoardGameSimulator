@@ -72,7 +72,7 @@ public enum PlayerColumnType implements TableColumnType{
 		{
 			case DELETE:	return "Delete";
 			case ID:		return gi.id;
-			case NAME:		return gi.name;
+			case NAME:		return gi.getName();
 			default:throw new IllegalArgumentException(getName());
 		}
 	}

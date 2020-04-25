@@ -32,6 +32,7 @@ import gameObjects.action.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import main.Player;
+import util.JFrameUtils;
 
 
 public class IngameChatPanel extends JPanel implements GameChangeListener {
@@ -53,23 +54,35 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	protected JTextField messageInput;
 	protected String receiverPlayerName = "all";
 	private final JComboBox<String> sendTo = new JComboBox<String>();
+	private	 int playerModCount = 0;
+	private int receiverPlayerId;
 
+	
 	void updatePlayerList()
 	{
-		String[] playerNames = game.getPlayerNames();
-		String[] sendToNames = new String[playerNames.length];
+		int modCount = game.getPlayerNumber();
+		for (int i = 0; i < game.getPlayerNumber(); ++i)
+		{
+			modCount += game.getPlayerByIndex(i).getNameModCount();
+		}
+		if (modCount == playerModCount)
+		{
+			return;
+		}
+		playerModCount = modCount;
+		String[] sendToNames = new String[game.getPlayerNumber()];
 		// The first option in the sendTo combobox is to send the message to everybody "all"
 		sendToNames[0] = "all";
 
 		int targetIndex = 1;
 		for(int playerIndex=0; playerIndex<game.getPlayerNumber(); playerIndex++) {
+			String name = game.getPlayerByIndex(playerIndex).getName();
 			// copy all player names to the combobox. 
 			// Omit the own name, since you don't want to send messages to yourself.
-			if (!playerNames[playerIndex].matches(player.name)) {
-				sendToNames[targetIndex] = playerNames[playerIndex];
+			if (!name.equals(player.getName())) {
+				sendToNames[targetIndex] = name;
 				targetIndex++;
 			}
-
 		}
 		Object selected = sendTo.getSelectedItem();
 		sendTo.setModel(new DefaultComboBoxModel<String>(sendToNames));
@@ -102,7 +115,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		this.add(sendToPanel);
 
 		messageInput = new JTextField();
-		messageInput.addActionListener(new InputListener(this));
+		messageInput.addActionListener(new InputListener());
 
 		JPanel messagePanel = new JPanel();
 		messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.X_AXIS));
@@ -140,16 +153,24 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		}
 	}
 
-	protected void send(String message)
+	protected void send(String message, int toPlayer)
 	{
-		game.update(new UsertextMessageAction(id, player.id, -1, message));
+		game.update(new UsertextMessageAction(id, player.id, toPlayer, message));
 	}
+	
+	private Runnable updatePlayerListRunnable = new Runnable() {
+		
+		@Override
+		public void run() {
+			updatePlayerList();
+		}
+	};
 
 	@Override
 	public void changeUpdate(GameAction action) {
 		if (action instanceof GamePlayerEditAction)
 		{
-			updatePlayerList();
+			JFrameUtils.runByDispatcher(updatePlayerListRunnable);
 		}
 		else if (action instanceof UsertextMessageAction)
 		{
@@ -164,14 +185,14 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 			// chop off the sender part from the message:			
 			String message = rawMessage.substring(rawMessage.indexOf(":")+1);
 			String tabName;
-			if ( sender.matches(player.name) | recipient.matches(player.name)  | recipient.matches("all")) {
+			if ( sender.matches(player.getName()) | recipient.matches(player.getName())  | recipient.matches("all")) {
 				// The message was sent by me or it was sent to me or it was sent to all (which means also to me)
 
 				// Find the tab to add the message to
 				int chatIndex = -1;
 				if (recipient.matches("all")) {
 					tabName = "all";
-				} else if (sender.matches(player.name)) {
+				} else if (sender.equals(player.getName())) {
 					// I sent the message. Look for a tab named with the reciver
 					tabName = recipient;
 				} else {
@@ -197,51 +218,47 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		}
 	}
 	
-	
-}
-
-class InputListener implements ActionListener {
-	private IngameChatPanel chatPanel;
-	InputListener(IngameChatPanel panel) {
-		chatPanel = panel;
-	}
-	@Override
-	public void actionPerformed(java.awt.event.ActionEvent evt) {
-		String inputText = chatPanel.messageInput.getText();
-		if(inputText.length() > 0) {
-			String message = chatPanel.receiverPlayerName +":"+ chatPanel.player.name + ":"+ inputText +"\n";
-			chatPanel.messageInput.setText("");
-			chatPanel.send(message);
+	/*
+	* When a different recipient is selected in the combo box,
+	* switch to the corresponding dialog in the tabbed pane.
+	*/
+	class SendToListener implements ActionListener {
+			SendToListener(IngameChatPanel panel) {
 		}
-	}
 
-}
+		@Override
+		public void actionPerformed(java.awt.event.ActionEvent evt) {
+			JComboBox<?> sendTo = (JComboBox<?>) evt.getSource();
+			receiverPlayerName = (String) sendTo.getSelectedItem();
+			Player pl = game.getPlayerByName(receiverPlayerName);
+			receiverPlayerId = pl == null ? -1 : pl.id;
 
-/*
-* When a different recipient is selected in the combo box,
-* switch to the corresponding dialog in the tabbed pane.
-*/
-class SendToListener implements ActionListener {
-	private IngameChatPanel chatPanel;
-
-	SendToListener(IngameChatPanel panel) {
-		chatPanel = panel;
-	}
-
-	@Override
-	public void actionPerformed(java.awt.event.ActionEvent evt) {
-		JComboBox<?> sendTo = (JComboBox<?>) evt.getSource();
-		chatPanel.receiverPlayerName = (String) sendTo.getSelectedItem();
-
-		int receiverIndex = chatPanel.chatPanes.indexOfTab(chatPanel.receiverPlayerName);
-		if (receiverIndex >= 0) {
-			// When a player sends a private message for the first time, the chat tab does not yet exist.
-			chatPanel.chatPanes.setSelectedIndex(receiverIndex);
+			int receiverIndex = chatPanes.indexOfTab(receiverPlayerName);
+			if (receiverIndex >= 0) {
+				// When a player sends a private message for the first time, the chat tab does not yet exist.
+				chatPanes.setSelectedIndex(receiverIndex);
+			}
 		}
+
+
 	}
 
+	class InputListener implements ActionListener {
+		InputListener() {}
+		@Override
+		public void actionPerformed(java.awt.event.ActionEvent evt) {
+			String inputText = messageInput.getText();
+			if(inputText.length() > 0) {
+				String message = receiverPlayerName +":"+ player.getName() + ":"+ inputText +"\n";
+				messageInput.setText("");
+				send(message, receiverPlayerId);
+			}
+		}
 
+	}
 }
+
+
 
 /*
  * When a tab changes, update the combobox 

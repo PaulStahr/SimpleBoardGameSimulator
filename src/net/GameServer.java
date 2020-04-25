@@ -174,7 +174,7 @@ public class GameServer implements Runnable {
 			    				GameInstance gi = getGameInstance(gameinstanceName);
 			    				for (int i = 0; i < gi.getPlayerNumber(); ++i)
 			    				{
-			    					out.write(gi.getPlayerByIndex(i).name);
+			    					out.write(gi.getPlayerByIndex(i).getName());
 			    				}
 			    				out.close();
 			    				break;

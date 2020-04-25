@@ -35,6 +35,7 @@ public class GameWindow extends JFrame implements ActionListener{
 	public final JMenuItem menuItemExit = new JMenuItem("Exit");
 	private final JMenuItem menuItemEditGame = new JMenuItem("Edit");
 	private final JMenuItem menuItemSaveGame = new JMenuItem("Save");
+	private final JMenuItem menuItemAbount = new JMenuItem("About");
 	
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private static final Logger logger = LoggerFactory.getLogger(GameWindow.class);
@@ -49,14 +50,18 @@ public class GameWindow extends JFrame implements ActionListener{
 		this.gi = gi;
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menuFile = new JMenu("File");
+		JMenu menuExtras = new JMenu("Extras");
 		menuBar.add(menuFile);
+		menuBar.add(menuExtras);
 		setJMenuBar(menuBar);
 		menuItemExit.addActionListener(this);
 		menuItemEditGame.addActionListener(this);
 		menuItemSaveGame.addActionListener(this);
+		menuItemAbount.addActionListener(Credits.getOpenWindowListener());
 		menuFile.add(menuItemExit);
 		menuFile.add(menuItemEditGame);
 		menuFile.add(menuItemSaveGame);
+		menuExtras.add(menuItemAbount);
 		gi.addPlayer(player);
 		gamePanel = new GamePanel(gi);
 		gamePanel.player = player;

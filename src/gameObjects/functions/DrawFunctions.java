@@ -14,12 +14,12 @@ import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gui.GamePanel;
@@ -81,7 +81,7 @@ public class DrawFunctions {
             {
                 g2.setTransform(new AffineTransform());
                 g2.fillRect(gamePanel.mouseScreenX - 5, gamePanel.mouseScreenY - 5, 10, 10);
-                g2.drawString(p.name, gamePanel.mouseScreenX + 15, gamePanel.mouseScreenY + 5);
+                g2.drawString(p.getName(), gamePanel.mouseScreenX + 15, gamePanel.mouseScreenY + 5);
                 g2.drawString(p.actionString, gamePanel.mouseScreenX - 5, gamePanel.mouseScreenY - 20);
                 g.drawString(infoText, gamePanel.mouseScreenX - 25, gamePanel.mouseScreenY + 5);
                 g2.setTransform(tmp);
@@ -89,7 +89,7 @@ public class DrawFunctions {
             else {
                 g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
                 g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
-                g.drawString(p.name, p.mouseXPos + 15, p.mouseYPos + 5);
+                g.drawString(p.getName(), p.mouseXPos + 15, p.mouseYPos + 5);
                 g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
             }
             //g.drawString(p.name, p.mouseXPos, p.mo    useYPos);
