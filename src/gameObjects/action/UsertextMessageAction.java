@@ -1,5 +1,4 @@
-package gameObjects;
-
+package gameObjects.action;
 
 public class UsertextMessageAction extends GameAction{
 	public final String message;

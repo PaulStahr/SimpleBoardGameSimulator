@@ -17,8 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.GameMetaInfo;
-import gameObjects.GamePlayerEditAction;
-import gameObjects.UsertextMessageAction;
+import gameObjects.action.GamePlayerEditAction;
+import gameObjects.action.UsertextMessageAction;
 import gameObjects.definition.GameObject;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
@@ -62,9 +62,8 @@ public class GameServer implements Runnable {
 		return null;
 	}
 	
-	public static String readLine(InputStream is) throws IOException
+	public static String readLine(InputStream is, StringBuilder strB) throws IOException
 	{
-		StringBuilder strB = new StringBuilder();
 		int value;
 		while ((value = is.read()) != '\n')
 		{
@@ -102,7 +101,8 @@ public class GameServer implements Runnable {
 				}
 				else if (ce == CommandEncoding.PLAIN)
 				{
-					line = readLine(input);
+					StringBuilder strB = new StringBuilder();
+					line = readLine(input, strB);
 				}
 				ArrayList<String> split = new ArrayList<>();
 				StringUtils.split(line, ' ', split);
@@ -289,11 +289,7 @@ public class GameServer implements Runnable {
 			    				{
 				    				UsertextMessageAction message = userMessageChatHistory.get(index);
 				    				PrintWriter printer = new PrintWriter(output);
-				    				printer.print(message.source);
-				    				printer.print(' ');
-				    				printer.print(message.player);
-				    				printer.print(' ');
-				    				printer.print(message.message);
+				    				printer.print(new StringBuilder().append(message.source).append(' ').append(message.player).append(' ').append(message.message).toString());
 				    				printer.close();
 			    				}
 			    				break;

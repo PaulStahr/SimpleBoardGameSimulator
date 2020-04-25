@@ -25,8 +25,8 @@ import javax.swing.text.StyledDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.GameAction;
-import gameObjects.UsertextMessageAction;
+import gameObjects.action.GameAction;
+import gameObjects.action.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import main.Player;

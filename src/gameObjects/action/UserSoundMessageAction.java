@@ -1,4 +1,4 @@
-package gameObjects;
+package gameObjects.action;
 
 public class UserSoundMessageAction extends GameAction{
 	public final String message;

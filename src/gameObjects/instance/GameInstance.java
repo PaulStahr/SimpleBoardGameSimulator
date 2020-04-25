@@ -6,8 +6,9 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.GameAction;
 import gameObjects.GameInstanceColumnType;
+import gameObjects.action.GameAction;
+import gameObjects.action.GamePlayerEditAction;
 import main.Player;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
@@ -48,10 +49,12 @@ public class GameInstance {
 		if (pl != null)
 		{
 			pl.set(player);
-			return pl;
+		}else {
+			players.add(player);
+			pl = player;
 		}
-		players.add(player);
-		return player;
+		update(new GamePlayerEditAction(0, pl, pl));
+		return pl;		
 	}
 	
 	public Player getPlayer(int id)
