@@ -51,7 +51,7 @@ public class SynchronousGameClientLobbyConnection {
 	    strB.append(NetworkString.PULL).append(' ').append(NetworkString.MESSAGE).append(index);
 	    writeCommand(strB, server.getOutputStream());
 	    Scanner scanner = new Scanner(server.getInputStream());
-	    UsertextMessageAction result = new UsertextMessageAction(scanner.nextInt(), scanner.nextInt(), scanner.next());
+	    UsertextMessageAction result = new UsertextMessageAction(scanner.nextInt(), scanner.nextInt(), scanner.nextInt(), scanner.next());
 	    scanner.close();
 	    server.close();
 	    return result;

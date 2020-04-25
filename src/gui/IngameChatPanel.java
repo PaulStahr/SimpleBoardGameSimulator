@@ -142,7 +142,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 
 	protected void send(String message)
 	{
-		game.update(new UsertextMessageAction(id, player.id , message));
+		game.update(new UsertextMessageAction(id, player.id, -1, message));
 	}
 
 	@Override
@@ -154,7 +154,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		else if (action instanceof UsertextMessageAction)
 		{
 			UsertextMessageAction textAction = (UsertextMessageAction) action;
-			Player pl = game.getPlayerById(textAction.player);
+			Player pl = game.getPlayerById(textAction.sourcePlayer);
 			String rawMessage = textAction.message;
 			Color color = pl == null ? Color.BLACK : pl.color;
 			String recipient = rawMessage.substring(0, rawMessage.indexOf(":"));

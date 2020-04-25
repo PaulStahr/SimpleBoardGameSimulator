@@ -249,7 +249,7 @@ public class GameServer implements Runnable {
 			    				
 			    				break;
 			    			case NetworkString.MESSAGE:
-			    				userMessageChatHistory.add(new UsertextMessageAction(Integer.parseInt(split.get(2)), Integer.parseInt(split.get(3)), split.get(4)));
+			    				userMessageChatHistory.add(new UsertextMessageAction(Integer.parseInt(split.get(2)), Integer.parseInt(split.get(3)), Integer.parseInt(split.get(4)), split.get(5)));
 			    				break;
 			    			case NetworkString.GAME_OBJECT:
 			    				break;
@@ -289,7 +289,7 @@ public class GameServer implements Runnable {
 			    				{
 				    				UsertextMessageAction message = userMessageChatHistory.get(index);
 				    				PrintWriter printer = new PrintWriter(output);
-				    				printer.print(new StringBuilder().append(message.source).append(' ').append(message.player).append(' ').append(message.message).toString());
+				    				printer.print(new StringBuilder().append(message.source).append(' ').append(message.sourcePlayer).append(' ').append(message.destinationPlayer).append(' ').append(message.message).toString());
 				    				printer.close();
 			    				}
 			    				break;
