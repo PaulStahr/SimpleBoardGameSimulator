@@ -811,7 +811,7 @@ public class GameIO {
 		}
 		else if (state instanceof FigureState)
 		{
-			
+			((FigureState) state).standing = is.readBoolean();
 		}
 	}
 	
@@ -835,7 +835,7 @@ public class GameIO {
 		}
 		else if (state instanceof FigureState)
 		{
-			
+			out.writeBoolean(((FigureState) state).standing);
 		}
 	}
 
