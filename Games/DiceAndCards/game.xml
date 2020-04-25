@@ -9,7 +9,5 @@
 <side value="6">wuerfel6.png</side>
 </object>
 <object type="card" unique_name="caro10" front="caro10.jpg" back="back.jpg"/>
-<object type="card" unique_name="carobube" front="carobube.jpg" back="back.jpg"/>
-<object type="card" unique_name="carodame" front="carodame.jpg" back="back.jpg"/>
 <background>background.jpg</background>
 </xml>

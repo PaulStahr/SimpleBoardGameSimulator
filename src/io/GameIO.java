@@ -602,12 +602,14 @@ public class GameIO {
 
 
 		String gameName = null;
+		int objectIdCounter = 0;
 		for (Element elem : root.getChildren())
 		{
 			final String name = elem.getName();
 			if (name.equals(IOString.OBJECT))
 			{
 				game.objects.add(createGameObjectFromElement(elem, game.images));
+				++objectIdCounter;
 			}
 			else if (name.equals(IOString.BACKGROUND))
 			{
