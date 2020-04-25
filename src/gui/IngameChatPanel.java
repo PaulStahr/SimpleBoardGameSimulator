@@ -141,7 +141,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		if (action instanceof UsertextMessageAction)
 		{
 			UsertextMessageAction textAction = (UsertextMessageAction) action;
-			Player pl = game.getPlayer(textAction.player);
+			Player pl = game.getPlayerById(textAction.player);
 			String rawMessage = textAction.message;
 			Color color = pl == null ? Color.BLACK : pl.color;
 			String recipient = rawMessage.substring(0, rawMessage.indexOf(":"));

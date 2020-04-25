@@ -53,7 +53,7 @@ public class SimpleNetworkServertest {
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi);
     	connection.syncPull();
     	connection.start();
-    	Player pl = gi.getPlayer(player.id);
+    	Player pl = gi.getPlayerById(player.id);
     	if (pl == null)
     	{
     		logger.error("Player " + player.id+ " doesn't exist");

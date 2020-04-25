@@ -373,12 +373,12 @@ public class GameIO {
 	    	Document doc_inst = new Document();
 	    	Element root_inst = new Element(IOString.XML);
 
-			for (int idx = 0; idx < gi.objects.size(); idx++) {
-	        	ObjectInstance ObjectInstance = gi.objects.get(idx);
+			for (int idx = 0; idx < gi.getObjectNumber(); idx++) {
+	        	ObjectInstance ObjectInstance = gi.getObjectInstanceByIndex(idx);
         		root_inst.addContent(createElementFromObjectInstance(ObjectInstance));
         	}
-			for (int idx = 0; idx < gi.players.size(); idx++) {
-				Player player = gi.players.get(idx);
+			for (int idx = 0; idx < gi.getPlayerNumber(); idx++) {
+				Player player = gi.getPlayerByIndex(idx);
 				root_inst.addContent(createElementFromPlayer(player));
 			}
 	        Element sessionName = new Element(IOString.NAME);

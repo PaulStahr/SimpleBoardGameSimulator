@@ -20,10 +20,10 @@ public class GameInstance {
 	public String password;
 	public String name;
 	public boolean hidden = false;
-	public final ArrayList<ObjectInstance> objects = new ArrayList<>();
-	public final ArrayList<Player> players = new ArrayList<>();
-	public final ArrayList<GameAction> actions = new ArrayList<>();
-	public final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
+	private final ArrayList<ObjectInstance> objects = new ArrayList<>();
+	private final ArrayList<Player> players = new ArrayList<>();
+	private final ArrayList<GameAction> actions = new ArrayList<>();
+	private final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
 	
 	public static interface GameChangeListener
 	{
@@ -45,7 +45,7 @@ public class GameInstance {
 	
 	public Player addPlayer(Player player)
 	{
-		Player pl = getPlayer(player.id);
+		Player pl = getPlayerById(player.id);
 		if (pl != null)
 		{
 			pl.set(player);
@@ -57,7 +57,7 @@ public class GameInstance {
 		return pl;		
 	}
 	
-	public Player getPlayer(int id)
+	public Player getPlayerById(int id)
 	{
 		for (int i = 0; i < players.size(); ++i)
 		{
@@ -68,8 +68,16 @@ public class GameInstance {
 		}
 		return null;
 	}
+	public Player getPlayerByIndex(int idx)
+	{
+		return players.get(idx);
+	}
+	public int getPlayerNumber()
+	{
+		return players.size();
+	}
 	
-	public Player getPlayer(String name)
+	public Player getPlayerByName(String name)
 	{
 		for (int i = 0; i < players.size(); ++i)
 		{
@@ -83,7 +91,7 @@ public class GameInstance {
 
 	public ObjectInstance addObjectInstance(ObjectInstance objectInstance)
 	{
-		ObjectInstance oi = getObjectInstance(objectInstance.id);
+		ObjectInstance oi = getObjectInstanceById(objectInstance.id);
 		if (oi != null)
 		{
 			oi.updateState(objectInstance.state);
@@ -94,7 +102,7 @@ public class GameInstance {
 		return objectInstance;
 	}
 	
-	public ObjectInstance getObjectInstance(int id)
+	public ObjectInstance getObjectInstanceById(int id)
 	{
 		for (int i = 0; i < objects.size(); ++i)
 		{
@@ -104,6 +112,15 @@ public class GameInstance {
 			}
 		}
 		return null;
+	}
+
+	public ObjectInstance getObjectInstanceByIndex(int index)
+	{
+		return this.objects.get(index);
+	}
+
+	public int getObjectNumber(){
+		return this.objects.size();
 	}
 	
 	public int getHash()

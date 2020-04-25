@@ -273,7 +273,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    			}
 		    			case NetworkString.PLAYER:
 		    			{
-		    				GameIO.writePlayerToStream(gi.getPlayer(id), byteStream);
+		    				GameIO.writePlayerToStream(gi.getPlayerById(id), byteStream);
 		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.PLAYER).append(' ').append(byteStream.size());
 		    				byteStream.writeTo(objOut);
 		    				strB.setLength(0);
@@ -520,7 +520,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								{
 									GameIO.editObjectStateFromStream(inst.state, new ByteArrayInputStream(data, 0, size));
 								}*/
-								Player pl = gi.getPlayer(playerId);
+								Player pl = gi.getPlayerById(playerId);
 								if (pl == null)
 								{
 									logger.error("Can't find player: " + playerId);
@@ -542,7 +542,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								data = ArrayUtil.ensureLength(data, size);
 								
 								//objIn.readFully(data, 0, size);
-								Player object = gi.getPlayer(playerId);
+								Player object = gi.getPlayerById(playerId);
 								if (object != null)
 								{
 									GameIO.editPlayerFromStreamObject(objIn, object);
@@ -555,7 +555,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 									gi.addPlayer(object);
 									//gi.addPlayer(GameIO.readPlayerFromStream(new ByteArrayInputStream(data, 0, size)));
 								}
-								Player sourcePlayer = gi.getPlayer(sourcePlayerId);
+								Player sourcePlayer = gi.getPlayerById(sourcePlayerId);
 								if (sourcePlayer == null)
 								{
 									logger.error("Can't find player: " + sourcePlayerId);

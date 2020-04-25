@@ -48,7 +48,7 @@ public class DrawFunctions {
             drawStack(gamePanel, g, tmp, gameInstance, player.id, 1);
             int playerId = ObjectFunctions.getStackOwner(gameInstance, tmp);
             if (playerId != -1) {
-                Player p = gameInstance.getPlayer(playerId);
+                Player p = gameInstance.getPlayerById(playerId);
                 drawStackBorder(gameInstance, g, player, objectInstance, 10, p.color, 1, true, tmp);
             } else {
                 if (tmp.size() > 1) {
