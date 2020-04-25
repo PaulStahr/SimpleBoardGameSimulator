@@ -124,6 +124,7 @@ public abstract class DataHandler
     
     public static final InputStream getResourceAsStream(String file)
     {
+    	System.out.println("Read File: " + getResourceFolder().concat(file));
     	return DataHandler.class.getResourceAsStream(getResourceFolder().concat(file));
     }
     
