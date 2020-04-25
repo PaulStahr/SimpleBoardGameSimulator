@@ -325,7 +325,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append(NetworkString.STATE).append(' ')
 					 			.append(id).append(' ')
 					 			.append(action.source).append(' ')
-					 			.append(((GameObjectInstanceEditAction) action).player.id).append(' ')
+					 			.append(((GameObjectInstanceEditAction) action).player).append(' ')
 					 			.append(((GameObjectInstanceEditAction) action).object.id).append(' ')
 					 			.append( byteStream.size());
 					 		objOut.writeObject(strB.toString());
@@ -343,11 +343,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append(NetworkString.PLAYER).append(' ')
 					 			.append(id).append(' ')
 					 			.append(action.source).append(' ')
-					 			.append(((GamePlayerEditAction) action).player.id).append(' ')
-					 			.append(((GamePlayerEditAction) action).object.id).append(' ')
+					 			.append(((GamePlayerEditAction) action).sourcePlayer).append(' ')
+					 			.append(((GamePlayerEditAction) action).editedPlayer.id).append(' ')
 					 			.append( byteStream.size());
 					 		objOut.writeObject(strB.toString());
-					 		GameIO.writePlayerToStreamObject(objOut, ((GamePlayerEditAction)action).object);
+					 		GameIO.writePlayerToStreamObject(objOut, ((GamePlayerEditAction)action).editedPlayer);
 					 		//byteStream.writeTo(objOut);
 					    	//byteStream.reset();
 					     	strB.setLength(0);
@@ -370,7 +370,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append(((UsertextMessageAction) action).player).append(' ')
 					 			.append(id).append(' ')
 					 			.append(action.source).append(' ')
-					 			.append(((GameObjectInstanceEditAction) action).player.id).append(' ')
+					 			.append(((GameObjectInstanceEditAction) action).player).append(' ')
 					 			.append(((GameObjectInstanceEditAction) action).object.id).append(' ');
 					 		objOut.writeObject(strB.toString());
 					 		objOut.writeObject(((UsertextMessageAction) action).message);
@@ -588,6 +588,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 			}
 			split.clear();
 		}
+	}
+	
+	public void stop()
+	{
+		
 	}
 	
 	@Override

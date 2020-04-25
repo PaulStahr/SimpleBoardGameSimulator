@@ -1,6 +1,7 @@
 package gameObjects.instance;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -169,5 +170,13 @@ public class GameInstance {
 
 	public void addChangeListener(GameChangeListener listener) {
 		changeListener.add(listener);
+	}
+
+	public List<ObjectInstance> getObjectInstanceList() {
+		return Collections.unmodifiableList(objects);
+	}
+
+	public List<Player> getPlayerList() {
+		return Collections.unmodifiableList(players);
 	}
 }
