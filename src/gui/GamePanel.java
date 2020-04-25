@@ -122,7 +122,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		addKeyListener(this);
 		addMouseWheelListener(this);
 		setFocusable(true);
-		gameInstance.changeListener.add(this);
+		gameInstance.addChangeListener(this);
 
 		// This is the cheat sheet showing the user how he can interact with the game board
 		JPanel p = new JPanel();

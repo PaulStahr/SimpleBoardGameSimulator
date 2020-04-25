@@ -55,7 +55,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	public IngameChatPanel(GameInstance game, Player player)
 	{
 		this.game = game;
-		game.changeListener.add(this);
+		game.addChangeListener(this);
 		this.player = player;
 
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));

@@ -75,7 +75,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	public AsynchronousGameConnection(GameInstance gi, ObjectInputStream input, OutputStream output)
 	{
 		this.gi = gi;
-		gi.changeListener.add(this);
+		gi.addChangeListener(this);
 		this.objIn = input;
 		this.output = output;
 	}
@@ -89,7 +89,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	public AsynchronousGameConnection(GameInstance gi, InputStream input, OutputStream output)
 	{
 		this.gi = gi;
-		gi.changeListener.add(this);
+		gi.addChangeListener(this);
 		/*if (!(input instanceof ObjectInputStream))
 		{
 			throw new RuntimeException();

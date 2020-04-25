@@ -23,7 +23,7 @@ public class GameInstance {
 	public final ArrayList<ObjectInstance> objects = new ArrayList<>();
 	public final ArrayList<Player> players = new ArrayList<>();
 	public final ArrayList<GameAction> actions = new ArrayList<>();
-	public final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
+	private final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
 	
 	public static interface GameChangeListener
 	{
@@ -148,5 +148,9 @@ public class GameInstance {
 	public void remove(ObjectInstance objectInstance) {
 		objects.remove(objectInstance);
 		//TODO clean up references
+	}
+
+	public void addChangeListener(GameChangeListener listener) {
+		changeListener.add(listener);
 	}
 }
