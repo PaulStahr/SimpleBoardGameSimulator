@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -32,6 +33,7 @@ import gameObjects.action.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import main.Player;
+import util.JFrameUtils;
 
 
 public class IngameChatPanel extends JPanel implements GameChangeListener {
@@ -56,6 +58,26 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 
 	void updatePlayerList()
 	{
+		ComboBoxModel<String> model = sendTo.getModel();
+		if (model.getSize() == game.getPlayerNumber())
+		{
+			allEqual:
+			{
+				for (int i = 1, j = 0; i < model.getSize(); ++j)
+				{
+					Player current = game.getPlayerByIndex(j);
+					if (!current.name.equals(player.name))
+					{
+						if (!model.getElementAt(j).equals(current.name))
+						{
+							break allEqual;
+						}
+						++j;
+					}
+				}
+				return;
+			}
+		}
 		String[] playerNames = game.getPlayerNames();
 		String[] sendToNames = new String[playerNames.length];
 		// The first option in the sendTo combobox is to send the message to everybody "all"
@@ -65,11 +87,10 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		for(int playerIndex=0; playerIndex<game.getPlayerNumber(); playerIndex++) {
 			// copy all player names to the combobox. 
 			// Omit the own name, since you don't want to send messages to yourself.
-			if (!playerNames[playerIndex].matches(player.name)) {
+			if (!playerNames[playerIndex].equals(player.name)) {
 				sendToNames[targetIndex] = playerNames[playerIndex];
 				targetIndex++;
 			}
-
 		}
 		Object selected = sendTo.getSelectedItem();
 		sendTo.setModel(new DefaultComboBoxModel<String>(sendToNames));
@@ -144,12 +165,20 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	{
 		game.update(new UsertextMessageAction(id, player.id, -1, message));
 	}
+	
+	private Runnable updatePlayerListRunnable = new Runnable() {
+		
+		@Override
+		public void run() {
+			updatePlayerList();
+		}
+	};
 
 	@Override
 	public void changeUpdate(GameAction action) {
 		if (action instanceof GamePlayerEditAction)
 		{
-			updatePlayerList();
+			JFrameUtils.runByDispatcher(updatePlayerListRunnable);
 		}
 		else if (action instanceof UsertextMessageAction)
 		{
