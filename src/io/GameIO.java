@@ -147,7 +147,6 @@ public class GameIO {
 			{
 				case IOString.PLAYER:
 					Player player = createPlayerFromElement(elem);
-					System.out.println(player);
 					gi.addPlayer(player);
 					break;
 				case IOString.NAME:gi.name = elem.getValue();break;
@@ -528,10 +527,10 @@ public class GameIO {
 	 * @param in the InputStream that encodes the snapshot
 	 * @return the GameInstance encodes in @param stream
 	 */
-	public static GameInstance readSnapshotFromZip(InputStream in) throws IOException, JDOMException
+	public static GameInstance readSnapshotFromZip(InputStream in, GameInstance gi) throws IOException, JDOMException
 	{
 		ZipInputStream stream = new ZipInputStream(in);
-		GameInstance result = readSnapshotFromZip(stream);
+		GameInstance result = readSnapshotFromZip(stream, gi);
 		in.close();
 		return result;
 	}
@@ -555,8 +554,12 @@ public class GameIO {
 	{
 		ByteArrayOutputStream gameBuffer = new ByteArrayOutputStream();
 		ByteArrayOutputStream gameInstanceBuffer = new ByteArrayOutputStream();
-		GameInstance result;
-		Game game;
+		final GameInstance result;
+		
+		public GameSnapshotreader(GameInstance result)
+		{
+			this.result = result;
+		}
 		
 		void put (String name, InputStream content) throws IOException
 		{
@@ -577,7 +580,7 @@ public class GameIO {
 			    	if (ArrayUtil.firstEqualIndex(ImageIO.getReaderFileSuffixes(), suffix) != -1)
 			    	{
 			    		BufferedImage img = ImageIO.read(content);
-						game.images.put(name, img);
+						result.game.images.put(name, img);
 			    	}
 			    }
 			}
@@ -588,38 +591,35 @@ public class GameIO {
 			Document doc = new SAXBuilder().build(new ByteArrayInputStream(gameBuffer.toByteArray()));
 			Element root = doc.getRootElement();
 
-			String gameName = null;
 			for (Element elem : root.getChildren())
 			{
 				final String name = elem.getName();
 				if (name.equals(IOString.OBJECT))
 				{
-					game.objects.add(createGameObjectFromElement(elem, game.images));
+					result.game.objects.add(createGameObjectFromElement(elem, result.game.images));
 				}
 				else if (name.equals(IOString.BACKGROUND))
 				{
-					game.background = game.images.get(elem.getValue());
+					result.game.background = result.game.images.get(elem.getValue());
 				}
 				else if (name.equals(IOString.NAME))
 				{
-					gameName = elem.getValue();
+					result.name = elem.getValue();
 				}
 			}
-			if (gameName == null)
+			if (result.name == null)
 			{
 				logger.warn("Name not set");
-				gameName=String.valueOf(Math.random());
+				result.name = String.valueOf(Math.random());
 			}
-			result = new GameInstance(game, gameName);
 			editGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
 			
 		}
 	}
 	
-	public static GameInstance readSnapshotFromFolder(File folder) throws IOException, JDOMException
+	public static GameInstance readSnapshotFromFolder(File folder, GameInstance result) throws IOException, JDOMException
 	{
-		GameSnapshotreader gsr = new GameSnapshotreader();
-		gsr.game  = new Game();
+		GameSnapshotreader gsr = new GameSnapshotreader(result);
 		for (File subfile : folder.listFiles())
 		{
 			FileInputStream input = new FileInputStream(subfile);
@@ -640,10 +640,9 @@ public class GameIO {
 	 * @param stream the ZipInputStream that encodes the snapshot
 	 * @return the GameInstance encodes in @param stream
 	 */
-	public static GameInstance readSnapshotFromZip(ZipInputStream stream) throws IOException, JDOMException
+	public static GameInstance readSnapshotFromZip(ZipInputStream stream, GameInstance gi) throws IOException, JDOMException
 	{
-		GameSnapshotreader gsr = new GameSnapshotreader();
-		gsr.game  = new Game();
+		GameSnapshotreader gsr = new GameSnapshotreader(gi);
 		try
 		{
 			ZipEntry entry;

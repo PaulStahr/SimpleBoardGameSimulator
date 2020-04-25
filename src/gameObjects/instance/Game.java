@@ -51,4 +51,10 @@ public class Game {
 		}
 		return result;
 	}
+	
+	public void clear()
+	{
+		images.clear();
+		objects.clear();
+	}
 }

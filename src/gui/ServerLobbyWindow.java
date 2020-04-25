@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import gameObjects.GameInstanceColumnType;
 import gameObjects.GameMetaInfo;
+import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import io.GameIO;
 import main.Player;
@@ -111,12 +112,14 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				try
 				{
 					File file = fileChooser.getSelectedFile();
-					GameInstance gi = GameIO.readSnapshotFromZip(new FileInputStream(file));
+					GameInstance gi = new GameInstance(new Game(), null);
+					GameIO.readSnapshotFromZip(new FileInputStream(file), gi);
+					gi.name = "Tadada";
 					Player player = new Player(textFieldName.getText(), Integer.parseInt(textFieldId.getText()));
 					GameWindow gw = new GameWindow(gi, player);
 			    	client.pushGameSession(gi);
 			    	try {
-						Thread.sleep(1000);
+						Thread.sleep(5000);
 					} catch (InterruptedException e1) {
 						logger.error("Unnexpected interrupt", e1);
 					}
@@ -211,6 +214,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		tableOpenGames.getModel().addTableModelListener(this);
 		this.client = client;
 		buttonCreateGame.addActionListener(this);
+		textFieldAddress.setText(client.getAddress());
 		textFieldPort.setText(Integer.toString(client.getPort()));
 	}
 	

@@ -8,6 +8,7 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gui.GameWindow;
 import io.GameIO;
@@ -48,9 +49,8 @@ public class SimpleNetworkServertest {
     	SynchronousGameClientLobbyConnection sclc = new SynchronousGameClientLobbyConnection(address,  port);
     	GameInstance gi = sclc.getGameInstance(gameInstanceId);
     	sclc.addPlayerToGameSession(player, gi.name, gi.password);
-    	gi.players.add(player);
+    	player = gi.addPlayer(player);
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi);
-    	//gi.addPlayer(player);
     	connection.syncPull();
     	connection.start();
     	Player pl = gi.getPlayer(player.id);
@@ -66,7 +66,6 @@ public class SimpleNetworkServertest {
     public static void localTwoInstanceTest(int port) throws IOException, JDOMException
     {
     	String address = "127.0.0.1";
-    	
     	{
 	    	GameServer gs = startNewServer(port);
 	    	while (!gs.isReady())
@@ -82,7 +81,8 @@ public class SimpleNetworkServertest {
     	{
     	   	Player player = new Player("Paul", 1);
     	   	FileInputStream fis = new FileInputStream("Games/DiceCardsFigures.zip");
-			GameInstance gi = GameIO.readSnapshotFromZip(fis);
+			GameInstance gi = new GameInstance(new Game(), null);
+			GameIO.readSnapshotFromZip(fis, gi);
 			gi.name = "Testsession";
 			gi.players.add(player);
 	    	fis.close();

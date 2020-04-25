@@ -15,7 +15,7 @@ import util.jframe.table.TableColumnType;
 public class GameInstance {
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.CONNECT, GameInstanceColumnType.DELETE});
 	public static final Logger logger = LoggerFactory.getLogger(GameInstance.class);
-	public Game game;
+	public final Game game;
 	public String password;
 	public String name;
 	public boolean hidden = false;
@@ -33,6 +33,13 @@ public class GameInstance {
 	{
 		this.game = game;
 		this.name = name;
+	}
+	
+	public void clear()
+	{
+		objects.clear();
+		players.clear();
+		game.clear();
 	}
 	
 	public Player addPlayer(Player player)

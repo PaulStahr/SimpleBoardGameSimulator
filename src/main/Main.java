@@ -11,6 +11,7 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gui.GameWindow;
 import gui.ServerLobbyWindow;
@@ -26,8 +27,15 @@ public class Main {
 	
 	/* This is the main() function */
 	public static final void main (String args[]){
+		/*ServerLobbyWindow tmp = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection("212.201.75.217", 20));
+		tmp.setVisible(true);
+    	tmp.setSize(500,200);*/
 		LockbackUtil.setLoglevel("WARN");
-    	for (int i = 0; i < args.length; ++i)
+		/*if (true)
+		{
+			return;
+		}*/
+		for (int i = 0; i < args.length; ++i)
     	{
     		if (args[i].equals("--loglevel"))
     		{
@@ -42,20 +50,18 @@ public class Main {
     		}
     		else if (args[i].equals("--join"))
     		{
+    			if (args.length != 6)
+    			{
+    				System.out.println("Usage: <address> <port> <name> <id> <game>");
+    			}
     			try {
-					test.SimpleNetworkServertest.connectAndJoinGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), "Testsession");
-	    		} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					test.SimpleNetworkServertest.connectAndJoinGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), args[i + 5]);
 				} catch (NumberFormatException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("Can't parse port", e);
 				} catch (UnknownHostException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("Unknown host", e);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("Error during join game", e);
 				} catch (JDOMException e) {
 					logger.error("Can't read", e);
 				}
@@ -65,7 +71,8 @@ public class Main {
     		{
 				try {
 	    			FileInputStream fis = new FileInputStream("Doppelkopf.zip");
-			 		GameInstance game0 = GameIO.readSnapshotFromZip(fis);
+			 		GameInstance game0 = new GameInstance(new Game(), null);
+			 		GameIO.readSnapshotFromZip(fis, game0);
 	            	fis.close();
 	            	game0.name = "Testsession";
 	            	game0.players.add(new Player(args[i + 3], Integer.parseInt(args[i + 4])));
@@ -137,10 +144,12 @@ public class Main {
     	try {
     		
     		FileInputStream fis = new FileInputStream("Doppelkopf.zip");
-    		GameInstance game0 = GameIO.readSnapshotFromZip(fis);
+    		GameInstance game0 = new GameInstance(new Game(), null);
+    		GameIO.readSnapshotFromZip(fis, game0);
         	fis.close();
         	fis = new FileInputStream("Doppelkopf.zip");
-        	GameInstance game1 = GameIO.readSnapshotFromZip(fis);
+    		GameInstance game1 = new GameInstance(new Game(), null);
+        	GameIO.readSnapshotFromZip(fis, game1);
 	    	fis.close();
 	    	/*GameServer server = new GameServer(1234);
 	    	server.gameInstances.add(game0);

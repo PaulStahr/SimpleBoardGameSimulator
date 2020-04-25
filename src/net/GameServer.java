@@ -227,14 +227,14 @@ public class GameServer implements Runnable {
 			    			case NetworkString.GAME_INSTANCE:
 			    				logger.debug("do push (" + id + ")");
 								try {
-									GameInstance gi;
+									GameInstance gi = new GameInstance(new Game(), null);
 									if (ce == CommandEncoding.SERIALIZE)
 									{
-										gi = GameIO.readSnapshotFromZip(new ByteArrayInputStream((byte[])((ObjectInputStream)input).readObject()));
+										GameIO.readSnapshotFromZip(new ByteArrayInputStream((byte[])((ObjectInputStream)input).readObject()), gi);
 									}
 									else
 									{
-										gi = GameIO.readSnapshotFromZip(input);		
+										GameIO.readSnapshotFromZip(input, gi);		
 									}
 									logger.debug("read successfull");
 									synchronized(gameInstances)

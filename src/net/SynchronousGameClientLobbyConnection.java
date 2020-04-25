@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import gameObjects.GameMetaInfo;
 import gameObjects.UsertextMessageAction;
+import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import io.GameIO;
 import main.Player;
@@ -189,7 +190,8 @@ public class SynchronousGameClientLobbyConnection {
 	    StringBuilder strB = new StringBuilder();
 	    strB.append(NetworkString.READ).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(gameInstanceId);
 	    output = writeCommand(strB, output);
-	    GameInstance gi = GameIO.readSnapshotFromZip(server.getInputStream());
+	    GameInstance gi = new GameInstance(new Game(), null);
+	    GameIO.readSnapshotFromZip(server.getInputStream(), gi);
 	    logger.debug("Read successfull");
 	    server.close();
 	    return gi;
@@ -206,5 +208,9 @@ public class SynchronousGameClientLobbyConnection {
 
 	public int getPort() {
 		return port;
+	}
+
+	public String getAddress() {
+		return address;
 	}
 }
