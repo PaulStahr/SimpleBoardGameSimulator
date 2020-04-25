@@ -162,7 +162,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				{
 					try
 					{
-						Player player = new Player(textFieldName.getText(), 1);
+						Player player = new Player(textFieldName.getText(), Integer.parseInt(textFieldId.getText()));
 						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.indexOf(GameInstanceColumnType.ID)));
 				    	client.addPlayerToGameSession(player, gi.name, gi.password);
 				    	GameWindow gw = new GameWindow(gi, player);

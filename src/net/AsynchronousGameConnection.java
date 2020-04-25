@@ -534,16 +534,16 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						}
 						else if (split.get(1).equals(NetworkString.EDIT) && split.get(2).equals(NetworkString.PLAYER))
 						{
-							int sourceId = Integer.parseInt(split.get(4));
-							if (sourceId != connectionId)
+							int sourceConnectionId = Integer.parseInt(split.get(4));
+							if (sourceConnectionId != connectionId)
 							{
 								int sourcePlayerId = Integer.parseInt(split.get(5));
-								int playerId = Integer.parseInt(split.get(6));
+								int editPlayerId = Integer.parseInt(split.get(6));
 								int size = Integer.parseInt(split.get(7));
 								data = ArrayUtil.ensureLength(data, size);
 								
 								//objIn.readFully(data, 0, size);
-								Player object = gi.getPlayerById(playerId);
+								Player object = gi.getPlayerById(editPlayerId);
 								if (object != null)
 								{
 									GameIO.editPlayerFromStreamObject(objIn, object);
@@ -551,7 +551,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								}
 								else
 								{
-									object = new Player("",  playerId);
+									object = new Player("",  editPlayerId);
 									GameIO.editPlayerFromStreamObject(objIn, object);
 									gi.addPlayer(object);
 									//gi.addPlayer(GameIO.readPlayerFromStream(new ByteArrayInputStream(data, 0, size)));
@@ -563,7 +563,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								}
 								else
 								{
-									gi.update(new GamePlayerEditAction(sourceId, sourcePlayer, object));
+									gi.update(new GamePlayerEditAction(sourceConnectionId, sourcePlayer, object));
 								}
 							}
 						}
