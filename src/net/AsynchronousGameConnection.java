@@ -174,18 +174,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		//PrintWriter writer = new PrintWriter(output, true);
 		ObjectOutputStream objOut = null;
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		if (output instanceof ObjectOutputStream)
-		{
-			objOut = ((ObjectOutputStream)output);
-		}
-		else
-		{
-			try {
-				objOut = new ObjectOutputStream(output);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+		try {
+			objOut = StreamUtil.toObjectStream(output);
+		} catch (IOException e1) {
+			logger.error("Can't initialize ObjectStream", e1);
 		}
     	while (true)
 		{
@@ -325,7 +317,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    	if (action instanceof GameObjectInstanceEditAction)
 				 		{
 				    		objOut.writeObject(action);
-				    		GameIO.writeStateToStreamObject(objOut, gi.getObjectInstanceById(((GameObjectInstanceEditAction)action).object).state);
+				    		GameIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).getObject(gi).state);
 				    		
 					    	/*strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.EDIT).append(' ')
@@ -342,7 +334,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					   }
 				    	else if (action instanceof GamePlayerEditAction)
 				 		{
-					    	strB.append(NetworkString.ACTION).append(' ')
+				    		objOut.writeObject(action);
+				    		GameIO.writePlayerToStreamObject(objOut, ((GamePlayerEditAction)action).getEditedPlayer(gi));
+					    	/*strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.EDIT).append(' ')
 					 			.append(NetworkString.PLAYER).append(' ')
 					 			.append(connectionId).append(' ')
@@ -352,7 +346,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append( byteStream.size());
 					 		objOut.writeObject(strB.toString());
 					 		GameIO.writePlayerToStreamObject(objOut, ((GamePlayerEditAction)action).editedPlayer);
-					 		strB.setLength(0);
+					 		strB.setLength(0);*/
 					   }
 					   else if (action instanceof UsertextMessageAction)
 					   {
@@ -399,7 +393,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		if (objIn == null)
 		{
 			try {
-				objIn = StreamUtil.toObjectStream(objIn);
+				objIn = StreamUtil.toObjectStream(input);
 			} catch (IOException e1) {
 				logger.error("Can't open Object-Input-Stream", e1);
 			}
@@ -428,8 +422,19 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				if (inputObject instanceof GameObjectInstanceEditAction)
 				{
 					GameObjectInstanceEditAction action = (GameObjectInstanceEditAction)inputObject;
-					ObjectInstance inst = gi.getObjectInstanceById(action.object);
-					GameIO.editStateFromStreamObject(objIn, inst.state);
+					GameIO.editStateFromStreamObject(objIn, action.getObject(gi).state);
+					gi.update(action);
+					continue;
+				}
+				if (inputObject instanceof GamePlayerEditAction)
+				{
+					GamePlayerEditAction action = (GamePlayerEditAction)inputObject;
+					Player editedPlayer = action.getEditedPlayer(gi);
+					if (editedPlayer == null)
+					{
+						editedPlayer = gi.addPlayer(new Player("", action.editedPlayer));
+					}
+					GameIO.editPlayerFromStreamObject(objIn, editedPlayer);
 					gi.update(action);
 					continue;
 				}
@@ -511,7 +516,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 							{
 								int playerId = Integer.parseInt(split.get(5));
 								int objectId = Integer.parseInt(split.get(6));
-								int size = Integer.parseInt(split.get(7));
+								Integer.parseInt(split.get(7)); //size
 								
 								ObjectInstance inst = gi.getObjectInstanceById(objectId);
 								//ObjectState state = (ObjectState)objIn.readObject();
