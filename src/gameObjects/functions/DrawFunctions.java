@@ -6,7 +6,10 @@ import static gameObjects.functions.ObjectFunctions.isStackCollected;
 import static java.lang.Integer.min;
 import static java.lang.Math.abs;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -47,6 +50,10 @@ public class DrawFunctions {
             int playerId = ObjectFunctions.getStackOwner(gameInstance, tmp);
             if (playerId != -1) {
                 Player p = gameInstance.getPlayerById(playerId);
+                if (p == null)
+                {
+                	throw new NullPointerException("Player with id " + playerId + " not found");
+                }
                 drawStackBorder(gameInstance, g, player, objectInstance, 10, p.color, 1, true, tmp);
             } else {
                 if (tmp.size() > 1) {
