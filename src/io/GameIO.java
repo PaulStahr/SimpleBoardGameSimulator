@@ -370,6 +370,7 @@ public class GameIO {
 		try
 		{
 			zipOutputStream = new ZipOutputStream(os);
+			zipOutputStream.setLevel(9);
 			writeGameToZip(gi.game, zipOutputStream);
 		    // save game_instance.xml
 	    	Document doc_inst = new Document();
