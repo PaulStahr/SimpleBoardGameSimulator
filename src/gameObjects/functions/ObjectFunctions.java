@@ -1187,12 +1187,12 @@ public class ObjectFunctions {
         int splitObjectid = topNObjects.last();
         if (gameInstance.getObjectInstanceById(splitObjectid).state.belowInstanceId == -1) {
             gameInstance.getObjectInstanceById(splitObjectid).state.belowInstanceId = -1;
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, gameInstance.getObjectInstanceById(splitObjectid)));
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player.id, splitObjectid));
         } else {
             gameInstance.getObjectInstanceById(gameInstance.getObjectInstanceById(splitObjectid).state.belowInstanceId).state.aboveInstanceId = -1;
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, gameInstance.getObjectInstanceById(gameInstance.getObjectInstanceById(splitObjectid).state.belowInstanceId)));
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player.id, gameInstance.getObjectInstanceById(splitObjectid).state.belowInstanceId));
             gameInstance.getObjectInstanceById(splitObjectid).state.belowInstanceId = -1;
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, gameInstance.getObjectInstanceById(splitObjectid)));
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player.id, splitObjectid));
         }
     }
 

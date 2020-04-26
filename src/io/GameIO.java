@@ -30,6 +30,8 @@ import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gameObjects.action.GameAction;
+import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectDice.DiceSide;
@@ -813,6 +815,18 @@ public class GameIO {
 		{
 			((FigureState) state).standing = is.readBoolean();
 		}
+	}
+	
+	public static GameAction readGameObjectInstanceEditActionFromStreamObject(ObjectInputStream in) throws IOException
+	{
+		return new GameObjectInstanceEditAction(in.readInt(), in.readInt(), in.readInt());
+	}
+	
+	public static void writeGameObjectInstanceEditActionToStreamObject(ObjectOutputStream out, GameObjectInstanceEditAction action) throws IOException
+	{
+		out.writeInt(action.source);
+		out.writeInt(action.player);
+		out.writeInt(action.object);
 	}
 	
 	public static void writeStateToStreamObject(ObjectOutputStream out, ObjectState state) throws IOException
