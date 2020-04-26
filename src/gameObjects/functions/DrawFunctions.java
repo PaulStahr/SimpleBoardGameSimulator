@@ -88,6 +88,21 @@ public class DrawFunctions {
                 //draw screen position of other players
                 Point2D leftCorner = new Point2D.Double();
                 Point2D rightCorner = new Point2D.Double();
+
+                /*
+                                if (true)
+                {
+                	leftCorner.setLocation(p.screenToBoardPos[6], p.screenToBoardPos[7]);
+                	double width = abs(p.screenToBoardPos[6]-p.screenToBoardPos[4]);
+                	double height = abs(p.screenToBoardPos[7]-p.screenToBoardPos[1]);
+                	rightCorner.setLocation(p.screenToBoardPos[4], p.screenToBoardPos[5]);
+                    gamePanel.boardToScreenPos(leftCorner, leftCorner);
+                    gamePanel.boardToScreenPos(rightCorner, rightCorner);
+                    g2.setStroke(new BasicStroke(10));
+                    g2.drawRect((int) leftCorner.getX(), (int) leftCorner.getY(), (int) width, (int) height);
+                }
+                 */
+
                 if (true)
                 {
                 	leftCorner.setLocation(p.screenToBoardPos[0], p.screenToBoardPos[1]);
