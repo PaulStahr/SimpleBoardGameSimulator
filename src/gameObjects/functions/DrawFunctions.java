@@ -42,10 +42,10 @@ public class DrawFunctions {
     }
 
     public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, IntegerArrayList tmp){
-        if (ObjectFunctions.isStackBottom(objectInstance)) {
+        if (ObjectFunctions.isStackTop(objectInstance)) {
             tmp.clear();
-            ObjectFunctions.getAboveStack(gameInstance, objectInstance, tmp);
-            drawStack(gamePanel, g, tmp, gameInstance, player.id, 1);
+            ObjectFunctions.getBelowStack(gameInstance, objectInstance, tmp);
+            drawStack(g, tmp, gameInstance, player.id, 1);
             int playerId = ObjectFunctions.getStackOwner(gameInstance, tmp);
             if (playerId != -1) {
                 Player p = gameInstance.getPlayerById(playerId);
@@ -91,12 +91,9 @@ public class DrawFunctions {
                 g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
                 g.drawString(p.getName(), p.mouseXPos + 15, p.mouseYPos + 5);
                 g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
+                g2.setTransform(tmp);
             }
-            //g.drawString(p.name, p.mouseXPos, p.mo    useYPos);
-            //drawBorder(g, p, ObjectFunctions.getNearestObjectByPosition(gamePanel, gameInstance, p, p.mouseXPos, p.mouseYPos, 1, null), 10, p.color, 1);
-            g2.scale(gamePanel.zooming, gamePanel.zooming);
         }
-        g2.setTransform(tmp);
     }
 
     public static void drawActiveObject(GamePanel gamePanel, Graphics g, Player player, ObjectInstance activeObject) {
@@ -182,12 +179,9 @@ public class DrawFunctions {
         g2.setTransform(tmp);
     }
 
-    public static void drawStack(GamePanel gamePanel, Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming) {
-        /*if (isStackInPrivateArea(gamePanel, gameInstance, stackList))
-        {
-        }*/
-        if(true){
-            if (haveSamePositions(gameInstance.getObjectInstanceById(stackList.get(0)), gameInstance.getObjectInstanceById(stackList.last()))) {
+    public static void drawStack(Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming) {
+        if (stackList.size()>0) {
+            if (isStackCollected(gameInstance,gameInstance.getObjectInstanceById(stackList.get(0)))){
                 IntegerArrayList newStackList = new IntegerArrayList();
                 newStackList.add(gameInstance.getObjectInstanceById(stackList.last()).id);
                 stackList = newStackList;

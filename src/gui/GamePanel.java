@@ -190,20 +190,35 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		mouseScreenX = arg0.getX();
 		mouseScreenY = arg0.getY();
 		screenToBoardPos(mouseScreenX, mouseScreenY, mouseBoardPos);
-		mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, player.mouseXPos, player.mouseYPos);
-		if (mouseInPrivateArea)
-		{
-			outText = String.valueOf(mouseScreenY);
-			//outText = String.valueOf(this.privateArea.getAngle(mouseGamePos.getXI(), mouseGamePos.getYI()));
-		}
+		mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, mouseBoardPos.getXI(), mouseBoardPos.getYI());
+
 
 		if (player != null) {
 			player.setMousePos(mouseBoardPos.getXI(), mouseBoardPos.getYI());
 			gameInstance.update(new GamePlayerEditAction(id, player, player));
-			activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
-			if(activeObject != null) {
-				//player.actionString = String.valueOf(activeObject.id);
-				outText = String.valueOf(activeObject.id);
+			ObjectInstance nearestObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
+			if (mouseInPrivateArea && nearestObject != null)
+			{
+				if (activeObject != null){
+					activeObject.state.isActive = false;
+				}
+				nearestObject.state.isActive = false;
+				activeObject = nearestObject;
+				outText = String.valueOf(mouseScreenY);
+			}else if (!mouseInPrivateArea){
+				if (activeObject != null) {
+					activeObject.state.isActive = false;
+					outText = String.valueOf(activeObject.id);
+				}
+				if (nearestObject != null) {
+					activeObject = nearestObject;
+					activeObject.state.isActive = true;
+				} else {
+					if (activeObject != null) {
+						activeObject.state.isActive = false;
+						activeObject = null;
+					}
+				}
 			}
 		}
 		repaint();
@@ -442,7 +457,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			for (ObjectInstance oi:activeObjects) {
 				ObjectFunctions.takeObjects(this, gameInstance, player, oi);
+				oi.state.isActive = false;
 			}
+			selectedObjects.clear();
+			activeObjects.clear();
 		}
 		else if (e.getKeyCode() == KeyEvent.VK_D)
 		{
