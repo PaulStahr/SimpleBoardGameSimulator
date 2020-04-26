@@ -277,10 +277,14 @@ public class GameIO {
 		player.color = new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR)));
 		player.mouseXPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X));
 		player.mouseYPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y));
-		player.screenToBoardPos[0].setLocation(Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_LEFT_X)), Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_LEFT_Y)));
-		player.screenToBoardPos[1].setLocation(Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_RIGHT_X)), Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_RIGHT_Y)));
-		player.screenToBoardPos[2].setLocation(Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_X)), Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_Y)));
-		player.screenToBoardPos[3].setLocation(Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_X)), Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_Y)));
+		player.screenToBoardPos[0] = Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_LEFT_X));
+		player.screenToBoardPos[1] = Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_LEFT_Y));
+		player.screenToBoardPos[2] = Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_RIGHT_X));
+		player.screenToBoardPos[3] = Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_RIGHT_Y));
+		player.screenToBoardPos[4] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_X));
+		player.screenToBoardPos[5] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_Y));
+		player.screenToBoardPos[6] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_X));
+		player.screenToBoardPos[7] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_Y));
 		return player;
 	}
 
@@ -361,14 +365,14 @@ public class GameIO {
 		elem.setAttribute(IOString.COLOR, Integer.toString(player.color.getRGB()));
 		elem.setAttribute(IOString.MOUSE_X, Integer.toString(player.mouseXPos));
 		elem.setAttribute(IOString.MOUSE_Y, Integer.toString(player.mouseYPos));
-		elem.setAttribute(IOString.BOTTOM_LEFT_X, Double.toString(player.screenToBoardPos[0].getX()));
-		elem.setAttribute(IOString.BOTTOM_LEFT_Y, Double.toString(player.screenToBoardPos[0].getY()));
-		elem.setAttribute(IOString.BOTTOM_RIGHT_X, Double.toString(player.screenToBoardPos[1].getX()));
-		elem.setAttribute(IOString.BOTTOM_RIGHT_Y, Double.toString(player.screenToBoardPos[1].getY()));
-		elem.setAttribute(IOString.TOP_RIGHT_X, Double.toString(player.screenToBoardPos[2].getX()));
-		elem.setAttribute(IOString.TOP_RIGHT_Y, Double.toString(player.screenToBoardPos[2].getY()));
-		elem.setAttribute(IOString.TOP_LEFT_X, Double.toString(player.screenToBoardPos[3].getX()));
-		elem.setAttribute(IOString.TOP_LEFT_Y, Double.toString(player.screenToBoardPos[3].getY()));
+		elem.setAttribute(IOString.BOTTOM_LEFT_X, Double.toString(player.screenToBoardPos[0]));
+		elem.setAttribute(IOString.BOTTOM_LEFT_Y, Double.toString(player.screenToBoardPos[1]));
+		elem.setAttribute(IOString.BOTTOM_RIGHT_X, Double.toString(player.screenToBoardPos[2]));
+		elem.setAttribute(IOString.BOTTOM_RIGHT_Y, Double.toString(player.screenToBoardPos[3]));
+		elem.setAttribute(IOString.TOP_RIGHT_X, Double.toString(player.screenToBoardPos[4]));
+		elem.setAttribute(IOString.TOP_RIGHT_Y, Double.toString(player.screenToBoardPos[5]));
+		elem.setAttribute(IOString.TOP_LEFT_X, Double.toString(player.screenToBoardPos[6]));
+		elem.setAttribute(IOString.TOP_LEFT_Y, Double.toString(player.screenToBoardPos[7]));
 		return elem;
 	}
 
@@ -808,9 +812,7 @@ public class GameIO {
 		player.mouseYPos = is.readInt();
 		//read player window position
 		for (int i=0;i<player.screenToBoardPos.length; ++i){
-			double x = is.readDouble();
-			double y = is.readDouble();
-			player.screenToBoardPos[i].setLocation(x, y);
+			player.screenToBoardPos[i] = is.readDouble();
 		}
 	}
 	
@@ -824,8 +826,7 @@ public class GameIO {
 		out.writeInt(player.mouseYPos);
 		//write player window position
 		for (int i=0;i<player.screenToBoardPos.length; ++i){
-			out.writeDouble(player.screenToBoardPos[i].getX());
-			out.writeDouble(player.screenToBoardPos[i].getY());
+			out.writeDouble(player.screenToBoardPos[i]);
 		}
 	}
 	

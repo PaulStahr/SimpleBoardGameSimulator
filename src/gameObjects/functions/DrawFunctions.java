@@ -2,7 +2,6 @@ package gameObjects.functions;
 
 import static gameObjects.functions.ObjectFunctions.getStackBottom;
 import static gameObjects.functions.ObjectFunctions.getStackTop;
-import static gameObjects.functions.ObjectFunctions.haveSamePositions;
 import static gameObjects.functions.ObjectFunctions.isStackCollected;
 import static java.lang.Integer.min;
 import static java.lang.Math.abs;
@@ -92,9 +91,12 @@ public class DrawFunctions {
                 //draw screen position of other players
                 Point2D leftCorner = new Point2D.Double();
                 Point2D rightCorner = new Point2D.Double();
-                if (p.screenToBoardPos[0] != null && p.screenToBoardPos[1] != null) {
-                    gamePanel.boardToScreenPos(p.screenToBoardPos[0], leftCorner);
-                    gamePanel.boardToScreenPos(p.screenToBoardPos[1], rightCorner);
+                if (true)
+                {
+                	leftCorner.setLocation(player.screenToBoardPos[0], player.screenToBoardPos[1]);
+                	rightCorner.setLocation(player.screenToBoardPos[0], player.screenToBoardPos[1]);
+                    gamePanel.boardToScreenPos(leftCorner, leftCorner);
+                    gamePanel.boardToScreenPos(rightCorner, rightCorner);
                     g2.drawLine((int) leftCorner.getX(), (int) leftCorner.getY(), (int) rightCorner.getX(), (int) rightCorner.getY());
                 }
 
