@@ -2,15 +2,11 @@ package gameObjects.functions;
 
 import static gameObjects.functions.ObjectFunctions.getStackBottom;
 import static gameObjects.functions.ObjectFunctions.getStackTop;
-import static gameObjects.functions.ObjectFunctions.haveSamePositions;
 import static gameObjects.functions.ObjectFunctions.isStackCollected;
 import static java.lang.Integer.min;
 import static java.lang.Math.abs;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -88,18 +84,22 @@ public class DrawFunctions {
                 g2.setTransform(tmp);
             }
             else {
-                g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
+
                 //draw screen position of other players
                 Point2D leftCorner = new Point2D.Double();
                 Point2D rightCorner = new Point2D.Double();
-                if (p.screenToBoardPos[0] != null && p.screenToBoardPos[1] != null) {
-                    gamePanel.boardToScreenPos(p.screenToBoardPos[0], leftCorner);
-                    gamePanel.boardToScreenPos(p.screenToBoardPos[1], rightCorner);
+                if (true)
+                {
+                	leftCorner.setLocation(p.screenToBoardPos[0], p.screenToBoardPos[1]);
+                	rightCorner.setLocation(p.screenToBoardPos[2], p.screenToBoardPos[3]);
+                    gamePanel.boardToScreenPos(leftCorner, leftCorner);
+                    gamePanel.boardToScreenPos(rightCorner, rightCorner);
+                    g2.setStroke(new BasicStroke(10));
                     g2.drawLine((int) leftCorner.getX(), (int) leftCorner.getY(), (int) rightCorner.getX(), (int) rightCorner.getY());
                 }
 
                 //draw mouse position of other players
-
+                g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
                 g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
                 g.drawString(p.getName(), p.mouseXPos + 15, p.mouseYPos + 5);
                 g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);

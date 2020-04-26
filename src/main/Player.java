@@ -2,6 +2,7 @@ package main;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -17,7 +18,7 @@ public class Player {
 	public int mouseXPos = 0;
 	public int mouseYPos = 0;
 
-	public Point2D[] screenToBoardPos = new Point2D[4];
+	public final double[] screenToBoardPos = new double[8];
 
 	public String actionString = "";
 	private transient int nameModCount = 0;
@@ -55,10 +56,14 @@ public class Player {
 		this.color = color;
 		this.mouseXPos = mouseX;
 		this.mouseYPos = mouseY;
-		this.screenToBoardPos[0].setLocation(bl_x, bl_y);
-		this.screenToBoardPos[1].setLocation(br_x, br_y);
-		this.screenToBoardPos[2].setLocation(tr_x, tr_y);
-		this.screenToBoardPos[3].setLocation(tl_x, tl_y);
+		this.screenToBoardPos[0] = bl_x;
+		this.screenToBoardPos[1] = bl_y;
+		this.screenToBoardPos[2] = br_x;
+		this.screenToBoardPos[3] = br_y;
+		this.screenToBoardPos[4] = tr_x;
+		this.screenToBoardPos[5] = tr_y;
+		this.screenToBoardPos[6] = tl_x;
+		this.screenToBoardPos[7] = tl_y;
 		setPlayerColor();	
 	}
 
@@ -77,14 +82,7 @@ public class Player {
 	}
 
 	public void initPlayerStartPosition(){
-		Point2D bl = new Point2D.Double(0,0);
-		Point2D br = new Point2D.Double(0,0);
-		Point2D tr = new Point2D.Double(0,0);
-		Point2D tl = new Point2D.Double(0,0);
-		screenToBoardPos[0] = bl;
-		screenToBoardPos[1] = br;
-		screenToBoardPos[2] = tr;
-		screenToBoardPos[3] = tl;
+		Arrays.fill(screenToBoardPos, 0);
 	}
 
 	public void setMousePos(int posX, int posY){
@@ -98,6 +96,11 @@ public class Player {
 		this.mouseXPos = player.mouseXPos;
 		this.mouseYPos = player.mouseYPos;
 		System.out.println(this.mouseXPos);
+	}
+
+	public void setBoardPos(int i, Point2D point) {
+		this.screenToBoardPos[i * 2] = point.getX();
+		this.screenToBoardPos[i * 2 + 1] = point.getY();
 	}
 
 }

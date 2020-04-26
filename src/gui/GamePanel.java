@@ -35,7 +35,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import geometry.Vector2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -559,15 +558,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		boardToScreenTransformation.rotate(rotation);
 		boardToScreenTransformation.translate(translateX, translateY);
 		if (player != null){
-			Point2D leftBottom = screenToBoardTransformation.transform(new Point2D.Double(0, getHeight()), null);
-			Point2D rightBottom = screenToBoardTransformation.transform(new Point2D.Double(getWidth(), getHeight()), null);
-			Point2D rightTop = screenToBoardTransformation.transform(new Point2D.Double(getWidth(), 0), null);
-			Point2D leftTop = screenToBoardTransformation.transform(new Point2D.Double(0, 0), null);
-
-			player.screenToBoardPos[0] = leftBottom;
-			player.screenToBoardPos[1] = rightBottom;
-			player.screenToBoardPos[2] = rightTop;
-			player.screenToBoardPos[3] = leftTop;
+			Point2D point = new Point2D.Double();
+			
+			point.setLocation(0, getHeight());
+			screenToBoardTransformation.transform(point, point);
+			player.setBoardPos(0, point);
+			point.setLocation(getWidth(), getHeight());
+			screenToBoardTransformation.transform(point, point);
+			player.setBoardPos(1, point);
+			point.setLocation(getWidth(), 0);
+			screenToBoardTransformation.transform(point, point);
+			player.setBoardPos(2, point);
+			point.setLocation(0, 0);
+			screenToBoardTransformation.transform(point, point);
+			player.setBoardPos(3, point);
 		}
 	}
 
