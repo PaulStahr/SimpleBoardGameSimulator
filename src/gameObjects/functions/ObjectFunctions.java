@@ -1,10 +1,12 @@
 package gameObjects.functions;
 
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 import javax.swing.SwingUtilities;
@@ -25,6 +27,8 @@ import gui.GamePanel;
 import main.Player;
 import util.Pair;
 import util.data.IntegerArrayList;
+
+import static java.lang.Math.max;
 
 public class ObjectFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -929,6 +933,7 @@ public class ObjectFunctions {
 
     public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
         if (activeObject != null) {
+            setNewDrawValue(gamePanel.id, gameInstance, player, activeObject);
             if (activeObject.go instanceof GameObjectToken) {
                 if (gamePanel.privateArea != null && activeObject.state.owner_id != player.id && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                     IntegerArrayList stackIds = new IntegerArrayList();
@@ -1248,8 +1253,8 @@ public class ObjectFunctions {
         Point2D point = new Point2D.Double();
         int lowX = Math.min(posX, posX + width);
         int lowY = Math.min(posY, posY + height);
-        int highX = Math.max(posX, posX + width);
-        int highY = Math.max(posY, posY + height);
+        int highX = max(posX, posX + width);
+        int highY = max(posY, posY + height);
         for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
             ObjectInstance objectInstance = gameInstance.getObjectInstanceByIndex(idx);
             point.setLocation(objectInstance.state.posX, objectInstance.state.posY);
@@ -1307,4 +1312,34 @@ public class ObjectFunctions {
         }
         return objectInstances1;
     }
+
+    public static IntegerArrayList getDrawOrder(GameInstance gameInstance){
+        IntegerArrayList ial = new IntegerArrayList();
+        ArrayList<Pair<Long, Integer>> drawValues = new ArrayList<>();
+        for (int idx = 0; idx<gameInstance.getObjectNumber(); ++idx){
+            Pair<Long, Integer> x = new Pair<>(gameInstance.getObjectInstanceByIndex(idx).state.drawValue, gameInstance.getObjectInstanceByIndex(idx).id);
+            drawValues.add(x);
+        }
+
+        Collections.sort(drawValues, Comparator.comparing(p -> p.getKey()));
+        for (Pair<Long, Integer> valuePair:drawValues)
+        {
+            ial.add(valuePair.getValue());
+        }
+        return ial;
+    }
+
+    public static long getMaxDrawValue(GameInstance gameInstance){
+        long maxDrawValue = 0;
+        for (int idx = 0; idx<gameInstance.getObjectNumber(); ++idx){
+            maxDrawValue = max(maxDrawValue, gameInstance.getObjectInstanceByIndex(idx).state.drawValue);
+        }
+        return maxDrawValue;
+    }
+
+    public static void setNewDrawValue(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
+        objectInstance.state.drawValue = getMaxDrawValue(gameInstance) + 1;
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+    }
+
 }

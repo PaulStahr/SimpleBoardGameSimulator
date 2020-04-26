@@ -39,6 +39,7 @@ public class DrawFunctions {
     }
 
     public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, IntegerArrayList tmp){
+        //draw tokens in the order of its draw value
         if (ObjectFunctions.isStackTop(objectInstance)) {
             tmp.clear();
             ObjectFunctions.getBelowStack(gameInstance, objectInstance, tmp);

@@ -18,6 +18,7 @@ public abstract class ObjectState implements Serializable {
 	public int aboveInstanceId = -1;
 	public int belowInstanceId = -1;
 	public int value;
+	public long drawValue = 0;
 	
 	@Override
 	public int hashCode()

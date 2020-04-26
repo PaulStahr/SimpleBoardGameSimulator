@@ -21,6 +21,7 @@ public class ObjectInstance {
 		this.go = go;
 		this.state = go.newObjectState();
 		this.id = id;
+		this.state.drawValue = this.id;
 	}
 	
 	public Image getLook(int playerId)

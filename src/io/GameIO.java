@@ -79,6 +79,7 @@ public class GameIO {
 		elem.setAttribute(IOString.Y, Integer.toString(state.posY));
 		elem.setAttribute(IOString.R, Integer.toString(state.rotation));
 		elem.setAttribute(IOString.OWNER_ID, Integer.toString(state.owner_id));
+		elem.setAttribute(IOString.DRAW_VALUE, Long.toString(state.drawValue));
 		elem.setAttribute(IOString.ABOVE, Integer.toString(state.aboveInstanceId));
 		elem.setAttribute(IOString.BELOW, Integer.toString(state.belowInstanceId));
 		elem.setAttribute(IOString.VALUE, Integer.toString(state.value));
@@ -118,6 +119,11 @@ public class GameIO {
 		if (ownerAttribute != null)
 		{
 	        state.owner_id = Integer.parseInt(ownerAttribute.getValue());
+		}
+		Attribute drawValueAttribute = elem.getAttribute(IOString.DRAW_VALUE);
+		if (drawValueAttribute != null)
+		{
+			state.drawValue = Long.parseLong(drawValueAttribute.getValue());
 		}
 		Attribute valueAttribute = elem.getAttribute(IOString.VALUE);
 		if (valueAttribute != null)

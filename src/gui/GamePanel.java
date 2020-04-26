@@ -164,7 +164,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 
         //Draw all objects not in some private area
-		for (int idx = 0; idx < gameInstance.getObjectNumber(); ++ idx) {
+		for (int idx:ObjectFunctions.getDrawOrder(gameInstance)) {
 			ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
 			if (oi.state.owner_id != player.id || !oi.state.inPrivateArea) {
 				try {

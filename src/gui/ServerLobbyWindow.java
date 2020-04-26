@@ -165,6 +165,8 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 					try
 					{
 						int playerId = Integer.parseInt(textFieldId.getText());
+						Options.set("last_connection.address", textFieldAddress.getText());
+						Options.set("last_connection.port", textFieldPort.getText());
 						Options.set("last_connection.name", textFieldName.getText());
 						Options.set("last_connection.id", playerId);
 						Player player = new Player(textFieldName.getText(), playerId);
