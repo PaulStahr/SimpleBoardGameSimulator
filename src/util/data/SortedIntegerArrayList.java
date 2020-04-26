@@ -80,6 +80,7 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 		return data[index];
 	}
 	
+	@Override
 	public int getI(int index){
 		if (index >= length)
 			throw new ArrayIndexOutOfBoundsException(index);
@@ -126,13 +127,13 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 		length = 0;
 	}
 	
-	public final int countMatches(int data[], int length)
+	public final int countMatches(int data[], int begin, int end)
 	{
-		if (length == 0 || this.length == 0)
+		if (end == begin || this.length == 0)
 		{
 			return 0;
 		}
-		int i = 0, j = 0, matches = 0;
+		int i = 0, j = begin, matches = 0;
 		while (true)
 		{
 			if (this.data[i] < data[j])
@@ -144,7 +145,7 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 			}
 			else if (this.data[i] > data[j])
 			{
-				if (++j == length)
+				if (++j == end)
 				{
 					return matches;
 				}
@@ -152,7 +153,7 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 			else
 			{
 				++matches;
-				if (++i == this.length || ++j == length)
+				if (++i == this.length || ++j == end)
 				{
 					return matches;
 				}
@@ -162,16 +163,17 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 	
 	public final int countMatches(SortedIntegerArrayList other)
 	{
-		return countMatches(other.data, other.length);
+		return countMatches(other.data, 0, other.length);
 	}
 	
-	public final boolean hasMatch(int data[], int length)
+	@Override
+	public final boolean hasMatch(int data[], int begin, int end)
 	{
-		if (length == 0 || this.length == 0)
+		if (end == begin || this.length == 0)
 		{
 			return false;
 		}
-		int i = 0, j = 0;
+		int i = 0, j = begin;
 		while (true)
 		{
 			if (this.data[i] < data[j])
@@ -183,7 +185,7 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 			}
 			else if (this.data[i] > data[j])
 			{
-				if (++j == length)
+				if (++j == end)
 				{
 					return false;
 				}
@@ -197,7 +199,7 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 
 	public final boolean hasMatch(SortedIntegerArrayList other)
 	{
-		return hasMatch(other.data, other.length);
+		return hasMatch(other.data, 0, other.length);
 	}
 
 	public ReadOnlySortedIntegerArrayList readOnly() {
@@ -219,6 +221,7 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 			return data[index];
 		}
 		
+		@Override
 		public int getI(int index){
 			if (index >= length)
 				throw new ArrayIndexOutOfBoundsException(index);
@@ -251,8 +254,8 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 		}
 
 		@Override
-		public boolean hasMatch(int[] data, int length) {
-			return SortedIntegerArrayList.this.hasMatch(data, length);
+		public boolean hasMatch(int[] data, int begin, int end) {
+			return SortedIntegerArrayList.this.hasMatch(data, 0, length);
 		}
 
 		@Override

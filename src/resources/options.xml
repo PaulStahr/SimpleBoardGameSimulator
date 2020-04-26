@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <options type="void">
   <recent_files type="string">{}</recent_files>
+  <last_connection type="void">
+  	<address type="string">127.0.0.1</address>
+  	<port type="int">1234</port>
+  	<name type="string"></name>
+  	<id type="int">1</id>
+  </last_connection>
 </options>

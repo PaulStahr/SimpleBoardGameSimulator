@@ -29,6 +29,7 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import data.Options;
 import gameObjects.GameInstanceColumnType;
 import gameObjects.GameMetaInfo;
 import gameObjects.instance.Game;
@@ -49,7 +50,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private static final Logger logger = LoggerFactory.getLogger(ServerLobbyWindow.class);
 	private static final long serialVersionUID = 6569919447688866509L;
 	public final SynchronousGameClientLobbyConnection client;
-	private final JTextField textFieldName = new JTextField();
+	private final JTextField textFieldName = new JTextField(Options.getString("last_connection.name"));
 	private final JTextField textFieldChat = new JTextField();
 	private final JTextArea textAreaChat = new JTextArea();
 	/*TODOS here:
@@ -66,13 +67,13 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private final JScrollPane scrollPaneOpenGames = new JScrollPane(tableOpenGames);
     private final JButton buttonPoll = new JButton("Aktualisiere");
     private final JButton buttonCreateGame = new JButton("Create Game");
-    private final JTextField textFieldId = new JTextField("1");
+    private final JTextField textFieldId = new JTextField(Options.getInteger("last_connection.id"));
     private final JLabel labelAddress = new JLabel("Address");
     private final JLabel labelPort = new JLabel("Port");
     private final JLabel labelName = new JLabel("Name");
     private final JLabel labelId = new JLabel("Id");
-    private final JTextField textFieldAddress = new JTextField("127.0.0.1");
-    private final JTextField textFieldPort = new JTextField("1234");
+    private final JTextField textFieldAddress = new JTextField(Options.getString("last_connection.address"));
+    private final JTextField textFieldPort = new JTextField(String.valueOf(Options.getInteger("last_connection.port")));
 	private boolean isUpdating = false;
 	
     private final AbstractAction tableAction = new AbstractAction() {
@@ -110,6 +111,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 			if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION)
 			{
+				Options.set("last_connection.name", textFieldName.getText());
 				try
 				{
 					File file = fileChooser.getSelectedFile();
@@ -162,7 +164,10 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				{
 					try
 					{
-						Player player = new Player(textFieldName.getText(), Integer.parseInt(textFieldId.getText()));
+						int playerId = Integer.parseInt(textFieldId.getText());
+						Options.set("last_connection.name", textFieldName.getText());
+						Options.set("last_connection.id", playerId);
+						Player player = new Player(textFieldName.getText(), playerId);
 						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.indexOf(GameInstanceColumnType.ID)));
 				    	client.addPlayerToGameSession(player, gi.name, gi.password);
 				    	GameWindow gw = new GameWindow(gi, player);

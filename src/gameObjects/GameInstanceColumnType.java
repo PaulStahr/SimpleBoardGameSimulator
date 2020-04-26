@@ -2,7 +2,6 @@ package gameObjects;
 
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
-import util.ArrayUtil;
 import util.data.UniqueObjects;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.ValueColumnTypes;
@@ -15,7 +14,6 @@ public enum GameInstanceColumnType implements TableColumnType{
 	NUM_PLAYERS("Players", ValueColumnTypes.TYPE_TEXTFIELD, "0", null);
 	
     private static final GameInstanceColumnType ct[] = GameInstanceColumnType.values();
-    private static final String[] columnNames = TableColumnType.getColumnNames(ct);
     
     public static final int size()
     {
@@ -42,7 +40,7 @@ public enum GameInstanceColumnType implements TableColumnType{
 	}
 	
 	public static GameInstanceColumnType getByName(String name) {
-		int index = ArrayUtil.firstEqualIndex(columnNames, name);
+		int index = TableColumnType.getIndexByName(ct, name);
 		return index < 0 ? null : ct[index];
 	}
 

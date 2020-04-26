@@ -5,7 +5,6 @@ import java.util.Map.Entry;
 
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
-import util.ArrayUtil;
 import util.data.UniqueObjects;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.ValueColumnTypes;
@@ -17,7 +16,6 @@ public enum ImageColumnType implements TableColumnType{
 	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
 	
     private static final ImageColumnType ct[] = ImageColumnType.values();
-    private static final String[] columnNames = TableColumnType.getColumnNames(ct);
     
     public static final int size()
     {
@@ -44,7 +42,7 @@ public enum ImageColumnType implements TableColumnType{
 	}
 	
 	public static ImageColumnType getByName(String name) {
-		int index = ArrayUtil.firstEqualIndex(columnNames, name);
+		int index = TableColumnType.getIndexByName(ct, name);
 		return index < 0 ? null : ct[index];
 	}
 
