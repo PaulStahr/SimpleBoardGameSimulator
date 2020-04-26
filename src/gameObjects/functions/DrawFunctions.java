@@ -86,8 +86,10 @@ public class DrawFunctions {
             else {
 
                 //draw screen position of other players
-                Point2D leftCorner = new Point2D.Double();
-                Point2D rightCorner = new Point2D.Double();
+                Point2D leftBottomCorner = new Point2D.Double();
+                Point2D rightBottomCorner = new Point2D.Double();
+                Point2D rightTopCorner = new Point2D.Double();
+                Point2D leftTopCorner = new Point2D.Double();
 
                 /*
                                 if (true)
@@ -105,19 +107,31 @@ public class DrawFunctions {
 
                 if (true)
                 {
-                	leftCorner.setLocation(p.screenToBoardPos[0], p.screenToBoardPos[1]);
-                	rightCorner.setLocation(p.screenToBoardPos[2], p.screenToBoardPos[3]);
-                    gamePanel.boardToScreenPos(leftCorner, leftCorner);
-                    gamePanel.boardToScreenPos(rightCorner, rightCorner);
-                    g2.setStroke(new BasicStroke(10));
-                    g2.drawLine((int) leftCorner.getX(), (int) leftCorner.getY(), (int) rightCorner.getX(), (int) rightCorner.getY());
+                	leftBottomCorner.setLocation(p.screenToBoardPos[0], p.screenToBoardPos[1]);
+                	rightBottomCorner.setLocation(p.screenToBoardPos[2], p.screenToBoardPos[3]);
+                    rightTopCorner.setLocation(p.screenToBoardPos[4], p.screenToBoardPos[5]);
+                    leftTopCorner.setLocation(p.screenToBoardPos[6], p.screenToBoardPos[7]);
+
+                    gamePanel.boardToScreenPos(leftBottomCorner, leftBottomCorner);
+                    gamePanel.boardToScreenPos(rightBottomCorner, rightBottomCorner);
+                    gamePanel.boardToScreenPos(rightTopCorner, rightTopCorner);
+                    gamePanel.boardToScreenPos(leftTopCorner, leftTopCorner);
+
+                    g2.setStroke(new BasicStroke(2));
+                    g2.drawLine((int) leftBottomCorner.getX(), (int) leftBottomCorner.getY(), (int) rightBottomCorner.getX(), (int) rightBottomCorner.getY());
+                    g2.drawLine((int) rightBottomCorner.getX(), (int) rightBottomCorner.getY(), (int) rightTopCorner.getX(), (int) rightTopCorner.getY());
+                    g2.drawLine((int) leftBottomCorner.getX(), (int) leftBottomCorner.getY(), (int) leftTopCorner.getX(), (int) leftTopCorner.getY());
+
+                    //g2.drawRect((int) leftTopCorner.getX(), (int) leftTopCorner.getY(), (int) abs(leftTopCorner.getX() - rightTopCorner.getX()), (int) abs(leftTopCorner.getY() - leftBottomCorner.getY()));
+                    g2.setStroke(new BasicStroke());
                 }
 
                 //draw mouse position of other players
+                g2.translate(p.mouseXPos-5, p.mouseYPos-5);
                 g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
-                g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
-                g.drawString(p.getName(), p.mouseXPos + 15, p.mouseYPos + 5);
-                g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
+                g.fillRect(0, 0, 10, 10);
+                g.drawString(p.getName(),  15,  5);
+                g.drawString(p.actionString,  5, 20);
                 g2.setTransform(tmp);
             }
         }
@@ -288,7 +302,7 @@ public class DrawFunctions {
         if (objectInstance != null && player != null) {
             if(isStackCollected(gameInstance, objectInstance))
             {
-                if((!drawProperStack || tmp.size() > 1) || objectInstance.id != player.id)
+                if((!drawProperStack || tmp.size() > 1) || objectInstance.state.owner_id != -1)
                     drawBorder(gameInstance, g, player, getStackTop(gameInstance, objectInstance), borderWidth, color, zooming);
             	tmp.clear();
             }

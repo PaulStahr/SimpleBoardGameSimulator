@@ -67,7 +67,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private final JScrollPane scrollPaneOpenGames = new JScrollPane(tableOpenGames);
     private final JButton buttonPoll = new JButton("Aktualisiere");
     private final JButton buttonCreateGame = new JButton("Create Game");
-    private final JTextField textFieldId = new JTextField(Options.getInteger("last_connection.id"));
+    private final JTextField textFieldId = new JTextField(String.valueOf(Options.getInteger("last_connection.id")));
     private final JLabel labelAddress = new JLabel("Address");
     private final JLabel labelPort = new JLabel("Port");
     private final JLabel labelName = new JLabel("Name");

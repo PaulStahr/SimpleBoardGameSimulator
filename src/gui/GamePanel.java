@@ -574,6 +574,22 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			player.setBoardPos(3, point);
 			gameInstance.update(new GamePlayerEditAction(id, player, player));
 		}
+
+		//move own stack to private bottom
+		/*
+		if (player != null) {
+			IntegerArrayList ial = new IntegerArrayList();
+			ObjectFunctions.getOwnedStack(gameInstance,player,ial);
+			if (ial.size() >0) {
+				if (gameInstance.getObjectInstanceById(ial.get(0)).state.owner_id == player.id) {
+					Point2D origin = new Point2D.Double(getWidth() / 2, getHeight());
+					screenToBoardTransformation.transform(origin, null);
+					ObjectFunctions.moveStackTo(this, gameInstance, player, ial, (int) origin.getX(), (int) origin.getY());
+				}
+			}
+		}
+		*/
+
 	}
 
 	public void screenToBoardPos(int x, int y, Vector2d out)
