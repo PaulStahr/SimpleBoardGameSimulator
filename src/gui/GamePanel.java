@@ -4,7 +4,7 @@ import static gameObjects.functions.DrawFunctions.drawActiveObject;
 import static gameObjects.functions.DrawFunctions.drawBoard;
 import static gameObjects.functions.DrawFunctions.drawDiceObjects;
 import static gameObjects.functions.DrawFunctions.drawFigureObjects;
-import static gameObjects.functions.DrawFunctions.drawPlayerMarkers;
+import static gameObjects.functions.DrawFunctions.drawPlayerPositions;
 import static gameObjects.functions.DrawFunctions.drawSelectedObjects;
 import static gameObjects.functions.DrawFunctions.drawTokenObjects;
 import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
@@ -28,12 +28,14 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import geometry.Vector2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,8 +178,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 			}
 		}
-		drawActiveObject(this, g, player, activeObject);
-		drawPlayerMarkers(this, g, gameInstance, player, infoText);
+		drawActiveObject(this, gameInstance, g, player, activeObject);
+		drawPlayerPositions(this, g, gameInstance, player, infoText);
 		drawSelectedObjects(this, g, gameInstance, player, ial);
 		drawTokensInPrivateArea(this, g, gameInstance);
 
@@ -505,8 +507,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			zoomFactor += (int) e.getPreciseWheelRotation();
 			zooming = Math.exp(-zoomFactor * 0.1);
 			updateGameTransform();
-			//double zooming = Math.exp(-zoomFactor * 0.1);
-			//ObjectFunctions.zoomObjects(gameInstance, zooming);
 		}
 		else{
 			mouseWheelValue += (int) e.getPreciseWheelRotation();
@@ -558,11 +558,27 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		boardToScreenTransformation.scale(zooming, zooming);
 		boardToScreenTransformation.rotate(rotation);
 		boardToScreenTransformation.translate(translateX, translateY);
+		if (player != null){
+			Point2D leftBottom = screenToBoardTransformation.transform(new Point2D.Double(0, getHeight()), null);
+			Point2D rightBottom = screenToBoardTransformation.transform(new Point2D.Double(getWidth(), getHeight()), null);
+			Point2D rightTop = screenToBoardTransformation.transform(new Point2D.Double(getWidth(), 0), null);
+			Point2D leftTop = screenToBoardTransformation.transform(new Point2D.Double(0, 0), null);
+
+			player.screenToBoardPos[0] = leftBottom;
+			player.screenToBoardPos[1] = rightBottom;
+			player.screenToBoardPos[2] = rightTop;
+			player.screenToBoardPos[3] = leftTop;
+		}
 	}
 
 	public void screenToBoardPos(int x, int y, Vector2d out)
 	{
 		gameTransform.transformAffine(x, y, out);
+	}
+	public void boardToScreenPos(Point2D in, Point2D out)
+	{
+		out.setLocation(in.getX(), in.getY());
+		boardToScreenTransformation.transform(out, null);
 	}
 
 	public void translateBoard(MouseEvent arg0)

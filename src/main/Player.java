@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Random;
 
@@ -15,6 +16,9 @@ public class Player {
 	public Color color;
 	public int mouseXPos = 0;
 	public int mouseYPos = 0;
+
+	public Point2D[] screenToBoardPos = new Point2D[4];
+
 	public String actionString = "";
 	private transient int nameModCount = 0;
 	

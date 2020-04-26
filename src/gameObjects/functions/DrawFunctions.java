@@ -12,6 +12,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
 import org.slf4j.Logger;
@@ -68,7 +69,7 @@ public class DrawFunctions {
         drawObject(g, gameInstance.getObjectInstanceById(oi.id), player.id, zooming);
     }
 
-    public static void drawPlayerMarkers(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, String infoText)
+    public static void drawPlayerPositions(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, String infoText)
     {
         Graphics2D g2 = (Graphics2D)g;
         AffineTransform tmp = g2.getTransform();
@@ -88,6 +89,17 @@ public class DrawFunctions {
             }
             else {
                 g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
+                //draw screen position of other players
+                Point2D leftCorner = new Point2D.Double();
+                Point2D rightCorner = new Point2D.Double();
+                if (p.screenToBoardPos[0] != null && p.screenToBoardPos[1] != null) {
+                    gamePanel.boardToScreenPos(p.screenToBoardPos[0], leftCorner);
+                    gamePanel.boardToScreenPos(p.screenToBoardPos[1], rightCorner);
+                    g2.drawLine((int) leftCorner.getX(), (int) leftCorner.getY(), (int) rightCorner.getX(), (int) rightCorner.getY());
+                }
+
+                //draw mouse position of other players
+
                 g.fillRect(p.mouseXPos - 5, p.mouseYPos - 5, 10, 10);
                 g.drawString(p.getName(), p.mouseXPos + 15, p.mouseYPos + 5);
                 g.drawString(p.actionString, p.mouseXPos - 5, p.mouseYPos - 20);
@@ -96,14 +108,14 @@ public class DrawFunctions {
         }
     }
 
-    public static void drawActiveObject(GamePanel gamePanel, Graphics g, Player player, ObjectInstance activeObject) {
+    public static void drawActiveObject(GamePanel gamePanel, GameInstance gameInstance, Graphics g, Player player, ObjectInstance activeObject) {
         int playerId = player == null ? -1 : player.id;
         if (activeObject != null) {
             if (activeObject.state.isActive) {
                 drawObject(g, activeObject, playerId, 1);
             }
             if (player != null && (activeObject.state.owner_id != playerId || activeObject.state.isActive)) {
-                drawBorder(g, player, activeObject, 5, player.color, 1);
+                drawBorder(gameInstance, g, player, activeObject, 5, player.color, 1);
             }
         }
         if (activeObject != null && !activeObject.state.isActive && activeObject.state.owner_id == playerId) {
@@ -132,10 +144,10 @@ public class DrawFunctions {
                 }
             }
             else if (currentObject.go instanceof GameObjectDice){
-                drawBorder(g, player, currentObject, 5, player.color, 1);
+                drawBorder(gameInstance, g, player, currentObject, 5, player.color, 1);
             }
             else if (currentObject.go instanceof GameObjectFigure){
-                drawBorder(g, player, currentObject, 5, player.color, 1);
+                drawBorder(gameInstance, g, player, currentObject, 5, player.color, 1);
             }
         }
         Graphics2D g2 = (Graphics2D)g;
@@ -235,7 +247,7 @@ public class DrawFunctions {
         }
     }
 
-    public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, AffineTransform transform) {
+    public static void drawBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, AffineTransform transform) {
         if (objectInstance != null) {
             g.setColor(color);
             Graphics2D g2d = (Graphics2D) g.create();
@@ -243,20 +255,26 @@ public class DrawFunctions {
             if(transform != null)
                 g2d.setTransform(transform);
             g2d.setStroke(new BasicStroke(borderWidth));
+            if (objectInstance.state.owner_id != -1)
+            {
+                Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
+                g2d.drawString(playerOwner.getName() + " Hand Cards", objectInstance.state.posX, objectInstance.state.posY - 20);
+            }
+
             g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, (int) (objectInstance.getWidth(player.id) * zooming) + borderWidth, (int) (objectInstance.getHeight(player.id) * zooming) + borderWidth);
             g2d.setTransform(tmp);
         }
     }
-    public static void drawBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming) {
-        drawBorder(g, player, objectInstance, borderWidth, color, zooming, null);
+    public static void drawBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming) {
+        drawBorder(gameInstance, g, player, objectInstance, borderWidth, color, zooming, null);
     }
 
     public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, boolean drawProperStack, IntegerArrayList tmp) {
         if (objectInstance != null && player != null) {
             if(isStackCollected(gameInstance, objectInstance))
             {
-                if((!drawProperStack || tmp.size() > 1))
-                    drawBorder(g, player, getStackTop(gameInstance, objectInstance), borderWidth, color, zooming);
+                if((!drawProperStack || tmp.size() > 1) || objectInstance.id != player.id)
+                    drawBorder(gameInstance, g, player, getStackTop(gameInstance, objectInstance), borderWidth, color, zooming);
             	tmp.clear();
             }
             else
