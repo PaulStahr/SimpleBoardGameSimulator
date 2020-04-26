@@ -21,6 +21,26 @@ public interface TableColumnType {
 		return names;
 	}
 	
+	public static int getIndexByName(TableColumnType[] tct, String name)
+	{
+		for (int i = 0; i < tct.length; ++i)
+		{
+			if (name.equals(tct[i].getName()))
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+
+
+	static TableColumnType getItemByName(TableColumnType[] tct, String name) {
+		int index = getIndexByName(tct,  name);
+		return index < 0 ? null : tct[index];
+	}
+
+	
 	public static String[] getColumnNames(List<? extends TableColumnType> types) {
 		String names[] = new String[types.size()];
 		for (int i = 0; i < types.size(); ++i)
@@ -46,5 +66,4 @@ public interface TableColumnType {
 				throw new IllegalArgumentException();
 		}
 	}
-
 }

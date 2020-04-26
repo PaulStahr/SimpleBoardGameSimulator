@@ -15,7 +15,7 @@ import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 
 public class GameInstance {
-	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.CONNECT, GameInstanceColumnType.DELETE});
+	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.NUM_PLAYERS, GameInstanceColumnType.CONNECT, GameInstanceColumnType.DELETE});
 	public static final Logger logger = LoggerFactory.getLogger(GameInstance.class);
 	public final Game game;
 	public String password;
