@@ -29,8 +29,13 @@ import main.Player;
 import util.ArrayUtil;
 import util.StringUtils;
 import util.data.UniqueObjects;
+import util.io.StreamUtil;
 
 public class AsynchronousGameConnection implements Runnable, GameChangeListener{
+	public enum Network {
+		ACTION_EDIT_STATE
+	}
+
 	private static final Logger logger = LoggerFactory.getLogger(AsynchronousGameConnection.class);
 	GameInstance gi;
 	Thread outputThread;
@@ -169,18 +174,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		//PrintWriter writer = new PrintWriter(output, true);
 		ObjectOutputStream objOut = null;
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		if (output instanceof ObjectOutputStream)
-		{
-			objOut = ((ObjectOutputStream)output);
-		}
-		else
-		{
-			try {
-				objOut = new ObjectOutputStream(output);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+		try {
+			objOut = StreamUtil.toObjectStream(output);
+		} catch (IOException e1) {
+			logger.error("Can't initialize ObjectStream", e1);
 		}
     	while (true)
 		{
@@ -319,26 +316,27 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    {
 				    	if (action instanceof GameObjectInstanceEditAction)
 				 		{
-					    	//GameIO.writeObjectStateToStreamXml(((GameObjectInstanceEditAction)action).object.state, byteStream);
-					 		strB.append(NetworkString.ACTION).append(' ')
+				    		objOut.writeObject(action);
+				    		GameIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).getObject(gi).state);
+				    		
+					    	/*strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.EDIT).append(' ')
 					 			.append(NetworkString.STATE).append(' ')
 					 			.append(connectionId).append(' ')
 					 			.append(action.source).append(' ')
 					 			.append(((GameObjectInstanceEditAction) action).player).append(' ')
-					 			.append(((GameObjectInstanceEditAction) action).object.id).append(' ')
+					 			.append(((GameObjectInstanceEditAction) action).object).append(' ')
 					 			.append( byteStream.size());
-					 		objOut.writeObject(strB.toString());
-					 		GameIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).object.state);
-					 		//objOut.writeObject(((GameObjectInstanceEditAction)action).object.state.copy());
-					 		//byteStream.writeTo(objOut);
-					    	byteStream.reset();
-					     	strB.setLength(0);
+					 		GameIO.writeGameObjectInstanceEditActionToStreamObject(objOut, (GameObjectInstanceEditAction)action);
+					 		GameIO.writeStateToStreamObject(objOut, gi.getObjectInstanceById(((GameObjectInstanceEditAction)action).object).state);
+					 		byteStream.reset();
+					     	strB.setLength(0);*/
 					   }
 				    	else if (action instanceof GamePlayerEditAction)
 				 		{
-					    	//GameIO.writePlayerToStream(((GamePlayerEditAction)action).object, byteStream);
-					 		strB.append(NetworkString.ACTION).append(' ')
+				    		objOut.writeObject(action);
+				    		GameIO.writePlayerToStreamObject(objOut, ((GamePlayerEditAction)action).getEditedPlayer(gi));
+					    	/*strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.EDIT).append(' ')
 					 			.append(NetworkString.PLAYER).append(' ')
 					 			.append(connectionId).append(' ')
@@ -348,9 +346,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append( byteStream.size());
 					 		objOut.writeObject(strB.toString());
 					 		GameIO.writePlayerToStreamObject(objOut, ((GamePlayerEditAction)action).editedPlayer);
-					 		//byteStream.writeTo(objOut);
-					    	//byteStream.reset();
-					     	strB.setLength(0);
+					 		strB.setLength(0);*/
 					   }
 					   else if (action instanceof UsertextMessageAction)
 					   {
@@ -372,7 +368,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append(connectionId).append(' ')
 					 			.append(action.source).append(' ')
 					 			.append(((GameObjectInstanceEditAction) action).player).append(' ')
-					 			.append(((GameObjectInstanceEditAction) action).object.id).append(' ');
+					 			.append(((GameObjectInstanceEditAction) action).object).append(' ');
 					 		objOut.writeObject(strB.toString());
 					 		objOut.writeObject(((UsertextMessageAction) action).message);
 					     	strB.setLength(0);
@@ -396,23 +392,16 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		//Scanner in = new Scanner( input);
 		if (objIn == null)
 		{
-			if (input instanceof ObjectInputStream)
-			{
-				objIn = (ObjectInputStream)input;
+			try {
+				objIn = StreamUtil.toObjectStream(input);
+			} catch (IOException e1) {
+				logger.error("Can't open Object-Input-Stream", e1);
 			}
-			else
+
+			if (objIn == null)
 			{
-				try {
-					objIn = new ObjectInputStream(input);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+				return;
 			}
-		}
-		if (objIn == null)
-		{
-			return;
 		}
 		while (true)
 		{
@@ -429,6 +418,25 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					{
 						return;
 					}
+				}
+				if (inputObject instanceof GameObjectInstanceEditAction)
+				{
+					GameObjectInstanceEditAction action = (GameObjectInstanceEditAction)inputObject;
+					GameIO.editStateFromStreamObject(objIn, action.getObject(gi).state);
+					gi.update(action);
+					continue;
+				}
+				if (inputObject instanceof GamePlayerEditAction)
+				{
+					GamePlayerEditAction action = (GamePlayerEditAction)inputObject;
+					Player editedPlayer = action.getEditedPlayer(gi);
+					if (editedPlayer == null)
+					{
+						editedPlayer = gi.addPlayer(new Player("", action.editedPlayer));
+					}
+					GameIO.editPlayerFromStreamObject(objIn, editedPlayer);
+					gi.update(action);
+					continue;
 				}
 				if (!(inputObject instanceof String))
 				{
@@ -508,7 +516,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 							{
 								int playerId = Integer.parseInt(split.get(5));
 								int objectId = Integer.parseInt(split.get(6));
-								int size = Integer.parseInt(split.get(7));
+								Integer.parseInt(split.get(7)); //size
 								
 								ObjectInstance inst = gi.getObjectInstanceById(objectId);
 								//ObjectState state = (ObjectState)objIn.readObject();

@@ -24,6 +24,9 @@ package util.io;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 
 public class StreamUtil {
@@ -53,5 +56,27 @@ public class StreamUtil {
 		}
 		reader.close();
 		return new String(ch, 0, len);
+	}
+	
+	public static ObjectOutputStream toObjectStream(OutputStream input) throws IOException {
+		if (input instanceof ObjectOutputStream)
+		{
+			return (ObjectOutputStream)input;
+		}
+		else
+		{
+			return new ObjectOutputStream(input);
+		}
+	}	
+
+	public static ObjectInputStream toObjectStream(InputStream input) throws IOException {
+		if (input instanceof ObjectInputStream)
+		{
+			return (ObjectInputStream)input;
+		}
+		else
+		{
+			return new ObjectInputStream(input);
+		}
 	}
 }

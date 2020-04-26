@@ -1,5 +1,9 @@
 package gameObjects.functions;
 
+import java.awt.event.MouseEvent;
+
+import javax.swing.SwingUtilities;
+
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectFigure;
@@ -8,9 +12,6 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gui.GamePanel;
 import main.Player;
-
-import javax.swing.*;
-import java.awt.event.MouseEvent;
 
 public class MoveFunctions {
 
@@ -38,21 +39,21 @@ public class MoveFunctions {
             /*Remove top card*/
             ObjectFunctions.removeObject(gamePanel, gameInstance, player, activeObject);
             ObjectFunctions.moveObjectTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, activeObject));
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player.id, activeObject.id));
         }
     }
 
     public static void dragDices(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, MouseEvent arg0, int xDiff, int yDiff, int mouseWheelValue) {
         if (activeObject != null && (activeObject.go instanceof GameObjectDice) && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
             ObjectFunctions.moveObjectTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, activeObject));
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player.id, activeObject.id));
         }
     }
 
     public static void dragFigures(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, MouseEvent arg0, int xDiff, int yDiff, int mouseWheelValue) {
         if (activeObject != null && (activeObject.go instanceof GameObjectFigure) && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
             ObjectFunctions.moveObjectTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, activeObject));
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player.id, activeObject.id));
         }
     }
 }
