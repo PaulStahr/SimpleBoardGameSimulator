@@ -56,9 +56,9 @@ public class Player {
 		this.mouseXPos = mouseX;
 		this.mouseYPos = mouseY;
 		this.screenToBoardPos[0].setLocation(bl_x, bl_y);
-		this.screenToBoardPos[0].setLocation(br_x, br_y);
-		this.screenToBoardPos[0].setLocation(tr_x, tr_y);
-		this.screenToBoardPos[0].setLocation(tl_x, tl_y);
+		this.screenToBoardPos[1].setLocation(br_x, br_y);
+		this.screenToBoardPos[2].setLocation(tr_x, tr_y);
+		this.screenToBoardPos[3].setLocation(tl_x, tl_y);
 		setPlayerColor();	
 	}
 
