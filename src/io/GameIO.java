@@ -260,7 +260,15 @@ public class GameIO {
 				Integer.parseInt(elem.getAttributeValue(IOString.ID)),
 				new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR))),
 				Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X)),
-				Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y)));
+				Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y)),
+				Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_LEFT_X)),
+				Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_LEFT_Y)),
+				Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_RIGHT_X)),
+				Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_RIGHT_Y)),
+				Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_X)),
+				Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_Y)),
+				Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_X)),
+				Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_Y)));
 	}
 
 	private static Player editPlayerFromElement(Element elem, Player player)
@@ -269,6 +277,10 @@ public class GameIO {
 		player.color = new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR)));
 		player.mouseXPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X));
 		player.mouseYPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y));
+		player.screenToBoardPos[0].setLocation(Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_LEFT_X)), Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_LEFT_Y)));
+		player.screenToBoardPos[1].setLocation(Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_RIGHT_X)), Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_RIGHT_Y)));
+		player.screenToBoardPos[2].setLocation(Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_X)), Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_Y)));
+		player.screenToBoardPos[3].setLocation(Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_X)), Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_Y)));
 		return player;
 	}
 
@@ -349,6 +361,14 @@ public class GameIO {
 		elem.setAttribute(IOString.COLOR, Integer.toString(player.color.getRGB()));
 		elem.setAttribute(IOString.MOUSE_X, Integer.toString(player.mouseXPos));
 		elem.setAttribute(IOString.MOUSE_Y, Integer.toString(player.mouseYPos));
+		elem.setAttribute(IOString.BOTTOM_LEFT_X, Double.toString(player.screenToBoardPos[0].getX()));
+		elem.setAttribute(IOString.BOTTOM_LEFT_Y, Double.toString(player.screenToBoardPos[0].getY()));
+		elem.setAttribute(IOString.BOTTOM_RIGHT_X, Double.toString(player.screenToBoardPos[1].getX()));
+		elem.setAttribute(IOString.BOTTOM_RIGHT_Y, Double.toString(player.screenToBoardPos[1].getY()));
+		elem.setAttribute(IOString.TOP_RIGHT_X, Double.toString(player.screenToBoardPos[2].getX()));
+		elem.setAttribute(IOString.TOP_RIGHT_Y, Double.toString(player.screenToBoardPos[2].getY()));
+		elem.setAttribute(IOString.TOP_LEFT_X, Double.toString(player.screenToBoardPos[3].getX()));
+		elem.setAttribute(IOString.TOP_LEFT_Y, Double.toString(player.screenToBoardPos[3].getY()));
 		return elem;
 	}
 
@@ -781,17 +801,32 @@ public class GameIO {
 	public static void editPlayerFromStreamObject(ObjectInputStream is, Player player) throws ClassNotFoundException, IOException
 	{
 		player.setName((String)is.readObject());
+		//read player color
 		player.color = new Color(is.readInt());
+		//read player mouse position
 		player.mouseXPos = is.readInt();
 		player.mouseYPos = is.readInt();
+		//read player window position
+		for (int i=0;i<player.screenToBoardPos.length; ++i){
+			double x = is.readDouble();
+			double y = is.readDouble();
+			player.screenToBoardPos[i].setLocation(x, y);
+		}
 	}
 	
 	public static void writePlayerToStreamObject(ObjectOutputStream out, Player player) throws IOException
 	{
 		out.writeObject(player.getName());
+		//write player color
 		out.writeInt(player.color.getRGB());
+		//write player mouse position
 		out.writeInt(player.mouseXPos);
 		out.writeInt(player.mouseYPos);
+		//write player window position
+		for (int i=0;i<player.screenToBoardPos.length; ++i){
+			out.writeDouble(player.screenToBoardPos[i].getX());
+			out.writeDouble(player.screenToBoardPos[i].getY());
+		}
 	}
 	
 	public static void editStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException

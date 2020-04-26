@@ -46,14 +46,19 @@ public class Player {
 		this.name = name;
 		this.id = id;
 		setPlayerColor();
+		initPlayerStartPosition();
 	}
 	
-	public Player(String name, int id, Color color, int mouseX, int mouseY) {
+	public Player(String name, int id, Color color, int mouseX, int mouseY, double bl_x, double bl_y, double br_x, double br_y, double tr_x, double tr_y, double tl_x, double tl_y) {
 		this.name = name;
 		this.id = id;
 		this.color = color;
 		this.mouseXPos = mouseX;
 		this.mouseYPos = mouseY;
+		this.screenToBoardPos[0].setLocation(bl_x, bl_y);
+		this.screenToBoardPos[0].setLocation(br_x, br_y);
+		this.screenToBoardPos[0].setLocation(tr_x, tr_y);
+		this.screenToBoardPos[0].setLocation(tl_x, tl_y);
 		setPlayerColor();	
 	}
 
@@ -69,6 +74,17 @@ public class Player {
 		float b = rand.nextFloat();
 
 		this.color = new Color(r, g, b);
+	}
+
+	public void initPlayerStartPosition(){
+		Point2D bl = new Point2D.Double(0,0);
+		Point2D br = new Point2D.Double(0,0);
+		Point2D tr = new Point2D.Double(0,0);
+		Point2D tl = new Point2D.Double(0,0);
+		screenToBoardPos[0] = bl;
+		screenToBoardPos[1] = br;
+		screenToBoardPos[2] = tr;
+		screenToBoardPos[3] = tl;
 	}
 
 	public void setMousePos(int posX, int posY){
