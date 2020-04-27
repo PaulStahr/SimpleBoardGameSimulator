@@ -29,13 +29,16 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import data.DataHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +117,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public float cardOverlap = (float) (2/3.0);
 
+	public BufferedImage[] playerImages = new BufferedImage[10];
+
 
 	public GamePanel(GameInstance gameInstance)
 	{
@@ -146,6 +151,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		this.add(p);
 		updateGameTransform();
 		addComponentListener(this);
+
+
+		for (int i = 0; i < 10; ++i) {
+			try {
+				playerImages[i] = ImageIO.read(DataHandler.getResourceAsStream("images/kenney-animalpack/PNG/Round/id" + String.valueOf(i) + ".png"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	@Override

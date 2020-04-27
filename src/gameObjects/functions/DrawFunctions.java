@@ -122,6 +122,10 @@ public class DrawFunctions {
                     rightTopCorner.setLocation(p.screenToBoardPos[4], p.screenToBoardPos[5]);
                     leftTopCorner.setLocation(p.screenToBoardPos[6], p.screenToBoardPos[7]);
 
+                    Point2D boardMiddle = new Point2D.Double(1/2*(leftBottomCorner.getX()+rightBottomCorner.getX()), leftBottomCorner.getY());
+                    gamePanel.boardToScreenPos(boardMiddle, boardMiddle);
+
+
                     gamePanel.boardToScreenPos(leftBottomCorner, leftBottomCorner);
                     gamePanel.boardToScreenPos(rightBottomCorner, rightBottomCorner);
                     gamePanel.boardToScreenPos(rightTopCorner, rightTopCorner);
@@ -132,9 +136,10 @@ public class DrawFunctions {
                     g2.drawLine((int) rightBottomCorner.getX(), (int) rightBottomCorner.getY(), (int) rightTopCorner.getX(), (int) rightTopCorner.getY());
                     g2.drawLine((int) leftBottomCorner.getX(), (int) leftBottomCorner.getY(), (int) leftTopCorner.getX(), (int) leftTopCorner.getY());
 
-                    BufferedImage image = ImageIO.read(DataHandler.getResourceAsStream("images/player.png"));
-                    g2.drawImage(image, null, (int) (leftBottomCorner.getX() + rightBottomCorner.getX()/2),(int) leftBottomCorner.getY());
+                    int imageNumber = p.id % 10;
+                    g2.drawImage(gamePanel.playerImages[imageNumber], null, (int) boardMiddle.getX(), (int) boardMiddle .getY());
                     //g2.drawRect((int) leftTopCorner.getX(), (int) leftTopCorner.getY(), (int) abs(leftTopCorner.getX() - rightTopCorner.getX()), (int) abs(leftTopCorner.getY() - leftBottomCorner.getY()));
+                    //g2.drawString("\u1F981", (int) (leftBottomCorner.getX() + rightBottomCorner.getX()/2),(int) leftBottomCorner.getY());
                     g2.setStroke(new BasicStroke());
                 }
 
