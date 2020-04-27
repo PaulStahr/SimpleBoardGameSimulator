@@ -85,6 +85,18 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		return set(index, (int)value);
 	}
 	
+	public void set(IntegerArrayList list){
+		if (this.data.length < list.size())
+		{
+			this.data = Arrays.copyOf(list.data, list.length);
+		}
+		else
+		{
+			System.arraycopy(list.data, 0, this.data, 0, list.length);
+			this.length = list.length;
+		}
+	}
+	
 	public int set(int index, int value){
 		int old = data[index];
 		data[index] = value;

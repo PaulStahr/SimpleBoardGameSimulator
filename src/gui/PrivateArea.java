@@ -18,7 +18,7 @@ public class PrivateArea {
     public int height = 0;
     public Shape shape = null;
     public int elementNumber = 0;
-    public IntegerArrayList privateObjects = new IntegerArrayList();
+    public final IntegerArrayList privateObjects = new IntegerArrayList();
     public AffineTransform objectTransform;
     private final AffineTransform boardTransform;
     private final AffineTransform inverseBoardTransform;
@@ -67,8 +67,9 @@ public class PrivateArea {
     }
 
     public void setPrivateObjects(IntegerArrayList objectIds) {
-        this.privateObjects = objectIds;
+        this.privateObjects.set(objectIds);
     }
+
     public void updatePrivateObjects(IntegerArrayList objectIds) {
         privateObjects.clear();
         privateObjects.add(objectIds);
