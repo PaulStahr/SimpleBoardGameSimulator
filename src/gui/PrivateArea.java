@@ -18,7 +18,7 @@ public class PrivateArea {
     public int height = 0;
     public Shape shape = null;
     public int elementNumber = 0;
-    public IntegerArrayList privateObjects = new IntegerArrayList();
+    public final IntegerArrayList privateObjects = new IntegerArrayList();
     public AffineTransform objectTransform;
     private final AffineTransform boardToScreenTransformation;
     private final AffineTransform screenToBoardTransformation;
@@ -67,11 +67,7 @@ public class PrivateArea {
     }
 
     public void setPrivateObjects(IntegerArrayList objectIds) {
-        this.privateObjects = objectIds;
-    }
-    public void updatePrivateObjects(IntegerArrayList objectIds) {
-        privateObjects.clear();
-        privateObjects.add(objectIds);
+        this.privateObjects.set(objectIds);
     }
 
     public double getAngle(int posX, int posY) {
