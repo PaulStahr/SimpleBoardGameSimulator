@@ -29,6 +29,7 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
@@ -178,7 +179,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 		drawActiveObjectBorder(this, gameInstance, g, player, activeObject);
-		drawPlayerPositions(this, g, gameInstance, player, infoText);
+		try {
+			drawPlayerPositions(this, g, gameInstance, player, infoText);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		drawSelectedObjects(this, g, gameInstance, player, ial);
 		drawTokensInPrivateArea(this, g, gameInstance);
 

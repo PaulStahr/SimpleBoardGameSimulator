@@ -1,19 +1,20 @@
 package gameObjects.functions;
 
+import static data.DataHandler.getResource;
 import static gameObjects.functions.ObjectFunctions.getStackBottom;
 import static gameObjects.functions.ObjectFunctions.getStackTop;
 import static gameObjects.functions.ObjectFunctions.isStackCollected;
 import static java.lang.Integer.min;
 import static java.lang.Math.abs;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import data.DataHandler;
+import main.Main;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +26,8 @@ import gameObjects.instance.ObjectInstance;
 import gui.GamePanel;
 import main.Player;
 import util.data.IntegerArrayList;
+
+import javax.imageio.ImageIO;
 
 public class DrawFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -73,8 +76,7 @@ public class DrawFunctions {
         drawObject(g, gameInstance.getObjectInstanceById(oi.id), player.id, zooming);
     }
 
-    public static void drawPlayerPositions(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, String infoText)
-    {
+    public static void drawPlayerPositions(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, String infoText) throws IOException {
         Graphics2D g2 = (Graphics2D)g;
         AffineTransform tmp = g2.getTransform();
         for(int pIdx = 0;pIdx < gameInstance.getPlayerNumber();++pIdx) {
@@ -130,6 +132,8 @@ public class DrawFunctions {
                     g2.drawLine((int) rightBottomCorner.getX(), (int) rightBottomCorner.getY(), (int) rightTopCorner.getX(), (int) rightTopCorner.getY());
                     g2.drawLine((int) leftBottomCorner.getX(), (int) leftBottomCorner.getY(), (int) leftTopCorner.getX(), (int) leftTopCorner.getY());
 
+                    BufferedImage image = ImageIO.read(DataHandler.getResourceAsStream("images/player.png"));
+                    g2.drawImage(image, null, (int) (leftBottomCorner.getX() + rightBottomCorner.getX()/2),(int) leftBottomCorner.getY());
                     //g2.drawRect((int) leftTopCorner.getX(), (int) leftTopCorner.getY(), (int) abs(leftTopCorner.getX() - rightTopCorner.getX()), (int) abs(leftTopCorner.getY() - leftBottomCorner.getY()));
                     g2.setStroke(new BasicStroke());
                 }
@@ -148,6 +152,9 @@ public class DrawFunctions {
     public static void drawActiveObjectBorder(GamePanel gamePanel, GameInstance gameInstance, Graphics g, Player player, ObjectInstance activeObject) {
         int playerId = player == null ? -1 : player.id;
         if (activeObject != null) {
+            if (activeObject.state.isActive && activeObject.state.owner_id == player.id) {
+                drawObject(g, activeObject, playerId, 1);
+            }
             if (player != null && (activeObject.state.owner_id != playerId || activeObject.state.isActive)) {
                 drawBorder(gameInstance, g, player, activeObject, 5, player.color, 1);
             }
