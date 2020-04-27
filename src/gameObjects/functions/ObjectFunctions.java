@@ -1,6 +1,7 @@
 package gameObjects.functions;
 
-import java.awt.*;
+import static java.lang.Math.max;
+
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -27,8 +28,6 @@ import gui.GamePanel;
 import main.Player;
 import util.Pair;
 import util.data.IntegerArrayList;
-
-import static java.lang.Math.max;
 
 public class ObjectFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -1126,7 +1125,7 @@ public class ObjectFunctions {
         gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
         idList.clear();
         getOwnedStack(gameInstance, player, idList);
-        gamePanel.privateArea.updatePrivateObjects(idList);
+        gamePanel.privateArea.setPrivateObjects(idList);
     }
 
     public static void removeFromOwnStack(GamePanel gamePanel, GameInstance gameInstance, Player player, int id) {
@@ -1136,7 +1135,7 @@ public class ObjectFunctions {
         objectInstance.state.inPrivateArea = false;
         IntegerArrayList stackIds = new IntegerArrayList();
         getOwnedStack(gameInstance, player, stackIds);
-        gamePanel.privateArea.updatePrivateObjects(stackIds);
+        gamePanel.privateArea.setPrivateObjects(stackIds);
     }
 
 

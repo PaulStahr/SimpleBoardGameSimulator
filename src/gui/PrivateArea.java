@@ -70,11 +70,6 @@ public class PrivateArea {
         this.privateObjects.set(objectIds);
     }
 
-    public void updatePrivateObjects(IntegerArrayList objectIds) {
-        privateObjects.clear();
-        privateObjects.add(objectIds);
-    }
-
     public double getAngle(int posX, int posY) {
         Point2D baseLine = new Point2D.Double(1, 0);
         Point2D point = new Point2D.Double(posX - origin.getX(), origin.getY() - posY);
