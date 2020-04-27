@@ -10,7 +10,7 @@ public class GameMetaInfo implements Serializable
 	 * 
 	 */
 	private static final long serialVersionUID = -7628362027154634902L;
-	String id;
+	public String id;
 	public String name;
 	public int connectedPlayerCount;
 	public GameMetaInfo(String id)
@@ -19,7 +19,7 @@ public class GameMetaInfo implements Serializable
 	}
 	public GameMetaInfo(GameInstance gameInstance) {
 		this.id = gameInstance.name;
-		this.name = gameInstance.name;
+		this.name = gameInstance.game.name;
 		this.connectedPlayerCount = gameInstance.getPlayerNumber();
 	}
 	

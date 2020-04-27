@@ -10,7 +10,9 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Point2D;
 
+import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
+import main.Player;
 import util.data.IntegerArrayList;
 import util.data.IntegerArrayList.ReadOnlyIntegerArrayList;
 
@@ -69,8 +71,9 @@ public class PrivateArea {
         return shape.contains(posX, posY);
     }
 
-    public void setPrivateObjects(IntegerArrayList objectIds) {
-        this.privateObjects.set(objectIds);
+    public void updatePrivateObjects(GameInstance gameInstance, Player player) {
+    	privateObjects.clear();
+    	ObjectFunctions.getOwnedStack(gameInstance, player, privateObjects);
     }
 
     public double getAngle(int posX, int posY) {

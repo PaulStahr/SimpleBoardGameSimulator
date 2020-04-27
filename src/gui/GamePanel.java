@@ -390,6 +390,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (logger.isDebugEnabled()) {logger.debug("change Update:" + action.source + " " + id);}
 		if (action instanceof GameObjectInstanceEditAction)
 		{
+			privateArea.updatePrivateObjects(gameInstance, player);
 			repaint();
 			//If direct repaint causes problems use this:
 			//JFrameUtils.runByDispatcher(repaintRunnable);

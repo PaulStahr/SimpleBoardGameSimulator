@@ -166,7 +166,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 					{
 						int playerId = Integer.parseInt(textFieldId.getText());
 						Options.set("last_connection.address", textFieldAddress.getText());
-						Options.set("last_connection.port", textFieldPort.getText());
+						Options.set("last_connection.port", Integer.valueOf(textFieldPort.getText()));
 						Options.set("last_connection.name", textFieldName.getText());
 						Options.set("last_connection.id", playerId);
 						Player player = new Player(textFieldName.getText(), playerId);
@@ -238,6 +238,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		buttonCreateGame.addActionListener(this);
 		textFieldAddress.setText(client.getAddress());
 		textFieldPort.setText(Integer.toString(client.getPort()));
+		setMinimumSize(getPreferredSize());
 	}
 	
     @Override

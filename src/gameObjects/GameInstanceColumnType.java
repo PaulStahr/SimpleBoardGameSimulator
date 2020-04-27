@@ -72,7 +72,7 @@ public enum GameInstanceColumnType implements TableColumnType{
 		{
 			case CONNECT: 		return "Connect";
 			case DELETE:		return "Delete";
-			case ID:			return gi.name;
+			case ID:			return gi.id;
 			case NAME:			return gi.name;
 			case NUM_PLAYERS:	return gi.connectedPlayerCount;
 			default:throw new IllegalArgumentException(getName());

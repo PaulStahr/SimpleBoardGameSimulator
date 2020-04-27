@@ -201,6 +201,18 @@ public class ArrayUtil {
 		return -1;
 	}
 	
+	public static final int linearSearch(int data[], int begin, int end, int value)
+	{
+		for (int i = begin; i < end; ++i)
+		{
+			if (data[i] == value)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+	
 	public static final int firstEqualIndex(Object data[], Object value)
 	{
 		return firstEqualIndex(data, 0, data.length, value);
@@ -477,5 +489,10 @@ public class ArrayUtil {
 		{
 			data[from] *= mult;
 		}
+	}
+
+	public static void indexOf(int[] data, int i, int length, int value) {
+		// TODO Auto-generated method stub
+		
 	}
 }

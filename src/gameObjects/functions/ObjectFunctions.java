@@ -1121,9 +1121,7 @@ public class ObjectFunctions {
         objectInstance.state.isActive = false;
         insertIntoStack(gamePanel, gameInstance, player, objectInstance, idList, insertId, cardMargin);
         gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
-        idList.clear();
-        getOwnedStack(gameInstance, player, idList);
-        gamePanel.privateArea.setPrivateObjects(idList);
+        gamePanel.privateArea.updatePrivateObjects(gameInstance, player);
     }
 
     public static void removeFromOwnStack(GamePanel gamePanel, GameInstance gameInstance, Player player, int id) {
@@ -1131,9 +1129,7 @@ public class ObjectFunctions {
         removeObject(gamePanel, gameInstance, player, objectInstance);
         objectInstance.state.owner_id = -1;
         objectInstance.state.inPrivateArea = false;
-        IntegerArrayList stackIds = new IntegerArrayList();
-        getOwnedStack(gameInstance, player, stackIds);
-        gamePanel.privateArea.setPrivateObjects(stackIds);
+        gamePanel.privateArea.updatePrivateObjects(gameInstance, player);
     }
 
 
