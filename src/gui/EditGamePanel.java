@@ -9,10 +9,12 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import gameObjects.GameObjectColumnType;
@@ -47,6 +49,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final JScrollPane scrollPaneGameObjectInstances = new JScrollPane(tableGameObjectInstances);
 	private final JScrollPane scrollPaneGameObjects = new JScrollPane(tableGameObjects);
 	private final JScrollPane scrollPaneImages = new JScrollPane(tableImages);
+	private final GeneralPanel panelGeneral = new GeneralPanel();	
 	private final JTabbedPane tabPane = new JTabbedPane();
 	public EditGamePanel(GameInstance gi) {
 		this.gi = gi;
@@ -54,6 +57,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(tabPane));
 		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(tabPane));
+		tabPane.addTab("Genenaral", panelGeneral);
 		tabPane.addTab("GameObjects", scrollPaneGameObjects);
 		tabPane.addTab("GameObjectInstances", scrollPaneGameObjectInstances);
 		tabPane.addTab("Images", scrollPaneImages);
@@ -74,6 +78,32 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableImages,tableAction, IMAGE_TYPES.indexOf(ImageColumnType.DELETE));
  	private final ButtonColumn deletePlayerColumn = new ButtonColumn(tablePlayer,tableAction, Player.TYPES.indexOf(PlayerColumnType.DELETE));
 	
+ 	private class GeneralPanel extends JPanel
+ 	{
+ 		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3667665407550359889L;
+		private final JLabel labelName = new JLabel("Name");
+ 		private final JTextField textFieldName = new JTextField();
+ 		private final JLabel labelBackground = new JLabel("Background");
+ 		private final JTextField textFieldBackground = new JTextField();
+ 		
+ 		public GeneralPanel()
+ 		{
+ 			GroupLayout layout = new GroupLayout(this);
+ 			setLayout(layout);
+ 			
+ 			layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelBackground)).addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(textFieldBackground)));
+ 			layout.setVerticalGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName)).addGroup(layout.createParallelGroup().addComponent(labelBackground).addComponent(textFieldBackground)));
+ 		}
+
+		public void update() {
+			textFieldName.setText(gi.name);
+			textFieldBackground.setText(gi.game.getImageKey(gi.game.background));
+		}
+ 	}
+ 	
 	/**
 	 * 
 	 */
@@ -85,6 +115,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, deleteObjectInstanceColumn);
 		JFrameUtils.updateTable(tableImages, scrollPaneImages, gi.game.images.entrySet().toArray(), IMAGE_TYPES, tableModelImages, deleteImageColumn);
 		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(), Player.TYPES, tableModelPlayer, deletePlayerColumn);
+		panelGeneral.update();
 	}
 	
 	@Override

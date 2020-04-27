@@ -29,7 +29,7 @@ public class Game {
 	 * @param image image for which the name is needed
 	 * @return name of the image or null if image not found
 	 */
-	public String getImageKey(BufferedImage image)
+	public String getImageKey(Image image)
 	{
 		for (Map.Entry<String, BufferedImage> mapEntry : images.entrySet())
 		{
