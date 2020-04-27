@@ -238,6 +238,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		buttonCreateGame.addActionListener(this);
 		textFieldAddress.setText(client.getAddress());
 		textFieldPort.setText(Integer.toString(client.getPort()));
+		setMinimumSize(getPreferredSize());
 	}
 	
     @Override
