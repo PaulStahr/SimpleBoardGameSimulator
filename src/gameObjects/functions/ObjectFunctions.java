@@ -933,7 +933,6 @@ public class ObjectFunctions {
 
     public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
         if (activeObject != null) {
-            setNewDrawValue(gamePanel.id, gameInstance, player, activeObject);
             if (activeObject.go instanceof GameObjectToken) {
                 if (gamePanel.privateArea != null && activeObject.state.owner_id != player.id && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                     IntegerArrayList stackIds = new IntegerArrayList();
@@ -1338,8 +1337,10 @@ public class ObjectFunctions {
     }
 
     public static void setNewDrawValue(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
-        objectInstance.state.drawValue = getMaxDrawValue(gameInstance) + 1;
-        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+        if (objectInstance != null) {
+            objectInstance.state.drawValue = getMaxDrawValue(gameInstance) + 1;
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+        }
     }
 
 }

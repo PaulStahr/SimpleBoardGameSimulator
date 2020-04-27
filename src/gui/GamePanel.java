@@ -1,6 +1,6 @@
 package gui;
 
-import static gameObjects.functions.DrawFunctions.drawActiveObject;
+import static gameObjects.functions.DrawFunctions.drawActiveObjectBorder;
 import static gameObjects.functions.DrawFunctions.drawBoard;
 import static gameObjects.functions.DrawFunctions.drawDiceObjects;
 import static gameObjects.functions.DrawFunctions.drawFigureObjects;
@@ -177,7 +177,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 			}
 		}
-		drawActiveObject(this, gameInstance, g, player, activeObject);
+		drawActiveObjectBorder(this, gameInstance, g, player, activeObject);
 		drawPlayerPositions(this, g, gameInstance, player, infoText);
 		drawSelectedObjects(this, g, gameInstance, player, ial);
 		drawTokensInPrivateArea(this, g, gameInstance);
@@ -627,6 +627,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void setActiveObjects(){
 		//Get active or selected objects
 		activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
+		ObjectFunctions.setNewDrawValue(this.id, gameInstance, player, activeObject);
 		activeObjects.clear();
 		if (selectedObjects.size() > 0){
 			for (int id:selectedObjects){

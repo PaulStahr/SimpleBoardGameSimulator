@@ -145,12 +145,9 @@ public class DrawFunctions {
         }
     }
 
-    public static void drawActiveObject(GamePanel gamePanel, GameInstance gameInstance, Graphics g, Player player, ObjectInstance activeObject) {
+    public static void drawActiveObjectBorder(GamePanel gamePanel, GameInstance gameInstance, Graphics g, Player player, ObjectInstance activeObject) {
         int playerId = player == null ? -1 : player.id;
         if (activeObject != null) {
-            if (activeObject.state.isActive) {
-                drawObject(g, activeObject, playerId, 1);
-            }
             if (player != null && (activeObject.state.owner_id != playerId || activeObject.state.isActive)) {
                 drawBorder(gameInstance, g, player, activeObject, 5, player.color, 1);
             }

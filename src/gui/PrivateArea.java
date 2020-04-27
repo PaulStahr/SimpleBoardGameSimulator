@@ -20,13 +20,13 @@ public class PrivateArea {
     public int elementNumber = 0;
     public IntegerArrayList privateObjects = new IntegerArrayList();
     public AffineTransform objectTransform;
-    private final AffineTransform boardTransform;
-    private final AffineTransform inverseBoardTransform;
+    private final AffineTransform boardToScreenTransformation;
+    private final AffineTransform screenToBoardTransformation;
     public Point2D.Double origin = new Point2D.Double();
 
-    public PrivateArea(GamePanel gamePanel, GameInstance gameInstance, AffineTransform boardTransform, AffineTransform inverseBoardTransformation) {
-        this.boardTransform = boardTransform;
-        this.inverseBoardTransform = inverseBoardTransformation;
+    public PrivateArea(GamePanel gamePanel, GameInstance gameInstance, AffineTransform boardToScreenTransformation, AffineTransform screenToBoardTransformation) {
+        this.boardToScreenTransformation = boardToScreenTransformation;
+        this.screenToBoardTransformation = screenToBoardTransformation;
     }
 
     public void setArea(double posX, double posY, double width,  double height, int translateX, int translateY, double rotation, double zooming) {
@@ -59,7 +59,7 @@ public class PrivateArea {
     }
 
     public boolean containsBoardCoordinates(int posX, int posY) {
-        Point2D transformedPoint = boardTransform.transform(new Point2D.Double(posX, posY), null);
+        Point2D transformedPoint = boardToScreenTransformation.transform(new Point2D.Double(posX, posY), null);
         return transformedPoint != null && shape.contains(transformedPoint);
     }
     public boolean containsScreenCoordinates(int posX, int posY) {
@@ -120,7 +120,7 @@ public class PrivateArea {
     }
 
     public Point2D transformPoint(int posX, int posY) {
-        Point2D transformedPoint = boardTransform.transform(new Point2D.Double(posX, posY), null);
+        Point2D transformedPoint = boardToScreenTransformation.transform(new Point2D.Double(posX, posY), null);
         return transformedPoint;
     }
 }

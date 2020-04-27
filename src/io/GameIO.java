@@ -842,6 +842,7 @@ public class GameIO {
 		state.belowInstanceId = is.readInt();
 		state.inPrivateArea = is.readBoolean();
 		state.owner_id = is.readInt();
+		state.drawValue = is.readLong();
 		state.posX = is.readInt();
 		state.posY = is.readInt();
 		state.rotation = is.readInt();
@@ -878,6 +879,7 @@ public class GameIO {
 		out.writeInt(state.belowInstanceId);
 		out.writeBoolean(state.inPrivateArea);
 		out.writeInt(state.owner_id);
+		out.writeLong(state.drawValue);
 		out.writeInt(state.posX);
 		out.writeInt(state.posY);
 		out.writeInt(state.rotation);
