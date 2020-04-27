@@ -751,9 +751,8 @@ public class ObjectFunctions {
         int distance = Integer.MAX_VALUE;
         if (isInPrivateArea(gamePanel, xPos, yPos)) {
             Point2D transformedPoint = gamePanel.privateArea.transformPoint(xPos, yPos);
-            if (gamePanel.privateArea.privateObjects.size() > 0) {
-                activeObject = gameInstance.getObjectInstanceById(gamePanel.privateArea.getObjectIdByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY()));
-            }
+        	int id = gamePanel.privateArea.getObjectIdByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY());
+            activeObject = gameInstance.getObjectInstanceById(id);
         } else {
             for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
                 ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
@@ -1276,7 +1275,7 @@ public class ObjectFunctions {
     public static boolean isStackInPrivateArea(GamePanel gamePanel, GameInstance gameInstance, IntegerArrayList stackIds) {
         if (stackIds.size() > 0) {
             for (int id : stackIds) {
-                if (!gamePanel.privateArea.privateObjects.contains(id))
+                if (!gamePanel.privateArea.contains(id))
                     return false;
             }
             return true;

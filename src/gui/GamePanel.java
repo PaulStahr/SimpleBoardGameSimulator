@@ -271,7 +271,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				selectedObjects.clear();
 			}
 			setActiveObjects();
-			if (activeObject != null && this.privateArea.privateObjects.contains(activeObject.id)) {
+			if (activeObject != null && this.privateArea.contains(activeObject.id)) {
 				activeObject.state.posX = player.mouseXPos - activeObject.getWidth(player.id) / 2;
 				activeObject.state.posY = player.mouseYPos - activeObject.getHeight(player.id) / 2;
 			}

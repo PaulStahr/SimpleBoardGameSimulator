@@ -157,8 +157,8 @@ public class DrawFunctions {
             AffineTransform tmp = g2d.getTransform();
             AffineTransform transform = new AffineTransform();
             transform.translate(gamePanel.getWidth()/2, gamePanel.getHeight());
-            transform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.privateObjects.size() * 2));
-            transform.rotate(gamePanel.privateArea.privateObjects.indexOf(activeObject.id) * Math.PI / (gamePanel.privateArea.privateObjects.size()));
+            transform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));
+            transform.rotate(gamePanel.privateArea.objects.indexOf(activeObject.id) * Math.PI / (gamePanel.privateArea.objects.size()));
             transform.translate(-activeObject.getWidth(player.id) / 2, -activeObject.getHeight(player.id) / 2);
             transform.translate(0, -250);
 
@@ -198,10 +198,10 @@ public class DrawFunctions {
         g2.setTransform(new AffineTransform());
         int playerId = gamePanel.player == null ? -1 : gamePanel.player.id;
         g2.translate(gamePanel.getWidth() / 2, gamePanel.getHeight());
-        if (gamePanel.privateArea.privateObjects.size() != 0)
+        if (gamePanel.privateArea.objects.size() != 0)
         {
             int activeObjectCount = 0;
-            for(int id : gamePanel.privateArea.privateObjects)
+            for(int id : gamePanel.privateArea.objects)
             {
                 ObjectInstance objectInstance = gameInstance.getObjectInstanceById(id);
                 if (objectInstance.state.isActive) {
@@ -209,8 +209,8 @@ public class DrawFunctions {
                 }
             }
 
-            g2.rotate(-Math.PI * 0.5 + Math.PI / ((gamePanel.privateArea.privateObjects.size()-activeObjectCount) * 2));
-            for(int id : gamePanel.privateArea.privateObjects)
+            g2.rotate(-Math.PI * 0.5 + Math.PI / ((gamePanel.privateArea.objects.size()-activeObjectCount) * 2));
+            for(int id : gamePanel.privateArea.objects)
             {
                 ObjectInstance objectInstance = gameInstance.getObjectInstanceById(id);
                 if (!objectInstance.state.isActive) {
@@ -218,7 +218,7 @@ public class DrawFunctions {
                     g2.translate(0, -250);
                     g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * 0.5), -(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
                     g2.translate(0, 250);
-                    g2.rotate(Math.PI / (gamePanel.privateArea.privateObjects.size()-activeObjectCount));
+                    g2.rotate(Math.PI / (gamePanel.privateArea.objects.size()-activeObjectCount));
                 }
             }
         }

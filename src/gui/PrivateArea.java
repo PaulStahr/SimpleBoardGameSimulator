@@ -12,13 +12,16 @@ import java.awt.geom.Point2D;
 
 import gameObjects.instance.GameInstance;
 import util.data.IntegerArrayList;
+import util.data.IntegerArrayList.ReadOnlyIntegerArrayList;
 
 public class PrivateArea {
     public int width = 0;
     public int height = 0;
     public Shape shape = null;
     public int elementNumber = 0;
-    public final IntegerArrayList privateObjects = new IntegerArrayList();
+
+    private final IntegerArrayList privateObjects = new IntegerArrayList();
+    public final ReadOnlyIntegerArrayList objects = privateObjects.readOnly();
     public AffineTransform objectTransform;
     private final AffineTransform boardToScreenTransformation;
     private final AffineTransform screenToBoardTransformation;
@@ -119,4 +122,8 @@ public class PrivateArea {
         Point2D transformedPoint = boardToScreenTransformation.transform(new Point2D.Double(posX, posY), null);
         return transformedPoint;
     }
+
+	public boolean contains(int id) {
+		return privateObjects.contains(id);
+	}
 }
