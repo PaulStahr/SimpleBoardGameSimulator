@@ -57,4 +57,8 @@ public class Game {
 		images.clear();
 		objects.clear();
 	}
+
+	public String[] getImageKeys() {
+		return images.keySet().toArray(new String[images.size()]);
+	}
 }
