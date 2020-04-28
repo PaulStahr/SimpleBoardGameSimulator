@@ -52,4 +52,6 @@ public class IOString {
 	public static final String SHEAR_Y = "shear_y";
 	public static final String TRANSLATE_X = "translate_x";
 	public static final String TRANSLATE_Y = "translate_y";
+	public static final String SCREEN_W = "srceen_w";
+	public static final String SCREEN_H = "srceen_h";
 }

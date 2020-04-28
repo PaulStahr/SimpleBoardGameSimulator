@@ -276,6 +276,8 @@ public class GameIO {
 				Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_Y)),
 				Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_X)),
 				Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_Y)));
+		result.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
+		result.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
 		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), result.viewTransformation);
 		return result;
 	}
@@ -294,6 +296,8 @@ public class GameIO {
 		player.screenToBoardPos[5] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_Y));
 		player.screenToBoardPos[6] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_X));
 		player.screenToBoardPos[7] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_Y));
+		player.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
+		player.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
 		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), player.viewTransformation);
 		return player;
 	}
@@ -403,6 +407,8 @@ public class GameIO {
 		elem.setAttribute(IOString.TOP_RIGHT_Y, Double.toString(player.screenToBoardPos[5]));
 		elem.setAttribute(IOString.TOP_LEFT_X, Double.toString(player.screenToBoardPos[6]));
 		elem.setAttribute(IOString.TOP_LEFT_Y, Double.toString(player.screenToBoardPos[7]));
+		elem.setAttribute(IOString.SCREEN_W, Integer.toString(player.screenWidth));
+		elem.setAttribute(IOString.SCREEN_H, Integer.toString(player.screenHeight));
 		elem.addContent(createElementFromAffineTransform(player.viewTransformation));
 		return elem;
 	}
@@ -848,6 +854,8 @@ public class GameIO {
 		player.viewTransformation.setToScale(is.readDouble(), is.readDouble());
 		player.viewTransformation.setToShear(is.readDouble(), is.readDouble());
 		player.viewTransformation.setToTranslation(is.readDouble(), is.readDouble());
+		player.screenWidth = is.readInt();
+		player.screenHeight = is.readInt();
 	}
 	
 	public static void writePlayerToStreamObject(ObjectOutputStream out, Player player) throws IOException
@@ -868,6 +876,8 @@ public class GameIO {
 		out.writeDouble(player.viewTransformation.getShearY());
 		out.writeDouble(player.viewTransformation.getTranslateX());
 		out.writeDouble(player.viewTransformation.getTranslateY());
+		out.writeInt(player.screenWidth);
+		out.writeInt(player.screenHeight);
 	}
 	
 	public static void editStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
