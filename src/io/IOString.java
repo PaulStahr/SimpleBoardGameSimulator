@@ -45,4 +45,11 @@ public class IOString {
 	public static final String CARD = "card";
 	public static final String XML = "xml";
 	public static final String GROUP = "group";
+	public static final String AFFINE_TRANSFORM = "affine_transform";
+	public static final String SCALE_X = "scale_x";
+	public static final String SCALE_Y = "scale_y";
+	public static final String SHEAR_X = "shear_x";
+	public static final String SHEAR_Y = "shear_y";
+	public static final String TRANSLATE_X = "translate_x";
+	public static final String TRANSLATE_Y = "translate_y";
 }
