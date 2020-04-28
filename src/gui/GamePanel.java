@@ -146,7 +146,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		p.add(new JLabel("View + Collect Stack: V"));
 		p.add(new JLabel("Collect Selected Objects: M"));
 		p.add(new JLabel("Collect All Objects: Strg + M"));
-		p.add(new JLabel("Dissolve Stack: R"));
+		p.add(new JLabel("Rotate Object: R"));
+		p.add(new JLabel("Dissolve Stack: Strg + R"));
 		p.add(new JLabel("Count Objects: C"));
 		p.add(new JLabel("Count Values: Strg + C"));
 		this.add(p);
@@ -478,6 +479,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 		else if (e.getKeyCode() == KeyEvent.VK_R)
+		{
+			for (ObjectInstance oi:activeObjects) {
+				ObjectFunctions.rotateStep(id, gameInstance,player, oi);
+			}
+			repaint();
+		}
+		else if (e.getKeyCode() == KeyEvent.VK_R && e.isControlDown())
 		{
 			for (ObjectInstance oi:activeObjects) {
 				ObjectFunctions.removeStackRelations(id, gameInstance, player, oi);

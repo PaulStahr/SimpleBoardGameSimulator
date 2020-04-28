@@ -295,8 +295,15 @@ public class DrawFunctions {
                 Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
                 g2d.drawString(playerOwner.getName() + " Hand Cards", objectInstance.state.posX, objectInstance.state.posY - 20);
             }
-
-            g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, (int) (objectInstance.getWidth(player.id) * zooming) + borderWidth, (int) (objectInstance.getHeight(player.id) * zooming) + borderWidth);
+            if (objectInstance.getRotation() == 0) {
+                g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, (int) (objectInstance.getWidth(player.id) * zooming) + borderWidth, (int) (objectInstance.getHeight(player.id) * zooming) + borderWidth);
+            }
+            else{
+                g2d.translate(objectInstance.state.posX + objectInstance.scale * objectInstance.getWidth(player.id) * zooming*0.5, objectInstance.state.posY + objectInstance.scale * objectInstance.getHeight(player.id) * zooming*0.5);
+                g2d.rotate(Math.toRadians(objectInstance.state.rotation));
+                g2d.drawRect(-(int) (objectInstance.scale * objectInstance.getWidth(player.id) * zooming*0.5),-(int) (objectInstance.scale * objectInstance.getHeight(player.id) * zooming * 0.5), (int) (objectInstance.scale * objectInstance.getWidth(player.id) * zooming), (int) (objectInstance.scale * objectInstance.getHeight(player.id) * zooming));
+                //g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, (int) (objectInstance.getWidth(player.id) * zooming) + borderWidth, (int) (objectInstance.getHeight(player.id) * zooming) + borderWidth);
+            }
             g2d.setTransform(tmp);
         }
     }

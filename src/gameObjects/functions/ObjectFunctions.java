@@ -1351,4 +1351,9 @@ public class ObjectFunctions {
         return -1;
     }
 
+    public static void rotateStep(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
+        objectInstance.state.rotation = objectInstance.getRotation() + objectInstance.rotationStep;
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+    }
+
 }
