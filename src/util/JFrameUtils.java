@@ -40,6 +40,7 @@ import java.util.function.Supplier;
 
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JCheckBoxMenuItem;
@@ -384,6 +385,12 @@ public class JFrameUtils{
 		if (value instanceof Boolean){	return value;}
 			else if (value == null){	return null;}
 			else{						return String.valueOf(value);}
+	}
+
+	public static <E>void updateComboBox(JComboBox<E> sendTo, E[] sendToNames) {
+		Object selected = sendTo.getSelectedItem();
+		sendTo.setModel(new DefaultComboBoxModel<E>(sendToNames));
+		sendTo.setSelectedItem(selected);
 	}
     
 

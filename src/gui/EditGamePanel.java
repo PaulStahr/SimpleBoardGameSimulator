@@ -1,7 +1,10 @@
 package gui;
 
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Map.Entry;
@@ -9,12 +12,15 @@ import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
 import gameObjects.GameObjectColumnType;
@@ -23,6 +29,7 @@ import gameObjects.ImageColumnType;
 import gameObjects.PlayerColumnType;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectInstanceEditAction;
+import gameObjects.action.GameStructureEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
@@ -77,8 +84,9 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  	private final ButtonColumn deleteObjectInstanceColumn = new ButtonColumn(tableGameObjects,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
  	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableImages,tableAction, IMAGE_TYPES.indexOf(ImageColumnType.DELETE));
  	private final ButtonColumn deletePlayerColumn = new ButtonColumn(tablePlayer,tableAction, Player.TYPES.indexOf(PlayerColumnType.DELETE));
-	
- 	private class GeneralPanel extends JPanel
+	private boolean isUpdating = false;
+	 	
+ 	private class GeneralPanel extends JPanel implements ItemListener, DocumentListener
  	{
  		/**
 		 * 
@@ -87,21 +95,55 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		private final JLabel labelName = new JLabel("Name");
  		private final JTextField textFieldName = new JTextField();
  		private final JLabel labelBackground = new JLabel("Background");
- 		private final JTextField textFieldBackground = new JTextField();
- 		
+ 		private final JComboBox<String> comboBoxBackground = new JComboBox<String>();
+		
  		public GeneralPanel()
  		{
  			GroupLayout layout = new GroupLayout(this);
  			setLayout(layout);
  			
- 			layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelBackground)).addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(textFieldBackground)));
- 			layout.setVerticalGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName)).addGroup(layout.createParallelGroup().addComponent(labelBackground).addComponent(textFieldBackground)));
+ 			layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelBackground)).addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(comboBoxBackground)));
+ 			layout.setVerticalGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName)).addGroup(layout.createParallelGroup().addComponent(labelBackground).addComponent(comboBoxBackground)));
  		}
 
 		public void update() {
 			textFieldName.setText(gi.name);
-			textFieldBackground.setText(gi.game.getImageKey(gi.game.background));
+			textFieldName.getDocument().addDocumentListener(this);
+			JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
+			comboBoxBackground.setSelectedItem(gi.game.getImageKey(gi.game.background));
+			comboBoxBackground.addItemListener(this);
 		}
+
+		@Override
+		public void itemStateChanged(ItemEvent arg0) {
+			if (isUpdating)
+			{
+				return;
+			}
+			if (arg0.getStateChange() == ItemEvent.SELECTED) {
+		        gi.game.background = gi.game.images.get(arg0.getItem());
+		        gi.update(new GameStructureEditAction(0));
+			}
+		}
+		
+		
+		public void update(DocumentEvent event)
+		{
+			if (isUpdating)
+			{
+				return;
+			}
+			gi.name = textFieldName.getText();
+		}
+
+		@Override
+		public void changedUpdate(DocumentEvent arg0) {update(arg0);	}
+
+		@Override
+		public void insertUpdate(DocumentEvent arg0) {update(arg0);}
+
+		@Override
+		public void removeUpdate(DocumentEvent arg0) {update(arg0);}
  	}
  	
 	/**
@@ -111,15 +153,25 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 
 	private void updateTables()
 	{
+    	if (!EventQueue.isDispatchThread())
+    	{
+    		throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");
+    	}
+		isUpdating = true;
 		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, deleteObjectColumn);
 		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, deleteObjectInstanceColumn);
 		JFrameUtils.updateTable(tableImages, scrollPaneImages, gi.game.images.entrySet().toArray(), IMAGE_TYPES, tableModelImages, deleteImageColumn);
 		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(), Player.TYPES, tableModelPlayer, deletePlayerColumn);
 		panelGeneral.update();
+		isUpdating = false;
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent ae) {
+		if (isUpdating)
+		{
+			return;
+		}
 		if (ae instanceof ButtonColumn.TableButtonActionEvent)
 		{
 			ButtonColumn.TableButtonActionEvent event = (ButtonColumn.TableButtonActionEvent)ae;

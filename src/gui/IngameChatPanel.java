@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -84,9 +83,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 				targetIndex++;
 			}
 		}
-		Object selected = sendTo.getSelectedItem();
-		sendTo.setModel(new DefaultComboBoxModel<String>(sendToNames));
-		sendTo.setSelectedItem(selected);
+		JFrameUtils.updateComboBox(sendTo, sendToNames);
 	}
 
 	public IngameChatPanel(GameInstance game, Player player)
@@ -185,7 +182,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 			// chop off the sender part from the message:			
 			String message = rawMessage.substring(rawMessage.indexOf(":")+1);
 			String tabName;
-			if ( sender.matches(player.getName()) | recipient.matches(player.getName())  | recipient.matches("all")) {
+			if ( sender.equals(player.getName()) || recipient.equals(player.getName())  || recipient.equals("all")) {
 				// The message was sent by me or it was sent to me or it was sent to all (which means also to me)
 
 				// Find the tab to add the message to
