@@ -1,6 +1,7 @@
 package io;
 
 import java.awt.Color;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -261,7 +262,7 @@ public class GameIO {
 	 */
 	private static Player createPlayerFromElement(Element elem)
 	{
-		return new Player(
+		Player result = new Player(
 				elem.getAttributeValue(IOString.NAME),
 				Integer.parseInt(elem.getAttributeValue(IOString.ID)),
 				new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR))),
@@ -275,8 +276,12 @@ public class GameIO {
 				Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_Y)),
 				Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_X)),
 				Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_Y)));
+		result.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
+		result.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
+		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), result.screenToBoardTransformation);
+		return result;
 	}
-
+	
 	private static Player editPlayerFromElement(Element elem, Player player)
 	{
 		player.setName(elem.getAttributeValue(IOString.NAME));
@@ -291,6 +296,9 @@ public class GameIO {
 		player.screenToBoardPos[5] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_Y));
 		player.screenToBoardPos[6] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_X));
 		player.screenToBoardPos[7] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_Y));
+		player.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
+		player.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
+		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), player.screenToBoardTransformation);
 		return player;
 	}
 
@@ -358,6 +366,27 @@ public class GameIO {
 		}
 		return elem;
 	}
+	
+	private static Element createElementFromAffineTransform(AffineTransform at)
+	{
+		Element elem = new Element(IOString.AFFINE_TRANSFORM);
+		elem.setAttribute(IOString.SCALE_X, Double.toString(at.getScaleX()));
+		elem.setAttribute(IOString.SCALE_Y, Double.toString(at.getScaleY()));
+		elem.setAttribute(IOString.SHEAR_X, Double.toString(at.getShearX()));
+		elem.setAttribute(IOString.SHEAR_Y, Double.toString(at.getShearY()));
+		elem.setAttribute(IOString.TRANSLATE_X, Double.toString(at.getTranslateX()));
+		elem.setAttribute(IOString.TRANSLATE_Y, Double.toString(at.getTranslateY()));
+		return elem;
+	}
+	
+	private static Element editAffineTransformFromElement(Element elem, AffineTransform at)
+	{
+		at.setTransform(
+				Double.parseDouble(elem.getAttributeValue(IOString.SCALE_X)), Double.parseDouble(elem.getAttributeValue(IOString.SHEAR_Y)),
+				Double.parseDouble(elem.getAttributeValue(IOString.SCALE_Y)), Double.parseDouble(elem.getAttributeValue(IOString.SHEAR_X)),
+				Double.parseDouble(elem.getAttributeValue(IOString.TRANSLATE_X)), Double.parseDouble(elem.getAttributeValue(IOString.TRANSLATE_Y)));
+		return elem;
+	}
 
 	/**
 	 * Creates a new Element that represents the @param player.
@@ -379,6 +408,9 @@ public class GameIO {
 		elem.setAttribute(IOString.TOP_RIGHT_Y, Double.toString(player.screenToBoardPos[5]));
 		elem.setAttribute(IOString.TOP_LEFT_X, Double.toString(player.screenToBoardPos[6]));
 		elem.setAttribute(IOString.TOP_LEFT_Y, Double.toString(player.screenToBoardPos[7]));
+		elem.setAttribute(IOString.SCREEN_W, Integer.toString(player.screenWidth));
+		elem.setAttribute(IOString.SCREEN_H, Integer.toString(player.screenHeight));
+		elem.addContent(createElementFromAffineTransform(player.screenToBoardTransformation));
 		return elem;
 	}
 
@@ -479,7 +511,7 @@ public class GameIO {
         }
         
         Element elem_back = new Element(IOString.BACKGROUND);
-        elem_back.setText(game.getImageKey((BufferedImage) game.background));
+        elem_back.setText(game.getImageKey(game.background));
         root_game.addContent(elem_back);
     	
         ZipEntry gameZipOutput = new ZipEntry(IOString.GAME_XML);
@@ -820,6 +852,9 @@ public class GameIO {
 		for (int i=0;i<player.screenToBoardPos.length; ++i){
 			player.screenToBoardPos[i] = is.readDouble();
 		}
+		player.screenToBoardTransformation.setTransform(is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble());
+		player.screenWidth = is.readInt();
+		player.screenHeight = is.readInt();
 	}
 	
 	public static void writePlayerToStreamObject(ObjectOutputStream out, Player player) throws IOException
@@ -834,6 +869,14 @@ public class GameIO {
 		for (int i=0;i<player.screenToBoardPos.length; ++i){
 			out.writeDouble(player.screenToBoardPos[i]);
 		}
+		out.writeDouble(player.screenToBoardTransformation.getScaleX());
+		out.writeDouble(player.screenToBoardTransformation.getShearY());
+		out.writeDouble(player.screenToBoardTransformation.getShearX());
+		out.writeDouble(player.screenToBoardTransformation.getScaleY());
+		out.writeDouble(player.screenToBoardTransformation.getTranslateX());
+		out.writeDouble(player.screenToBoardTransformation.getTranslateY());
+		out.writeInt(player.screenWidth);
+		out.writeInt(player.screenHeight);
 	}
 	
 	public static void editStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
