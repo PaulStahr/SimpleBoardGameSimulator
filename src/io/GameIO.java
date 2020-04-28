@@ -278,7 +278,7 @@ public class GameIO {
 				Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_Y)));
 		result.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
 		result.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
-		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), result.viewTransformation);
+		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), result.screenToBoardTransformation);
 		return result;
 	}
 	
@@ -298,7 +298,7 @@ public class GameIO {
 		player.screenToBoardPos[7] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_Y));
 		player.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
 		player.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
-		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), player.viewTransformation);
+		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), player.screenToBoardTransformation);
 		return player;
 	}
 
@@ -410,7 +410,7 @@ public class GameIO {
 		elem.setAttribute(IOString.TOP_LEFT_Y, Double.toString(player.screenToBoardPos[7]));
 		elem.setAttribute(IOString.SCREEN_W, Integer.toString(player.screenWidth));
 		elem.setAttribute(IOString.SCREEN_H, Integer.toString(player.screenHeight));
-		elem.addContent(createElementFromAffineTransform(player.viewTransformation));
+		elem.addContent(createElementFromAffineTransform(player.screenToBoardTransformation));
 		return elem;
 	}
 
@@ -852,7 +852,7 @@ public class GameIO {
 		for (int i=0;i<player.screenToBoardPos.length; ++i){
 			player.screenToBoardPos[i] = is.readDouble();
 		}
-		player.viewTransformation.setTransform(is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble());
+		player.screenToBoardTransformation.setTransform(is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble());
 		player.screenWidth = is.readInt();
 		player.screenHeight = is.readInt();
 	}
@@ -869,12 +869,12 @@ public class GameIO {
 		for (int i=0;i<player.screenToBoardPos.length; ++i){
 			out.writeDouble(player.screenToBoardPos[i]);
 		}
-		out.writeDouble(player.viewTransformation.getScaleX());
-		out.writeDouble(player.viewTransformation.getShearY());
-		out.writeDouble(player.viewTransformation.getShearX());
-		out.writeDouble(player.viewTransformation.getScaleY());
-		out.writeDouble(player.viewTransformation.getTranslateX());
-		out.writeDouble(player.viewTransformation.getTranslateY());
+		out.writeDouble(player.screenToBoardTransformation.getScaleX());
+		out.writeDouble(player.screenToBoardTransformation.getShearY());
+		out.writeDouble(player.screenToBoardTransformation.getShearX());
+		out.writeDouble(player.screenToBoardTransformation.getScaleY());
+		out.writeDouble(player.screenToBoardTransformation.getTranslateX());
+		out.writeDouble(player.screenToBoardTransformation.getTranslateY());
 		out.writeInt(player.screenWidth);
 		out.writeInt(player.screenHeight);
 	}

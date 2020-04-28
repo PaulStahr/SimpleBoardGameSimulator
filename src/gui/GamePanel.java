@@ -601,7 +601,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		if (player != null)
 		{
-			player.viewTransformation.setTransform(boardToScreenTransformation);
+			player.screenToBoardTransformation.setTransform(screenToBoardTransformation);
 			player.screenWidth = getWidth();
 			player.screenHeight = getHeight();
 		}

@@ -11,7 +11,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 
 import org.slf4j.Logger;
@@ -80,14 +79,9 @@ public class DrawFunctions {
             Player p = gameInstance.getPlayerByIndex(pIdx);
             g.setColor(p.color);
             AffineTransform inverse = null;
-            try {
-            	g2.setTransform(tmp);
-				g2.transform(inverse = p.viewTransformation.createInverse());
-			} catch (NoninvertibleTransformException e) {
-				// TODO Auto-generated catch block
-				//e.printStackTrace();
-			}
-            //if(isInPrivateArea(gamePanel, p.mouseXPos, p.mouseYPos))
+        	g2.setTransform(tmp);
+			g2.transform(inverse = p.screenToBoardTransformation);
+			//if(isInPrivateArea(gamePanel, p.mouseXPos, p.mouseYPos))
                 //TODO p.actionString = "Private Area";
             /*if(p.id == player.id)
             {

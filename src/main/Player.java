@@ -19,7 +19,7 @@ public class Player {
 	public int mouseXPos = 0;
 	public int mouseYPos = 0;
 	public int screenWidth = 0, screenHeight = 0;
-	public final AffineTransform viewTransformation = new AffineTransform();
+	public final AffineTransform screenToBoardTransformation = new AffineTransform();
 
 	public final double[] screenToBoardPos = new double[8];
 
