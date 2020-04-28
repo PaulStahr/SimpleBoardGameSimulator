@@ -1345,10 +1345,7 @@ public class ObjectFunctions {
 
     public static int getStackIdOfObject(GameInstance gameInstance, ObjectInstance objectInstance, IntegerArrayList ial){
         ObjectFunctions.getStack(gameInstance, objectInstance, ial);
-        if (ial.contains(objectInstance.id)){
-            return ial.indexOf(objectInstance.id);
-        }
-        return -1;
+        return ial.indexOf(objectInstance.id);
     }
 
 }

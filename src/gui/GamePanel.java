@@ -324,11 +324,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (player != null)
 			{
 				ObjectFunctions.getOwnedStack(gameInstance,player,ial);
-				String string = "";
+				StringBuilder strB = new StringBuilder();
 				for (int id: ial){
-					string += String.valueOf(id) + " ";
+					strB.append(id).append(' ');
 				}
-				outText = string;
+				outText = strB.toString();
 				//int xDiff = objOrigPosX - mousePressedGamePos.getXI() + mouseBoardPos.getXI();
 				//int yDiff = objOrigPosY - mousePressedGamePos.getYI() + mouseBoardPos.getYI();
 				screenToBoardPos(mouseScreenX = arg0.getX(), mouseScreenY = arg0.getY(), mouseBoardPos);
