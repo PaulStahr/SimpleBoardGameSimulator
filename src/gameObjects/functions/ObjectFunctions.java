@@ -684,7 +684,9 @@ public class ObjectFunctions {
                 if (belowObject != null) {
                     aboveObject.state.belowInstanceId = belowObject.id;
                     belowObject.state.aboveInstanceId = aboveObject.id;
-                    moveAboveStackTo(gamePanel, gameInstance, player, objectInstance, objectInstance.state.posX, objectInstance.state.posY, false);
+                    if(!isStackCollected(gameInstance,aboveObject)) {
+                        moveAboveStackTo(gamePanel, gameInstance, player, objectInstance, objectInstance.state.posX, objectInstance.state.posY, false);
+                    }
                     gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, belowObject));
                 } else {
                     aboveObject.state.belowInstanceId = -1;
@@ -871,10 +873,9 @@ public class ObjectFunctions {
                 ObjectInstance currentInstance = gameInstance.getObjectInstanceById(id);
                 if (player.id != currentInstance.state.owner_id && currentInstance.state.owner_id == -1) {
                     insertIntoOwnStack(gamePanel, gameInstance, player, currentInstance, 0, (int) (currentInstance.getWidth(player.id) * gamePanel.cardOverlap));
-                    gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentInstance));
                 }
             }
-            ObjectFunctions.displayStack(gamePanel, gameInstance, player, objectInstance, (int) (objectInstance.getWidth(player.id) * gamePanel.cardOverlap));
+            //ObjectFunctions.displayStack(gamePanel, gameInstance, player, objectInstance, (int) (objectInstance.getWidth(player.id) * gamePanel.cardOverlap));
         }
     }
 
@@ -918,18 +919,23 @@ public class ObjectFunctions {
     }
 
     //TODO can only handle one stack
-    public static void getOwnedStack(GameInstance gameInstance, Player player, IntegerArrayList idList) {
+    public static void getOwnedStack(GameInstance gameInstance, Player player, IntegerArrayList idList, boolean ignoreActiveObject) {
         idList.clear();
         for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
-            if (oi.state.owner_id == player.id) {
+            if (oi.state.owner_id == player.id && (!ignoreActiveObject || !oi.state.isActive)) {
                 getStack(gameInstance, oi, idList);
                 return;
             }
         }
     }
 
-    public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
+    public static void getOwnedStack(GameInstance gameInstance, Player player, IntegerArrayList idList) {
+        getOwnedStack(gameInstance,player,idList,true);
+    }
+
+
+        public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
         if (activeObject != null) {
             if (activeObject.go instanceof GameObjectToken) {
                 if (gamePanel.privateArea != null && activeObject.state.owner_id != player.id && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
@@ -1335,6 +1341,14 @@ public class ObjectFunctions {
             objectInstance.state.drawValue = getMaxDrawValue(gameInstance) + 1;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
         }
+    }
+
+    public static int getStackIdOfObject(GameInstance gameInstance, ObjectInstance objectInstance, IntegerArrayList ial){
+        ObjectFunctions.getStack(gameInstance, objectInstance, ial);
+        if (ial.contains(objectInstance.id)){
+            return ial.indexOf(objectInstance.id);
+        }
+        return -1;
     }
 
 }

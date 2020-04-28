@@ -23,7 +23,7 @@ public class MoveFunctions {
                 ObjectFunctions.removeObject(gamePanel, gameInstance, player, activeObject);
             }
             /*Remove top N dragged objects from stack if middle mouse button is held*/
-            else if(mouseWheelValue > 0 && SwingUtilities.isMiddleMouseButton(arg0))
+            else if(mouseWheelValue > 0 && SwingUtilities.isMiddleMouseButton(arg0) && !selectedDrag)
             {
                 ObjectFunctions.splitStackAtN(gamePanel.id, gameInstance, player, activeObject, mouseWheelValue);
             }
@@ -35,8 +35,8 @@ public class MoveFunctions {
                 ObjectFunctions.displayStack(gamePanel, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, activeObject), (int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap));
             }
         }
-        else if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0)) && arg0.isShiftDown() && activeObject != null && activeObject.state.owner_id != player.id) {
-            /*Remove top card*/
+         /*Get bottom card with shift*/
+        else if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0)) && arg0.isShiftDown() && activeObject != null && activeObject.state.owner_id != -1) {
             ObjectFunctions.removeObject(gamePanel, gameInstance, player, activeObject);
             ObjectFunctions.moveObjectTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player.id, activeObject.id));
