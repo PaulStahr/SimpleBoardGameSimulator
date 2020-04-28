@@ -381,9 +381,10 @@ public class GameIO {
 	
 	private static Element editAffineTransformFromElement(Element elem, AffineTransform at)
 	{
-		at.setToScale(Double.parseDouble(elem.getAttributeValue(IOString.SCALE_X)), Double.parseDouble(elem.getAttributeValue(IOString.SCALE_Y)));
-		at.setToShear(Double.parseDouble(elem.getAttributeValue(IOString.SHEAR_X)), Double.parseDouble(elem.getAttributeValue(IOString.SHEAR_Y)));
-		at.setToTranslation(Double.parseDouble(elem.getAttributeValue(IOString.TRANSLATE_X)), Double.parseDouble(elem.getAttributeValue(IOString.TRANSLATE_Y)));
+		at.setTransform(
+				Double.parseDouble(elem.getAttributeValue(IOString.SCALE_X)), Double.parseDouble(elem.getAttributeValue(IOString.SHEAR_Y)),
+				Double.parseDouble(elem.getAttributeValue(IOString.SCALE_Y)), Double.parseDouble(elem.getAttributeValue(IOString.SHEAR_X)),
+				Double.parseDouble(elem.getAttributeValue(IOString.TRANSLATE_X)), Double.parseDouble(elem.getAttributeValue(IOString.TRANSLATE_Y)));
 		return elem;
 	}
 
@@ -851,9 +852,7 @@ public class GameIO {
 		for (int i=0;i<player.screenToBoardPos.length; ++i){
 			player.screenToBoardPos[i] = is.readDouble();
 		}
-		player.viewTransformation.setToScale(is.readDouble(), is.readDouble());
-		player.viewTransformation.setToShear(is.readDouble(), is.readDouble());
-		player.viewTransformation.setToTranslation(is.readDouble(), is.readDouble());
+		player.viewTransformation.setTransform(is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble());
 		player.screenWidth = is.readInt();
 		player.screenHeight = is.readInt();
 	}
@@ -871,9 +870,9 @@ public class GameIO {
 			out.writeDouble(player.screenToBoardPos[i]);
 		}
 		out.writeDouble(player.viewTransformation.getScaleX());
-		out.writeDouble(player.viewTransformation.getScaleY());
-		out.writeDouble(player.viewTransformation.getShearX());
 		out.writeDouble(player.viewTransformation.getShearY());
+		out.writeDouble(player.viewTransformation.getShearX());
+		out.writeDouble(player.viewTransformation.getScaleY());
 		out.writeDouble(player.viewTransformation.getTranslateX());
 		out.writeDouble(player.viewTransformation.getTranslateY());
 		out.writeInt(player.screenWidth);

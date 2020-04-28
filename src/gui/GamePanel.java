@@ -172,12 +172,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHints(rh);
         g2.setTransform(boardToScreenTransformation);
-        try {
-			screenToBoardTransformation.setTransform(boardToScreenTransformation.createInverse());
-		} catch (NoninvertibleTransformException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 
         //Draw all objects not in some private area
 		for (int idx:ObjectFunctions.getDrawOrder(gameInstance)) {
@@ -194,11 +188,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 		drawActiveObjectBorder(this, gameInstance, g, player, activeObject);
-		try {
-			drawPlayerPositions(this, g, gameInstance, player, infoText);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		drawPlayerPositions(this, g, gameInstance, player, infoText);
 		drawSelectedObjects(this, g, gameInstance, player, ial);
 		drawTokensInPrivateArea(this, g, gameInstance);
 
@@ -586,6 +576,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		boardToScreenTransformation.scale(zooming, zooming);
 		boardToScreenTransformation.rotate(rotation);
 		boardToScreenTransformation.translate(translateX, translateY);
+		try {
+			screenToBoardTransformation.setTransform(boardToScreenTransformation);
+			screenToBoardTransformation.invert();
+		} catch (NoninvertibleTransformException e) {
+			logger.error("Transformation not invertible");
+		}
 		if (player != null){
 			Point2D point = new Point2D.Double();
 			
@@ -603,7 +599,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			player.setBoardPos(3, point);
 			gameInstance.update(new GamePlayerEditAction(id, player, player));
 		}
-
+		if (player != null)
+		{
+			player.viewTransformation.setTransform(boardToScreenTransformation);
+			player.screenWidth = getWidth();
+			player.screenHeight = getHeight();
+		}
 		//move own stack to private bottom
 		/*
 		if (player != null) {
