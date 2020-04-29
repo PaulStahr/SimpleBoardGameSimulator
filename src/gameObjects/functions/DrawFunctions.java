@@ -75,69 +75,31 @@ public class DrawFunctions {
     public static void drawPlayerPositions(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, String infoText) {
         Graphics2D g2 = (Graphics2D)g;
         AffineTransform tmp = g2.getTransform();
+        BasicStroke wideStroke = new BasicStroke(4);
+        BasicStroke basicStroke = new BasicStroke();
         for(int pIdx = 0;pIdx < gameInstance.getPlayerNumber();++pIdx) {
             Player p = gameInstance.getPlayerByIndex(pIdx);
             g.setColor(p.color);
-            AffineTransform inverse = null;
-        	g2.setTransform(tmp);
-			g2.transform(inverse = p.screenToBoardTransformation);
-			//if(isInPrivateArea(gamePanel, p.mouseXPos, p.mouseYPos))
-                //TODO p.actionString = "Private Area";
-            /*if(p.id == player.id)
-            {
-                g2.fillRect(gamePanel.mouseScreenX - 5, gamePanel.mouseScreenY - 5, 10, 10);
-                g2.drawString(p.getName(), gamePanel.mouseScreenX + 15, gamePanel.mouseScreenY + 5);
-                g2.drawString(p.actionString, gamePanel.mouseScreenX - 5, gamePanel.mouseScreenY - 20);
-                g.drawString(infoText, gamePanel.mouseScreenX - 25, gamePanel.mouseScreenY + 5);
-                g2.setTransform(tmp);
-            }
-            else {*/
-
-                //draw screen position of other players
-                /*Point2D leftBottomCorner = new Point2D.Double();
-                Point2D rightBottomCorner = new Point2D.Double();
-                Point2D rightTopCorner = new Point2D.Double();
-                Point2D leftTopCorner = new Point2D.Double();*/
-
-                if (true)
-                {
-                	/*leftBottomCorner.setLocation(p.screenToBoardPos[0], p.screenToBoardPos[1]);
-                	rightBottomCorner.setLocation(p.screenToBoardPos[2], p.screenToBoardPos[3]);
-                    rightTopCorner.setLocation(p.screenToBoardPos[4], p.screenToBoardPos[5]);
-                    leftTopCorner.setLocation(p.screenToBoardPos[6], p.screenToBoardPos[7]);*/
-
-
-                    /*Point2D boardMiddle = new Point2D.Double(1/2*(leftBottomCorner.getX()+rightBottomCorner.getX()),1/2*(leftBottomCorner.getY()+rightBottomCorner.getY()));
-                    gamePanel.boardToScreenPos(boardMiddle, boardMiddle);
-                    gamePanel.boardToScreenPos(leftBottomCorner, leftBottomCorner);
-                    gamePanel.boardToScreenPos(rightBottomCorner, rightBottomCorner);
-                    gamePanel.boardToScreenPos(rightTopCorner, rightTopCorner);
-                    gamePanel.boardToScreenPos(leftTopCorner, leftTopCorner);*/
-
-                    //double screenLength = (rightBottomCorner.getX() - leftBottomCorner.getX())*(rightBottomCorner.getX() - leftBottomCorner.getX()) + (rightBottomCorner.getY() - leftBottomCorner.getY())*(rightBottomCorner.getY() - leftBottomCorner.getY());
-
-                    g2.setStroke(new BasicStroke(4));
-                    g2.drawLine(40, p.screenHeight, p.screenWidth, p.screenHeight);
-                    //g2.drawLine((int) rightBottomCorner.getX(), (int) rightBottomCorner.getY(), (int) rightTopCorner.getX(), (int) rightTopCorner.getY());
-                    //g2.drawLine((int) leftBottomCorner.getX(), (int) leftBottomCorner.getY(), (int) leftTopCorner.getX(), (int) leftTopCorner.getY());
-
-                    int imageNumber = p.id % 10;
-                    BufferedImage img = gamePanel.playerImages[imageNumber];
-                    g2.drawImage(img, null, (p.screenWidth-img.getWidth()) / 2, p.screenHeight-100);
-                    //g2.drawRect((int) leftTopCorner.getX(), (int) leftTopCorner.getY(), (int) abs(leftTopCorner.getX() - rightTopCorner.getX()), (int) abs(leftTopCorner.getY() - leftBottomCorner.getY()));
-                    //g2.drawString("\u1F981", (int) (leftBottomCorner.getX() + rightBottomCorner.getX()/2),(int) leftBottomCorner.getY());
-                    g2.setStroke(new BasicStroke());
-                    g2.setTransform(tmp);
-               // }
-
-                //draw mouse position of other players
-                g2.translate(p.mouseXPos-5, p.mouseYPos-5);
-                g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
-                g.fillRect(0, 0, 10, 10);
-                g.drawString(p.getName(),  15,  5);
-                g.drawString(p.actionString,  5, 20);
-            }
+            g2.setTransform(tmp);
+			g2.transform(p.screenToBoardTransformation);
+	        g2.setStroke(wideStroke);
+            g2.drawLine(40, p.screenHeight, p.screenWidth, p.screenHeight);
+            int imageNumber = p.id % 10;
+            if (p.id != player.id)
+			{
+                BufferedImage img = gamePanel.playerImages[imageNumber];
+                g2.drawImage(img, null, (p.screenWidth-img.getWidth()) / 2, p.screenHeight-100);
+			}
+            g2.setTransform(tmp);
+            //draw mouse position of other players
+            g2.setStroke(basicStroke);
+            g2.translate(p.mouseXPos-5, p.mouseYPos-5);
+            g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
+            g.fillRect(0, 0, 10, 10);
+            g.drawString(p.getName(),  15,  5);
         }
+        g.drawString(player.actionString,  5, 20);
+        g.drawString(infoText, gamePanel.mouseScreenX - 25, gamePanel.mouseScreenY + 5);
         g2.setTransform(tmp);
     }
 

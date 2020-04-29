@@ -21,14 +21,6 @@ public class IOString {
 	public static final String COLOR = "color";
 	public static final String MOUSE_X = "mouse_x";
 	public static final String MOUSE_Y = "mouse_y";
-	public static final String BOTTOM_LEFT_X = "bottom_left_x";
-	public static final String BOTTOM_LEFT_Y = "bottom_left_y";
-	public static final String BOTTOM_RIGHT_X = "bottom_right_x";
-	public static final String BOTTOM_RIGHT_Y = "bottom_right_y";
-	public static final String TOP_RIGHT_X = "top_right_x";
-	public static final String TOP_RIGHT_Y = "top_right_y";
-	public static final String TOP_LEFT_X = "top_left_x";
-	public static final String TOP_LEFT_Y = "top_left_y";
 	public static final String TYPE = "type";
 	public static final String WIDTH = "width";
 	public static final String HEIGHT = "height";

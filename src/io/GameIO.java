@@ -267,15 +267,7 @@ public class GameIO {
 				Integer.parseInt(elem.getAttributeValue(IOString.ID)),
 				new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR))),
 				Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X)),
-				Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y)),
-				Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_LEFT_X)),
-				Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_LEFT_Y)),
-				Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_RIGHT_X)),
-				Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_RIGHT_Y)),
-				Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_X)),
-				Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_Y)),
-				Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_X)),
-				Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_Y)));
+				Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y)));
 		result.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
 		result.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
 		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), result.screenToBoardTransformation);
@@ -288,14 +280,6 @@ public class GameIO {
 		player.color = new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR)));
 		player.mouseXPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X));
 		player.mouseYPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y));
-		player.screenToBoardPos[0] = Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_LEFT_X));
-		player.screenToBoardPos[1] = Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_LEFT_Y));
-		player.screenToBoardPos[2] = Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_RIGHT_X));
-		player.screenToBoardPos[3] = Double.parseDouble(elem.getAttributeValue(IOString.BOTTOM_RIGHT_Y));
-		player.screenToBoardPos[4] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_X));
-		player.screenToBoardPos[5] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_RIGHT_Y));
-		player.screenToBoardPos[6] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_X));
-		player.screenToBoardPos[7] = Double.parseDouble(elem.getAttributeValue(IOString.TOP_LEFT_Y));
 		player.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
 		player.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
 		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), player.screenToBoardTransformation);
@@ -400,14 +384,6 @@ public class GameIO {
 		elem.setAttribute(IOString.COLOR, Integer.toString(player.color.getRGB()));
 		elem.setAttribute(IOString.MOUSE_X, Integer.toString(player.mouseXPos));
 		elem.setAttribute(IOString.MOUSE_Y, Integer.toString(player.mouseYPos));
-		elem.setAttribute(IOString.BOTTOM_LEFT_X, Double.toString(player.screenToBoardPos[0]));
-		elem.setAttribute(IOString.BOTTOM_LEFT_Y, Double.toString(player.screenToBoardPos[1]));
-		elem.setAttribute(IOString.BOTTOM_RIGHT_X, Double.toString(player.screenToBoardPos[2]));
-		elem.setAttribute(IOString.BOTTOM_RIGHT_Y, Double.toString(player.screenToBoardPos[3]));
-		elem.setAttribute(IOString.TOP_RIGHT_X, Double.toString(player.screenToBoardPos[4]));
-		elem.setAttribute(IOString.TOP_RIGHT_Y, Double.toString(player.screenToBoardPos[5]));
-		elem.setAttribute(IOString.TOP_LEFT_X, Double.toString(player.screenToBoardPos[6]));
-		elem.setAttribute(IOString.TOP_LEFT_Y, Double.toString(player.screenToBoardPos[7]));
 		elem.setAttribute(IOString.SCREEN_W, Integer.toString(player.screenWidth));
 		elem.setAttribute(IOString.SCREEN_H, Integer.toString(player.screenHeight));
 		elem.addContent(createElementFromAffineTransform(player.screenToBoardTransformation));
@@ -849,9 +825,6 @@ public class GameIO {
 		player.mouseXPos = is.readInt();
 		player.mouseYPos = is.readInt();
 		//read player window position
-		for (int i=0;i<player.screenToBoardPos.length; ++i){
-			player.screenToBoardPos[i] = is.readDouble();
-		}
 		player.screenToBoardTransformation.setTransform(is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble());
 		player.screenWidth = is.readInt();
 		player.screenHeight = is.readInt();
@@ -866,9 +839,6 @@ public class GameIO {
 		out.writeInt(player.mouseXPos);
 		out.writeInt(player.mouseYPos);
 		//write player window position
-		for (int i=0;i<player.screenToBoardPos.length; ++i){
-			out.writeDouble(player.screenToBoardPos[i]);
-		}
 		out.writeDouble(player.screenToBoardTransformation.getScaleX());
 		out.writeDouble(player.screenToBoardTransformation.getShearY());
 		out.writeDouble(player.screenToBoardTransformation.getShearX());

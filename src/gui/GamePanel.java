@@ -584,28 +584,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		} catch (NoninvertibleTransformException e) {
 			logger.error("Transformation not invertible");
 		}
-		if (player != null){
-			Point2D point = new Point2D.Double();
-			
-			point.setLocation(0, getHeight());
-			screenToBoardTransformation.transform(point, point);
-			player.setBoardPos(0, point);
-			point.setLocation(getWidth(), getHeight());
-			screenToBoardTransformation.transform(point, point);
-			player.setBoardPos(1, point);
-			point.setLocation(getWidth(), 0);
-			screenToBoardTransformation.transform(point, point);
-			player.setBoardPos(2, point);
-			point.setLocation(0, 0);
-			screenToBoardTransformation.transform(point, point);
-			player.setBoardPos(3, point);
-			gameInstance.update(new GamePlayerEditAction(id, player, player));
-		}
 		if (player != null)
 		{
 			player.screenToBoardTransformation.setTransform(screenToBoardTransformation);
 			player.screenWidth = getWidth();
 			player.screenHeight = getHeight();
+			gameInstance.update(new GamePlayerEditAction(id, player, player));
 		}
 		//move own stack to private bottom
 		/*
