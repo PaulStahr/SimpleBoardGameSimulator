@@ -548,19 +548,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent actionEvent) {
-
-	}
+	public void actionPerformed(ActionEvent actionEvent) {}
 
 	@Override
-	public void componentHidden(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-	}
+	public void componentHidden(ComponentEvent arg0) {}
 
 	@Override
-	public void componentMoved(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
-	}
+	public void componentMoved(ComponentEvent arg0) {}
 
 	@Override
 	public void componentResized(ComponentEvent arg0) {
