@@ -1,15 +1,21 @@
 package gui;
 
 import java.awt.EventQueue;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
@@ -71,6 +77,23 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		tabPane.addTab("Player", tablePlayer);
 		updateTables();
 		gi.addChangeListener(this);
+		
+		scrollPaneImages.setDropTarget(new DropTarget() {
+		    @Override
+			public synchronized void drop(DropTargetDropEvent evt) {
+		        try {
+		            evt.acceptDrop(DnDConstants.ACTION_COPY);
+		            List<File> droppedFiles = (List<File>)
+		                evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+		            for (File file : droppedFiles) {
+		            	gi.game.images.put(file.getName(), ImageIO.read(file));
+		            }
+		        } catch (Exception ex) {
+		            ex.printStackTrace();
+		        }
+		        updateTables();
+		    }
+		});
 	}
     private final AbstractAction tableAction = new AbstractAction() {
     	private static final long serialVersionUID = 3980835476835695337L;
