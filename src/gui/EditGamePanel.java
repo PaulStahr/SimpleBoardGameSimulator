@@ -22,6 +22,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.Document;
 
 import gameObjects.GameObjectColumnType;
 import gameObjects.GameObjectInstanceColumnType;
@@ -52,7 +53,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final JTable tableGameObjects = new JTable(tableModelGameObjects);
 	private final JTable tableImages = new JTable(tableModelImages);
 	private final JTable tablePlayer = new JTable(tableModelPlayer);
-	public String name;
 	private final JScrollPane scrollPaneGameObjectInstances = new JScrollPane(tableGameObjectInstances);
 	private final JScrollPane scrollPaneGameObjects = new JScrollPane(tableGameObjects);
 	private final JScrollPane scrollPaneImages = new JScrollPane(tableImages);
@@ -96,22 +96,34 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  		private final JTextField textFieldName = new JTextField();
  		private final JLabel labelBackground = new JLabel("Background");
  		private final JComboBox<String> comboBoxBackground = new JComboBox<String>();
+ 		private final JLabel labelPassword = new JLabel("Password");
+ 		private final JTextField textFieldPassword = new JTextField();
 		
  		public GeneralPanel()
  		{
  			GroupLayout layout = new GroupLayout(this);
  			setLayout(layout);
  			
- 			layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelBackground)).addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(comboBoxBackground)));
- 			layout.setVerticalGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName)).addGroup(layout.createParallelGroup().addComponent(labelBackground).addComponent(comboBoxBackground)));
+ 			layout.setHorizontalGroup(
+ 					layout.createSequentialGroup()
+ 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelBackground).addComponent(labelPassword))
+ 					.addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(comboBoxBackground).addComponent(textFieldPassword)));
+ 			layout.setVerticalGroup(
+ 					layout.createSequentialGroup()
+ 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName))
+ 					.addGroup(layout.createParallelGroup().addComponent(labelBackground).addComponent(comboBoxBackground))
+ 					.addGroup(layout.createParallelGroup().addComponent(labelPassword).addComponent(textFieldPassword)));
+ 			
+ 			textFieldName.getDocument().addDocumentListener(this);
+			comboBoxBackground.addItemListener(this);
+			textFieldPassword.getDocument().addDocumentListener(this);
  		}
 
 		public void update() {
 			textFieldName.setText(gi.name);
-			textFieldName.getDocument().addDocumentListener(this);
 			JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
 			comboBoxBackground.setSelectedItem(gi.game.getImageKey(gi.game.background));
-			comboBoxBackground.addItemListener(this);
+			textFieldPassword.setText(gi.password);
 		}
 
 		@Override
@@ -133,7 +145,15 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			{
 				return;
 			}
-			gi.name = textFieldName.getText();
+			Document source = event.getDocument();
+			if (source == textFieldName.getDocument())
+			{
+				gi.name = textFieldName.getText();
+			}
+			else if (source == textFieldPassword.getDocument())
+			{
+				gi.password = textFieldPassword.getText();
+			}
 		}
 
 		@Override
