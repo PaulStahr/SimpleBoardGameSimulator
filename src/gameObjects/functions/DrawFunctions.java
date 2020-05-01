@@ -88,7 +88,10 @@ public class DrawFunctions {
             if (p.id != player.id)
 			{
                 BufferedImage img = gamePanel.playerImages[imageNumber];
-                g2.drawImage(img, null, (p.screenWidth-img.getWidth()) / 2, p.screenHeight-100);
+                g2.translate((p.screenWidth-img.getWidth())/2, p.screenHeight - 20);
+                g2.drawImage(img, null, 0, 20);
+                //g2.scale(1/(gamePanel.zooming)*1/p.screenToBoardTransformation.getScaleX(), 1/(gamePanel.zooming)*1/p.screenToBoardTransformation.getScaleY());
+                g2.drawString(p.getName(), 0, 0);
 			}
             g2.setTransform(tmp);
             //draw mouse position of other players
@@ -98,8 +101,8 @@ public class DrawFunctions {
             g.fillRect(0, 0, 10, 10);
             g.drawString(p.getName(),  15,  5);
         }
-        g.drawString(player.actionString,  5, 20);
-        g.drawString(infoText, gamePanel.mouseScreenX - 25, gamePanel.mouseScreenY + 5);
+        g.drawString(player.actionString,  0, -15);
+        g.drawString(infoText, -20, 10);
         g2.setTransform(tmp);
     }
 

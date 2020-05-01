@@ -592,19 +592,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			gameInstance.update(new GamePlayerEditAction(id, player, player));
 		}
 		//move own stack to private bottom
-		/*
 		if (player != null) {
 			IntegerArrayList ial = new IntegerArrayList();
 			ObjectFunctions.getOwnedStack(gameInstance,player,ial);
 			if (ial.size() >0) {
-				if (gameInstance.getObjectInstanceById(ial.get(0)).state.owner_id == player.id) {
-					Point2D origin = new Point2D.Double(getWidth() / 2, getHeight());
-					screenToBoardTransformation.transform(origin, null);
-					ObjectFunctions.moveStackTo(this, gameInstance, player, ial, (int) origin.getX(), (int) origin.getY());
+				ObjectInstance oi = gameInstance.getObjectInstanceById(ial.get(0));
+				if (oi.state.owner_id == player.id) {
+					Point2D targetPoint = new Point2D.Double(this.getWidth()/2-oi.getWidth(player.id)/2, this.getHeight()-oi.getHeight(player.id));
+					player.screenToBoardTransformation.transform(targetPoint,targetPoint);
+					ObjectFunctions.moveStackTo(this, gameInstance, player, ial, (int) targetPoint.getX(), (int) targetPoint.getY());
 				}
 			}
 		}
-		*/
 
 	}
 
