@@ -209,7 +209,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			player.setMousePos(mouseBoardPos.getXI(), mouseBoardPos.getYI());
 			gameInstance.update(new GamePlayerEditAction(id, player, player));
 			ObjectInstance nearestObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
-			if (mouseInPrivateArea && nearestObject != null)
+			if (mouseInPrivateArea && nearestObject != null && !arg0.isControlDown())
 			{
 				if (activeObject != null){
 					activeObject.state.isActive = false;
@@ -263,14 +263,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
-		if (arg0.getClickCount() < 2) {
-
 			if (SwingUtilities.isLeftMouseButton(arg0)) {
 				isLeftMouseKeyHold = true;
 			}
 			if (SwingUtilities.isRightMouseButton(arg0)) {
 				isRightMouseKeyHold = true;
 			}
+
 			mouseScreenX = arg0.getX();
 			mouseScreenY = arg0.getY();
 			screenToBoardPos(arg0.getX(), arg0.getY(), mousePressedGamePos);
@@ -295,23 +294,31 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					objOrigPosY.add(oi.state.posY);
 					oi.state.isActive = true;
 				}
-
 			}
-
+			/*Handle all drags of Token Objects*/
+			int counter = 0;
+			for (ObjectInstance oi: activeObjects) {
+				boolean selectedDrag = false;
+				if (activeObjects.size()>1){
+					selectedDrag = true;
+				}
+				MoveFunctions.dragTokens(this, gameInstance, player, oi, arg0, objOrigPosX.get(counter)- mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter)- mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue, selectedDrag);
+				MoveFunctions.dragDices(this, gameInstance, player, oi, arg0,  objOrigPosX.get(counter)- mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter)- mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
+				MoveFunctions.dragFigures(this, gameInstance, player, oi, arg0,  objOrigPosX.get(counter)- mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter)- mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
+				counter+=1;
+			}
 			repaint();
-		}
 	}
 
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
 		/*Translate the board if control is down*/
-		if (arg0.isControlDown())
+		if (arg0.isControlDown() && !mouseInPrivateArea)
 		{
 			translateBoard(arg0);
 		}
 		else
 		{
-
 			if (player != null)
 			{
 				ObjectFunctions.getOwnedStack(gameInstance,player,ial);
@@ -381,7 +388,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			isSelectStarted = false;
 		}
 		activeObject = null;
-		gameInstance.update(new GamePlayerEditAction(id, player, player));
+		//gameInstance.update(new GamePlayerEditAction(id, player, player));
 		mouseColor = player.color;
 		repaint();
 	}
@@ -420,92 +427,92 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	}
 	@Override
 	public void keyPressed(KeyEvent e) {
-		boolean controlDown = e.isControlDown();
-		setActiveObjects();
-		if(e.getKeyCode() == KeyEvent.VK_C && !controlDown)
-		{
-			int count = 0;
-			for (ObjectInstance oi:activeObjects) {
-				count += ObjectFunctions.countStack(gameInstance, oi);
-			}
-			player.actionString = "Object Number: " + String.valueOf(count);
-		}
-		else if(e.getKeyCode() == KeyEvent.VK_F && !controlDown)
-		{
-			for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
-				ObjectFunctions.flipTokenObject(id, gameInstance, player, oi);
-				ObjectFunctions.rollTheDice(id, gameInstance, player, oi);
-			}
-		}
-		else if (controlDown && e.getKeyCode() == KeyEvent.VK_F)
-		{
-			for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
-				ObjectFunctions.flipTokenStack(id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, oi));
-			}
-		}
-		else if(e.getKeyCode() == KeyEvent.VK_S) {
-			for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
-				ObjectFunctions.shuffleStack(id, gameInstance, player, oi);
-			}
+		if (!mouseInPrivateArea) {
+			boolean controlDown = e.isControlDown();
+			setActiveObjects();
+			if (e.getKeyCode() == KeyEvent.VK_C && !controlDown) {
+				int count = 0;
+				for (ObjectInstance oi : activeObjects) {
+					count += ObjectFunctions.countStack(gameInstance, oi);
+				}
+				player.actionString = "Object Number: " + String.valueOf(count);
+			} else if (e.getKeyCode() == KeyEvent.VK_F && !controlDown) {
+				for (ObjectInstance oi : activeObjects) {
+					ObjectFunctions.flipTokenObject(id, gameInstance, player, oi);
+					ObjectFunctions.rollTheDice(id, gameInstance, player, oi);
+				}
+			} else if (controlDown && e.getKeyCode() == KeyEvent.VK_F) {
+				for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
+					ObjectFunctions.flipTokenStack(id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, oi));
+				}
+			} else if (e.getKeyCode() == KeyEvent.VK_S) {
+				for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
+					ObjectFunctions.shuffleStack(id, gameInstance, player, oi);
+				}
 
-		}
-		else if (controlDown && e.getKeyCode() == KeyEvent.VK_C)
-		{
-			int count = 0;
-			for (ObjectInstance oi:activeObjects) {
-				count += ObjectFunctions.countStackValues(gameInstance, oi);
-			}
-			player.actionString = "Value: " + String.valueOf(count);
-		}
-		else if (e.getKeyCode() == KeyEvent.VK_V) {
-			for (ObjectInstance oi:ObjectFunctions.getStackRepresentatives(gameInstance,activeObjects)) {
-				if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, oi), ObjectFunctions.getStackBottom(gameInstance, oi))) {
-					ObjectFunctions.displayStack(this, gameInstance, player, oi, (int) (oi.getWidth(player.id) * cardOverlap));
+			} else if (controlDown && e.getKeyCode() == KeyEvent.VK_C) {
+				int count = 0;
+				for (ObjectInstance oi : activeObjects) {
+					count += ObjectFunctions.countStackValues(gameInstance, oi);
+				}
+				player.actionString = "Value: " + String.valueOf(count);
+			} else if (e.getKeyCode() == KeyEvent.VK_V) {
+				if (!mouseInPrivateArea) {
+					for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
+						if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, oi), ObjectFunctions.getStackBottom(gameInstance, oi))) {
+							ObjectFunctions.displayStack(this, gameInstance, player, oi, (int) (oi.getWidth(player.id) * cardOverlap));
+						} else {
+							if (activeObjects.size() == 1) {
+								ObjectFunctions.collectStack(this, gameInstance, player, activeObjects.get(0));
+							} else {
+								ObjectFunctions.collectStack(this, gameInstance, player, oi);
+							}
+						}
+					}
 				} else {
-					if (activeObjects.size()==1){ObjectFunctions.collectStack(this, gameInstance, player, activeObjects.get(0));}else {
-						ObjectFunctions.collectStack(this, gameInstance, player, oi);
+					ObjectFunctions.getOwnedStack(gameInstance, player, ial);
+					if (ial.size() > 0) {
+						ObjectInstance oi = gameInstance.getObjectInstanceById(ial.getI(0));
+						if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, oi), ObjectFunctions.getStackBottom(gameInstance, oi))) {
+							ObjectFunctions.displayStack(this, gameInstance, player, oi, (int) (oi.getWidth(player.id) * cardOverlap));
+						} else {
+							if (activeObjects.size() == 1) {
+								ObjectFunctions.collectStack(this, gameInstance, player, activeObjects.get(0));
+							} else {
+								ObjectFunctions.collectStack(this, gameInstance, player, oi);
+							}
+						}
 					}
 				}
+			} else if (e.getKeyCode() == KeyEvent.VK_R) {
+				for (ObjectInstance oi : activeObjects) {
+					ObjectFunctions.rotateStep(id, gameInstance, player, oi);
+				}
+				repaint();
+			} else if (e.getKeyCode() == KeyEvent.VK_R && controlDown) {
+				for (ObjectInstance oi : activeObjects) {
+					ObjectFunctions.removeStackRelations(id, gameInstance, player, oi);
+				}
+			} else if (e.getKeyCode() == KeyEvent.VK_T) {
+				for (ObjectInstance oi : activeObjects) {
+					ObjectFunctions.takeObjects(this, gameInstance, player, oi);
+					oi.state.isActive = false;
+				}
+				selectedObjects.clear();
+				activeObjects.clear();
+			} else if (e.getKeyCode() == KeyEvent.VK_D) {
+				for (ObjectInstance oi : activeObjects) {
+					ObjectFunctions.dropObjects(this, gameInstance, player, oi);
+				}
+			} else if (e.getKeyCode() == KeyEvent.VK_M && controlDown) {
+				for (ObjectInstance oi : activeObjects) {
+					ObjectFunctions.getAllObjectsOfGroup(id, gameInstance, player, oi);
+				}
+			} else if (e.getKeyCode() == KeyEvent.VK_M && !controlDown) {
+				ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
 			}
 		}
-		else if (e.getKeyCode() == KeyEvent.VK_R)
-		{
-			for (ObjectInstance oi:activeObjects) {
-				ObjectFunctions.rotateStep(id, gameInstance,player, oi);
-			}
-			repaint();
-		}
-		else if (e.getKeyCode() == KeyEvent.VK_R && e.isControlDown())
-		{
-			for (ObjectInstance oi:activeObjects) {
-				ObjectFunctions.removeStackRelations(id, gameInstance, player, oi);
-			}
-		}
-		else if (e.getKeyCode() == KeyEvent.VK_T)
-		{
-			for (ObjectInstance oi:activeObjects) {
-				ObjectFunctions.takeObjects(this, gameInstance, player, oi);
-				oi.state.isActive = false;
-			}
-			selectedObjects.clear();
-			activeObjects.clear();
-		}
-		else if (e.getKeyCode() == KeyEvent.VK_D)
-		{
-			for (ObjectInstance oi:activeObjects) {
-				ObjectFunctions.dropObjects(this, gameInstance, player, oi);
-			}
-		}
-		else if (e.getKeyCode() == KeyEvent.VK_M && e.isControlDown())
-		{
-			for (ObjectInstance oi:activeObjects) {
-				ObjectFunctions.getAllObjectsOfGroup(id, gameInstance, player, oi);
-			}
-		}
-		else if (e.getKeyCode() == KeyEvent.VK_M && !e.isControlDown())
-		{
-			ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
-		}
+		activeObjects.clear();
 
 	}
 

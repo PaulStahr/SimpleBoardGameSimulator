@@ -285,7 +285,13 @@ public class DrawFunctions {
             else
             {
                 Graphics2D g2d = (Graphics2D) g.create();
-                g.setColor(color);
+                g2d.setColor(color);
+                if (objectInstance.state.owner_id != -1)
+                {
+                    Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
+                    g2d.drawString(playerOwner.getName() + " Hand Cards", objectInstance.state.posX, objectInstance.state.posY - 20);
+                    g2d.setColor(playerOwner.color);
+                }
                 g2d.setStroke(new BasicStroke(borderWidth));
                 ObjectInstance stackTop = getStackTop(gameInstance, objectInstance);
                 ObjectInstance stackBottom = getStackBottom(gameInstance, objectInstance);

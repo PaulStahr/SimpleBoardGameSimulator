@@ -780,6 +780,22 @@ public class ObjectFunctions {
 
     }
 
+    public static void displayStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int posX, int posY, int cardMargin) {
+        if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
+            ObjectInstance stackTopInstance = getStackTop(gameInstance,objectInstance);
+            IntegerArrayList belowList = new IntegerArrayList();
+            getBelowStack(gameInstance, stackTopInstance, belowList);
+            if (belowList.size() > 1) {
+                if (isStackCollected(gameInstance, stackTopInstance)) {
+                    for (int i = 0; i < belowList.size(); i++) {
+                        moveObjectTo(gamePanel, gameInstance, player, gameInstance.getObjectInstanceById(belowList.get(i)), (int) (posX - (belowList.size() / 2.0 - i) * cardMargin), posY);
+                        //removeFromStack(gamePanelId, gameInstance, player, gameInstance.getObjectInstanceById(belowList.get(i)));
+                    }
+                }
+            }
+
+        }
+    }
 
     //show all objects below element objectInstance
     public static void displayStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int cardMargin) {
@@ -802,7 +818,9 @@ public class ObjectFunctions {
         }
     }
 
-    //Move the whole stack to element object instance
+
+
+        //Move the whole stack to element object instance
     public static void collectStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         if (!haveSamePositions(getStackBottom(gameInstance, objectInstance), getStackTop(gameInstance, objectInstance)) && objectInstance.go instanceof GameObjectToken) {
             IntegerArrayList stack = new IntegerArrayList();
