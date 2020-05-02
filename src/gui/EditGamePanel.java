@@ -1,6 +1,7 @@
 package gui;
 
 import java.awt.EventQueue;
+import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
@@ -9,6 +10,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
@@ -19,6 +22,7 @@ import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -38,6 +42,7 @@ import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.definition.GameObject;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
@@ -48,7 +53,7 @@ import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.TableModel;
 
-public class EditGamePanel extends JPanel implements ActionListener, GameChangeListener, Runnable{
+public class EditGamePanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener{
 	public static final List<TableColumnType> IMAGE_TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{ImageColumnType.ID, ImageColumnType.WIDTH, ImageColumnType.HEIGHT, ImageColumnType.DELETE});
 	GameInstance gi;
 	private final DefaultTableModel tableModelGameObjectInstances= new TableModel(ObjectInstance.TYPES);
@@ -62,6 +67,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final JScrollPane scrollPaneGameObjectInstances = new JScrollPane(tableGameObjectInstances);
 	private final JScrollPane scrollPaneGameObjects = new JScrollPane(tableGameObjects);
 	private final JScrollPane scrollPaneImages = new JScrollPane(tableImages);
+	private final JScrollPane scrollPanePlayer = new JScrollPane(tablePlayer);
 	private final GeneralPanel panelGeneral = new GeneralPanel();	
 	private final JTabbedPane tabPane = new JTabbedPane();
 	public EditGamePanel(GameInstance gi) {
@@ -74,7 +80,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		tabPane.addTab("GameObjects", scrollPaneGameObjects);
 		tabPane.addTab("GameObjectInstances", scrollPaneGameObjectInstances);
 		tabPane.addTab("Images", scrollPaneImages);
-		tabPane.addTab("Player", tablePlayer);
+		tabPane.addTab("Player", scrollPanePlayer);
+		tableGameObjects.addMouseListener(this);
 		updateTables();
 		gi.addChangeListener(this);
 		
@@ -83,7 +90,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			public synchronized void drop(DropTargetDropEvent evt) {
 		        try {
 		            evt.acceptDrop(DnDConstants.ACTION_COPY);
-		            List<File> droppedFiles = (List<File>)
+		            List<? extends File> droppedFiles = (List<? extends File>)
 		                evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 		            for (File file : droppedFiles) {
 		            	gi.game.images.put(file.getName(), ImageIO.read(file));
@@ -258,5 +265,96 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		}
 	}
 	
+	public static class ObjectEditPanel extends JPanel implements DocumentListener{
+		private final JLabel labelName = new JLabel("Name");
+		private final JTextField textFieldName = new JTextField();
+		private final JLabel labelWidth = new JLabel("Width");
+		private final JTextField textFieldWidth = new JTextField();
+		private final JLabel labelHeight = new JLabel("Height");
+		private final JTextField textFieldHeight = new JTextField();
+		private final GameObject go;
+		boolean updating = false;
+		public ObjectEditPanel(GameObject go)
+		{
+			GroupLayout layout = new GroupLayout(this);
+			setLayout(layout);
+			this.go = go;
+			textFieldName.setText(go.uniqueName);
+			textFieldWidth.setText(Integer.toString(go.widthInMM));
+			textFieldHeight.setText(Integer.toString(go.heightInMM));
+			textFieldWidth.getDocument().addDocumentListener(this);
+			textFieldHeight.getDocument().addDocumentListener(this);
+			layout.setHorizontalGroup(
+ 					layout.createSequentialGroup()
+ 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelWidth).addComponent(labelHeight))
+ 					.addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(textFieldWidth).addComponent(textFieldHeight)));
+ 			layout.setVerticalGroup(
+ 					layout.createSequentialGroup()
+ 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName))
+ 					.addGroup(layout.createParallelGroup().addComponent(labelWidth).addComponent(textFieldWidth))
+ 					.addGroup(layout.createParallelGroup().addComponent(labelHeight).addComponent(textFieldHeight)));
+ 			
+			if(go instanceof GameObjectToken)
+			{
+				JLabel labelFrontImage = new JLabel();
+				JComboBox<String> comboBoxFrontImage = new JComboBox<String>();
+				GameObjectToken token = (GameObjectToken)go;
+				
+			}
+		}
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			Document source = e.getDocument();
+			if (updating)
+			{
+				return;
+			}
+			if (source == textFieldWidth.getDocument())
+			{
+				go.widthInMM = Integer.parseInt(textFieldWidth.getText());
+			}
+			else if (source == textFieldHeight.getDocument())
+			{
+				go.heightInMM = Integer.parseInt(textFieldHeight.getText());
+			}
+		}
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+			changedUpdate(e);
+		}
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			changedUpdate(e);
+		}
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent arg0) {}
 
+	@Override
+	public void mouseEntered(MouseEvent arg0) {}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {}
+
+	@Override
+	public void mousePressed(MouseEvent mouseEvent) {
+		Object source = mouseEvent.getSource();
+		if (source == tableGameObjects)
+		{
+	        JTable table =(JTable) source;
+	        Point point = mouseEvent.getPoint();
+	        int row = table.rowAtPoint(point);
+	        if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
+	            JFrame frame = new JFrame();
+	            frame.setLayout(JFrameUtils.SINGLE_COLUMN_LAYOUT);
+	            frame.add(new ObjectEditPanel(gi.game.objects.get(table.getSelectedRow())));
+	            frame.setSize(300,300);
+	            frame.setVisible(true);
+	        }
+		}
+    }
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {}
 }
