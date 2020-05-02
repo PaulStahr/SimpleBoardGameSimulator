@@ -70,6 +70,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final JScrollPane scrollPanePlayer = new JScrollPane(tablePlayer);
 	private final GeneralPanel panelGeneral = new GeneralPanel();	
 	private final JTabbedPane tabPane = new JTabbedPane();
+	public int id = (int)(Math.random() * Integer.MAX_VALUE);
 	public EditGamePanel(GameInstance gi) {
 		this.gi = gi;
 		GroupLayout layout = new GroupLayout(this);
@@ -164,7 +165,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			if (arg0.getStateChange() == ItemEvent.SELECTED) {
 		        gi.game.background = gi.game.images.get(arg0.getItem());
-		        gi.update(new GameStructureEditAction(0, GameStructureEditAction.EDIT_BACKGROUND));
+		        gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_BACKGROUND));
 			}
 		}
 		
@@ -179,10 +180,12 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			if (source == textFieldName.getDocument())
 			{
 				gi.name = textFieldName.getText();
+				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_SESSION_NAME));
 			}
 			else if (source == textFieldPassword.getDocument())
 			{
 				gi.password = textFieldPassword.getText();
+				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_SESSION_PASSWORD));
 			}
 		}
 

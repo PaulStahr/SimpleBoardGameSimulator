@@ -3,6 +3,9 @@ package gameObjects.action;
 public class GameStructureEditAction extends GameAction {
 
 	public static final byte EDIT_BACKGROUND = 0;
+	public static final byte EDIT_GAME_NAME = 1;
+	public static final byte EDIT_SESSION_PASSWORD = 2;
+	public static final byte EDIT_SESSION_NAME = 3;
 	
 	public final byte type;
 	

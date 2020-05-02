@@ -368,6 +368,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 							switch(gs.type)
 							{
 								case GameStructureEditAction.EDIT_BACKGROUND:objOut.writeObject(gs); objOut.writeObject(gi.game.getImageKey(gi.game.background));break;
+								case GameStructureEditAction.EDIT_GAME_NAME:objOut.writeObject(gs); objOut.writeObject(gi.game.name);break;
+								case GameStructureEditAction.EDIT_SESSION_NAME:objOut.writeObject(gs); objOut.writeObject(gi.name);break;
+								case GameStructureEditAction.EDIT_SESSION_PASSWORD:objOut.writeObject(gs); objOut.writeObject(gi.password);break;
 							}
 						
 						}
@@ -460,7 +463,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					GameStructureEditAction action = (GameStructureEditAction)inputObject;
 					switch(action.type)
 					{
-						case GameStructureEditAction.EDIT_BACKGROUND:gi.game.background = gi.game.images.get(objIn.readObject());break;
+					case GameStructureEditAction.EDIT_BACKGROUND:gi.game.background = gi.game.images.get(objIn.readObject());break;
+					case GameStructureEditAction.EDIT_GAME_NAME:gi.game.name = (String)objIn.readObject();break;
+					case GameStructureEditAction.EDIT_SESSION_NAME:gi.name = (String)objIn.readObject();break;
+					case GameStructureEditAction.EDIT_SESSION_PASSWORD:gi.password = (String)objIn.readObject();break;
 					}
 					gi.update(action);
 				}
