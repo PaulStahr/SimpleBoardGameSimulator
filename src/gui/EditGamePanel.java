@@ -164,7 +164,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			if (arg0.getStateChange() == ItemEvent.SELECTED) {
 		        gi.game.background = gi.game.images.get(arg0.getItem());
-		        gi.update(new GameStructureEditAction(0));
+		        gi.update(new GameStructureEditAction(0, GameStructureEditAction.EDIT_BACKGROUND));
 			}
 		}
 		

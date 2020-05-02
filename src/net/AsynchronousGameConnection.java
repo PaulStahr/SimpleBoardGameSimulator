@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GamePlayerEditAction;
+import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.UserSoundMessageAction;
 import gameObjects.action.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
@@ -350,7 +351,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					   }
 					   else if (action instanceof UsertextMessageAction)
 					   {
-					    	strB.append(NetworkString.ACTION).append(' ')
+						   objOut.writeObject(action);
+					    	/*strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.TEXTMESSAGE).append(' ')
 					 			.append(connectionId).append(' ')
 					 			.append(action.source).append(' ')
@@ -358,8 +360,17 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append(((UsertextMessageAction) action).sourcePlayer);
 					 		objOut.writeObject(strB.toString());
 					 		objOut.writeObject(((UsertextMessageAction) action).message);
-					     	strB.setLength(0);
+					     	strB.setLength(0);*/
 					    }
+					   else if (action instanceof GameStructureEditAction)
+						{
+							GameStructureEditAction gs = (GameStructureEditAction)action;
+							switch(gs.type)
+							{
+								case GameStructureEditAction.EDIT_BACKGROUND:objOut.writeObject(gs); objOut.writeObject(gi.game.getImageKey(gi.game.background));break;
+							}
+						
+						}
 					    else if (action instanceof UserSoundMessageAction)
 					    {
 					    	strB.append(NetworkString.ACTION).append(' ')
@@ -437,6 +448,21 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					GameIO.editPlayerFromStreamObject(objIn, editedPlayer);
 					gi.update(action);
 					continue;
+				}
+				if (inputObject instanceof UsertextMessageAction)
+				{
+					UsertextMessageAction action = (UsertextMessageAction)inputObject;
+					gi.update(action);
+					continue;
+				}
+				if (inputObject instanceof GameStructureEditAction)
+				{
+					GameStructureEditAction action = (GameStructureEditAction)inputObject;
+					switch(action.type)
+					{
+						case GameStructureEditAction.EDIT_BACKGROUND:gi.game.background = gi.game.images.get(objIn.readObject());break;
+					}
+					gi.update(action);
 				}
 				if (!(inputObject instanceof String))
 				{
