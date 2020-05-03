@@ -1,5 +1,6 @@
 package gameObjects.functions;
 
+import static java.lang.Math.PI;
 import static java.lang.Math.max;
 
 import java.awt.event.MouseEvent;
@@ -718,14 +719,12 @@ public class ObjectFunctions {
         int distance = Integer.MAX_VALUE;
         for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
-            int dist = isOnObject(xPos, yPos, oi, player.id, maxInaccuracy);
-
-            if (dist < distance) {
+            int dist = objectDist(xPos, yPos, oi, player.id);
+            if (dist < distance && isOnObject(xPos, yPos, oi, player.id, maxInaccuracy)) {
                 activeObject = getStackTop(gameInstance, oi);
                 distance = dist;
             }
         }
-
         return activeObject;
     }
 
@@ -733,18 +732,27 @@ public class ObjectFunctions {
         return getTopActiveObjectByPosition(gameInstance, player, xPos, yPos, 0);
     }
 
-    private static int isOnObject(int xPos, int yPos, ObjectInstance oi, int playerid, int maxInaccuracy) {
-        int xDiff = xPos - (oi.state.posX + oi.getWidth(playerid) / 2), yDiff = yPos - (oi.state.posY + oi.getHeight(playerid) / 2);
+    private static int objectDist(int xPos, int yPos, ObjectInstance oi, int playerId){
+        int xMiddle = oi.state.posX + oi.getWidth(playerId) / 2;
+        int yMiddle = oi.state.posY + oi.getHeight(playerId) / 2;
+        int xDiff = xPos - xMiddle, yDiff = yPos - yMiddle;
         int dist = xDiff * xDiff + yDiff * yDiff;
+        return dist;
+    }
 
-        double sin = Math.sin(oi.state.rotation), cos = Math.cos(oi.state.rotation);
-        double transformedX = xPos * cos + yPos * sin;
-        double transformedY = -xPos * sin + yPos * cos;
+    private static boolean isOnObject(int xPos, int yPos, ObjectInstance oi, int playerId, int maxInaccuracy) {
+        int xMiddle = oi.state.posX + oi.getWidth(playerId) / 2;
+        int yMiddle = oi.state.posY + oi.getHeight(playerId) / 2;
+        int xDiff = xPos - xMiddle, yDiff = yPos - yMiddle;
+
+        double sin = Math.sin(oi.state.rotation*2*PI/360), cos = Math.cos(oi.state.rotation*2*PI/360);
+        double transformedX = -xDiff * cos + yDiff * sin + xMiddle;
+        double transformedY = -xDiff * sin - yDiff * cos + yMiddle;
         boolean leftIn = (transformedX > (oi.state.posX - maxInaccuracy));
-        boolean rightIn = (transformedX < (oi.state.posX + oi.getWidth(playerid) + maxInaccuracy));
-        boolean topIn = (transformedY < (oi.state.posY + oi.getHeight(playerid) + maxInaccuracy));
+        boolean rightIn = (transformedX < (oi.state.posX + oi.getWidth(playerId) + maxInaccuracy));
+        boolean topIn = (transformedY < (oi.state.posY + oi.getHeight(playerId) + maxInaccuracy));
         boolean bottomIn = (transformedY > (oi.state.posY - maxInaccuracy));
-        return leftIn && rightIn && topIn && bottomIn ? dist : Integer.MAX_VALUE;
+        return leftIn && rightIn && topIn && bottomIn;
     }
 
     //Get element nearest to xPos, yPos with some inaccuracy
@@ -759,8 +767,8 @@ public class ObjectFunctions {
             for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
                 ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
                 if ((ignoredObjects == null || !ignoredObjects.contains(oi.id)) && !oi.state.inPrivateArea) {
-                    int dist = isOnObject(xPos, yPos, oi, player.id, maxInaccuracy);
-                    if (dist < distance) {
+                    int dist = objectDist(xPos, yPos, oi, player.id);
+                    if (dist < distance && isOnObject(xPos, yPos, oi, player.id, maxInaccuracy)) {
                         activeObject = oi;
                         distance = dist;
                     }
@@ -1366,9 +1374,14 @@ public class ObjectFunctions {
         return ial.indexOf(objectInstance.id);
     }
 
-    public static void rotateStep(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
-        objectInstance.state.rotation = objectInstance.getRotation() + objectInstance.rotationStep;
-        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
+    public static void rotateStep(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial){
+        ial.clear();
+        getStack(gameInstance,objectInstance,ial);
+        for (int id:ial){
+            ObjectInstance oi = gameInstance.getObjectInstanceById(id);
+            oi.state.rotation = oi.getRotation() + oi.rotationStep;
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, oi));
+        }
     }
 
 }

@@ -45,31 +45,17 @@ public class DrawFunctions {
         if (ObjectFunctions.isStackTop(objectInstance)) {
             tmp.clear();
             ObjectFunctions.getBelowStack(gameInstance, objectInstance, tmp);
-            drawStack(g, tmp, gameInstance, player.id, 1);
-            int playerId = ObjectFunctions.getStackOwner(gameInstance, tmp);
-            if (playerId != -1) {
-                Player p = gameInstance.getPlayerById(playerId);
-                if (p == null)
-                {
-                	throw new NullPointerException("Player with id " + playerId + " not found");
-                }
-                drawStackBorder(gameInstance, g, player, objectInstance, 10, p.color, 1, true, tmp);
-            } else {
-                if (tmp.size() > 1) {
-                    g.setColor(gamePanel.stackColor);
-                    drawStackBorder(gameInstance, g, player, objectInstance, 5, gamePanel.stackColor, 1, true, tmp);
-                }
-            }
+            drawStack(gamePanel, g, tmp, gameInstance, player, 1);
         }
         tmp.clear();
     }
 
-    public static void drawDiceObjects(Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming){
-        drawObject(g, gameInstance.getObjectInstanceById(oi.id), player.id, zooming);
+    public static void drawDiceObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming){
+        drawObject(gamePanel, g, gameInstance, gameInstance.getObjectInstanceById(oi.id), player, zooming, 5);
     }
 
-    public static void drawFigureObjects(Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming){
-        drawObject(g, gameInstance.getObjectInstanceById(oi.id), player.id, zooming);
+    public static void drawFigureObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming){
+        drawObject(gamePanel, g, gameInstance, gameInstance.getObjectInstanceById(oi.id), player, zooming, 5);
     }
 
     public static void drawPlayerPositions(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, String infoText) {
@@ -100,54 +86,17 @@ public class DrawFunctions {
             g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
             g.fillRect(0, 0, 10, 10);
             g.drawString(p.getName(),  15,  5);
+
+            if (p.id == player.id){
+                g.drawString(player.actionString,  0, -15);
+                g.drawString(infoText, -20, 10);
+            }
         }
-        g.drawString(player.actionString,  0, -15);
-        g.drawString(infoText, -20, 10);
+
         g2.setTransform(tmp);
     }
 
-    public static void drawActiveObjectBorder(GamePanel gamePanel, GameInstance gameInstance, Graphics g, Player player, ObjectInstance activeObject) {
-        int playerId = player == null ? -1 : player.id;
-        if (activeObject != null) {
-            if (activeObject.state.isActive && activeObject.state.owner_id == player.id) {
-                drawObject(g, activeObject, playerId, 1);
-            }
-            if (player != null && (activeObject.state.owner_id != playerId || activeObject.state.isActive)) {
-                drawBorder(gameInstance, g, player, activeObject, 5, player.color, 1);
-            }
-        }
-        if (activeObject != null && !activeObject.state.isActive && activeObject.state.owner_id == playerId) {
-            Graphics2D g2d = (Graphics2D)g;
-            AffineTransform tmp = g2d.getTransform();
-            AffineTransform transform = new AffineTransform();
-            transform.translate(gamePanel.getWidth()/2, gamePanel.getHeight());
-            transform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));
-            transform.rotate(gamePanel.privateArea.objects.indexOf(activeObject.id) * Math.PI / (gamePanel.privateArea.objects.size()));
-            transform.translate(-activeObject.getWidth(player.id) / 2, -activeObject.getHeight(player.id) / 2);
-            transform.translate(0, -250);
-
-            drawPrivateAreaBorder(g, player, activeObject, 5, player.color, transform);
-            g2d.setTransform(tmp);
-        }
-    }
-
-    public static void drawSelectedObjects(GamePanel gamePanel, Graphics g,GameInstance gameInstance, Player player, IntegerArrayList tmp){
-        for(int id: gamePanel.selectedObjects)
-        {
-            ObjectInstance currentObject = gameInstance.getObjectInstanceById(id);
-            if (currentObject.go instanceof GameObjectToken) {
-                if (ObjectFunctions.isStackBottom(currentObject) && currentObject.state.owner_id != player.id) {
-                    drawStackBorder(gameInstance, g, player, currentObject, 5, player.color, 1, tmp);
-                    tmp.clear();
-                }
-            }
-            else if (currentObject.go instanceof GameObjectDice){
-                drawBorder(gameInstance, g, player, currentObject, 5, player.color, 1);
-            }
-            else if (currentObject.go instanceof GameObjectFigure){
-                drawBorder(gameInstance, g, player, currentObject, 5, player.color, 1);
-            }
-        }
+    public static void drawSelection(GamePanel gamePanel, Graphics g, Player player){
         Graphics2D g2 = (Graphics2D)g;
         g2.setTransform(new AffineTransform());
         if (gamePanel.activeObject == null  && !gamePanel.mouseInPrivateArea){
@@ -156,7 +105,7 @@ public class DrawFunctions {
         }
     }
 
-    public static void drawTokensInPrivateArea(GamePanel gamePanel, Graphics g, GameInstance gameInstance){
+    public static void drawTokensInPrivateArea(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, ObjectInstance activeObject){
         Graphics2D g2 = (Graphics2D)g;
         AffineTransform tmp = g2.getTransform();
         g2.setTransform(new AffineTransform());
@@ -187,47 +136,69 @@ public class DrawFunctions {
             }
         }
         g2.setTransform(tmp);
+        if (activeObject != null && !activeObject.state.isActive && activeObject.state.owner_id == playerId) {
+            Graphics2D g2d = (Graphics2D)g;
+            tmp = g2d.getTransform();
+            AffineTransform transform = new AffineTransform();
+            transform.translate(gamePanel.getWidth()/2, gamePanel.getHeight());
+            transform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));
+            transform.rotate(gamePanel.privateArea.objects.indexOf(activeObject.id) * Math.PI / (gamePanel.privateArea.objects.size()));
+            transform.translate(-activeObject.getWidth(player.id) / 2, -activeObject.getHeight(player.id) / 2);
+            transform.translate(0, -250);
+
+            drawPrivateAreaBorder(g, player, activeObject, 5, player.color, transform);
+            g2d.setTransform(tmp);
+        }
     }
 
-    public static void drawStack(Graphics g, IntegerArrayList stackList, GameInstance gameInstance, int playerId, double zooming) {
+    public static void drawStack(GamePanel gamePanel, Graphics g, IntegerArrayList stackList, GameInstance gameInstance, Player player, double zooming) {
         if (stackList.size()>0) {
             if (isStackCollected(gameInstance,gameInstance.getObjectInstanceById(stackList.get(0)))){
-                IntegerArrayList newStackList = new IntegerArrayList();
-                newStackList.add(gameInstance.getObjectInstanceById(stackList.last()).id);
-                stackList = newStackList;
+                int oiId = gameInstance.getObjectInstanceById(stackList.last()).id;
+                stackList.clear();
+                stackList.add(oiId);
             }
             for (int id : stackList) {
-                drawObject(g, gameInstance.getObjectInstanceById(id), playerId, zooming);
+                drawObject(gamePanel, g, gameInstance, gameInstance.getObjectInstanceById(id), player, zooming, 5);
             }
         }
     }
 
-    public static void drawObject(Graphics g, ObjectInstance objectInstance, int playerId, double zooming) {
-        BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
-        if (objectInstance.getRotation() == 0) {//TODO: use Graphics rotation if possible
-            if (objectInstance.state == null || img == null) {
-                logger.error("Object state is null");
-            } else {
-            	Graphics2D g2 = (Graphics2D)g;
-            	AffineTransform tmp = g2.getTransform();
-            	g2.translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming*0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming*0.5);
-            	g2.rotate(Math.toRadians(objectInstance.state.rotation));
-                g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming*0.5),-(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
-                g2.setTransform(tmp);
-            }
-        } else {//TODO add caching
-            //double rotationRequired = Math.toRadians(objectInstance.getRotation());
-            //double locationX = img.getWidth() / 2;
-           // double locationY = img.getHeight() / 2;
-            //AffineTransform tx = AffineTransform.getRotateInstance(rotationRequired, locationX * objectInstance.scale, locationY * objectInstance.scale);
-            //tx.scale(objectInstance.scale, objectInstance.scale);
-            //AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
-            //g.drawImage(op.filter(img, null), objectInstance.state.posX, objectInstance.state.posY, null);
-        	Graphics2D g2 = (Graphics2D)g;
+    public static void drawObject(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, double zooming, int borderWidth) {
+        BufferedImage img = objectInstance.go.getLook(objectInstance.state, player.id);
+        if (objectInstance.state == null || img == null) {
+            logger.error("Object state is null");
+        } else {
+            Graphics2D g2 = (Graphics2D) g;
             AffineTransform tmp = g2.getTransform();
-        	g2.translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming*0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming*0.5);
-        	g2.rotate(Math.toRadians(objectInstance.state.rotation));
-            g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming*0.5),-(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+            g2.translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming * 0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming * 0.5);
+            g2.rotate(Math.toRadians(objectInstance.state.rotation));
+            g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+
+            //Draw Border around objects
+            g2.setStroke(new BasicStroke(borderWidth));
+            if (objectInstance.state.owner_id != -1) {
+                    Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
+                    g2.setColor(playerOwner.color);
+                    g2.drawString(playerOwner.getName() + " Hand Cards", -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - 20);
+            }
+            else if(objectInstance.state.isActive || gamePanel.selectedObjects.contains(objectInstance.id)){
+                g2.setColor(player.color);
+            }
+            else{
+                g2.setStroke(new BasicStroke(borderWidth));
+                g2.setColor(gamePanel.stackColor);
+            }
+            if (objectInstance.go instanceof GameObjectToken) {
+                if (objectInstance.state.isActive || gamePanel.selectedObjects.contains(objectInstance.id) || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
+                    g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth/2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth/2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth/2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
+                }
+            }
+            else{
+                if (objectInstance.state.isActive || gamePanel.selectedObjects.contains(objectInstance.id)) {
+                    g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming));
+                }
+            }
             g2.setTransform(tmp);
         }
     }
@@ -258,7 +229,7 @@ public class DrawFunctions {
                 Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
                 g2d.drawString(playerOwner.getName() + " Hand Cards", objectInstance.state.posX, objectInstance.state.posY - 20);
             }
-            if (objectInstance.getRotation() == 0) {
+            if (true || objectInstance.getRotation() == 0) {
                 g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, (int) (objectInstance.getWidth(player.id) * zooming) + borderWidth, (int) (objectInstance.getHeight(player.id) * zooming) + borderWidth);
             }
             else{

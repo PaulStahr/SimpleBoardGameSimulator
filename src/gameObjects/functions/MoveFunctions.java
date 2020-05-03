@@ -1,6 +1,7 @@
 package gameObjects.functions;
 
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
@@ -10,8 +11,10 @@ import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import geometry.Vector2d;
 import gui.GamePanel;
 import main.Player;
+import util.data.IntegerArrayList;
 
 public class MoveFunctions {
 
@@ -55,5 +58,20 @@ public class MoveFunctions {
             ObjectFunctions.moveObjectTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player.id, activeObject.id));
         }
+    }
+
+    public static void dragObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, MouseEvent arg0, ArrayList<ObjectInstance> activeObjects, IntegerArrayList objOrigPosX, IntegerArrayList objOrigPosY, Vector2d mousePressedGamePos, Vector2d mouseBoardPos, int mouseWheelValue){
+        int counter = 0;
+        for (ObjectInstance oi : activeObjects) {
+            boolean selectedDrag = false;
+            if (activeObjects.size() > 1) {
+                selectedDrag = true;
+            }
+            MoveFunctions.dragTokens(gamePanel, gameInstance, player, oi, arg0, objOrigPosX.get(counter) - mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter) - mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue, selectedDrag);
+            MoveFunctions.dragDices(gamePanel, gameInstance, player, oi, arg0, objOrigPosX.get(counter) - mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter) - mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
+            MoveFunctions.dragFigures(gamePanel, gameInstance, player, oi, arg0, objOrigPosX.get(counter) - mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter) - mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
+            counter += 1;
+        }
+        gamePanel.repaint();
     }
 }

@@ -15,7 +15,7 @@ public class ObjectInstance {
 	public final GameObject go;
 	public final int id;
 	public double scale = 0.2;
-	public int rotationStep = 60;
+	public int rotationStep = 90;
 
 	public ObjectInstance(GameObject go, int id)
 	{
