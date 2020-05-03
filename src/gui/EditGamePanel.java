@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -31,6 +32,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.Document;
 
@@ -41,6 +44,7 @@ import gameObjects.PlayerColumnType;
 import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectInstanceEditAction;
+import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectToken;
@@ -54,7 +58,7 @@ import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.TableModel;
 
-public class EditGamePanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener{
+public class EditGamePanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener, TableModelListener{
 	public static final List<TableColumnType> IMAGE_TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{ImageColumnType.ID, ImageColumnType.WIDTH, ImageColumnType.HEIGHT, ImageColumnType.DELETE});
 	GameInstance gi;
 	private final DefaultTableModel tableModelGameObjectInstances= new TableModel(ObjectInstance.TYPES);
@@ -78,7 +82,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(tabPane));
 		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(tabPane));
-		tabPane.addTab("General", panelGeneral);
+		tabPane.addTab("Genral", panelGeneral);
 		tabPane.addTab("GameObjects", scrollPaneGameObjects);
 		tabPane.addTab("GameObjectInstances", scrollPaneGameObjectInstances);
 		tabPane.addTab("Images", scrollPaneImages);
@@ -86,6 +90,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		tableGameObjects.addMouseListener(this);
 		updateTables();
 		gi.addChangeListener(this);
+		tableModelPlayer.addTableModelListener(this);
 		
 		scrollPaneImages.setDropTarget(new DropTarget() {
 		    @Override
@@ -118,6 +123,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableImages,tableAction, IMAGE_TYPES.indexOf(ImageColumnType.DELETE));
  	private final ButtonColumn deletePlayerColumn = new ButtonColumn(tablePlayer,tableAction, Player.TYPES.indexOf(PlayerColumnType.DELETE));
 	private boolean isUpdating = false;
+	private Entry<String, BufferedImage>[] imageArray;
 	 	
  	private class GeneralPanel extends JPanel implements ItemListener, DocumentListener
  	{
@@ -215,7 +221,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		isUpdating = true;
 		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, deleteObjectColumn);
 		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, deleteObjectInstanceColumn);
-		JFrameUtils.updateTable(tableImages, scrollPaneImages, gi.game.images.entrySet().toArray(), IMAGE_TYPES, tableModelImages, deleteImageColumn);
+		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.entrySet().toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, deleteImageColumn);
 		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(), Player.TYPES, tableModelPlayer, deletePlayerColumn);
 		panelGeneral.update();
 		isUpdating = false;
@@ -231,7 +237,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		{
 			ButtonColumn.TableButtonActionEvent event = (ButtonColumn.TableButtonActionEvent)ae;
 			Object tableSource = event.getSource();
-			//int col = event.getCol();
+			int col = event.getCol();
 			int row = event.getRow();
 			if (tableSource== tableModelGameObjectInstances)
 			{
@@ -250,7 +256,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			else if (tableSource == tableModelPlayer)
 			{
-				
+			
 			}
 		}
 		updateTables();
@@ -270,7 +276,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		}
 	}
 	
-	public static class ObjectEditPanel extends JPanel implements DocumentListener{
+	public static class ObjectEditPanel extends JPanel implements DocumentListener, ItemListener{
 		private final JLabel labelName = new JLabel("Name");
 		private final JTextField textFieldName = new JTextField();
 		private final JLabel labelWidth = new JLabel("Width");
@@ -278,18 +284,43 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		private final JLabel labelHeight = new JLabel("Height");
 		private final JTextField textFieldHeight = new JTextField();
 		private final GameObject go;
+		private final GameInstance gi;
 		boolean updating = false;
-		public ObjectEditPanel(GameObject go)
+		private final ArrayList<JComboBox> imageComboBoxes = new ArrayList<>();
+		private final JComboBox<String> comboBoxFrontImage;
+		private final JComboBox<String> comboBoxBackImage;
+		
+		private void updateImages()
 		{
-			GroupLayout layout = new GroupLayout(this);
-			setLayout(layout);
+			String imageNames[] = gi.game.images.keySet().toArray(new String[gi.game.images.size()]);
+			for (int i = 0; i < imageComboBoxes.size(); ++i)
+			{
+				JFrameUtils.updateComboBox(imageComboBoxes.get(i), imageNames);
+			}
+		}
+		
+		public ObjectEditPanel(GameObject go, GameInstance gi)
+		{
+			this.gi = gi;
+			//GroupLayout layout = new GroupLayout(this);
+			//setLayout(layout);
+			setLayout(JFrameUtils.DOUBLE_COLUMN_LAUYOUT);
 			this.go = go;
 			textFieldName.setText(go.uniqueName);
 			textFieldWidth.setText(Integer.toString(go.widthInMM));
 			textFieldHeight.setText(Integer.toString(go.heightInMM));
 			textFieldWidth.getDocument().addDocumentListener(this);
 			textFieldHeight.getDocument().addDocumentListener(this);
-			layout.setHorizontalGroup(
+			
+			add(labelName);
+			add(textFieldName);
+			add(labelWidth);
+			add(textFieldWidth);
+			add(labelHeight);
+			add(textFieldHeight);
+			
+			
+			/*layout.setHorizontalGroup(
  					layout.createSequentialGroup()
  					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelWidth).addComponent(labelHeight))
  					.addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(textFieldWidth).addComponent(textFieldHeight)));
@@ -297,14 +328,30 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  					layout.createSequentialGroup()
  					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName))
  					.addGroup(layout.createParallelGroup().addComponent(labelWidth).addComponent(textFieldWidth))
- 					.addGroup(layout.createParallelGroup().addComponent(labelHeight).addComponent(textFieldHeight)));
+ 					.addGroup(layout.createParallelGroup().addComponent(labelHeight).addComponent(textFieldHeight)));*/
  			
 			if(go instanceof GameObjectToken)
 			{
-				JLabel labelFrontImage = new JLabel();
-				JComboBox<String> comboBoxFrontImage = new JComboBox<String>();
+				JLabel labelFrontImage = new JLabel("Front Image");
+				JLabel labelBackImage = new JLabel("Back Image");
+				comboBoxFrontImage = new JComboBox<String>();
+				comboBoxBackImage = new JComboBox<String>();
+				imageComboBoxes.add(comboBoxFrontImage);
+				imageComboBoxes.add(comboBoxBackImage);
+				updateImages();
 				GameObjectToken token = (GameObjectToken)go;
-				
+				comboBoxFrontImage.setSelectedItem(gi.game.getImageKey(token.getUpsideLook()));
+				comboBoxBackImage.setSelectedItem(gi.game.getImageKey(token.getDownsideLook()));
+				comboBoxFrontImage.addItemListener(this);
+				add(labelFrontImage);
+				add(comboBoxFrontImage);
+				add(labelBackImage);
+				add(comboBoxBackImage);
+			}
+			else
+			{
+				comboBoxFrontImage = null;
+				comboBoxBackImage = null;
 			}
 		}
 		@Override
@@ -322,6 +369,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			{
 				go.heightInMM = Integer.parseInt(textFieldHeight.getText());
 			}
+			//TODO: events
 		}
 		@Override
 		public void insertUpdate(DocumentEvent e) {
@@ -330,6 +378,23 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		@Override
 		public void removeUpdate(DocumentEvent e) {
 			changedUpdate(e);
+		}
+
+		@Override
+		public void itemStateChanged(ItemEvent event) {
+			Object source = event.getSource();
+			if (go instanceof GameObjectToken)
+			{
+				GameObjectToken got = (GameObjectToken)go;
+				if (source == comboBoxFrontImage)
+				{
+					got.upsideLook = gi.game.images.get(comboBoxFrontImage.getSelectedItem());
+				}
+				if (source == comboBoxFrontImage)
+				{
+					got.downsideLook = gi.game.images.get(comboBoxBackImage.getSelectedItem());
+				}
+			}
 		}
 	}
 	
@@ -353,7 +418,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	        if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
 	            JFrame frame = new JFrame();
 	            frame.setLayout(JFrameUtils.SINGLE_COLUMN_LAYOUT);
-	            frame.add(new ObjectEditPanel(gi.game.objects.get(table.getSelectedRow())));
+	            frame.add(new ObjectEditPanel(gi.game.objects.get(row), gi));
 	            frame.setSize(300,300);
 	            frame.setVisible(true);
 	        }
@@ -362,4 +427,57 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {}
+
+	@Override
+	public void tableChanged(TableModelEvent event) {
+		if (isUpdating)
+		{
+			return;
+		}
+		int rowBegin = event.getFirstRow();
+    	if (rowBegin == TableModelEvent.HEADER_ROW)
+    	{
+    		return;
+    	}
+    	isUpdating = true;
+		Object source = event.getSource();
+		int colBegin = event.getColumn() == TableModelEvent.ALL_COLUMNS ? 0 : event.getColumn();
+    	int rowEnd = event.getLastRow() + 1;
+    	TableModel model = (TableModel)source;
+    	int colEnd = event.getColumn() == TableModelEvent.ALL_COLUMNS ? model.getColumnCount() : (event.getColumn() + 1);
+		if (source == tableModelPlayer)
+		{
+			for (int col = colBegin; col < colEnd; ++col)
+			{
+				for (int row = rowBegin; row < rowEnd; ++row)
+				{
+					if (Player.TYPES.get(col) == PlayerColumnType.NAME)
+					{
+						Player pl = gi.getPlayerByIndex(row);
+						pl.setName((String)tableModelPlayer.getValueAt(row, col));
+						gi.update(new GamePlayerEditAction(id, pl, pl));
+					}
+				}
+			}
+		}else if (source == tableModelImages)
+		{
+			for (int col = colBegin; col < colEnd; ++col)
+			{
+				for (int row = rowBegin; row < rowEnd; ++row)
+				{
+					if (ImageColumnType.get(col) == ImageColumnType.ID)
+					{
+						gi.game.images.remove(imageArray[row].getKey());
+						gi.game.images.put((String)tableModelPlayer.getValueAt(row, col), imageArray[row].getValue());
+						//TODO update game
+					}
+				}
+			}
+		}else if (source == tableModelGameObjectInstances)
+		{
+		}else if (source == tableModelGameObjects)
+		{
+		}
+		isUpdating = false;
+	}
 }
