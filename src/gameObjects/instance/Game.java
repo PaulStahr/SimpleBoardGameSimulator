@@ -61,4 +61,15 @@ public class Game {
 	public String[] getImageKeys() {
 		return images.keySet().toArray(new String[images.size()]);
 	}
+
+	public Map.Entry<String, BufferedImage> getImage(int hash) {
+		for (Map.Entry<String, BufferedImage> mapEntry : images.entrySet())
+		{
+			if(mapEntry.getKey().hashCode() == hash)
+			{
+				return mapEntry;
+			}
+		}
+		return null;
+	}
 }

@@ -1,5 +1,6 @@
 package net;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
@@ -12,10 +13,14 @@ import java.io.OutputStream;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+
+import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GamePlayerEditAction;
@@ -31,6 +36,7 @@ import util.ArrayUtil;
 import util.StringUtils;
 import util.data.UniqueObjects;
 import util.io.StreamUtil;
+import util.stream.CappedInputStreamWrapper;
 
 public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	public enum Network {
@@ -365,12 +371,23 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					   else if (action instanceof GameStructureEditAction)
 						{
 							GameStructureEditAction gs = (GameStructureEditAction)action;
+							objOut.writeObject(gs);
 							switch(gs.type)
 							{
-								case GameStructureEditAction.EDIT_BACKGROUND:objOut.writeObject(gs); objOut.writeObject(gi.game.getImageKey(gi.game.background));break;
-								case GameStructureEditAction.EDIT_GAME_NAME:objOut.writeObject(gs); objOut.writeObject(gi.game.name);break;
-								case GameStructureEditAction.EDIT_SESSION_NAME:objOut.writeObject(gs); objOut.writeObject(gi.name);break;
-								case GameStructureEditAction.EDIT_SESSION_PASSWORD:objOut.writeObject(gs); objOut.writeObject(gi.password);break;
+								case GameStructureEditAction.EDIT_BACKGROUND: objOut.writeObject(gi.game.getImageKey(gi.game.background));break;
+								case GameStructureEditAction.EDIT_GAME_NAME: objOut.writeObject(gi.game.name);break;
+								case GameStructureEditAction.EDIT_SESSION_NAME: objOut.writeObject(gi.name);break;
+								case GameStructureEditAction.EDIT_SESSION_PASSWORD:objOut.writeObject(gi.password);break;
+								case GameStructureEditAction.ADD_IMAGE:
+								{
+									Map.Entry<String, BufferedImage> entry = gi.game.getImage(((AddObjectAction)gs).objectId);
+									objOut.writeObject(entry.getKey());
+									GameIO.writeImageToStream(entry.getValue(), "png", byteStream);
+									objOut.writeInt(byteStream.size());
+									byteStream.writeTo(objOut);
+									byteStream.reset();
+									break;
+								}
 							}
 						
 						}
@@ -417,6 +434,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				return;
 			}
 		}
+		CappedInputStreamWrapper cappedIn = new CappedInputStreamWrapper(objIn, 0);
 		while (true)
 		{
 			try {
@@ -463,12 +481,22 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					GameStructureEditAction action = (GameStructureEditAction)inputObject;
 					switch(action.type)
 					{
-					case GameStructureEditAction.EDIT_BACKGROUND:gi.game.background = gi.game.images.get(objIn.readObject());break;
-					case GameStructureEditAction.EDIT_GAME_NAME:gi.game.name = (String)objIn.readObject();break;
-					case GameStructureEditAction.EDIT_SESSION_NAME:gi.name = (String)objIn.readObject();break;
-					case GameStructureEditAction.EDIT_SESSION_PASSWORD:gi.password = (String)objIn.readObject();break;
+						case GameStructureEditAction.EDIT_BACKGROUND:gi.game.background = gi.game.images.get(objIn.readObject());break;
+						case GameStructureEditAction.EDIT_GAME_NAME:gi.game.name = (String)objIn.readObject();break;
+						case GameStructureEditAction.EDIT_SESSION_NAME:gi.name = (String)objIn.readObject();break;
+						case GameStructureEditAction.EDIT_SESSION_PASSWORD:gi.password = (String)objIn.readObject();break;
+						case GameStructureEditAction.ADD_IMAGE:
+						{
+							String name = (String)objIn.readObject();
+							int cap = objIn.readInt();
+							cappedIn.setCap(cap);
+							gi.game.images.put(name, ImageIO.read(cappedIn));
+							cappedIn.drain();
+							break;
+						}
 					}
 					gi.update(action);
+					continue;
 				}
 				if (!(inputObject instanceof String))
 				{

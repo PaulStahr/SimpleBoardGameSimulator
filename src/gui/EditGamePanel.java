@@ -38,6 +38,7 @@ import gameObjects.GameObjectColumnType;
 import gameObjects.GameObjectInstanceColumnType;
 import gameObjects.ImageColumnType;
 import gameObjects.PlayerColumnType;
+import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GameStructureEditAction;
@@ -77,7 +78,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(tabPane));
 		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(tabPane));
-		tabPane.addTab("Genenaral", panelGeneral);
+		tabPane.addTab("General", panelGeneral);
 		tabPane.addTab("GameObjects", scrollPaneGameObjects);
 		tabPane.addTab("GameObjectInstances", scrollPaneGameObjectInstances);
 		tabPane.addTab("Images", scrollPaneImages);
@@ -95,6 +96,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		                evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 		            for (File file : droppedFiles) {
 		            	gi.game.images.put(file.getName(), ImageIO.read(file));
+		            	gi.update(new AddObjectAction(id, GameStructureEditAction.ADD_IMAGE, file.getName().hashCode()));
 		            }
 		        } catch (Exception ex) {
 		            ex.printStackTrace();
@@ -262,7 +264,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 
 	@Override
 	public void changeUpdate(GameAction action) {
-		if (action instanceof GameObjectInstanceEditAction)
+		if (action instanceof GameObjectInstanceEditAction || action instanceof GameStructureEditAction)
 		{
 			JFrameUtils.runByDispatcher(this);
 		}
