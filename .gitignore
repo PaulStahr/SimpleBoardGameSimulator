@@ -10,3 +10,6 @@ build
 .gradle
 PrivateGames/
 Server/
+doc/documentation.synctex.gz
+doc/documentation.log
+doc/documentation.aux
