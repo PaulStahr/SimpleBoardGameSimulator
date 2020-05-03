@@ -1,18 +1,28 @@
 package gui;
 
 import java.awt.EventQueue;
+import java.awt.Point;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -22,15 +32,18 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.Document;
 
 import gameObjects.GameObjectColumnType;
 import gameObjects.GameObjectInstanceColumnType;
 import gameObjects.ImageColumnType;
 import gameObjects.PlayerColumnType;
+import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.definition.GameObject;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
@@ -41,7 +54,7 @@ import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.TableModel;
 
-public class EditGamePanel extends JPanel implements ActionListener, GameChangeListener, Runnable{
+public class EditGamePanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener{
 	public static final List<TableColumnType> IMAGE_TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{ImageColumnType.ID, ImageColumnType.WIDTH, ImageColumnType.HEIGHT, ImageColumnType.DELETE});
 	GameInstance gi;
 	private final DefaultTableModel tableModelGameObjectInstances= new TableModel(ObjectInstance.TYPES);
@@ -52,25 +65,45 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final JTable tableGameObjects = new JTable(tableModelGameObjects);
 	private final JTable tableImages = new JTable(tableModelImages);
 	private final JTable tablePlayer = new JTable(tableModelPlayer);
-	public String name;
 	private final JScrollPane scrollPaneGameObjectInstances = new JScrollPane(tableGameObjectInstances);
 	private final JScrollPane scrollPaneGameObjects = new JScrollPane(tableGameObjects);
 	private final JScrollPane scrollPaneImages = new JScrollPane(tableImages);
+	private final JScrollPane scrollPanePlayer = new JScrollPane(tablePlayer);
 	private final GeneralPanel panelGeneral = new GeneralPanel();	
 	private final JTabbedPane tabPane = new JTabbedPane();
+	public int id = (int)(Math.random() * Integer.MAX_VALUE);
 	public EditGamePanel(GameInstance gi) {
 		this.gi = gi;
 		GroupLayout layout = new GroupLayout(this);
 		setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(tabPane));
 		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(tabPane));
-		tabPane.addTab("Genenaral", panelGeneral);
+		tabPane.addTab("General", panelGeneral);
 		tabPane.addTab("GameObjects", scrollPaneGameObjects);
 		tabPane.addTab("GameObjectInstances", scrollPaneGameObjectInstances);
 		tabPane.addTab("Images", scrollPaneImages);
-		tabPane.addTab("Player", tablePlayer);
+		tabPane.addTab("Player", scrollPanePlayer);
+		tableGameObjects.addMouseListener(this);
 		updateTables();
 		gi.addChangeListener(this);
+		
+		scrollPaneImages.setDropTarget(new DropTarget() {
+		    @Override
+			public synchronized void drop(DropTargetDropEvent evt) {
+		        try {
+		            evt.acceptDrop(DnDConstants.ACTION_COPY);
+		            List<? extends File> droppedFiles = (List<? extends File>)
+		                evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+		            for (File file : droppedFiles) {
+		            	gi.game.images.put(file.getName(), ImageIO.read(file));
+		            	gi.update(new AddObjectAction(id, GameStructureEditAction.ADD_IMAGE, file.getName().hashCode()));
+		            }
+		        } catch (Exception ex) {
+		            ex.printStackTrace();
+		        }
+		        updateTables();
+		    }
+		});
 	}
     private final AbstractAction tableAction = new AbstractAction() {
     	private static final long serialVersionUID = 3980835476835695337L;
@@ -96,22 +129,34 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  		private final JTextField textFieldName = new JTextField();
  		private final JLabel labelBackground = new JLabel("Background");
  		private final JComboBox<String> comboBoxBackground = new JComboBox<String>();
+ 		private final JLabel labelPassword = new JLabel("Password");
+ 		private final JTextField textFieldPassword = new JTextField();
 		
  		public GeneralPanel()
  		{
  			GroupLayout layout = new GroupLayout(this);
  			setLayout(layout);
  			
- 			layout.setHorizontalGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelBackground)).addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(comboBoxBackground)));
- 			layout.setVerticalGroup(layout.createSequentialGroup().addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName)).addGroup(layout.createParallelGroup().addComponent(labelBackground).addComponent(comboBoxBackground)));
+ 			layout.setHorizontalGroup(
+ 					layout.createSequentialGroup()
+ 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelBackground).addComponent(labelPassword))
+ 					.addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(comboBoxBackground).addComponent(textFieldPassword)));
+ 			layout.setVerticalGroup(
+ 					layout.createSequentialGroup()
+ 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName))
+ 					.addGroup(layout.createParallelGroup().addComponent(labelBackground).addComponent(comboBoxBackground))
+ 					.addGroup(layout.createParallelGroup().addComponent(labelPassword).addComponent(textFieldPassword)));
+ 			
+ 			textFieldName.getDocument().addDocumentListener(this);
+			comboBoxBackground.addItemListener(this);
+			textFieldPassword.getDocument().addDocumentListener(this);
  		}
 
 		public void update() {
 			textFieldName.setText(gi.name);
-			textFieldName.getDocument().addDocumentListener(this);
 			JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
 			comboBoxBackground.setSelectedItem(gi.game.getImageKey(gi.game.background));
-			comboBoxBackground.addItemListener(this);
+			textFieldPassword.setText(gi.password);
 		}
 
 		@Override
@@ -122,7 +167,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			if (arg0.getStateChange() == ItemEvent.SELECTED) {
 		        gi.game.background = gi.game.images.get(arg0.getItem());
-		        gi.update(new GameStructureEditAction(0));
+		        gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_BACKGROUND));
 			}
 		}
 		
@@ -133,7 +178,17 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			{
 				return;
 			}
-			gi.name = textFieldName.getText();
+			Document source = event.getDocument();
+			if (source == textFieldName.getDocument())
+			{
+				gi.name = textFieldName.getText();
+				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_SESSION_NAME));
+			}
+			else if (source == textFieldPassword.getDocument())
+			{
+				gi.password = textFieldPassword.getText();
+				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_SESSION_PASSWORD));
+			}
 		}
 
 		@Override
@@ -209,11 +264,102 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 
 	@Override
 	public void changeUpdate(GameAction action) {
-		if (action instanceof GameObjectInstanceEditAction)
+		if (action instanceof GameObjectInstanceEditAction || action instanceof GameStructureEditAction)
 		{
 			JFrameUtils.runByDispatcher(this);
 		}
 	}
 	
+	public static class ObjectEditPanel extends JPanel implements DocumentListener{
+		private final JLabel labelName = new JLabel("Name");
+		private final JTextField textFieldName = new JTextField();
+		private final JLabel labelWidth = new JLabel("Width");
+		private final JTextField textFieldWidth = new JTextField();
+		private final JLabel labelHeight = new JLabel("Height");
+		private final JTextField textFieldHeight = new JTextField();
+		private final GameObject go;
+		boolean updating = false;
+		public ObjectEditPanel(GameObject go)
+		{
+			GroupLayout layout = new GroupLayout(this);
+			setLayout(layout);
+			this.go = go;
+			textFieldName.setText(go.uniqueName);
+			textFieldWidth.setText(Integer.toString(go.widthInMM));
+			textFieldHeight.setText(Integer.toString(go.heightInMM));
+			textFieldWidth.getDocument().addDocumentListener(this);
+			textFieldHeight.getDocument().addDocumentListener(this);
+			layout.setHorizontalGroup(
+ 					layout.createSequentialGroup()
+ 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelWidth).addComponent(labelHeight))
+ 					.addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(textFieldWidth).addComponent(textFieldHeight)));
+ 			layout.setVerticalGroup(
+ 					layout.createSequentialGroup()
+ 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName))
+ 					.addGroup(layout.createParallelGroup().addComponent(labelWidth).addComponent(textFieldWidth))
+ 					.addGroup(layout.createParallelGroup().addComponent(labelHeight).addComponent(textFieldHeight)));
+ 			
+			if(go instanceof GameObjectToken)
+			{
+				JLabel labelFrontImage = new JLabel();
+				JComboBox<String> comboBoxFrontImage = new JComboBox<String>();
+				GameObjectToken token = (GameObjectToken)go;
+				
+			}
+		}
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			Document source = e.getDocument();
+			if (updating)
+			{
+				return;
+			}
+			if (source == textFieldWidth.getDocument())
+			{
+				go.widthInMM = Integer.parseInt(textFieldWidth.getText());
+			}
+			else if (source == textFieldHeight.getDocument())
+			{
+				go.heightInMM = Integer.parseInt(textFieldHeight.getText());
+			}
+		}
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+			changedUpdate(e);
+		}
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			changedUpdate(e);
+		}
+	}
+	
+	@Override
+	public void mouseClicked(MouseEvent arg0) {}
 
+	@Override
+	public void mouseEntered(MouseEvent arg0) {}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {}
+
+	@Override
+	public void mousePressed(MouseEvent mouseEvent) {
+		Object source = mouseEvent.getSource();
+		if (source == tableGameObjects)
+		{
+	        JTable table =(JTable) source;
+	        Point point = mouseEvent.getPoint();
+	        int row = table.rowAtPoint(point);
+	        if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
+	            JFrame frame = new JFrame();
+	            frame.setLayout(JFrameUtils.SINGLE_COLUMN_LAYOUT);
+	            frame.add(new ObjectEditPanel(gi.game.objects.get(table.getSelectedRow())));
+	            frame.setSize(300,300);
+	            frame.setVisible(true);
+	        }
+		}
+    }
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {}
 }

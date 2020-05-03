@@ -86,10 +86,11 @@ public class DrawFunctions {
             g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
             g.fillRect(0, 0, 10, 10);
             g.drawString(p.getName(),  15,  5);
-
+            
             if (p.id == player.id){
                 g.drawString(player.actionString,  0, -15);
                 g.drawString(infoText, -20, 10);
+
             }
         }
 

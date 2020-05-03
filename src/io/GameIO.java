@@ -449,6 +449,20 @@ public class GameIO {
 		}
 	}
 	
+	public static final void writeImageToStream(BufferedImage img, String suffix, OutputStream out) throws IOException
+	{
+		if (getVersion() < 9)
+    	{
+    		MemoryCacheImageOutputStream tmp = new MemoryCacheImageOutputStream(out);
+	    	ImageIO.write(img, suffix, tmp);
+    		tmp.close();
+    	}
+	    else
+	    {
+	    	ImageIO.write(img, suffix, out);
+    	}
+    }
+	
 	public static void writeGameToZip(Game game, ZipOutputStream zipOutputStream) throws IOException
 	{	
 		// Save all images
@@ -462,16 +476,7 @@ public class GameIO {
 		    	String suffix = key.substring(idx + 1);
 		    	if (ArrayUtil.firstEqualIndex(ImageIO.getWriterFileSuffixes(), suffix) != -1)
 		    	{
-		    		if (getVersion() < 9)
-			    	{
-			    		MemoryCacheImageOutputStream tmp = new MemoryCacheImageOutputStream(zipOutputStream);
-				    	ImageIO.write(pair.getValue(), suffix, tmp);
-			    		tmp.close();
-			    	}
-				    else
-				    {
-				    	ImageIO.write(pair.getValue(), suffix, zipOutputStream);
-			    	}
+		    		writeImageToStream(pair.getValue(), suffix, zipOutputStream);
 		    	}
 		    }
 		    zipOutputStream.closeEntry();

@@ -37,5 +37,10 @@ public abstract class ObjectState implements Serializable {
 		this.value = state.value;
 	}
 
-	public abstract ObjectState copy(); 
+	public abstract ObjectState copy();
+
+	public double getRadiansRotation()
+	{
+		return Math.toRadians(rotation);
+	}
 }
