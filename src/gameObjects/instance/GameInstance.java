@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import gameObjects.GameInstanceColumnType;
 import gameObjects.action.GameAction;
+import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GamePlayerEditAction;
+import gameObjects.definition.GameObject;
 import main.Player;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
@@ -142,6 +144,11 @@ public class GameInstance {
 	}
 
 	public void update(GameAction action) {
+		if (action instanceof GameObjectEditAction)
+		{
+			GameObject obj = ((GameObjectEditAction) action).getObject(this);
+			obj.updateImages(this);
+		}
 		for (int i = 0; i < changeListener.size(); ++i)
 		{
 			try
@@ -178,5 +185,13 @@ public class GameInstance {
 
 	public List<Player> getPlayerList() {
 		return Collections.unmodifiableList(players);
+	}
+
+	public void remove(GameObject object) {
+		game.objects.remove(object);
+	}
+
+	public void remove(Player player) {
+		players.remove(player);
 	}
 }

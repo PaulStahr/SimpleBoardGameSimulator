@@ -3,11 +3,14 @@ package gameObjects.definition;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 
 public class GameObjectFigure extends GameObject{
-	BufferedImage standingLook;
-	BufferedImage lyingLook;
+	private transient BufferedImage standingLook;
+	private transient BufferedImage lyingLook;
+	private String standingLookStr;
+	private String lyingLookStr;
 	public GameObjectFigure(String uniqueName, String objectType, int widthInMM, int heightInMM, BufferedImage standingLook, int value, int rotationStep) {
 		super(uniqueName, objectType, widthInMM, heightInMM, value, rotationStep);
 		this.standingLook = standingLook;
@@ -22,6 +25,13 @@ public class GameObjectFigure extends GameObject{
 	    graphics2D.rotate(Math.PI / 2, height / 2, width / 2);
 	    graphics2D.drawRenderedImage(standingLook, null);
 	    this.lyingLook = lyingFigure;
+	}
+	
+	@Override
+	public void updateImages(GameInstance gi)
+	{
+		standingLook = gi.game.getImage(standingLookStr);
+		lyingLook = gi.game.getImage(lyingLookStr);		
 	}
 
 	@Override

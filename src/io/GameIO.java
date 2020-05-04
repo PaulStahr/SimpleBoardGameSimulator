@@ -227,9 +227,9 @@ public class GameIO {
 						BufferedImage img = images.get(side.getValue());
 						if (img == null)
 						{
-							logger.warn("Imege not found: ", side.getValue());
+							logger.warn("Image not found: ", side.getValue());
 						}
-						dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img));
+						dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img, side.getValue()));
 					}
 				}
 				result = new GameObjectDice(uniqueName, type, width, height, dss.toArray(new DiceSide[dss.size()]), value, rotationStep);
@@ -814,6 +814,34 @@ public class GameIO {
     	Element root = doc.getRootElement();
 		editPlayerFromElement(root, gi);
 	}
+
+	public static void writeObjectToStreamObject(ObjectOutputStream objOut, GameObject editedObject) throws IOException {
+		objOut.writeInt(editedObject.widthInMM);
+		objOut.writeInt(editedObject.heightInMM);
+		objOut.writeInt(editedObject.rotationStep);
+		objOut.writeInt(editedObject.value);
+		objOut.writeObject(editedObject.objectType);
+		if (editedObject instanceof GameObjectToken)
+		{
+			GameObjectToken token = (GameObjectToken)editedObject;
+			objOut.writeObject(token.getDownsideLookId());
+			objOut.writeObject(token.getUpsideLookId());
+		}
+	}
+	
+	public static void editGameObjectFromStreamObject(ObjectInputStream objIn, GameObject object) throws IOException, ClassNotFoundException {
+		object.widthInMM = objIn.readInt();
+		object.heightInMM = objIn.readInt();
+		object.rotationStep = objIn.readInt();
+		object.value = objIn.readInt();
+		object.objectType = (String)objIn.readObject();
+		if (object instanceof GameObjectToken)
+		{
+			GameObjectToken token = (GameObjectToken)object;
+			token.setDownsideLook((String)objIn.readObject());
+			token.setUpsideLook((String)objIn.readObject());
+		}
+	}
 	
 	public static void editPlayerFromStreamObject(ObjectInputStream is, Player player) throws ClassNotFoundException, IOException
 	{
@@ -954,5 +982,6 @@ public class GameIO {
 		stream.close();
 		return pl;
 	}
+
 	
 }

@@ -72,4 +72,12 @@ public class Game {
 		}
 		return null;
 	}
+
+	public GameObject getObjectByIndex(int index) {
+		return objects.get(index);
+	}
+
+	public BufferedImage getImage(String standingLookStr) {
+		return images.get(standingLookStr);
+	}
 }

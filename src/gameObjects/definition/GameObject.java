@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.List;
 
 import gameObjects.GameObjectColumnType;
+import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 import util.ArrayTools;
 import util.data.UniqueObjects;
@@ -50,4 +51,6 @@ public abstract class GameObject {
 	{
 		return widthInMM ^ heightInMM ^ uniqueName.hashCode();
 	}
+
+	public abstract void updateImages(GameInstance gi);
 }

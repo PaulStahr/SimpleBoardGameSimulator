@@ -2,11 +2,36 @@ package gameObjects.definition;
 
 import java.awt.image.BufferedImage;
 
+import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 
 public class GameObjectToken extends GameObject{
-	public BufferedImage upsideLook;
-	public BufferedImage downsideLook;
+	private String downsideLookId;
+	private String upsideLookId;
+	private BufferedImage upsideLook;
+	private BufferedImage downsideLook;
+	
+	public String getDownsideLookId()
+	{
+		return downsideLookId;
+	}
+	
+	public String getUpsideLookId()
+	{
+		return upsideLookId;
+	}
+	
+	public void setUpsideLook(String upsideLookId)
+	{
+		this.upsideLookId = upsideLookId;
+		this.upsideLook = null;
+	}
+	
+	public void setDownsideLook(String downsideLookId)
+	{
+		this.downsideLookId = downsideLookId;
+		this.downsideLook = null;
+	}
 
 	public GameObjectToken(String uniqueName, String objectType, int widthInMM, int heightInMM, BufferedImage front, BufferedImage back, int value, int rotationStep) {
 		super(uniqueName, objectType, widthInMM, heightInMM, value, rotationStep);
@@ -69,5 +94,11 @@ public class GameObjectToken extends GameObject{
 	public BufferedImage getDownsideLook()
 	{
 		return downsideLook;
+	}
+
+	@Override
+	public void updateImages(GameInstance gi) {
+		downsideLook = gi.game.getImage(downsideLookId);
+		upsideLook = gi.game.getImage(upsideLookId);
 	}
 }

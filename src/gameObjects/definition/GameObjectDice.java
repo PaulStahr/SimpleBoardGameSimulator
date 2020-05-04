@@ -3,18 +3,21 @@ package gameObjects.definition;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 
 public class GameObjectDice extends GameObject{
 	public static class DiceSide
 	{
 		public final int value;
-		public final BufferedImage img;
+		public BufferedImage img;
+		public final String imgStr;
 	
-		public DiceSide(int value, BufferedImage img)
+		public DiceSide(int value, BufferedImage img, String imgStr)
 		{
 			this.value = value;
 			this.img = img;
+			this.imgStr = imgStr;
 		}
 	}
 	public DiceSide dss[];
@@ -92,6 +95,14 @@ public class GameObjectDice extends GameObject{
 		state.side = rnd.nextInt(dss.length);
 		state.value = dss[state.side].value;
 		return dss[state.side];
+	}
+
+	@Override
+	public void updateImages(GameInstance gi) {
+		for (int i = 0; i < dss.length; ++i)
+		{
+			dss[i].img = gi.game.getImage(dss[i].imgStr);
+		}
 	}
 
 }
