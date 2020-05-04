@@ -21,69 +21,96 @@
  ******************************************************************************/
 package util.data;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Queue;
+
+import util.ArrayUtil;
 
 public class ArrayQueue<E> implements Queue<E>{
 	private Object data[] = new Object[2];
 	private int bitmask = 1;
-	private int start=0, end=0;
+	private int begin=0, end=0;
 
 	public void push(E object){
-		if (((end +2) & bitmask) == start){
+		if (((end +2) & bitmask) == begin){
 			Object tmp[] = new Object[data.length*2];
 			bitmask = tmp.length - 1; 
-			if (start < end){
-				System.arraycopy(data, start, tmp, 0, end-start);
+			if (begin < end){
+				System.arraycopy(data, begin, tmp, 0, end-begin);
 			}else{
-				System.arraycopy(data, start, tmp, 0, data.length-start);
-				System.arraycopy(data, 0, tmp, data.length-start, end);				
+				System.arraycopy(data, begin, tmp, 0, data.length-begin);
+				System.arraycopy(data, 0, tmp, data.length-begin, end);				
 			}
 			data = tmp;
-			end -= start;
-			start = 0;
+			end -= begin;
+			begin = 0;
 		}
 		data[end++] = object;
 	}
 	
+	@Override
 	@SuppressWarnings({ "unchecked"})
 	public E peek(){
 		if (isEmpty())
 			return null;
-		return (E)data[start++];
+		return (E)data[begin++];
 	}
 	
+	@Override
 	public boolean isEmpty(){
-		return start==end;
+		return begin==end;
 	}
 	
+	@Override
 	public int size() {
-		return (end-start+data.length)&bitmask;
+		return (end-begin+data.length)&bitmask;
 	}
 
 	@Override
 	public boolean addAll(Collection<? extends E> arg0) {
-		// TODO Auto-generated method stub
-		return false;
+		for (E elem : arg0)
+		{
+			add(elem);
+		}
+		return true;
 	}
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
-		
+		if (begin < end)
+		{
+			Arrays.fill(data, begin, end, null);
+		}
+		else
+		{
+			Arrays.fill(data, begin, data.length, null);
+			Arrays.fill(data, 0, end, null);
+		}
+		begin = end = 0;
 	}
 
 	@Override
-	public boolean contains(Object arg0) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean contains(Object value) {
+		if (begin < end)
+		{
+			return ArrayUtil.linearSearch(data, begin, end, value) >= 0;
+		}
+		return ArrayUtil.linearSearch(data, begin, data.length, value) >= 0 || ArrayUtil.linearSearch(data, 0, end, value) >= 0;
 	}
 
 	@Override
 	public boolean containsAll(Collection<?> arg0) {
-		// TODO Auto-generated method stub
-		return false;
+		for (Object  o: arg0)
+		{
+			if (!contains(o))
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@Override
@@ -93,15 +120,27 @@ public class ArrayQueue<E> implements Queue<E>{
 	}
 
 	@Override
-	public boolean remove(Object arg0) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean remove(Object value) {
+		if (begin < end)
+		{
+			int index = ArrayUtil.linearSearch(data, begin, end, value);
+			if (index < 0)
+			{
+				return false;
+			}
+			System.arraycopy(data, index + 1, data, index, end - index - 1);
+			--end;
+		}
+		return ArrayUtil.linearSearch(data, begin, data.length, value) >= 0 || ArrayUtil.linearSearch(data, 0, end, value) >= 0;
 	}
 
 	@Override
 	public boolean removeAll(Collection<?> arg0) {
-		// TODO Auto-generated method stub
-		return false;
+		for (Object elem : arg0)
+		{
+			remove(elem);
+		}
+		return true;
 	}
 
 	@Override
@@ -112,43 +151,65 @@ public class ArrayQueue<E> implements Queue<E>{
 
 	@Override
 	public Object[] toArray() {
-		// TODO Auto-generated method stub
-		return null;
+		Object result[] = new Object[size()];
+		return toArray(result);
 	}
 
 	@Override
-	public <T> T[] toArray(T[] arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	public <T> T[] toArray(T[] result) {
+		if (begin < end)
+		{
+			System.arraycopy(data, begin, result, 0, end - begin);
+		}
+		else
+		{
+			System.arraycopy(data, begin, result, 0, data.length - begin);
+			System.arraycopy(data, begin, result, data.length - begin, end);
+		}
+		return result;
 	}
 
 	@Override
 	public boolean add(E arg0) {
-		// TODO Auto-generated method stub
-		return false;
+		push(arg0);
+		return true;
 	}
 
 	@Override
 	public E element() {
-		// TODO Auto-generated method stub
-		return null;
+		if (size() == 0)
+		{
+			throw new NoSuchElementException();
+		}
+		E head = (E)data[begin];
+		++begin;
+		return head;
 	}
 
 	@Override
 	public boolean offer(E arg0) {
-		// TODO Auto-generated method stub
-		return false;
+		return add(arg0);
 	}
 
 	@Override
 	public E poll() {
-		// TODO Auto-generated method stub
-		return null;
+		if (size() == 0)
+		{
+			return null;
+		}
+		E head = (E)data[begin];
+		++begin;
+		return head;
 	}
 
 	@Override
 	public E remove() {
-		// TODO Auto-generated method stub
-		return null;
+		if (size() == 0)
+		{
+			throw new NoSuchElementException();
+		}
+		E head = (E)data[begin];
+		++begin;
+		return head;
 	}
 }
