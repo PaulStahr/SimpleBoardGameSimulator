@@ -342,7 +342,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				beginSelectPosScreenY = arg0.getY();
 				isSelectStarted = true;
 			} else {
-				for (int i:selectedObjects){
+				for (int i : selectedObjects) {
 					gameInstance.getObjectInstanceById(i).state.isActive = false;
 				}
 				selectedObjects.clear();
@@ -361,8 +361,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					oi.state.isActive = true;
 				}
 			}
-				//Handle all drags of Objects
-				MoveFunctions.dragObjects(this,gameInstance,player,arg0,activeObjects,objOrigPosX,objOrigPosY,mousePressedGamePos,mouseBoardPos,mouseWheelValue);
+			//Handle all drags of Objects
+			MoveFunctions.dragObjects(this, gameInstance, player, arg0, activeObjects, objOrigPosX, objOrigPosY, mousePressedGamePos, mouseBoardPos, mouseWheelValue);
+			if (this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)) {
+				this.privateArea.currentDragPosition = this.privateArea.getInsertPosition(mouseScreenX, mouseScreenY);
+				outText = "Position:" + String.valueOf(this.privateArea.currentDragPosition);
+			}
+			else{
+				this.privateArea.currentDragPosition = -1;
+			}
 		}
 	}
 
@@ -395,6 +402,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				if (this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)){
 					this.privateArea.currentDragPosition = this.privateArea.getInsertPosition(mouseScreenX, mouseScreenY);
 					outText = "Position:" + String.valueOf(this.privateArea.currentDragPosition);
+				}
+				else{
+					this.privateArea.currentDragPosition = -1;
 				}
 				if (activeObject == null && selectedObjects.size() == 0 && !SwingUtilities.isMiddleMouseButton(arg0) && !mouseInPrivateArea) {
 					selectWidth = mouseScreenX - beginSelectPosScreenX;

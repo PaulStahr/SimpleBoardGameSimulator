@@ -196,9 +196,17 @@ public class DrawFunctions {
             Graphics2D g2 = (Graphics2D) g;
             AffineTransform tmp = g2.getTransform();
             g2.translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming * 0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming * 0.5);
-            g2.rotate(Math.toRadians(objectInstance.state.rotation));
-            g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
-
+            if (!gamePanel.privateArea.containsBoardCoordinates(objectInstance.state.posX, objectInstance.state.posY) || !objectInstance.state.isActive){
+                g2.rotate(Math.toRadians(objectInstance.state.rotation));
+                g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+            }
+            else if (objectInstance.state.isActive){
+                int insertPosition = gamePanel.privateArea.getInsertPosition(objectInstance.state.posX + objectInstance.getWidth(player.id)/2, objectInstance.state.posY + objectInstance.getHeight(player.id)/2);
+                for(int i = 0; i < insertPosition;++i){
+                    g2.rotate(Math.PI / (gamePanel.privateArea.objects.size()));
+                }
+                g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+            }
 
             //Draw Border around objects
             g2.setStroke(new BasicStroke(borderWidth));
