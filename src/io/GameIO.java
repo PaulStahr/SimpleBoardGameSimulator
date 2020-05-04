@@ -84,6 +84,7 @@ public class GameIO {
 		elem.setAttribute(IOString.ABOVE, Integer.toString(state.aboveInstanceId));
 		elem.setAttribute(IOString.BELOW, Integer.toString(state.belowInstanceId));
 		elem.setAttribute(IOString.VALUE, Integer.toString(state.value));
+		elem.setAttribute(IOString.ROTATION_STEP, Integer.toString(state.rotationStep));
 		if (state instanceof TokenState)
     	{
 			elem.setAttribute(IOString.SIDE, Boolean.toString(((TokenState)state).side));
@@ -130,6 +131,11 @@ public class GameIO {
 		if (valueAttribute != null)
 		{
 			state.value = Integer.parseInt(valueAttribute.getValue());
+		}
+		Attribute rotationStep = elem.getAttribute(IOString.ROTATION_STEP);
+		if (rotationStep != null)
+		{
+			state.rotationStep = Integer.parseInt(rotationStep.getValue());
 		}
 		if (state instanceof TokenState && elem.getAttribute(IOString.SIDE) != null)
     	{
@@ -183,48 +189,36 @@ public class GameIO {
 		String uniqueName = elem.getAttributeValue(IOString.UNIQUE_NAME);
 		String type = elem.getAttributeValue(IOString.TYPE);
 		GameObject result = null;
+		int width = 66;
+		int height = 88;
+		int value = 0;
+		int rotationStep = 90;
+		if(elem.getAttributeValue(IOString.WIDTH) != null) {
+			width = Integer.parseInt(elem.getAttributeValue(IOString.WIDTH));
+		}
+		if(elem.getAttributeValue(IOString.HEIGHT) != null) {
+			height = Integer.parseInt(elem.getAttributeValue(IOString.HEIGHT));
+		}
+		if(elem.getAttributeValue(IOString.VALUE) != null) {
+			value = Integer.parseInt(elem.getAttributeValue(IOString.VALUE));
+		}
+		if(elem.getAttributeValue(IOString.ROTATION_STEP) != null) {
+			rotationStep = Integer.parseInt(elem.getAttributeValue(IOString.ROTATION_STEP));
+		}
 		switch(type)
 		{
 			case IOString.CARD:
 			{
-				int width = 66;
-				int height = 88;
-				int value = 0;
-				if(elem.getAttributeValue(IOString.WIDTH) != null) {
-					width = Integer.parseInt(elem.getAttributeValue(IOString.WIDTH));
-				}
-				if(elem.getAttributeValue(IOString.HEIGHT) != null) {
-					height = Integer.parseInt(elem.getAttributeValue(IOString.HEIGHT));
-				}
-				if(elem.getAttributeValue(IOString.VALUE) != null) {
-					value = Integer.parseInt(elem.getAttributeValue(IOString.VALUE));
-				}
-				result = new GameObjectToken(uniqueName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value);
+				result = new GameObjectToken(uniqueName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value, rotationStep);
 				break;
 			}
 			case IOString.FIGURE:
 			{
-				int width = 20;
-				int height = 40;
-				if(elem.getAttributeValue(IOString.WIDTH) != null) {
-					width = Integer.parseInt(elem.getAttributeValue(IOString.WIDTH));
-				}
-				if(elem.getAttributeValue(IOString.HEIGHT) != null) {
-					height = Integer.parseInt(elem.getAttributeValue(IOString.HEIGHT));
-				}
-				result = new GameObjectFigure(uniqueName, type, width, height, images.get(elem.getAttributeValue(IOString.STANDING)));
+				result = new GameObjectFigure(uniqueName, type, width, height, images.get(elem.getAttributeValue(IOString.STANDING)), value, rotationStep);
 				break;
 			}
 			case IOString.DICE:
 			{
-				int width = 20;
-				int height = 20;
-				if(elem.getAttributeValue(IOString.WIDTH) != null) {
-					width = Integer.parseInt(elem.getAttributeValue(IOString.WIDTH));
-				}
-				if(elem.getAttributeValue(IOString.HEIGHT) != null) {
-					height = Integer.parseInt(elem.getAttributeValue(IOString.HEIGHT));
-				}
 				ArrayList<DiceSide> dss = new ArrayList<>();
 				for (Element side : elem.getChildren())
 				{
@@ -238,7 +232,7 @@ public class GameIO {
 						dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img));
 					}
 				}
-				result = new GameObjectDice(uniqueName, type, width, height, dss.toArray(new DiceSide[dss.size()]));
+				result = new GameObjectDice(uniqueName, type, width, height, dss.toArray(new DiceSide[dss.size()]), value, rotationStep);
 				break;
 			}
 		}
@@ -865,6 +859,7 @@ public class GameIO {
 		state.posY = is.readInt();
 		state.rotation = is.readInt();
 		state.value = is.readInt();
+		state.rotationStep = is.readInt();
 		if (state instanceof TokenState)
 		{
 			((TokenState)state).side = is.readBoolean();
@@ -902,6 +897,7 @@ public class GameIO {
 		out.writeInt(state.posY);
 		out.writeInt(state.rotation);
 		out.writeInt(state.value);
+		out.writeInt(state.rotationStep);
 		if (state instanceof TokenState)
 		{
 			out.writeBoolean(((TokenState)state).side);

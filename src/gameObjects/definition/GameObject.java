@@ -14,15 +14,20 @@ public abstract class GameObject {
 	public int heightInMM;
 	public String uniqueName;
 	public String objectType;
+	public int value;
+	public int rotationStep;
 	public String groups[] = UniqueObjects.EMPTY_STRING_ARRAY;
+
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectColumnType.ID, GameObjectColumnType.NAME, GameObjectColumnType.DELETE});
 
-	public GameObject(String uniqueName, String objectType, int widthInMM, int heightInMM)
+	public GameObject(String uniqueName, String objectType, int widthInMM, int heightInMM, int value, int rotationStep)
 	{
 		this.uniqueName = uniqueName;
 		this.objectType = objectType;
 		this.widthInMM = widthInMM;
 		this.heightInMM = heightInMM;
+		this.value = value;
+		this.rotationStep = rotationStep;
 	}
 	
 	public abstract BufferedImage getLook(ObjectState state, int playerId);

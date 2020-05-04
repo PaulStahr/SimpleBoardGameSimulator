@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<xml>
+<name>NeuesSpiel</name>
+<object unique_name="caro10" id="0" x="100" y="100" r="0"/>
+<object unique_name="carobube" id="1" x="100" y="100" r="0"/>
+
+<object unique_name="carodame" id="2" x="100" y="100" r="0"/>
+
+<object unique_name="carokoenig" id="3" x="100" y="100" r="0"/>
+
+<object unique_name="caroass" id="4" x="100" y="100" r="0"/>
+
+
+<object unique_name="herz10" id="5" x="100" y="100" r="0"/>
+<object unique_name="herzbube" id="6" x="100" y="100" r="0"/>
+
+<object unique_name="herzdame" id="7" x="100" y="100" r="0"/>
+
+<object unique_name="herzkoenig" id="8" x="100" y="100" r="0"/>
+
+<object unique_name="herzass" id="9" x="100" y="100" r="0"/>
+
+
+<object unique_name="pik10" id="10" x="100" y="100" r="0"/>
+<object unique_name="pikbube" id="11" x="100" y="100" r="0"/>
+
+<object unique_name="pikdame" id="12" x="100" y="100" r="0"/>
+
+<object unique_name="pikkoenig" id="13" x="100" y="100" r="0"/>
+
+<object unique_name="pikass" id="14" x="100" y="100" r="0"/>
+
+
+<object unique_name="kreuz10" id="15" x="100" y="100" r="0"/>
+<object unique_name="kreuzbube" id="16" x="100" y="100" r="0"/>
+
+<object unique_name="kreuzdame" id="17" x="100" y="100" r="0"/>
+
+<object unique_name="kreuzkoenig" id="18" x="100" y="100" r="0"/>
+
+<object unique_name="kreuzass" id="19" x="100" y="100" r="0"/>
+
+
+<object unique_name="caro10" id="20" x="100" y="100" r="0"/>
+<object unique_name="carobube" id="21" x="100" y="100" r="0"/>
+
+<object unique_name="carodame" id="22" x="100" y="100" r="0"/>
+
+<object unique_name="carokoenig" id="23" x="100" y="100" r="0"/>
+
+<object unique_name="caroass" id="24" x="100" y="100" r="0"/>
+
+
+<object unique_name="herz10" id="25" x="100" y="100" r="0"/>
+<object unique_name="herzbube" id="26" x="100" y="100" r="0"/>
+
+<object unique_name="herzdame" id="27" x="100" y="100" r="0"/>
+
+<object unique_name="herzkoenig" id="28" x="100" y="100" r="0"/>
+
+<object unique_name="herzass" id="29" x="100" y="100" r="0"/>
+
+
+<object unique_name="pik10" id="30" x="100" y="100" r="0"/>
+<object unique_name="pikbube" id="31" x="100" y="100" r="0"/>
+
+<object unique_name="pikdame" id="32" x="100" y="100" r="0"/>
+
+<object unique_name="pikkoenig" id="33" x="100" y="100" r="0"/>
+
+<object unique_name="pikass" id="34" x="100" y="100" r="0"/>
+
+
+<object unique_name="kreuz10" id="35" x="100" y="100" r="0"/>
+<object unique_name="kreuzbube" id="36" x="100" y="100" r="0"/>
+
+<object unique_name="kreuzdame" id="37" x="100" y="100" r="0"/>
+
+<object unique_name="kreuzkoenig" id="38" x="100" y="100" r="0"/>
+
+<object unique_name="kreuzass" id="39" x="100" y="100" r="0"/>
+
+
+
+
+</xml>

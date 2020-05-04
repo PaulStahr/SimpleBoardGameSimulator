@@ -11,6 +11,7 @@ public class IOString {
 	public static final String ABOVE = "above";
 	public static final String BELOW = "below";
 	public static final String VALUE = "value";
+	public static final String ROTATION_STEP = "rotation_step";
 	public static final String SIDE = "side";
 	public static final String NAME = "name";
 	public static final String HIDDEN = "hidden";

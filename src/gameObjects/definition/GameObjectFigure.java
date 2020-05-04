@@ -8,10 +8,9 @@ import gameObjects.instance.ObjectState;
 public class GameObjectFigure extends GameObject{
 	BufferedImage standingLook;
 	BufferedImage lyingLook;
-	public GameObjectFigure(String uniqueName, String objectType, int widthInMM, int heightInMM, BufferedImage standingLook) {
-		super(uniqueName, objectType, widthInMM, heightInMM);
+	public GameObjectFigure(String uniqueName, String objectType, int widthInMM, int heightInMM, BufferedImage standingLook, int value, int rotationStep) {
+		super(uniqueName, objectType, widthInMM, heightInMM, value, rotationStep);
 		this.standingLook = standingLook;
-		
 		// calc a rotated figure from standing figure
 		int width = standingLook.getWidth();
 	    int height = standingLook.getHeight();

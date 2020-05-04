@@ -19,6 +19,7 @@ public abstract class ObjectState implements Serializable {
 	public int belowInstanceId = -1;
 	public int value;
 	public long drawValue = 0;
+	public int rotationStep = 90;
 	
 	@Override
 	public int hashCode()
@@ -35,6 +36,7 @@ public abstract class ObjectState implements Serializable {
 		this.aboveInstanceId = state.aboveInstanceId;
 		this.belowInstanceId = state.belowInstanceId;
 		this.value = state.value;
+		this.rotationStep = state.rotationStep;
 	}
 
 	public abstract ObjectState copy();

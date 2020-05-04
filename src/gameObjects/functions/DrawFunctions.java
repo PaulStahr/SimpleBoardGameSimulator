@@ -86,7 +86,7 @@ public class DrawFunctions {
             g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
             g.fillRect(0, 0, 10, 10);
             g.drawString(p.getName(),  15,  5);
-            
+
             if (p.id == player.id){
                 g.drawString(player.actionString,  0, -15);
                 g.drawString(infoText, -20, 10);
@@ -178,6 +178,7 @@ public class DrawFunctions {
 
             //Draw Border around objects
             g2.setStroke(new BasicStroke(borderWidth));
+
             if (objectInstance.state.owner_id != -1) {
                     Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
                     g2.setColor(playerOwner.color);
@@ -197,7 +198,7 @@ public class DrawFunctions {
             }
             else{
                 if (objectInstance.state.isActive || gamePanel.selectedObjects.contains(objectInstance.id)) {
-                    g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming));
+                    g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth/2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth/2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth/2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
                 }
             }
             g2.setTransform(tmp);

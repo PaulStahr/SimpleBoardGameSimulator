@@ -7,13 +7,11 @@ import gameObjects.instance.ObjectState;
 public class GameObjectToken extends GameObject{
 	BufferedImage upsideLook;
 	BufferedImage downsideLook;
-	public int value;
 
-	public GameObjectToken(String uniqueName, String objectType, int widthInMM, int heightInMM, BufferedImage front, BufferedImage back, int value) {
-		super(uniqueName, objectType, widthInMM, heightInMM);
+	public GameObjectToken(String uniqueName, String objectType, int widthInMM, int heightInMM, BufferedImage front, BufferedImage back, int value, int rotationStep) {
+		super(uniqueName, objectType, widthInMM, heightInMM, value, rotationStep);
 		this.upsideLook = front;
 		this.downsideLook = back;
-		this.value = value;
 	}
 
 	@Override
@@ -26,6 +24,7 @@ public class GameObjectToken extends GameObject{
 	{
 		TokenState state = new TokenState();
 		state.value = this.value;
+		state.rotationStep = this.rotationStep;
 	    return state;
 	}
 

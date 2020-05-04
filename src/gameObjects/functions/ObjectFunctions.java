@@ -1379,7 +1379,7 @@ public class ObjectFunctions {
         getStack(gameInstance,objectInstance,ial);
         for (int id:ial){
             ObjectInstance oi = gameInstance.getObjectInstanceById(id);
-            oi.state.rotation = oi.getRotation() + oi.rotationStep;
+            oi.state.rotation = oi.getRotation() + oi.state.rotationStep;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, oi));
         }
     }
