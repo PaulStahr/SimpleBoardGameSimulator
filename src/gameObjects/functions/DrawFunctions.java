@@ -155,7 +155,7 @@ public class DrawFunctions {
     public static void drawStack(GamePanel gamePanel, Graphics g, IntegerArrayList stackList, GameInstance gameInstance, Player player, double zooming) {
         if (stackList.size()>0) {
             if (isStackCollected(gameInstance,gameInstance.getObjectInstanceById(stackList.get(0)))){
-                int oiId = gameInstance.getObjectInstanceById(stackList.last()).id;
+                int oiId = gameInstance.getObjectInstanceById(stackList.getI(0)).id;
                 stackList.clear();
                 stackList.add(oiId);
             }
@@ -187,10 +187,11 @@ public class DrawFunctions {
             else if(objectInstance.state.isActive || gamePanel.selectedObjects.contains(objectInstance.id)){
                 g2.setColor(player.color);
             }
-            else{
+            else if(ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance)){
                 g2.setStroke(new BasicStroke(borderWidth));
                 g2.setColor(gamePanel.stackColor);
             }
+
             if (objectInstance.go instanceof GameObjectToken) {
                 if (objectInstance.state.isActive || gamePanel.selectedObjects.contains(objectInstance.id) || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
                     g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth/2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth/2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth/2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
@@ -216,67 +217,5 @@ public class DrawFunctions {
             g2d.drawRect(-borderWidth/2 ,-borderWidth/2, (objectInstance.getWidth(player.id)) + borderWidth, (objectInstance.getHeight(player.id)) + borderWidth);
             g2d.setTransform(tmp);
         }
-    }
-
-    public static void drawBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, AffineTransform transform) {
-        if (objectInstance != null) {
-            g.setColor(color);
-            Graphics2D g2d = (Graphics2D) g.create();
-            AffineTransform tmp = g2d.getTransform();
-            if(transform != null)
-                g2d.setTransform(transform);
-            g2d.setStroke(new BasicStroke(borderWidth));
-            if (objectInstance.state.owner_id != -1)
-            {
-                Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
-                g2d.drawString(playerOwner.getName() + " Hand Cards", objectInstance.state.posX, objectInstance.state.posY - 20);
-            }
-            if (true || objectInstance.getRotation() == 0) {
-                g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, (int) (objectInstance.getWidth(player.id) * zooming) + borderWidth, (int) (objectInstance.getHeight(player.id) * zooming) + borderWidth);
-            }
-            else{
-                g2d.translate(objectInstance.state.posX + objectInstance.scale * objectInstance.getWidth(player.id) * zooming*0.5, objectInstance.state.posY + objectInstance.scale * objectInstance.getHeight(player.id) * zooming*0.5);
-                g2d.rotate(Math.toRadians(objectInstance.state.rotation));
-                g2d.drawRect(-(int) (objectInstance.scale * objectInstance.getWidth(player.id) * zooming*0.5),-(int) (objectInstance.scale * objectInstance.getHeight(player.id) * zooming * 0.5), (int) (objectInstance.scale * objectInstance.getWidth(player.id) * zooming), (int) (objectInstance.scale * objectInstance.getHeight(player.id) * zooming));
-                //g2d.drawRect(objectInstance.state.posX - borderWidth / 2, objectInstance.state.posY - borderWidth / 2, (int) (objectInstance.getWidth(player.id) * zooming) + borderWidth, (int) (objectInstance.getHeight(player.id) * zooming) + borderWidth);
-            }
-            g2d.setTransform(tmp);
-        }
-    }
-    public static void drawBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming) {
-        drawBorder(gameInstance, g, player, objectInstance, borderWidth, color, zooming, null);
-    }
-
-    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, double zooming, boolean drawProperStack, IntegerArrayList tmp) {
-        if (objectInstance != null && player != null) {
-            if(isStackCollected(gameInstance, objectInstance))
-            {
-                if((!drawProperStack || tmp.size() > 1) || objectInstance.state.owner_id != -1)
-                    drawBorder(gameInstance, g, player, getStackTop(gameInstance, objectInstance), borderWidth, color, zooming);
-            	tmp.clear();
-            }
-            else
-            {
-                Graphics2D g2d = (Graphics2D) g.create();
-                g2d.setColor(color);
-                if (objectInstance.state.owner_id != -1)
-                {
-                    Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
-                    g2d.drawString(playerOwner.getName() + " Hand Cards", objectInstance.state.posX, objectInstance.state.posY - 20);
-                    g2d.setColor(playerOwner.color);
-                }
-                g2d.setStroke(new BasicStroke(borderWidth));
-                ObjectInstance stackTop = getStackTop(gameInstance, objectInstance);
-                ObjectInstance stackBottom = getStackBottom(gameInstance, objectInstance);
-                g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackTop.state.posX, stackTop.state.posY + (int)(stackTop.getHeight(player.id)*zooming));
-                g2d.drawLine(stackBottom.state.posX + (int)(stackBottom.getWidth(player.id) * zooming), stackBottom.state.posY, stackBottom.state.posX+(int)(stackBottom.getWidth(player.id)*zooming), stackBottom.state.posY + (int)(stackBottom.getHeight(player.id)*zooming));
-                g2d.drawLine(stackTop.state.posX, stackTop.state.posY, stackBottom.state.posX +(int)(stackBottom.getWidth(player.id)*zooming), stackBottom.state.posY);
-                g2d.drawLine(stackTop.state.posX, stackTop.state.posY + (int)(stackTop.getHeight(player.id)*zooming), stackBottom.state.posX +(int)(stackBottom.getWidth(player.id)*zooming), stackBottom.state.posY + (int)(stackBottom.getHeight(player.id)*zooming));
-            }
-        }
-    }
-
-    public static void drawStackBorder(GameInstance gameInstance, Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, int zooming, IntegerArrayList tmp) {
-        drawStackBorder(gameInstance, g, player, objectInstance, borderWidth, color, zooming, false, tmp);
     }
 }

@@ -75,7 +75,7 @@ public class GameWindow extends JFrame implements ActionListener{
 		setSize((int) screenSize.getWidth(), (int) screenSize.getHeight());
 		slider.setDividerLocation(0.5);
 
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 
 	@Override

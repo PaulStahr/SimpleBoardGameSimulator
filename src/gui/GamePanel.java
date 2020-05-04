@@ -342,6 +342,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				beginSelectPosScreenY = arg0.getY();
 				isSelectStarted = true;
 			} else {
+				for (int i:selectedObjects){
+					gameInstance.getObjectInstanceById(i).state.isActive = false;
+				}
 				selectedObjects.clear();
 			}
 			setActiveObjects();
@@ -560,6 +563,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 			} else if (e.getKeyCode() == KeyEvent.VK_M && !controlDown) {
 				ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
+				for (int i : selectedObjects){
+					gameInstance.getObjectInstanceById(i).state.isActive = false;
+				}
+				selectedObjects.clear();
 			}
 		}
 		for (ObjectInstance oi: activeObjects){
@@ -706,7 +713,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public void setActiveObjects(){
 		//Get active or selected objects
-		if (activeObject!= null){
+		if (activeObject != null){
 			activeObject.state.isActive = false;
 		}
 		activeObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);

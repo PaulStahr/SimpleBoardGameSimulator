@@ -3,6 +3,7 @@
 <table border = \"0\"><tr><td width = \"10\"></td><td><H3>Version</H3><ul>
 <li>$progversion</li></ul><br /><H3>Developer</H3><ul>
 <li>Paul Stahr (paul.stahr@gmx.de): Netzwerk und Gui</li><br />
+<li>Florian Seiffarth (florian.seiffarth@t-online.de): Gui</li><br />
 </ul><H3>Used Software</H3><ul>
 <li>Lockback</li><br />
 <li>Jdom</li></ul></td>
