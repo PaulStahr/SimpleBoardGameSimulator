@@ -5,8 +5,8 @@ import java.awt.image.BufferedImage;
 import gameObjects.instance.ObjectState;
 
 public class GameObjectToken extends GameObject{
-	BufferedImage upsideLook;
-	BufferedImage downsideLook;
+	public BufferedImage upsideLook;
+	public BufferedImage downsideLook;
 
 	public GameObjectToken(String uniqueName, String objectType, int widthInMM, int heightInMM, BufferedImage front, BufferedImage back, int value, int rotationStep) {
 		super(uniqueName, objectType, widthInMM, heightInMM, value, rotationStep);
