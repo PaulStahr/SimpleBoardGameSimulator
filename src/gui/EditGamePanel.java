@@ -43,6 +43,7 @@ import gameObjects.ImageColumnType;
 import gameObjects.PlayerColumnType;
 import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
+import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.GameStructureEditAction;
@@ -250,13 +251,13 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				Entry<String, BufferedImage> entry = entrySet.toArray(new Entry[entrySet.size()])[row];
 				gi.game.images.remove(entry.getKey(), entry.getValue());
 			}
-			else if (tableSource == tableModelGameObjectInstances)
+			else if (tableSource == tableModelGameObjects)
 			{
-				
+				gi.remove(gi.game.getObjectByIndex(row));
 			}
 			else if (tableSource == tableModelPlayer)
 			{
-			
+				gi.remove(gi.getPlayerByIndex(row));
 			}
 		}
 		updateTables();
@@ -276,7 +277,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		}
 	}
 	
-	public static class ObjectEditPanel extends JPanel implements DocumentListener, ItemListener{
+	public class ObjectEditPanel extends JPanel implements DocumentListener, ItemListener{
 		private final JLabel labelName = new JLabel("Name");
 		private final JTextField textFieldName = new JTextField();
 		private final JLabel labelWidth = new JLabel("Width");
@@ -369,7 +370,9 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			{
 				go.heightInMM = Integer.parseInt(textFieldHeight.getText());
 			}
-			//TODO: events
+			isUpdating = true;
+			gi.update(new GameObjectEditAction(id, go.uniqueName));
+			isUpdating = false;
 		}
 		@Override
 		public void insertUpdate(DocumentEvent e) {
@@ -388,12 +391,15 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				GameObjectToken got = (GameObjectToken)go;
 				if (source == comboBoxFrontImage)
 				{
-					got.upsideLook = gi.game.images.get(comboBoxFrontImage.getSelectedItem());
+					got.setUpsideLook((String)comboBoxFrontImage.getSelectedItem());
 				}
 				if (source == comboBoxFrontImage)
 				{
-					got.downsideLook = gi.game.images.get(comboBoxBackImage.getSelectedItem());
+					got.setDownsideLook((String)comboBoxBackImage.getSelectedItem());
 				}
+				isUpdating = true;
+				gi.update(new GameObjectEditAction(id, got.uniqueName));
+				isUpdating = false;
 			}
 		}
 	}

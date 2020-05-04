@@ -1,7 +1,5 @@
 package gameObjects.functions;
 
-import static gameObjects.functions.ObjectFunctions.getStackBottom;
-import static gameObjects.functions.ObjectFunctions.getStackTop;
 import static gameObjects.functions.ObjectFunctions.isStackCollected;
 import static java.lang.Integer.min;
 import static java.lang.Math.abs;
@@ -16,8 +14,6 @@ import java.awt.image.BufferedImage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;

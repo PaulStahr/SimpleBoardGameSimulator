@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
+import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.GameStructureEditAction;
@@ -338,7 +339,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 		GameIO.writeStateToStreamObject(objOut, gi.getObjectInstanceById(((GameObjectInstanceEditAction)action).object).state);
 					 		byteStream.reset();
 					     	strB.setLength(0);*/
-					   }
+				 		}
 				    	else if (action instanceof GamePlayerEditAction)
 				 		{
 				    		objOut.writeObject(action);
@@ -354,10 +355,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 		objOut.writeObject(strB.toString());
 					 		GameIO.writePlayerToStreamObject(objOut, ((GamePlayerEditAction)action).editedPlayer);
 					 		strB.setLength(0);*/
-					   }
-					   else if (action instanceof UsertextMessageAction)
-					   {
-						   objOut.writeObject(action);
+				 		}
+				    	else if (action instanceof UsertextMessageAction)
+				    	{
+				    		objOut.writeObject(action);
 					    	/*strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.TEXTMESSAGE).append(' ')
 					 			.append(connectionId).append(' ')
@@ -367,14 +368,19 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 		objOut.writeObject(strB.toString());
 					 		objOut.writeObject(((UsertextMessageAction) action).message);
 					     	strB.setLength(0);*/
-					    }
-					   else if (action instanceof GameStructureEditAction)
-						{
-							GameStructureEditAction gs = (GameStructureEditAction)action;
-							objOut.writeObject(gs);
-							switch(gs.type)
-							{
-								case GameStructureEditAction.EDIT_BACKGROUND: objOut.writeObject(gi.game.getImageKey(gi.game.background));break;
+					   	}
+				    	else if (action instanceof GameObjectEditAction)
+				    	{
+				    		objOut.writeObject(action);
+				    		GameIO.writeObjectToStreamObject(objOut, ((GameObjectEditAction)action).getObject(gi));
+				    	}
+				    	else if (action instanceof GameStructureEditAction)
+				    	{ 
+				    		GameStructureEditAction gs = (GameStructureEditAction)action;
+				    		objOut.writeObject(gs);
+				    		switch(gs.type)
+				    		{
+				    			case GameStructureEditAction.EDIT_BACKGROUND: objOut.writeObject(gi.game.getImageKey(gi.game.background));break;
 								case GameStructureEditAction.EDIT_GAME_NAME: objOut.writeObject(gi.game.name);break;
 								case GameStructureEditAction.EDIT_SESSION_NAME: objOut.writeObject(gi.name);break;
 								case GameStructureEditAction.EDIT_SESSION_PASSWORD:objOut.writeObject(gi.password);break;
@@ -389,7 +395,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 									break;
 								}
 							}
-						
 						}
 					    else if (action instanceof UserSoundMessageAction)
 					    {
@@ -454,7 +459,14 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				if (inputObject instanceof GameObjectInstanceEditAction)
 				{
 					GameObjectInstanceEditAction action = (GameObjectInstanceEditAction)inputObject;
-					GameIO.editStateFromStreamObject(objIn, action.getObject(gi).state);
+					GameIO.editStateFromStreamObject(objIn, action.getObject(gi).state);					
+					gi.update(action);
+					continue;
+				}
+				if (inputObject instanceof GameObjectEditAction)
+				{
+					GameObjectEditAction action = (GameObjectEditAction)inputObject;
+					GameIO.editGameObjectFromStreamObject(objIn, action.getObject(gi));
 					gi.update(action);
 					continue;
 				}

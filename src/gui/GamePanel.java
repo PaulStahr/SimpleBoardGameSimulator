@@ -37,17 +37,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.DataHandler;
 import gameObjects.action.GameAction;
+import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.functions.MoveFunctions;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
@@ -480,7 +481,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			//If direct repaint causes problems use this:
 			//JFrameUtils.runByDispatcher(repaintRunnable);
 		}
-		else if (action instanceof GamePlayerEditAction || action instanceof GameStructureEditAction)
+		else if (action instanceof GamePlayerEditAction || action instanceof GameStructureEditAction || action instanceof GameObjectEditAction)
 		{
 			repaint();
 		}
