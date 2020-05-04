@@ -1009,6 +1009,7 @@ public class ObjectFunctions {
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, activeObject));
             }
             activeObject.state.isActive = false;
+            gamePanel.privateArea.currentDragPosition = -1;
         }
     }
 

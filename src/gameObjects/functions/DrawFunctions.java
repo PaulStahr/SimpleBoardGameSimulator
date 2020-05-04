@@ -112,27 +112,50 @@ public class DrawFunctions {
         g2.setTransform(new AffineTransform());
         int playerId = gamePanel.player == null ? -1 : gamePanel.player.id;
         g2.translate(gamePanel.getWidth() / 2, gamePanel.getHeight());
-        if (gamePanel.privateArea.objects.size() != 0)
-        {
-            int activeObjectCount = 0;
-            for(int id : gamePanel.privateArea.objects)
-            {
-                ObjectInstance objectInstance = gameInstance.getObjectInstanceById(id);
-                if (objectInstance.state.isActive) {
-                    activeObjectCount+=1;
-                }
+        if (gamePanel.privateArea.objects.size() != 0) {
+            int extraSpace = 0;
+            if (gamePanel.privateArea.currentDragPosition != -1) {
+                extraSpace = 1;
+            } else {
+                extraSpace = 0;
             }
 
-            g2.rotate(-Math.PI * 0.5 + Math.PI / ((gamePanel.privateArea.objects.size()-activeObjectCount) * 2));
-            for(int id : gamePanel.privateArea.objects)
-            {
-                ObjectInstance objectInstance = gameInstance.getObjectInstanceById(id);
-                if (!objectInstance.state.isActive) {
-                    BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
-                    g2.translate(0, -250);
-                    g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * 0.5), -(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
-                    g2.translate(0, 250);
-                    g2.rotate(Math.PI / (gamePanel.privateArea.objects.size()-activeObjectCount));
+            g2.rotate(-Math.PI * 0.5 + Math.PI / ((gamePanel.privateArea.objects.size() + extraSpace) * 2));
+            for (int i = 0; i < gamePanel.privateArea.objects.size() + extraSpace; ++i) {
+                if (extraSpace == 0) {
+                    ObjectInstance objectInstance = gameInstance.getObjectInstanceById(gamePanel.privateArea.objects.getI(i));
+                    if (!objectInstance.state.isActive) {
+                        BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
+                        g2.translate(0, -250);
+                        g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * 0.5), -(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
+                        g2.translate(0, 250);
+                        g2.rotate(Math.PI / (gamePanel.privateArea.objects.size() + extraSpace));
+                    }
+                } else {
+                    if (i == gamePanel.privateArea.currentDragPosition) {
+                        g2.translate(0, -250);
+                        g2.translate(0, 250);
+                        g2.rotate(Math.PI / (gamePanel.privateArea.objects.size() + extraSpace));
+                    } else if (i < gamePanel.privateArea.currentDragPosition) {
+                        ObjectInstance objectInstance = gameInstance.getObjectInstanceById(gamePanel.privateArea.objects.getI(i));
+                        if (!objectInstance.state.isActive) {
+                            BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
+                            g2.translate(0, -250);
+                            g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * 0.5), -(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
+                            g2.translate(0, 250);
+                            g2.rotate(Math.PI / (gamePanel.privateArea.objects.size() + extraSpace));
+                        }
+                    } else if (i > gamePanel.privateArea.currentDragPosition) {
+                        ObjectInstance objectInstance = gameInstance.getObjectInstanceById(gamePanel.privateArea.objects.getI(i - 1));
+                        if (!objectInstance.state.isActive) {
+                            BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
+                            g2.translate(0, -250);
+                            g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * 0.5), -(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
+                            g2.translate(0, 250);
+                            g2.rotate(Math.PI / (gamePanel.privateArea.objects.size() + extraSpace));
+                        }
+                    }
+
                 }
             }
         }
@@ -175,6 +198,7 @@ public class DrawFunctions {
             g2.translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming * 0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming * 0.5);
             g2.rotate(Math.toRadians(objectInstance.state.rotation));
             g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+
 
             //Draw Border around objects
             g2.setStroke(new BasicStroke(borderWidth));

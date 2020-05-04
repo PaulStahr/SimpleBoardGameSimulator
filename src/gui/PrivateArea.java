@@ -29,6 +29,8 @@ public class PrivateArea {
     private final AffineTransform screenToBoardTransformation;
     public Point2D.Double origin = new Point2D.Double();
 
+    public int currentDragPosition = -1;
+
     public PrivateArea(GamePanel gamePanel, GameInstance gameInstance, AffineTransform boardToScreenTransformation, AffineTransform screenToBoardTransformation) {
         this.boardToScreenTransformation = boardToScreenTransformation;
         this.screenToBoardTransformation = screenToBoardTransformation;

@@ -392,6 +392,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 				/*Handle all drags of Token Objects*/
 				MoveFunctions.dragObjects(this,gameInstance,player,arg0,activeObjects,objOrigPosX,objOrigPosY,mousePressedGamePos,mouseBoardPos,mouseWheelValue);
+				if (this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)){
+					this.privateArea.currentDragPosition = this.privateArea.getInsertPosition(mouseScreenX, mouseScreenY);
+					outText = "Position:" + String.valueOf(this.privateArea.currentDragPosition);
+				}
 				if (activeObject == null && selectedObjects.size() == 0 && !SwingUtilities.isMiddleMouseButton(arg0) && !mouseInPrivateArea) {
 					selectWidth = mouseScreenX - beginSelectPosScreenX;
 					selectHeight = mouseScreenY - beginSelectPosScreenY;
