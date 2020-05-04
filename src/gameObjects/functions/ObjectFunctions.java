@@ -1340,16 +1340,14 @@ public class ObjectFunctions {
 
     public static IntegerArrayList getDrawOrder(GameInstance gameInstance){
         IntegerArrayList ial = new IntegerArrayList();
-        ArrayList<Pair<Long, Integer>> drawValues = new ArrayList<>();
+        ArrayList<ObjectInstance> drawValues = new ArrayList<>();
         for (int idx = 0; idx<gameInstance.getObjectNumber(); ++idx){
-            Pair<Long, Integer> x = new Pair<>(gameInstance.getObjectInstanceByIndex(idx).state.drawValue, gameInstance.getObjectInstanceByIndex(idx).id);
-            drawValues.add(x);
+        	drawValues.add(gameInstance.getObjectInstanceByIndex(idx));
         }
-
-        Collections.sort(drawValues, Comparator.comparing(p -> p.getKey()));
-        for (Pair<Long, Integer> valuePair:drawValues)
+        Collections.sort(drawValues, Comparator.comparing(p -> p.state.drawValue));
+        for (ObjectInstance instance:drawValues)
         {
-            ial.add(valuePair.getValue());
+            ial.add(instance.id);
         }
         return ial;
     }
