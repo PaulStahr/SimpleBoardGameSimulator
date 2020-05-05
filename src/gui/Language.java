@@ -9,12 +9,14 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class Language {
-    HashMap<Words, String> wordsToString;
+    private final HashMap<Words, String> wordsToString = new HashMap<>();
 
     public Language(Document document) {
         Element root = document.getRootElement();
         for (Element elem : root.getChildren())
         {
+            String name = elem.getName();
+            String value = elem.getValue();
             wordsToString.put(Words.valueOf(elem.getName()), elem.getValue());
         }
     }

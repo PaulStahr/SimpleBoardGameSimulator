@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xml>
-<newgame>Neues Spiel</newgame>
+<new_game>Neues Spiel</new_game>
 <update>Update</update>
 <refresh>Aktualisieren</refresh>
+<general>Allgemein</general>
+<game_objects>Spiel Objekte</game_objects>
+<game_object_instances>Spiel Objekt Instanzen</game_object_instances>
+<images>Bilder</images>
+<player>Spieler</player>
+<players>Spieler</players>
+<name>Name</name>
+<id>Id</id>
+<connect>Verbinden</connect>
+<delete>Löschen</delete>
+<server_address>Server Addresse</server_address>
+<port>Port</port>
+<move_top_card>Bewege oberste Karte</move_top_card>
+<move_bottom_card>Bewege unterste Karte</move_bottom_card>
+<view>Ansehen</view>
+<ok>Ok</ok>
+<accept>Akzeptieren</accept>
+<cancel>Cancel</cancel>
+<language>Sprache</language>
+<collect_stack>Stapel einsammeln</collect_stack>
+<dissolve_stack>Stapel auflösen</dissolve_stack>
+<move_stack>Stapel bewegen</move_stack>
+<shuffle_stack>Stapel mischen</shuffle_stack>
+<collect_selected_objects>Markierte Objekte stapeln</collect_selected_objects>
+<count_objects>Objekte zählen</count_objects>
+<take_objects_to_hand>Objekte zu Handkarten machen</take_objects_to_hand>
+<flip_card>Objekt umdrehen</flip_card>
+<flip_stack>Stapel umdrehen</flip_stack>
+<collect_all_objects_from_group>Alle Objekte einer Gruppe stapeln</collect_all_objects_from_group>
+<count_values>Objektwerte zählen</count_values>
+<drop_all_objects_from_hand>Alle Handkarten ablegen</drop_all_objects_from_hand>
+<rotate_object>Objekt rotieren</rotate_object>
+<settings>Einstellungen</settings>
+<options>Optionen</options>
 </xml>

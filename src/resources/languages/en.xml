@@ -1,6 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xml>
-<newgame>New Game</newgame>
+<new_game>New Game</new_game>
 <update>Update</update>
 <refresh>Refresh</refresh>
+<general>General</general>
+<game_objects>Game Objects</game_objects>
+<game_object_instances>Game Object Instances</game_object_instances>
+<images>Images</images>
+<player>Player</player>
+<players>Players</players>
+<name>Name</name>
+<id>Id</id>
+<connect>Connect</connect>
+<delete>Delete</delete>
+<server_address>Server Address</server_address>
+<port>Port</port>
+<players>Players</players>
+<name>Name</name>
+<id>Id</id>
+<connect>Connect</connect>
+<delete>Delete</delete>
+<server_address>Server Address</server_address>
+<port>Port</port>
+<move_top_card>Move Top Card</move_top_card>
+<move_bottom_card>Move Bottom Card</move_bottom_card>
+<view>View</view>
+<ok>Ok</ok>
+<accept>Accept</accept>
+<cancel>Cancel</cancel>
+<language>Language</language>
+<collect_stack>Collect Stack</collect_stack>
+<dissolve_stack>Dissolve Stack</dissolve_stack>
+<move_stack>Move Stack</move_stack>
+<shuffle_stack>Shuffle Stack</shuffle_stack>
+<collect_selected_objects>Collect Selected Objects</collect_selected_objects>
+<count_objects>Count Objects</count_objects>
+<take_objects_to_hand>Take Objects to Hand</take_objects_to_hand>
+<flip_card>Flip Object</flip_card>
+<flip_stack>Flip Stack</flip_stack>
+<collect_all_objects_from_group>Collect all objects of Group</collect_all_objects_from_group>
+<count_values>Count Values</count_values>
+<drop_all_objects_from_hand>Drop all Objects from Hand</drop_all_objects_from_hand>
+<rotate_object>Rotate Object</rotate_object>
+<settings>Settings</settings>
+<options>Options</options>
+
 </xml>

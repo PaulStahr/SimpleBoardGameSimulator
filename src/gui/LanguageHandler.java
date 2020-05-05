@@ -10,8 +10,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class LanguageHandler {
-    ArrayList<LanguageChangeListener> languageChangeListeners;
-    Language currentLanguage;
+    private final ArrayList<LanguageChangeListener> languageChangeListeners = new ArrayList<>();
+    private Language currentLanguage;
+
+    public LanguageHandler(Object object){
+        setCurrentLanguage(object);
+    }
 
     Language getCurrentLanguage(){
         return currentLanguage;
