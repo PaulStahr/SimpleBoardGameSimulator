@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class LanguageHandler {
     ArrayList<LanguageChangeListener> languageChangeListeners;
+    Object currentLanguage = "en";
 
     Language getCurrentLanguage(){
         Language language = new Language();

@@ -6,43 +6,21 @@ import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Language {
 
-    enum LanguageString {
+    enum LanguageWords {
         new_game,
         update,
     }
 
     SAXBuilder saxBuilder = new SAXBuilder();
     private String language = "en";
-    Document document;
-    {
-        try {
-            document = saxBuilder.build(DataHandler.getResourceAsStream("languages/" + language + ".xml"));
-        } catch (JDOMException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    Element root = document.getRootElement();
+    HashMap<LanguageWords, String> wordsToString;
 
-
-
-
-    String getString(LanguageString languageString){
-        for (Element elem : root.getChildren())
-        {
-            if (elem.getName() == languageString.toString()){
-                return elem.getValue();
-            }
-        }
-        return "";
-
-    }
-
-    void setLanguage(String language){
+    public Language(String language) {
+        Document document = null;
         this.language = language;
         try {
             document = saxBuilder.build(DataHandler.getResourceAsStream("languages/" + language + ".xml"));
@@ -51,6 +29,14 @@ public class Language {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        root = document.getRootElement();
+        Element root = document.getRootElement();
+        for (Element elem : root.getChildren())
+        {
+            wordsToString.put(LanguageWords.valueOf(elem.getName()), elem.getValue());
+        }
+    }
+    
+    String getString(LanguageWords languageWords){
+        return wordsToString.get(languageWords);
     }
 }
