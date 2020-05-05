@@ -35,6 +35,7 @@ public class GameWindow extends JFrame implements ActionListener{
 	public final JMenuItem menuItemExit = new JMenuItem("Exit");
 	private final JMenuItem menuItemEditGame = new JMenuItem("Edit");
 	private final JMenuItem menuItemSaveGame = new JMenuItem("Save");
+	private final JMenuItem menuItemSettings = new JMenuItem("Settings");
 	private final JMenuItem menuItemAbount = new JMenuItem("About");
 	private final LanguageHandler lh;
 	
@@ -60,9 +61,11 @@ public class GameWindow extends JFrame implements ActionListener{
 		menuItemEditGame.addActionListener(this);
 		menuItemSaveGame.addActionListener(this);
 		menuItemAbount.addActionListener(Credits.getOpenWindowListener());
+		menuItemSettings.addActionListener(this);
 		menuFile.add(menuItemExit);
 		menuFile.add(menuItemEditGame);
 		menuFile.add(menuItemSaveGame);
+		menuExtras.add(menuItemSettings);
 		menuExtras.add(menuItemAbount);
 		gi.addPlayer(player);
 		gamePanel = new GamePanel(gi);
@@ -104,6 +107,11 @@ public class GameWindow extends JFrame implements ActionListener{
 					JFrameUtils.logErrorAndShow("Couldn't save game", e, logger );
 				}
 			}
+		}
+		else if (source == menuItemSettings)
+		{
+			OptionWindow ow = new OptionWindow(lh);
+			ow.setVisible(true);
 		}
 	}
 	

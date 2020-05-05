@@ -116,11 +116,11 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	
 	@Override
 	public void languageChanged(Language language) {
-		tabPane.setTitleAt(tabPane.indexOfTabComponent(panelGeneral), language.getString(Words.general));
-		tabPane.setTitleAt(tabPane.indexOfTabComponent(panelGeneral), language.getString(Words.game_objects));
-		tabPane.setTitleAt(tabPane.indexOfTabComponent(panelGeneral), language.getString(Words.game_object_instances));
-		tabPane.setTitleAt(tabPane.indexOfTabComponent(panelGeneral), language.getString(Words.images));
-		tabPane.setTitleAt(tabPane.indexOfTabComponent(panelGeneral), language.getString(Words.player));
+		tabPane.setTitleAt(tabPane.indexOfComponent(panelGeneral), language.getString(Words.general));
+		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPaneGameObjects), language.getString(Words.game_objects));
+		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPaneGameObjectInstances), language.getString(Words.game_object_instances));
+		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPaneImages), language.getString(Words.images));
+		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPanePlayer), language.getString(Words.player));
 	}
 	
     private final AbstractAction tableAction = new AbstractAction() {

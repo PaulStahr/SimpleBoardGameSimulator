@@ -1,19 +1,21 @@
 package gui;
 
-import data.DataHandler;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import data.DataHandler;
+import gui.Language.LanguageSummary;
 
 public class LanguageHandler {
     private final ArrayList<LanguageChangeListener> languageChangeListeners = new ArrayList<>();
     private Language currentLanguage;
 
-    public LanguageHandler(Object object){
+    public LanguageHandler(LanguageSummary object){
         setCurrentLanguage(object);
     }
 
@@ -21,8 +23,12 @@ public class LanguageHandler {
         return currentLanguage;
     }
 
-    ArrayList<Object> getLanguages(){
-        ArrayList<Object> languages = new ArrayList<>();
+	public Object getCurrentSummary() {
+		return currentLanguage.summary;
+	}
+
+    public LanguageSummary[] getLanguages(){
+        ArrayList<LanguageSummary> languages = new ArrayList<>();
         SAXBuilder saxBuilder = new SAXBuilder();
         Document document = null;
         try {
@@ -35,19 +41,23 @@ public class LanguageHandler {
         Element root = document.getRootElement();
         for (Element elem : root.getChildren())
         {
-            languages.add(elem.getValue());
+            languages.add(new LanguageSummary(elem.getValue(), elem.getValue()));
         }
-        return languages;
+        return languages.toArray(new LanguageSummary[languages.size()]);
     }
 
-    void setCurrentLanguage(Object object){
+    void setCurrentLanguage(LanguageSummary summary){
         SAXBuilder saxBuilder = new SAXBuilder();
         try {
-            currentLanguage = new Language(saxBuilder.build(DataHandler.getResourceAsStream("languages/" + object + ".xml")));
+            currentLanguage = new Language(saxBuilder.build(DataHandler.getResourceAsStream("languages/" + summary + ".xml")), summary);
         } catch (JDOMException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        for (int i = 0; i < languageChangeListeners.size(); ++i)
+        {
+        	languageChangeListeners.get(i).languageChanged(currentLanguage);
         }
     }
 

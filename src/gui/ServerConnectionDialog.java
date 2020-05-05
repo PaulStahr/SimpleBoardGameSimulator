@@ -16,13 +16,13 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 	 * 
 	 */
 	private static final long serialVersionUID = -3954762140525349396L;
-	JLabel labelAddress = new JLabel("Server");
-	JTextField textFieldAddress = new JTextField();
-	JLabel labelName = new JLabel("Name");
-	JTextField textFieldName = new JTextField();
-	JButton buttonConnect = new JButton();
-	JButton buttonCancel = new JButton();
-	JButton buttonStartServer = new JButton();
+	private final JLabel labelAddress = new JLabel("Server");
+	private final JTextField textFieldAddress = new JTextField();
+	private final JLabel labelName = new JLabel("Name");
+	private final JTextField textFieldName = new JTextField();
+	private final JButton buttonConnect = new JButton();
+	private final JButton buttonCancel = new JButton();
+	private final JButton buttonStartServer = new JButton();
 	private final LanguageHandler lh;
 	public ServerConnectionDialog(LanguageHandler lh)
 	{

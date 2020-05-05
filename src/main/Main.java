@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gui.GameWindow;
+import gui.Language.LanguageSummary;
 import gui.LanguageHandler;
 import gui.ServerLobbyWindow;
 import io.GameIO;
@@ -36,7 +37,7 @@ public class Main {
 		{
 			return;
 		}*/
-		LanguageHandler lh = new LanguageHandler("de");
+		LanguageHandler lh = new LanguageHandler(new LanguageSummary("de", "de"));
 		for (int i = 0; i < args.length; ++i)
     	{
     		if (args[i].equals("--loglevel"))
