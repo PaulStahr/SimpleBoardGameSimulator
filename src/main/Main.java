@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gui.GameWindow;
+import gui.LanguageHandler;
 import gui.ServerLobbyWindow;
 import io.GameIO;
 import logging.LockbackUtil;
@@ -35,6 +36,7 @@ public class Main {
 		{
 			return;
 		}*/
+		LanguageHandler lh = null;
 		for (int i = 0; i < args.length; ++i)
     	{
     		if (args[i].equals("--loglevel"))
@@ -55,7 +57,7 @@ public class Main {
     				System.out.println("Usage: <address> <port> <name> <id> <game>");
     			}
     			try {
-					test.SimpleNetworkServertest.connectAndJoinGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), args[i + 5]);
+					test.SimpleNetworkServertest.connectAndJoinGame(args[i + 1], Integer.parseInt(args[i + 2]), new Player(args[i + 3], Integer.parseInt(args[i + 4])), args[i + 5], lh);
 				} catch (NumberFormatException e) {
 					logger.error("Can't parse port", e);
 				} catch (UnknownHostException e) {
@@ -76,7 +78,7 @@ public class Main {
 	            	fis.close();
 	            	game0.name = "Testsession";
 	            	game0.addPlayer(new Player(args[i + 3], Integer.parseInt(args[i + 4])));
-	            	test.SimpleNetworkServertest.connectAndStartGame(args[i + 1], Integer.parseInt(args[i + 2]), game0.getPlayerById(Integer.parseInt(args[i + 4])), game0);
+	            	test.SimpleNetworkServertest.connectAndStartGame(args[i + 1], Integer.parseInt(args[i + 2]), game0.getPlayerById(Integer.parseInt(args[i + 4])), game0, lh);
 	    		} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -97,10 +99,10 @@ public class Main {
     	}
     	try {
     		int port = 8000 + (int)(Math.random() * 100);
-    		ServerLobbyWindow slw = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection("127.0.0.1", port));
+    		ServerLobbyWindow slw = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection("127.0.0.1", port), lh);
         	slw.setVisible(true);
         	slw.setSize(300,100);
-        	test.SimpleNetworkServertest.localTwoInstanceTest(port);
+        	test.SimpleNetworkServertest.localTwoInstanceTest(port, lh);
 		} catch (IOException | JDOMException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -142,7 +144,7 @@ public class Main {
     public static void connectionTest()
     {
     	try {
-    		
+    		LanguageHandler lh = null;
     		FileInputStream fis = new FileInputStream("Doppelkopf.zip");
     		GameInstance game0 = new GameInstance(new Game(), null);
     		GameIO.readSnapshotFromZip(fis, game0);
@@ -187,7 +189,7 @@ public class Main {
 				}while(socket2 == null);	
 		    	AsynchronousGameConnection sgc1 = new AsynchronousGameConnection(game1, socket2.getInputStream(), socket2.getOutputStream());
 		    	sgc1.start();
-		    	GameWindow gw2 = new GameWindow(game1);
+		    	GameWindow gw2 = new GameWindow(game1, lh);
 		       	player = game1.addPlayer(player);    	
 		       	gw2.gamePanel.player = player;
 		       	gw2.setVisible(true);
@@ -196,7 +198,7 @@ public class Main {
 			while (socket[0] == null);
 	        AsynchronousGameConnection sgc = new AsynchronousGameConnection(game0, socket[0].getInputStream(), socket[0].getOutputStream());
 	    	sgc.start();
-	    	GameWindow gw0 = new GameWindow(game0);
+	    	GameWindow gw0 = new GameWindow(game0, lh);
 	    	player = game0.addPlayer(player);
 	    	gw0.gamePanel.player = player;
 	    		//GameWindow gw1 = new GameWindow(game0);

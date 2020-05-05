@@ -36,18 +36,20 @@ public class GameWindow extends JFrame implements ActionListener{
 	private final JMenuItem menuItemEditGame = new JMenuItem("Edit");
 	private final JMenuItem menuItemSaveGame = new JMenuItem("Save");
 	private final JMenuItem menuItemAbount = new JMenuItem("About");
+	private final LanguageHandler lh;
 	
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private static final Logger logger = LoggerFactory.getLogger(GameWindow.class);
 	
-	public GameWindow(GameInstance gi)
+	public GameWindow(GameInstance gi, LanguageHandler lh)
 	{
-		this(gi, null);
+		this(gi, null, lh);
 	}
 	
-	public GameWindow(GameInstance gi, Player player)
+	public GameWindow(GameInstance gi, Player player, LanguageHandler lh)
 	{
 		this.gi = gi;
+		this.lh = lh;
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menuFile = new JMenu("File");
 		JMenu menuExtras = new JMenu("Extras");
@@ -87,7 +89,7 @@ public class GameWindow extends JFrame implements ActionListener{
 		}
 		else if (source == menuItemEditGame )
 		{
-			new EditGameWindow(gi).setVisible(true);
+			new EditGameWindow(gi, lh).setVisible(true);
 		}
 		else if (source == menuItemSaveGame)
 		{

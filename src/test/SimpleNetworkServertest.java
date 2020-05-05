@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gui.GameWindow;
+import gui.LanguageHandler;
 import io.GameIO;
 import main.Player;
 import net.AsynchronousGameConnection;
@@ -26,9 +27,9 @@ public class SimpleNetworkServertest {
     	return gs;
     }
     
-    public static void connectAndStartGame(String address, int port, Player player, GameInstance gi) throws UnknownHostException, IOException
+    public static void connectAndStartGame(String address, int port, Player player, GameInstance gi, LanguageHandler lh) throws UnknownHostException, IOException
     {
-    	GameWindow gw = new GameWindow(gi, player);
+    	GameWindow gw = new GameWindow(gi, player, lh);
     	SynchronousGameClientLobbyConnection sclc = new SynchronousGameClientLobbyConnection(address,  port);
     	sclc.pushGameSession(gi);
     	try {
@@ -44,7 +45,7 @@ public class SimpleNetworkServertest {
     	gw.setVisible(true);
     }
     
-    public static GameWindow connectAndJoinGame(String address, int port, Player player, String gameInstanceId) throws UnknownHostException, IOException, JDOMException
+    public static GameWindow connectAndJoinGame(String address, int port, Player player, String gameInstanceId, LanguageHandler lh) throws UnknownHostException, IOException, JDOMException
     {
     	SynchronousGameClientLobbyConnection sclc = new SynchronousGameClientLobbyConnection(address,  port);
     	GameInstance gi = sclc.getGameInstance(gameInstanceId);
@@ -58,12 +59,12 @@ public class SimpleNetworkServertest {
     	{
     		logger.error("Player " + player.id+ " doesn't exist");
     	}
-    	GameWindow gw = new GameWindow(gi, pl);
+    	GameWindow gw = new GameWindow(gi, pl, lh);
     	gw.setVisible(true);
     	return gw;
     }
     
-    public static void localTwoInstanceTest(int port) throws IOException, JDOMException
+    public static void localTwoInstanceTest(int port, LanguageHandler lh) throws IOException, JDOMException
     {
     	String address = "127.0.0.1";
     	{
@@ -86,7 +87,7 @@ public class SimpleNetworkServertest {
 			gi.name = "Testsession";
 			gi.addPlayer(player);
 	    	fis.close();
-	    	connectAndStartGame(address, port, player, gi);
+	    	connectAndStartGame(address, port, player, gi, lh);
     	}
     	try {
     		Thread.sleep(300);
@@ -99,7 +100,7 @@ public class SimpleNetworkServertest {
 		//GameInstance gi = new GameInstance(new Game());
 		//gi.name = "Testsession";
 		//gi.players.add(player);
-	    GameWindow gw = connectAndJoinGame(address, port, player, "Testsession");
+	    GameWindow gw = connectAndJoinGame(address, port, player, "Testsession", lh);
     	try {
     		Thread.sleep(500);
     	}catch(InterruptedException e) {}
@@ -112,7 +113,7 @@ public class SimpleNetworkServertest {
 		//GameInstance gi = new GameInstance(new Game());
 		//gi.name = "Testsession";
 		//gi.players.add(player);
-	    GameWindow gw2 = connectAndJoinGame(address, port, player2, "Testsession");
+	    GameWindow gw2 = connectAndJoinGame(address, port, player2, "Testsession", lh);
     	try {
     		Thread.sleep(500);
     	}catch(InterruptedException e) {}

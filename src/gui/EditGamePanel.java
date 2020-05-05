@@ -59,9 +59,9 @@ import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.TableModel;
 
-public class EditGamePanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener, TableModelListener{
+public class EditGamePanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener{
 	public static final List<TableColumnType> IMAGE_TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{ImageColumnType.ID, ImageColumnType.WIDTH, ImageColumnType.HEIGHT, ImageColumnType.DELETE});
-	GameInstance gi;
+	private final GameInstance gi;
 	private final DefaultTableModel tableModelGameObjectInstances= new TableModel(ObjectInstance.TYPES);
 	private final DefaultTableModel tableModelGameObjects= new TableModel(GameObject.TYPES);
 	private final DefaultTableModel tableModelImages= new TableModel(IMAGE_TYPES);
@@ -77,17 +77,19 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final GeneralPanel panelGeneral = new GeneralPanel();	
 	private final JTabbedPane tabPane = new JTabbedPane();
 	public int id = (int)(Math.random() * Integer.MAX_VALUE);
-	public EditGamePanel(GameInstance gi) {
+	public EditGamePanel(GameInstance gi, LanguageHandler lh) {
 		this.gi = gi;
+		Language language = lh.getCurrentLanguage();
 		GroupLayout layout = new GroupLayout(this);
 		setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(tabPane));
 		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(tabPane));
-		tabPane.addTab("Genral", panelGeneral);
-		tabPane.addTab("GameObjects", scrollPaneGameObjects);
-		tabPane.addTab("GameObjectInstances", scrollPaneGameObjectInstances);
-		tabPane.addTab("Images", scrollPaneImages);
-		tabPane.addTab("Player", scrollPanePlayer);
+		lh.addLanguageChangeListener(this);
+		tabPane.addTab(language.getString(Words.general), panelGeneral);
+		tabPane.addTab(language.getString(Words.game_objects), scrollPaneGameObjects);
+		tabPane.addTab(language.getString(Words.game_object_instances), scrollPaneGameObjectInstances);
+		tabPane.addTab(language.getString(Words.images), scrollPaneImages);
+		tabPane.addTab(language.getString(Words.player), scrollPanePlayer);
 		tableGameObjects.addMouseListener(this);
 		updateTables();
 		gi.addChangeListener(this);
@@ -111,6 +113,16 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		    }
 		});
 	}
+	
+	@Override
+	public void languageChanged(Language language) {
+		tabPane.setTitleAt(tabPane.indexOfTabComponent(panelGeneral), language.getString(Words.general));
+		tabPane.setTitleAt(tabPane.indexOfTabComponent(panelGeneral), language.getString(Words.game_objects));
+		tabPane.setTitleAt(tabPane.indexOfTabComponent(panelGeneral), language.getString(Words.game_object_instances));
+		tabPane.setTitleAt(tabPane.indexOfTabComponent(panelGeneral), language.getString(Words.images));
+		tabPane.setTitleAt(tabPane.indexOfTabComponent(panelGeneral), language.getString(Words.player));
+	}
+	
     private final AbstractAction tableAction = new AbstractAction() {
     	private static final long serialVersionUID = 3980835476835695337L;
 			@Override

@@ -23,12 +23,14 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 	JButton buttonConnect = new JButton();
 	JButton buttonCancel = new JButton();
 	JButton buttonStartServer = new JButton();
-	public ServerConnectionDialog()
+	private final LanguageHandler lh;
+	public ServerConnectionDialog(LanguageHandler lh)
 	{
-		this("", -1);
+		this("", -1, lh);
 	}
 
-	public ServerConnectionDialog(String string, int i) {
+	public ServerConnectionDialog(String string, int i, LanguageHandler lh) {
+		this.lh = lh;
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		
@@ -54,7 +56,7 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 		Object source = arg0.getSource();
 		if (source == buttonConnect)
 		{
-			ServerLobbyWindow slw = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection(textFieldAddress.getText(), 1234));
+			ServerLobbyWindow slw = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection(textFieldAddress.getText(), 1234), lh);
 		}
 		else if (source == buttonStartServer)
 		{

@@ -75,6 +75,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
     private final JTextField textFieldAddress = new JTextField(Options.getString("last_connection.address"));
     private final JTextField textFieldPort = new JTextField(String.valueOf(Options.getInteger("last_connection.port")));
 	private boolean isUpdating = false;
+	private final LanguageHandler lh;
 	
     private final AbstractAction tableAction = new AbstractAction() {
     	private static final long serialVersionUID = 3980835476835695337L;
@@ -133,7 +134,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						gi.name = "Unnamed";
 					}
 					Player player = new Player(textFieldName.getText(), Integer.parseInt(textFieldId.getText()));
-					GameWindow gw = new GameWindow(gi, player);
+					GameWindow gw = new GameWindow(gi, player, lh);
 			    	client.pushGameSession(gi);
 			    	try {
 						Thread.sleep(5000);
@@ -172,7 +173,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						Player player = new Player(textFieldName.getText(), playerId);
 						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.indexOf(GameInstanceColumnType.ID)));
 				    	client.addPlayerToGameSession(player, gi.name, gi.password);
-				    	GameWindow gw = new GameWindow(gi, player);
+				    	GameWindow gw = new GameWindow(gi, player, lh);
 				    	AsynchronousGameConnection connection = client.connectToGameSession(gi);
 				    	//gi.addPlayer(player);
 				    	connection.syncPull();
@@ -196,8 +197,9 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		}
     }
 	
-	public ServerLobbyWindow(SynchronousGameClientLobbyConnection client)
+	public ServerLobbyWindow(SynchronousGameClientLobbyConnection client, LanguageHandler lh)
 	{
+		this.lh = lh;
 		Container content = getContentPane();
 		GroupLayout layout = new GroupLayout(content);
 		layout.setHorizontalGroup(layout.createParallelGroup()
