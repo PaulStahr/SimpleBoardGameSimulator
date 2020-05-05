@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xml>
-<en></>
+<newgame>New Game</newgame>
+<update>Update</update>
+<refresh>Refresh</refresh>
 </xml>

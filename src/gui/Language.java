@@ -9,22 +9,17 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class Language {
-
-    enum LanguageWords {
-        new_game,
-        update,
-    }
-    HashMap<LanguageWords, String> wordsToString;
+    HashMap<Words, String> wordsToString;
 
     public Language(Document document) {
         Element root = document.getRootElement();
         for (Element elem : root.getChildren())
         {
-            wordsToString.put(LanguageWords.valueOf(elem.getName()), elem.getValue());
+            wordsToString.put(Words.valueOf(elem.getName()), elem.getValue());
         }
     }
 
-    String getString(LanguageWords languageWords){
+    String getString(Words languageWords){
         return wordsToString.get(languageWords);
     }
 }
