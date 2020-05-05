@@ -1,16 +1,13 @@
 package gui;
 
 import data.DataHandler;
-import io.IOString;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
-
-import java.io.File;
 import java.io.IOException;
 
-public class Languages {
+public class Language {
 
     enum LanguageString {
         new_game,
@@ -20,7 +17,6 @@ public class Languages {
     SAXBuilder saxBuilder = new SAXBuilder();
     private String language = "en";
     Document document;
-
     {
         try {
             document = saxBuilder.build(DataHandler.getResourceAsStream("languages/" + language + ".xml"));
