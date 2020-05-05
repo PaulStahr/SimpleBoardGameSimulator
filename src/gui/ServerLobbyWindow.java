@@ -65,7 +65,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private final DefaultTableModel tableModelOpenGames = new TableModel(GameInstance.TYPES);
 	private final JTable tableOpenGames = new JTable(tableModelOpenGames);
 	private final JScrollPane scrollPaneOpenGames = new JScrollPane(tableOpenGames);
-    private final JButton buttonPoll = new JButton("Update");
+    private final JButton buttonPoll = new JButton("Refresh");
     private final JButton buttonCreateGame = new JButton("New Game");
     private final JTextField textFieldId = new JTextField(String.valueOf(Options.getInteger("last_connection.id")));
     private final JLabel labelAddress = new JLabel("Server Address");

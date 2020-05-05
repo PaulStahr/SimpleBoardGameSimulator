@@ -14,28 +14,16 @@ public class Language {
         new_game,
         update,
     }
-
-    SAXBuilder saxBuilder = new SAXBuilder();
-    private String language = "en";
     HashMap<LanguageWords, String> wordsToString;
 
-    public Language(String language) {
-        Document document = null;
-        this.language = language;
-        try {
-            document = saxBuilder.build(DataHandler.getResourceAsStream("languages/" + language + ".xml"));
-        } catch (JDOMException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public Language(Document document) {
         Element root = document.getRootElement();
         for (Element elem : root.getChildren())
         {
             wordsToString.put(LanguageWords.valueOf(elem.getName()), elem.getValue());
         }
     }
-    
+
     String getString(LanguageWords languageWords){
         return wordsToString.get(languageWords);
     }
