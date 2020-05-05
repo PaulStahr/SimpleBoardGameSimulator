@@ -37,6 +37,7 @@ import gameObjects.instance.GameInstance;
 import io.GameIO;
 import main.Player;
 import net.AsynchronousGameConnection;
+import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
 import util.jframe.JFileChooserRecentFiles;
@@ -67,6 +68,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private final JScrollPane scrollPaneOpenGames = new JScrollPane(tableOpenGames);
     private final JButton buttonPoll = new JButton("Refresh");
     private final JButton buttonCreateGame = new JButton("New Game");
+    private final JButton buttonCreateServer = new JButton("new Server");
     private final JTextField textFieldId = new JTextField(String.valueOf(Options.getInteger("last_connection.id")));
     private final JLabel labelAddress = new JLabel("Server Address");
     private final JLabel labelPort = new JLabel("Port");
@@ -151,7 +153,11 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 					JFrameUtils.logErrorAndShow("Can't connect to Server", ex, logger);
 				}
 			}
-			
+		}
+		else if (source == buttonCreateServer)
+		{
+			GameServer gs = new GameServer(Integer.parseUnsignedInt(textFieldPort.getText()));
+			gs.start();
 		}
 		else if (e instanceof ButtonColumn.TableButtonActionEvent)
 		{
@@ -215,7 +221,8 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				.addComponent(scrollPaneOpenGames)
 				.addGroup(layout.createSequentialGroup()
 						.addComponent(buttonPoll)
-						.addComponent(buttonCreateGame)));
+						.addComponent(buttonCreateGame)
+						.addComponent(buttonCreateServer)));
 		layout.setVerticalGroup(layout.createSequentialGroup()
 				.addGroup(layout
 						.createParallelGroup()
@@ -231,13 +238,15 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				.addGroup(layout
 						.createParallelGroup()
 						.addComponent(buttonPoll)
-						.addComponent(buttonCreateGame)));
+						.addComponent(buttonCreateGame)
+						.addComponent(buttonCreateServer)));
 		setLayout(layout);
 		buttonPoll.addActionListener(this);
 		tableOpenGames.getSelectionModel().addListSelectionListener(this);
 		tableOpenGames.getModel().addTableModelListener(this);
 		this.client = client;
 		buttonCreateGame.addActionListener(this);
+		buttonCreateServer.addActionListener(this);
 		textFieldAddress.setText(client.getAddress());
 		textFieldPort.setText(Integer.toString(client.getPort()));
 		setMinimumSize(getPreferredSize());
