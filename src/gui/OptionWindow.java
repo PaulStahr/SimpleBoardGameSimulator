@@ -13,7 +13,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
 import data.Options;
 import gui.Language.LanguageSummary;
@@ -72,7 +71,7 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
         	EventQueue.invokeLater(new Runnable() {
 				@Override
 				public void run() {
-		        	DataHandler.setLookAndFeel(JFrameLookAndFeelUtil.installedLookAndFeels.get(comboBoxLayoutManager.getSelectedIndex()));
+		        	JFrameLookAndFeelUtil.setLookAndFeel(JFrameLookAndFeelUtil.installedLookAndFeels.get(comboBoxLayoutManager.getSelectedIndex()));
 				}
 			});
 		}

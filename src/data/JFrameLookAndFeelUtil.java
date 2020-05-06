@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import javax.swing.UnsupportedLookAndFeelException;
 
 import org.slf4j.Logger;
@@ -43,6 +44,18 @@ public class JFrameLookAndFeelUtil {
     			}
     		}
     	});         
+    }
+    
+    public static final void setLookAndFeel(final Object lafi){
+    	if (lafi instanceof LookAndFeelInfo){
+    		if (UIManager.getLookAndFeel().getName().equals(((LookAndFeelInfo)lafi).getName()))
+    			return;
+    		setLookAndFeel(((LookAndFeelInfo)lafi).getClassName());
+    	}else if (lafi instanceof String){
+    		setLookAndFeel(lafi);
+    	}else{
+    		throw new IllegalArgumentException();
+    	}
     }
     
     private static final Runnable updateLookAndFeel = new Runnable(){

@@ -30,9 +30,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,18 +89,6 @@ public abstract class DataHandler
 
     public static final String getResourceFolder(){
     	return resourceFolder;
-    }
-    
-    public static final void setLookAndFeel(final Object lafi){
-    	if (lafi instanceof LookAndFeelInfo){
-    		if (UIManager.getLookAndFeel().getName().equals(((LookAndFeelInfo)lafi).getName()))
-    			return;
-    		setLookAndFeel(((LookAndFeelInfo)lafi).getClassName());
-    	}else if (lafi instanceof String){
-    		setLookAndFeel(lafi);
-    	}else{
-    		throw new IllegalArgumentException();
-    	}
     }
     
     public static final List<String> getRecentFiles(ArrayList<String> list){
