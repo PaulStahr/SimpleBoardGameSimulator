@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 
 import data.JFrameLookAndFeelUtil;
 import gameObjects.instance.GameInstance;
+import gui.minigames.TetrisWindow;
 import io.GameIO;
 import main.Player;
 import util.JFrameUtils;
@@ -39,6 +40,7 @@ public class GameWindow extends JFrame implements ActionListener{
 	private final JMenuItem menuItemSettings = new JMenuItem("Settings");
 	private final JMenuItem menuItemAbout = new JMenuItem("About");
 	private final JMenuItem menuItemControls = new JMenuItem("Controls");
+	private final JMenuItem menuItemTetris = new JMenuItem("Tetris");
 	private final LanguageHandler lh;
 	
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -67,12 +69,13 @@ public class GameWindow extends JFrame implements ActionListener{
 		menuItemAbout.addActionListener(Credits.getOpenWindowListener());
 		menuItemSettings.addActionListener(this);
 		menuItemControls.addActionListener(this);
+		menuItemTetris.addActionListener(this);
 		menuFile.add(menuItemExit);
 		menuFile.add(menuItemEditGame);
 		menuFile.add(menuItemSaveGame);
 		menuExtras.add(menuItemSettings);
+		menuExtras.add(menuItemTetris);
 		menuExtras.add(menuItemAbout);
-		menuControls.add(menuItemControls);
 		gi.addPlayer(player);
 		gamePanel = new GamePanel(gi);
 		gamePanel.player = player;
@@ -122,6 +125,11 @@ public class GameWindow extends JFrame implements ActionListener{
 		else if (source == menuItemControls){
 			ControlWindow cw = new ControlWindow(gi, lh);
 			cw.setVisible(true);
+		}
+		else if (source == menuItemTetris)
+		{
+			TetrisWindow tw = new TetrisWindow();
+			tw.setVisible(true);
 		}
 	}
 	

@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import util.StringUtils;
+import util.TimedUpdater;
 import util.data.UniqueObjects;
 import util.io.IOUtil;
 import util.io.StreamUtil;
@@ -48,7 +49,7 @@ public abstract class DataHandler
 {
 	private static final Logger logger = LoggerFactory.getLogger(DataHandler.class);
     private static final String resourceFolder = "/resources/";
-    
+    public static final TimedUpdater timedUpdater = new TimedUpdater(10);
     public static volatile int openWindows = 0;
 
 	

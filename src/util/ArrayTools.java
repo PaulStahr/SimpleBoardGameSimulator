@@ -21,6 +21,7 @@
  ******************************************************************************/
 package util;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.util.AbstractList;
 import java.util.Arrays;
@@ -325,7 +326,20 @@ public class ArrayTools {
 	public static int find(Object[] data, Object elem) {
 		return find (data, 0, data.length, elem);
 	}
+
 	
+	public static final <E> int removeReferences(WeakReference<?> data[], int size, E obj)
+	{
+		int write = 0;
+		for (int read=0;read<size;read++){
+			if (data[read].get() != obj){
+				data[write++] = data[read];
+			}
+		}
+		Arrays.fill(data, write, size, null);
+		return write;
+	}
+
 	/*private static class UnmodifiableSortedArrayListWithComparator<E>extends AbstractList<E> implements RandomAccess{
 		private final E[] array;
 		private int length;
