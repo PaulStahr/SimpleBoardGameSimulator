@@ -1,13 +1,5 @@
 package gui;
 
-import static gameObjects.functions.DrawFunctions.drawBoard;
-import static gameObjects.functions.DrawFunctions.drawDiceObjects;
-import static gameObjects.functions.DrawFunctions.drawFigureObjects;
-import static gameObjects.functions.DrawFunctions.drawPlayerPositions;
-import static gameObjects.functions.DrawFunctions.drawSelection;
-import static gameObjects.functions.DrawFunctions.drawTokenObjects;
-import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
-
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -57,6 +49,8 @@ import geometry.Matrix3d;
 import geometry.Vector2d;
 import main.Player;
 import util.data.IntegerArrayList;
+
+import static gameObjects.functions.DrawFunctions.*;
 
 //import gameObjects.GameObjectInstanceEditAction;
 
@@ -111,7 +105,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 
 
-	boolean isSelectStarted = false;
+	public boolean isSelectStarted = false;
 	public IntegerArrayList selectedObjects = new IntegerArrayList();
 	public int beginSelectPosScreenX = 0;
 	public int beginSelectPosScreenY = 0;
@@ -203,12 +197,38 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 			}
 		}
-		//Draw border around active object of player
-		//drawActiveObject(this, gameInstance, g, player, activeObject);
+
+
 		//Draw all player related information
 		drawPlayerPositions(this, g, gameInstance, player, infoText);
 		//Draw selection rectangle
 		drawSelection(this, g, player);
+		//Draw Private Area
+		drawPrivateArea(this, g);
+
+		AffineTransform tmp = g2.getTransform();
+		g2.setTransform(boardToScreenTransformation);
+		//Redraw active objects not in some private area
+		for (ObjectInstance oi:activeObjects) {
+			if (oi.state.owner_id != player.id || !oi.state.inPrivateArea || oi.state.isActive) {
+				try {
+					if (oi.go instanceof GameObjectToken) {
+						drawTokenObjects(this, g, gameInstance, oi, player, ial);
+					}
+					else if (oi.go instanceof GameObjectDice) {
+						drawDiceObjects(this, g, gameInstance, oi, player, 1);
+					}
+					else if (oi.go instanceof GameObjectFigure) {
+						drawFigureObjects(this, g, gameInstance, oi, player, 1);
+					}
+				}catch(Exception e)
+				{
+					logger.error("Error in drawing Tokens", e);
+				}
+			}
+		}
+
+		g2.setTransform(tmp);
 		//Draw objects in private area
 		drawTokensInPrivateArea(this, g, gameInstance, player, activeObject);
 		g.drawString(outText, 50, 50);
@@ -377,7 +397,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
 		/*Translate the board if control is down*/
-		if (arg0.isControlDown() && !mouseInPrivateArea)
+		if ((arg0.isControlDown() || (SwingUtilities.isMiddleMouseButton(arg0) && activeObjects.size() == 0)) && !mouseInPrivateArea)
 		{
 			translateBoard(arg0);
 		}
@@ -706,7 +726,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public void translateBoard(MouseEvent arg0)
 	{
-		if (SwingUtilities.isLeftMouseButton(arg0))
+		if (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))
 		{
 			double tmpX = (arg0.getX() - mouseScreenX) / zooming;
 			double tmpY = (arg0.getY() - mouseScreenY) / zooming;

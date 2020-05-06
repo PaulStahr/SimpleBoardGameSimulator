@@ -10,7 +10,11 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,14 +33,48 @@ public class DrawFunctions {
         //TODO Florian:sometimes images are drawn twice (the active object?)
         g.drawString(String.valueOf(gamePanel.mouseWheelValue), gamePanel.mouseScreenX, gamePanel.mouseScreenY);
         g.drawImage(gameInstance.game.background, 0, 0, gamePanel.getWidth(), gamePanel.getHeight(), Color.BLACK, null);
+    }
 
+    public static void drawPrivateArea(GamePanel gamePanel, Graphics g){
         int privateAreaHeight = 700;
         int privateAreaWidth = 700;
         gamePanel.privateArea.setArea(gamePanel.getWidth()/2 - privateAreaWidth/2, gamePanel.getHeight()-privateAreaHeight/2, privateAreaWidth, privateAreaHeight, gamePanel.translateX, gamePanel.translateY, gamePanel.rotation, gamePanel.zooming);
         gamePanel.privateArea.draw(g);
     }
 
-    public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, IntegerArrayList tmp){
+
+    public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, IntegerArrayList ial){
+        //Draw all objects not in some private area
+        for (int idx:ial) {
+            ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
+            if (oi.state.owner_id != player.id || !oi.state.inPrivateArea || oi.state.isActive) {
+                try {
+                    if (oi.go instanceof GameObjectToken) {
+                        drawTokenObjects(gamePanel, g, gameInstance, oi, player, ial);
+                    }
+                    else if (oi.go instanceof GameObjectDice) {
+                        drawDiceObjects(gamePanel, g, gameInstance, oi, player, 1);
+                    }
+                    else if (oi.go instanceof GameObjectFigure) {
+                        drawFigureObjects(gamePanel, g, gameInstance, oi, player, 1);
+                    }
+                }catch(Exception e)
+                {
+                    logger.error("Error in drawing Tokens", e);
+                }
+            }
+        }
+    }
+
+    public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList, IntegerArrayList ial) {
+        ial.clear();
+        for(ObjectInstance oi : oiList){
+            ial.add(oi.id);
+        }
+        drawObjectsFromList(gamePanel, g, gameInstance, player, ial);
+    }
+
+        public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, IntegerArrayList tmp){
         //draw tokens in the order of its draw value
         if (ObjectFunctions.isStackTop(objectInstance)) {
             tmp.clear();
@@ -86,7 +124,6 @@ public class DrawFunctions {
             if (p.id == player.id){
                 g.drawString(player.actionString,  0, -15);
                 g.drawString(infoText, -20, 10);
-
             }
         }
 
@@ -110,7 +147,7 @@ public class DrawFunctions {
         g2.translate(gamePanel.getWidth() / 2, gamePanel.getHeight());
         if (gamePanel.privateArea.objects.size() != 0) {
             int extraSpace = 0;
-            if (gamePanel.privateArea.currentDragPosition != -1) {
+            if (gamePanel.privateArea.currentDragPosition != -1 && gamePanel.activeObject != null && gamePanel.activeObjects.size() != 0 && !gamePanel.isSelectStarted) {
                 extraSpace = 1;
             } else {
                 extraSpace = 0;
@@ -193,7 +230,7 @@ public class DrawFunctions {
             AffineTransform tmp = g2.getTransform();
             g2.translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming * 0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming * 0.5);
             //draw object not in private area
-            if (!gamePanel.privateArea.containsBoardCoordinates(objectInstance.state.posX, objectInstance.state.posY) || !objectInstance.state.isActive){
+            if (gamePanel.privateArea == null || !gamePanel.privateArea.containsBoardCoordinates(objectInstance.state.posX, objectInstance.state.posY) || !objectInstance.state.isActive){
                 g2.rotate(Math.toRadians(objectInstance.state.rotation));
                 g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
             }

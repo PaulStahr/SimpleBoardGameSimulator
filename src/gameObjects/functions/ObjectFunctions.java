@@ -766,7 +766,7 @@ public class ObjectFunctions {
         } else {
             for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
                 ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
-                if ((ignoredObjects == null || !ignoredObjects.contains(oi.id)) && !oi.state.inPrivateArea) {
+                if ((ignoredObjects == null || !ignoredObjects.contains(oi.id)) && !oi.state.inPrivateArea && (oi.state.owner_id == -1 || oi.state.owner_id == player.id)) {
                     int dist = objectDist(xPos, yPos, oi, player.id);
                     if (dist < distance && isOnObject(xPos, yPos, oi, player.id, maxInaccuracy)) {
                         activeObject = oi;
