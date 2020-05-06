@@ -36,7 +36,8 @@ public class GameWindow extends JFrame implements ActionListener{
 	private final JMenuItem menuItemEditGame = new JMenuItem("Edit");
 	private final JMenuItem menuItemSaveGame = new JMenuItem("Save");
 	private final JMenuItem menuItemSettings = new JMenuItem("Settings");
-	private final JMenuItem menuItemAbount = new JMenuItem("About");
+	private final JMenuItem menuItemAbout = new JMenuItem("About");
+	private final JMenuItem menuItemControls = new JMenuItem("Controls");
 	private final LanguageHandler lh;
 	
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -54,19 +55,23 @@ public class GameWindow extends JFrame implements ActionListener{
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menuFile = new JMenu("File");
 		JMenu menuExtras = new JMenu("Extras");
+		JMenu menuControls = new JMenu("Controls");
 		menuBar.add(menuFile);
 		menuBar.add(menuExtras);
+		menuBar.add(menuControls);
 		setJMenuBar(menuBar);
 		menuItemExit.addActionListener(this);
 		menuItemEditGame.addActionListener(this);
 		menuItemSaveGame.addActionListener(this);
-		menuItemAbount.addActionListener(Credits.getOpenWindowListener());
+		menuItemAbout.addActionListener(Credits.getOpenWindowListener());
 		menuItemSettings.addActionListener(this);
+		menuItemControls.addActionListener(this);
 		menuFile.add(menuItemExit);
 		menuFile.add(menuItemEditGame);
 		menuFile.add(menuItemSaveGame);
 		menuExtras.add(menuItemSettings);
-		menuExtras.add(menuItemAbount);
+		menuExtras.add(menuItemAbout);
+		menuControls.add(menuItemControls);
 		gi.addPlayer(player);
 		gamePanel = new GamePanel(gi);
 		gamePanel.player = player;
@@ -112,6 +117,10 @@ public class GameWindow extends JFrame implements ActionListener{
 		{
 			OptionWindow ow = new OptionWindow(lh);
 			ow.setVisible(true);
+		}
+		else if (source == menuItemControls){
+			ControlWindow cw = new ControlWindow(gi, lh);
+			cw.setVisible(true);
 		}
 	}
 	

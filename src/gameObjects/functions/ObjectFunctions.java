@@ -1297,7 +1297,10 @@ public class ObjectFunctions {
     }
 
     public static boolean isInPrivateArea(GamePanel gamePanel, int posX, int posY) {
-        return gamePanel.privateArea.containsBoardCoordinates(posX, posY);
+        if(gamePanel.privateArea != null) {
+            return gamePanel.privateArea.containsBoardCoordinates(posX, posY);
+        }
+        return false;
     }
 
 
