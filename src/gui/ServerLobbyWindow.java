@@ -29,6 +29,7 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import data.JFrameLookAndFeelUtil;
 import data.Options;
 import gameObjects.GameInstanceColumnType;
 import gameObjects.GameMetaInfo;
@@ -249,6 +250,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		buttonCreateServer.addActionListener(this);
 		textFieldAddress.setText(client.getAddress());
 		textFieldPort.setText(Integer.toString(client.getPort()));
+		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		setMinimumSize(getPreferredSize());
 	}
 	

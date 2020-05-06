@@ -32,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.DataHandler;
+import data.JFrameLookAndFeelUtil;
 import data.ProgrammData;
 import util.JFrameUtils;
 import util.io.StreamUtil;
@@ -73,6 +74,6 @@ public class Credits extends JFrame
         pack();
         setResizable(false);      
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        DataHandler.addToUpdateTree(this);
+		JFrameLookAndFeelUtil.addToUpdateTree(this);
     }
 }

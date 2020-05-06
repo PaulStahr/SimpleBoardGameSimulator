@@ -54,7 +54,19 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	private final int connectionId = (int)(Math.random() * Integer.MAX_VALUE);
 	private ObjectInputStream objIn;
 	private boolean stopOnError = true;
-
+	private int outputEvents = 0;
+	private int inputEvents = 0;
+	
+	public int getInEvents()
+	{
+		return inputEvents;
+	}
+	
+	public int getOutEvents()
+	{
+		return outputEvents;
+	}
+	
 	@Override
 	public void changeUpdate(GameAction action) {
 		if (Thread.currentThread() != inputThread)
@@ -239,7 +251,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    				//byte data[] = byteStream.toByteArray();
 		    				if (logger.isDebugEnabled()){logger.debug("Write game instance to stream " + byteStream.size());}
 		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(byteStream.size());
-		    				objOut.writeObject(strB.toString());
+		    				objOut.writeUnshared(strB.toString());
 		    				byteStream.writeTo(objOut);
 		    				byteStream.reset();
 		    				strB.setLength(0);
@@ -324,9 +336,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    {
 				    	if (action instanceof GameObjectInstanceEditAction)
 				 		{
-				    		objOut.writeObject(action);
+				    		objOut.writeUnshared(action);
 				    		GameIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).getObject(gi).state);
-				    		
+				    		++outputEvents;
 					    	/*strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.EDIT).append(' ')
 					 			.append(NetworkString.STATE).append(' ')
@@ -342,8 +354,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				 		}
 				    	else if (action instanceof GamePlayerEditAction)
 				 		{
-				    		objOut.writeObject(action);
+				    		objOut.writeUnshared(action);
 				    		GameIO.writePlayerToStreamObject(objOut, ((GamePlayerEditAction)action).getEditedPlayer(gi));
+				    		++outputEvents;
 					    	/*strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.EDIT).append(' ')
 					 			.append(NetworkString.PLAYER).append(' ')
@@ -358,7 +371,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				 		}
 				    	else if (action instanceof UsertextMessageAction)
 				    	{
-				    		objOut.writeObject(action);
+				    		objOut.writeUnshared(action);
+				    		++outputEvents;
 					    	/*strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.TEXTMESSAGE).append(' ')
 					 			.append(connectionId).append(' ')
@@ -371,13 +385,14 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					   	}
 				    	else if (action instanceof GameObjectEditAction)
 				    	{
+				    		++outputEvents;
 				    		objOut.writeObject(action);
 				    		GameIO.writeObjectToStreamObject(objOut, ((GameObjectEditAction)action).getObject(gi));
 				    	}
 				    	else if (action instanceof GameStructureEditAction)
 				    	{ 
 				    		GameStructureEditAction gs = (GameStructureEditAction)action;
-				    		objOut.writeObject(gs);
+				    		objOut.writeUnshared(gs);
 				    		switch(gs.type)
 				    		{
 				    			case GameStructureEditAction.EDIT_BACKGROUND: objOut.writeObject(gi.game.getImageKey(gi.game.background));break;
@@ -395,10 +410,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 									break;
 								}
 							}
+				    		++outputEvents;
 						}
 					    else if (action instanceof UserSoundMessageAction)
 					    {
-					    	strB.append(NetworkString.ACTION).append(' ')
+				    		objOut.writeUnshared(action);
+				    		++outputEvents;
+					    	/*strB.append(NetworkString.ACTION).append(' ')
 					 			.append(NetworkString.SOUNDMESSAGE).append(' ')
 					 			.append(((UsertextMessageAction) action).sourcePlayer).append(' ')
 					 			.append(connectionId).append(' ')
@@ -407,7 +425,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					 			.append(((GameObjectInstanceEditAction) action).object).append(' ');
 					 		objOut.writeObject(strB.toString());
 					 		objOut.writeObject(((UsertextMessageAction) action).message);
-					     	strB.setLength(0);
+					     	strB.setLength(0);*/
+				    		++outputEvents;
 					    }
 					}
 				    catch ( Exception e ) {
@@ -461,6 +480,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					GameObjectInstanceEditAction action = (GameObjectInstanceEditAction)inputObject;
 					GameIO.editStateFromStreamObject(objIn, action.getObject(gi).state);					
 					gi.update(action);
+					++inputEvents;
 					continue;
 				}
 				if (inputObject instanceof GameObjectEditAction)
@@ -468,6 +488,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					GameObjectEditAction action = (GameObjectEditAction)inputObject;
 					GameIO.editGameObjectFromStreamObject(objIn, action.getObject(gi));
 					gi.update(action);
+					++inputEvents;
 					continue;
 				}
 				if (inputObject instanceof GamePlayerEditAction)
@@ -480,12 +501,14 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					}
 					GameIO.editPlayerFromStreamObject(objIn, editedPlayer);
 					gi.update(action);
+					++inputEvents;
 					continue;
 				}
 				if (inputObject instanceof UsertextMessageAction)
 				{
 					UsertextMessageAction action = (UsertextMessageAction)inputObject;
 					gi.update(action);
+					++inputEvents;
 					continue;
 				}
 				if (inputObject instanceof GameStructureEditAction)
@@ -508,6 +531,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						}
 					}
 					gi.update(action);
+					++inputEvents;
 					continue;
 				}
 				if (!(inputObject instanceof String))
@@ -610,6 +634,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								{
 									gi.update(new GameObjectInstanceEditAction(sourceId, pl, inst));
 								}
+								++inputEvents;
 							}
 						}
 						else if (split.get(1).equals(NetworkString.EDIT) && split.get(2).equals(NetworkString.PLAYER))

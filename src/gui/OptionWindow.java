@@ -1,5 +1,6 @@
 package gui;
 
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -10,7 +11,10 @@ import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager.LookAndFeelInfo;
 
+import data.JFrameLookAndFeelUtil;
+import data.Options;
 import gui.Language.LanguageSummary;
 import util.JFrameUtils;
 
@@ -28,6 +32,7 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 	public OptionWindow(LanguageHandler lh)
 	{
 		comboBoxLanguages.setModel(new DefaultComboBoxModel(lh.getLanguages()));
+		comboBoxLanguages.setSelectedItem(lh.getCurrentSummary());
 		buttonOk.addActionListener(this);
 		buttonCancel.addActionListener(this);
 		buttonAccept.addActionListener(this);
@@ -37,13 +42,15 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		panelSettings.add(comboBoxLanguages);
 		panelSettings.add(labelLayoutmanager);
 		panelSettings.add(comboBoxLayoutManager);
-		comboBoxLanguages.setSelectedItem(lh.getCurrentSummary());
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
-		
+		lh.addLanguageChangeListener(this);
 		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(panelSettings).addGroup(layout.createSequentialGroup().addComponent(buttonOk).addComponent(buttonAccept).addComponent(buttonCancel)));
 		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(panelSettings).addGroup(layout.createParallelGroup().addComponent(buttonOk).addComponent(buttonAccept).addComponent(buttonCancel)));
 		languageChanged(lh.getCurrentLanguage());
+		for (LookAndFeelInfo lookAndFeelInfo : JFrameLookAndFeelUtil.installedLookAndFeels)
+			comboBoxLayoutManager.addItem(lookAndFeelInfo.getName());
+		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		setSize(400,400);
 	}
 	
@@ -61,7 +68,15 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		if (source == buttonAccept || source == buttonOk)
 		{
 			lh.setCurrentLanguage((LanguageSummary)comboBoxLanguages.getSelectedItem());
+        	EventQueue.invokeLater(new Runnable() {
+				@Override
+				public void run() {
+		        	JFrameLookAndFeelUtil.setLookAndFeel(JFrameLookAndFeelUtil.installedLookAndFeels.get(comboBoxLayoutManager.getSelectedIndex()));
+				}
+			});
 		}
+    	Options.set("layout_manager", JFrameLookAndFeelUtil.installedLookAndFeels.get(comboBoxLayoutManager.getSelectedIndex()).getClassName());
+
 		if (source == buttonOk || source == buttonCancel)
 		{
 			dispose();

@@ -21,28 +21,18 @@
  ******************************************************************************/
 package data;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.UnsupportedLookAndFeelException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import util.JFrameUtils;
 import util.StringUtils;
 import util.data.UniqueObjects;
 import util.io.IOUtil;
@@ -56,30 +46,12 @@ import util.io.StreamUtil;
  */
 public abstract class DataHandler
 {
-    public static final UIManager.LookAndFeelInfo lookAndFeelInfo[] = UIManager.getInstalledLookAndFeels();
 	private static final Logger logger = LoggerFactory.getLogger(DataHandler.class);
     private static final String resourceFolder = "/resources/";
-    private static final ArrayList<WeakReference<JFrame> > updateUIList = new ArrayList<WeakReference<JFrame>>();
     
     public static volatile int openWindows = 0;
 
-	private static String lookAndFeel = "";
-    private static final Runnable updateLookAndFeel = new Runnable(){
-		@Override
-		public void run() {
-    		try{
-   				UIManager.setLookAndFeel(lookAndFeel);
-  			}catch (UnsupportedLookAndFeelException e) {
-  				logger.error("UIManager not supported");
-   			}catch (ClassNotFoundException e) {
-   				logger.error("UIManager not found");
-   			}catch (InstantiationException e) {
-   				logger.error("Can't set UIManager:", e);
-   			}catch (IllegalAccessException e) {
-   				logger.error("Can't set UIManager:", e);
-   			}      			
-		}        			
-	};
+	
 	
 	
 	public static void loadLib(String file) throws IOException {
@@ -94,27 +66,6 @@ public abstract class DataHandler
         System.load(fileOut.toString());
 	}
 	
-	static{
-        UIManager.addPropertyChangeListener(new PropertyChangeListener() {
-    		@Override
-    		public void propertyChange(PropertyChangeEvent evt) {
-    			for (int i=updateUIList.size()-1;i>=0;--i){
-    				try{
-    					JFrame frame = updateUIList.get(i).get();
-    					if (frame == null){
-    						updateUIList.remove(i);
-    					}else{
-    						SwingUtilities.updateComponentTreeUI(frame);
-    					}
-    				}catch(Exception e){
-    					logger.error("Error at updating Component tree", e);
-    				}
-    			}
-    		}
-    	});
-              
-	}    
-
     private DataHandler(){}
     
     public static final URL getResource(String resource)
@@ -138,25 +89,6 @@ public abstract class DataHandler
 
     public static final String getResourceFolder(){
     	return resourceFolder;
-    }
-    
-    public static final void setLookAndFeel(final Object lafi){
-    	if (lafi instanceof LookAndFeelInfo){
-    		if (UIManager.getLookAndFeel().getName().equals(((LookAndFeelInfo)lafi).getName()))
-    			return;
-    		setLookAndFeel(((LookAndFeelInfo)lafi).getClassName());
-    	}else if (lafi instanceof String){
-    		setLookAndFeel((String)lafi);
-    	}else{
-    		throw new IllegalArgumentException();
-    	}
-    }
-    
-    public static final void setLookAndFeel(String laf){
-    	if (lookAndFeel.equals(laf))
-    		return;
-    	lookAndFeel = laf;
-    	JFrameUtils.runByDispatcher(updateLookAndFeel);
     }
     
     public static final List<String> getRecentFiles(ArrayList<String> list){
@@ -208,7 +140,5 @@ public abstract class DataHandler
     	}
     }
 
-	public static void addToUpdateTree(JFrame frame) {
-		updateUIList.add(new WeakReference<JFrame>(frame));
-	}
+
 }
