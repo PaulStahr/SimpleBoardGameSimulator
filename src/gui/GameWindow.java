@@ -18,6 +18,7 @@ import javax.swing.JSplitPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import data.JFrameLookAndFeelUtil;
 import gameObjects.instance.GameInstance;
 import io.GameIO;
 import main.Player;
@@ -79,7 +80,7 @@ public class GameWindow extends JFrame implements ActionListener{
 		setLayout(new GridLayout(1, 1));
 		setSize((int) screenSize.getWidth(), (int) screenSize.getHeight());
 		slider.setDividerLocation(0.5);
-
+		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 

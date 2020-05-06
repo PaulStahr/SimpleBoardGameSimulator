@@ -2,6 +2,7 @@ package gui;
 
 import javax.swing.JFrame;
 
+import data.JFrameLookAndFeelUtil;
 import gameObjects.instance.GameInstance;
 
 public class EditGameWindow extends JFrame{
@@ -13,6 +14,7 @@ public class EditGameWindow extends JFrame{
 	public EditGameWindow(GameInstance gi, LanguageHandler lh) {
 		this.gi = gi;
 		setContentPane(new EditGamePanel(gi, lh));
+		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		setSize(500, 400);
 	}
 
