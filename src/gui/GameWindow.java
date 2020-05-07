@@ -31,7 +31,7 @@ public class GameWindow extends JFrame implements ActionListener{
 	 */
 	private static final long serialVersionUID = -1441104795154034811L;
 	GameInstance gi;
-	JSplitPane slider;
+	private final JSplitPane slider;
 	public GamePanel gamePanel;
 	public IngameChatPanel chatPanel;
 	public final JMenuItem menuItemExit = new JMenuItem("Exit");

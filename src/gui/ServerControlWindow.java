@@ -9,17 +9,17 @@ import javax.swing.JFrame;
 
 import net.GameServer;
 
-public class ServerControlWindow extends JFrame implements ActionListener, Runnable{
+public class ServerControlWindow extends JFrame implements ActionListener{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 6664485369638777976L;
 	private final JButton buttonStart = new JButton("Start");
 	private final JButton buttonStop = new JButton("Stop");
-	private Thread th;
-	private GameServer gs = new GameServer(1234);
-	public ServerControlWindow()
+	private final GameServer gs;
+	public ServerControlWindow(GameServer gs)
 	{
+		this.gs = gs;
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		
@@ -35,19 +35,11 @@ public class ServerControlWindow extends JFrame implements ActionListener, Runna
 		Object source = arg0.getSource();
 		if (source == buttonStart)
 		{
-			if (th != null)
-			{
-				th = new Thread(this);
-				th.start();
-			}
+			gs.start();
 		}
 		else if (source == buttonStop)
 		{
-			th = null;
+			gs.stop();
 		}
-	}
-	@Override
-	public void run() {
-		gs.start();
 	}
 }

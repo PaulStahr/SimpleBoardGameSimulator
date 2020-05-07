@@ -395,10 +395,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    		objOut.writeUnshared(gs);
 				    		switch(gs.type)
 				    		{
-				    			case GameStructureEditAction.EDIT_BACKGROUND: objOut.writeObject(gi.game.getImageKey(gi.game.background));break;
-								case GameStructureEditAction.EDIT_GAME_NAME: objOut.writeObject(gi.game.name);break;
-								case GameStructureEditAction.EDIT_SESSION_NAME: objOut.writeObject(gi.name);break;
-								case GameStructureEditAction.EDIT_SESSION_PASSWORD:objOut.writeObject(gi.password);break;
+				    			case GameStructureEditAction.EDIT_BACKGROUND: objOut.writeUnshared(gi.game.getImageKey(gi.game.background));break;
+								case GameStructureEditAction.EDIT_GAME_NAME: objOut.writeUnshared(gi.game.name);break;
+								case GameStructureEditAction.EDIT_SESSION_NAME: objOut.writeUnshared(gi.name);break;
+								case GameStructureEditAction.EDIT_SESSION_PASSWORD:objOut.writeUnshared(gi.password);break;
 								case GameStructureEditAction.ADD_IMAGE:
 								{
 									Map.Entry<String, BufferedImage> entry = gi.game.getImage(((AddObjectAction)gs).objectId);

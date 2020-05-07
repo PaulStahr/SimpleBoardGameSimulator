@@ -42,6 +42,8 @@ public class GameServer implements Runnable {
 	private Thread th;
 	CommandEncoding ce = CommandEncoding.SERIALIZE;
 	private final int id = (int)(Integer.MAX_VALUE * Math.random());
+	private boolean isRunning;
+	private boolean run;
 	
 	public boolean isReady()
 	{
@@ -145,7 +147,7 @@ public class GameServer implements Runnable {
 					    		{
 			    					gmi[i] = new GameMetaInfo(gameInstances.get(i));
 					    		}
-				    			out.writeObject(gmi);
+				    			out.writeUnshared(gmi);
 					    		out.close();
 					    		break;
 			    			}
@@ -334,6 +336,14 @@ public class GameServer implements Runnable {
 			    	case NetworkString.CONNECT:
 			    	{
 			    		GameInstance gi = getGameInstance(split.get(1));
+			    		if (!"".equals(gi.password) && !split.get(2).equals(gi.password))
+			    		{
+			    			ObjectOutputStream out = new ObjectOutputStream(output);
+			    			out.writeObject("Wrong Password");
+			    			out.close();
+			    			logger.debug("Wrong password");
+			    			break;
+			    		}
 			    		AsynchronousGameConnection asc;
 			    		if (input instanceof ObjectInputStream)
 			    		{
@@ -369,7 +379,7 @@ public class GameServer implements Runnable {
 		try {
 			server = new ServerSocket( port );
 			isReady = true;
-			while ( true )
+			while ( run )
 		    {
 		    	Socket client = null;
 		    	try
@@ -386,6 +396,17 @@ public class GameServer implements Runnable {
 		} catch (IOException e1) {
 			logger.error("Error in running Server connection", e1);
 		}
+		isRunning = false;
+	}
+	
+	public void stop()
+	{
+		run = false;
+	}
+	
+	public boolean isRunning()
+	{
+		return isRunning;
 	}
 
 	public void start()
@@ -394,6 +415,8 @@ public class GameServer implements Runnable {
 		 {
 			 th = new Thread(this);
 			 th.start();
+			 run = true;
+			 isRunning = true;
 		 }
     }
 }

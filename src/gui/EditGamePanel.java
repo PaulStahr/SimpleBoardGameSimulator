@@ -206,7 +206,9 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			else if (source == textFieldPassword.getDocument())
 			{
 				gi.password = textFieldPassword.getText();
+				isUpdating = true;
 				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_SESSION_PASSWORD));
+				isUpdating = false;
 			}
 		}
 
@@ -230,6 +232,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
     	if (!EventQueue.isDispatchThread())
     	{
     		throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");
+    	}
+    	if (isUpdating)
+    	{
+    		return;
     	}
 		isUpdating = true;
 		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, deleteObjectColumn);
@@ -316,7 +322,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		{
 			this.gi = gi;
 			//GroupLayout layout = new GroupLayout(this);
-			//setLayout(layout);
+			//setLayout(layout);YES_NO_OPTION
 			setLayout(JFrameUtils.DOUBLE_COLUMN_LAUYOUT);
 			this.go = go;
 			textFieldName.setText(go.uniqueName);

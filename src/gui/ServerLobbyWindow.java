@@ -15,6 +15,8 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -42,6 +44,7 @@ import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
 import util.jframe.JFileChooserRecentFiles;
+import util.jframe.PasswordDialog;
 import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableModel;
 
@@ -79,6 +82,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
     private final JTextField textFieldPort = new JTextField(String.valueOf(Options.getInteger("last_connection.port")));
 	private boolean isUpdating = false;
 	private final LanguageHandler lh;
+	private final ArrayList<GameMetaInfo> gmi = new ArrayList<>();
 	
     private final AbstractAction tableAction = new AbstractAction() {
     	private static final long serialVersionUID = 3980835476835695337L;
@@ -100,7 +104,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			try {
 				client.setAdress(textFieldAddress.getText());
 				client.setPort(Integer.parseInt(textFieldPort.getText()));
-				ArrayList<GameMetaInfo> gmi = new ArrayList<>();
+				gmi.clear();
 				client.getGameInstanceMeta(gmi);
 				JFrameUtils.updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn, deleteColumn);
 			} catch (IOException | ClassNotFoundException e1) {
@@ -145,7 +149,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						logger.error("Unnexpected interrupt", e1);
 					}
 			    	client.addPlayerToGameSession(player, gi.name, gi.password);
-			    	AsynchronousGameConnection connection = client.connectToGameSession(gi);
+			    	AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
 			    	connection.start();
 			    	gi.addPlayer(player);
 			    	gw.setVisible(true);
@@ -178,11 +182,25 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						Options.set("last_connection.name", textFieldName.getText());
 						Options.set("last_connection.id", playerId);
 						Player player = new Player(textFieldName.getText(), playerId);
+						String password = null;
+						if (gmi.get(row).passwordRequired)
+						{
+							JPasswordField pf = new JPasswordField(10);
+							int option = PasswordDialog.showOptionDialog("Passwort eingeben", "Ok", "Cancel", pf);
+							if (option == JOptionPane.OK_OPTION)
+							{
+								password = new String(pf.getPassword());
+							}
+						}
 						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.indexOf(GameInstanceColumnType.ID)));
-				    	client.addPlayerToGameSession(player, gi.name, gi.password);
+				    	if (password != null)
+				    	{
+				    		gi.password = password;
+				    	}
+						
+						client.addPlayerToGameSession(player, gi.name, gi.password);
 				    	GameWindow gw = new GameWindow(gi, player, lh);
-				    	AsynchronousGameConnection connection = client.connectToGameSession(gi);
-				    	//gi.addPlayer(player);
+				    	AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
 				    	connection.syncPull();
 				    	connection.start();
 				    	gw.setVisible(true);

@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
+import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
 
 public class ServerConnectionDialog extends JFrame implements ActionListener{
@@ -20,6 +21,7 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 	private final JTextField textFieldAddress = new JTextField();
 	private final JLabel labelName = new JLabel("Name");
 	private final JTextField textFieldName = new JTextField();
+	private final JTextField textFieldPort = new JTextField();
 	private final JButton buttonConnect = new JButton();
 	private final JButton buttonCancel = new JButton();
 	private final JButton buttonStartServer = new JButton();
@@ -60,7 +62,8 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 		}
 		else if (source == buttonStartServer)
 		{
-			ServerControlWindow scw = new ServerControlWindow();
+			GameServer gs = new GameServer(Integer.parseInt(textFieldPort.getText()));
+			ServerControlWindow scw = new ServerControlWindow(gs);
 			scw.setVisible(true);
 		}
 	}

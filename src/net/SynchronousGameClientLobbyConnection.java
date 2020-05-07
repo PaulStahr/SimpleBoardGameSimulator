@@ -173,12 +173,16 @@ public class SynchronousGameClientLobbyConnection {
 	    server.close();
 	}
 
-	public AsynchronousGameConnection connectToGameSession(GameInstance gi) throws UnknownHostException, IOException
+	public AsynchronousGameConnection connectToGameSession(GameInstance gi, String password) throws UnknownHostException, IOException
 	{
 		Socket server = new Socket( address, port);
 		OutputStream output = server.getOutputStream();
 	    StringBuilder strB = new StringBuilder();
 	    strB.append(NetworkString.CONNECT).append(' ').append(gi.name);
+	    if (password != null)
+    	{
+	    	strB.append(' ').append(password);
+    	}
 	    output = writeCommand(strB, output);
 	    return new AsynchronousGameConnection(gi, server.getInputStream(), output);
 	}

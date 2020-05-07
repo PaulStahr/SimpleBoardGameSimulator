@@ -35,11 +35,10 @@ public class SimpleNetworkServertest {
     	try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Unecpected interrupt", e);
 		}
     	sclc.addPlayerToGameSession(player, gi.name, gi.password);
-    	AsynchronousGameConnection connection = sclc.connectToGameSession(gi);
+    	AsynchronousGameConnection connection = sclc.connectToGameSession(gi, null);
     	connection.start();
     	gi.addPlayer(player);
     	gw.setVisible(true);
@@ -51,7 +50,7 @@ public class SimpleNetworkServertest {
     	GameInstance gi = sclc.getGameInstance(gameInstanceId);
     	sclc.addPlayerToGameSession(player, gi.name, gi.password);
     	player = gi.addPlayer(player);
-    	AsynchronousGameConnection connection = sclc.connectToGameSession(gi);
+    	AsynchronousGameConnection connection = sclc.connectToGameSession(gi, null);
     	connection.syncPull();
     	connection.start();
     	Player pl = gi.getPlayerById(player.id);
@@ -74,8 +73,7 @@ public class SimpleNetworkServertest {
 	    		try {
 					Thread.sleep(10);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error("Unecpected interrupt", e);
 				}
 	    	}
     	}
@@ -103,7 +101,9 @@ public class SimpleNetworkServertest {
 	    GameWindow gw = connectAndJoinGame(address, port, player, "Testsession", lh);
     	try {
     		Thread.sleep(500);
-    	}catch(InterruptedException e) {}
+    	}catch(InterruptedException e) {
+			logger.error("Unecpected interrupt", e);
+    	}
     	//gi.update(new GameObjectInstanceEditAction(0, gi.players.get(0), gi.objects.get(0)));    	
 
 
@@ -116,7 +116,9 @@ public class SimpleNetworkServertest {
 	    GameWindow gw2 = connectAndJoinGame(address, port, player2, "Testsession", lh);
     	try {
     		Thread.sleep(500);
-    	}catch(InterruptedException e) {}
+    	}catch(InterruptedException e) {
+			logger.error("Unecpected interrupt", e);
+    	}
 
 	}
 }
