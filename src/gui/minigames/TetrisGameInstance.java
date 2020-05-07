@@ -1,17 +1,33 @@
 package gui.minigames;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
+import util.data.IntegerArrayList;
 
 public class TetrisGameInstance {
-
+	public final ArrayList<TetrisGameListener> gameListener = new ArrayList<>();
+	private final IntegerArrayList ial = new IntegerArrayList();
+	
+	public static interface TetrisGameListener{
+		public void actionPerformed(TetrisGameEvent event);
+	};
 	
 	public static class TetrisGameEvent
 	{
-		public final int type;
+		public TetrisGameEvent(){}
+	}
+	
+	public static class TetrisGameResetEvent extends TetrisGameEvent{}
+	
+	public static class TetrisGameChangePixelEvent extends TetrisGameEvent{}
+
+	public static class TetrisGameRemoveRowsEvent extends TetrisGameEvent{
+		public final int rows[];
 		
-		public TetrisGameEvent(int type)
+		public TetrisGameRemoveRowsEvent(int rows[])
 		{
-			this.type = type;
+			this.rows = rows;
 		}
 	}
 	
@@ -65,12 +81,15 @@ public class TetrisGameInstance {
 			new TetrisObjectType(3,2, 3, true, true, true, false, false, true),
 			new TetrisObjectType(2,3, 3, true, true, true, false, true, false),
 			new TetrisObjectType(3,2, 3, true, false, false, true, true, true),
-			new TetrisObjectType(2,3, 3, true, true, true, false, false, true),
-			new TetrisObjectType(3,2, 4, true, true, false, false, true, true),
-			new TetrisObjectType(2,3, 4, true, false, true, true, false, true),
-			new TetrisObjectType(3,2, 5, false, true, true, true, true, false),
+			new TetrisObjectType(2,3, 3, false, true, false, true, true, true),
+			new TetrisObjectType(3,2, 4, true, true, true, true, false, false),	
+			new TetrisObjectType(2,3, 4, true, true, false, true, false, true),	
+			new TetrisObjectType(3,2, 4, false, false, true, true, true, true),	
+			new TetrisObjectType(2,3, 4, true, false, true, false, true, true),	
+			new TetrisObjectType(3,2, 5, true, true, false, false, true, true),
 			new TetrisObjectType(2,3, 5, false, true, true, true, true, false),
-			new TetrisObjectType(3,2, 6, true, true, true, true, false, false),	
+			new TetrisObjectType(3,2, 6, false, true, true, true, true, false),
+			new TetrisObjectType(2,3, 6, true, false, true, true, false, true),
 	};
 	
 	static {
@@ -109,6 +128,7 @@ public class TetrisGameInstance {
 	
 	private final ArrayList<FallingObject> toRemove = new ArrayList<>();
 	private int placedObjects;
+
 	
 	private void setPixels(FallingObject fo, byte multiply)
 	{
@@ -156,6 +176,19 @@ public class TetrisGameInstance {
 		return ret;
 	}
 	
+	public boolean row_filled(int row)
+	{
+		int offset = row * cols;
+		for (int y = offset; y < offset + cols; ++y)
+		{
+			if (gameWindow[y] <= 0)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	
 	public void logic_step()
 	{
 		for (int i = 0; i < fallingObject.size(); ++i)
@@ -166,6 +199,7 @@ public class TetrisGameInstance {
 			TetrisObjectType type = objectTypes[fo.type];
 			falling:
 			{
+				setPixels(fo, (byte)0);
 				for (int y = 0; y < type.height; ++y)
 				{
 					for (int x = 0; x < type.width; ++x)
@@ -179,10 +213,24 @@ public class TetrisGameInstance {
 						}
 					}
 				}
-				setPixels(fo, (byte)0);
 				--fo.y; 
 				setPixels(fo, (byte)-1);
 			}
+		}
+		if (toRemove.size() != 0)
+		{
+			for (int y = 0; y < rows; ++y)
+			{
+				if (row_filled(y))
+				{
+					ial.add(y);
+				}
+			}
+		}
+		if (ial.size() != 0)
+		{
+			actionPerformed(new TetrisGameRemoveRowsEvent(ial.toArrayI()));
+			ial.clear();
 		}
 		fallingObject.removeAll(toRemove);
 		toRemove.clear();
@@ -239,6 +287,44 @@ public class TetrisGameInstance {
 				setPixels(fo, (byte)-1);
 				return;
 			}
+		}
+	}
+
+	public byte add(FallingObject fo) {
+		byte placable = isPlacable(fo);
+		if (placable == 0)
+		{
+			setPixels(fo, (byte)1);
+			fallingObject.add(fo);
+		}
+		return placable;		
+	}
+	
+	public void actionPerformed(TetrisGameEvent event)
+	{
+		if (event instanceof TetrisGameResetEvent)
+		{
+			placedObjects = 0;
+			fallingObject.clear();
+			Arrays.fill(gameWindow, (byte)0);			
+		}
+		else if (event instanceof TetrisGameRemoveRowsEvent)
+		{
+			int deletedRows[] = ((TetrisGameRemoveRowsEvent) event).rows;
+			int outy = 0;
+			for (int y = 0; y < rows; ++y)
+			{
+				if (0 > Arrays.binarySearch(deletedRows, y))
+				{
+					System.arraycopy(gameWindow, y * cols, gameWindow, outy * cols, cols);
+					++outy;
+				}
+			}
+			Arrays.fill(gameWindow, outy * cols, gameWindow.length, (byte)0);
+		}
+		for (int i = 0; i < gameListener.size(); ++i)
+		{
+			gameListener.get(i).actionPerformed(event);
 		}
 	}
 }

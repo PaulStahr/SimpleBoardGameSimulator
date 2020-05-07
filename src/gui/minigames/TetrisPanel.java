@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gui.minigames.TetrisGameInstance.FallingObject;
+import gui.minigames.TetrisGameInstance.TetrisGameResetEvent;
 
 public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 	private static final Logger logger = LoggerFactory.getLogger(TetrisPanel.class);
@@ -57,7 +58,7 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 					}
 					else
 					{
-						th.wait((int)(1000*Math.exp(-tgi.placedObjectCount() * 0.1)));
+						th.wait((int)(1000*Math.exp(-tgi.placedObjectCount() * 0.02)));
 					}
 				}
 			} catch (InterruptedException e) {
@@ -66,7 +67,11 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 			
 			if (tgi.fallingObject.size() == 0)
 			{
-				tgi.fallingObject.add(new FallingObject((byte)rand.nextInt(15), 4, 18));
+				byte successfull = tgi.add(new FallingObject((byte)rand.nextInt(18), 4, 18));
+				if (successfull > 0)
+				{
+					tgi.actionPerformed(new TetrisGameResetEvent());
+				}
 			}
 			tgi.logic_step();
 			repaint();
