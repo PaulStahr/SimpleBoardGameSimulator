@@ -76,6 +76,7 @@ public class GameWindow extends JFrame implements ActionListener{
 		menuExtras.add(menuItemSettings);
 		menuExtras.add(menuItemTetris);
 		menuExtras.add(menuItemAbout);
+		menuControls.add(menuItemControls);
 		gi.addPlayer(player);
 		gamePanel = new GamePanel(gi);
 		gamePanel.player = player;

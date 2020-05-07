@@ -3,6 +3,18 @@ package gui.minigames;
 import java.util.ArrayList;
 
 public class TetrisGameInstance {
+
+	
+	public static class TetrisGameEvent
+	{
+		public final int type;
+		
+		public TetrisGameEvent(int type)
+		{
+			this.type = type;
+		}
+	}
+	
 	private byte gameWindow[];
 	private int rows;
 	private int cols;
@@ -49,23 +61,30 @@ public class TetrisGameInstance {
 			new TetrisObjectType(3,2, 2, false, true, false, true, true, true),
 			new TetrisObjectType(2,3, 2, true, false, true, true, true, false),
 			new TetrisObjectType(3,2, 2, true, true, true, false, true, false),
-			new TetrisObjectType(2,3, 2, true, true, true, false, true, false),
+			new TetrisObjectType(2,3, 2, false, true, true, true, false, true),
 			new TetrisObjectType(3,2, 3, true, true, true, false, false, true),
-			new TetrisObjectType(3,2, 4, true, true, true, true, false, false),	
+			new TetrisObjectType(2,3, 3, true, true, true, false, true, false),
+			new TetrisObjectType(3,2, 3, true, false, false, true, true, true),
+			new TetrisObjectType(2,3, 3, true, true, true, false, false, true),
+			new TetrisObjectType(3,2, 4, true, true, false, false, true, true),
+			new TetrisObjectType(2,3, 4, true, false, true, true, false, true),
+			new TetrisObjectType(3,2, 5, false, true, true, true, true, false),
+			new TetrisObjectType(2,3, 5, false, true, true, true, true, false),
+			new TetrisObjectType(3,2, 6, true, true, true, true, false, false),	
 	};
 	
 	static {
 		int first = 0;;
-		for (int i = 1; i <= objectTypes.length; ++i)
+		for (int i = 0; i < objectTypes.length; ++i)
 		{
-			if (i != objectTypes.length && objectTypes[i].id == objectTypes[i - 1].id)
+			if (i+1 < objectTypes.length && objectTypes[i+1].id == objectTypes[i].id)
 			{
-				objectTypes[i-1].next = (byte)i;
+				objectTypes[i].next = (byte)(i+1);
 			}
 			else
 			{
-				objectTypes[i - 1].next = (byte)first;
-				first = i;
+				objectTypes[i].next = (byte)first;
+				first = i+1;
 			}
 		}
 			
@@ -96,7 +115,7 @@ public class TetrisGameInstance {
 		TetrisObjectType type = objectTypes[fo.type];
 		int fox = fo.x;
 		int foy = fo.y;
-		byte pxvalue = (byte)(multiply * (fo.type + 1));
+		byte pxvalue = (byte)(multiply * (objectTypes[fo.type].id + 1));
 		for (int y = 0; y < type.height; ++y)
 		{
 			for (int x = 0; x < type.width; ++x)

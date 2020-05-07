@@ -49,14 +49,24 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 		while (isRunning)
 		{
 			try {
-				Thread.sleep((int)(1000*Math.exp(-tgi.placedObjectCount() * 0.1)));
+				synchronized(th)
+				{
+					if (down)
+					{
+						th.wait(50);
+					}
+					else
+					{
+						th.wait((int)(1000*Math.exp(-tgi.placedObjectCount() * 0.1)));
+					}
+				}
 			} catch (InterruptedException e) {
 				logger.error("Unexpected interruption", e);
 			}
 			
 			if (tgi.fallingObject.size() == 0)
 			{
-				tgi.fallingObject.add(new FallingObject((byte)rand.nextInt(8), 4, 8));
+				tgi.fallingObject.add(new FallingObject((byte)rand.nextInt(15), 4, 18));
 			}
 			tgi.logic_step();
 			repaint();
@@ -93,7 +103,10 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 			case KeyEvent.VK_RIGHT: tgi.moveRight(0);repaint();break;
 			case KeyEvent.VK_LEFT: tgi.moveLeft(0);repaint();break;
 			case KeyEvent.VK_UP: tgi.rotate(0);repaint();break;
-			case KeyEvent.VK_DOWN: down = true;break;
+			case KeyEvent.VK_DOWN: down = true;synchronized(th) {
+				th.notifyAll();
+			}
+			break;
 		}
 	}
 
