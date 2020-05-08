@@ -38,4 +38,12 @@ public enum Words {
     rotate_object,
     settings,
     options,
+    exit,
+    edit,
+    save,
+    about,
+    controls,
+    tetris,
+    files,
+    extras,
 }

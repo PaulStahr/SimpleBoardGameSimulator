@@ -130,7 +130,20 @@ public class ListTools {
 		while (end != begin)
 		{
 			--end;
-			list.remove(end);
+			list.remove(end);//TODO slow
 		}
+	}
+
+	public static <T> void removeReference(ArrayList<WeakReference<T>> list, T l) {
+		int write = 0;
+        for (int read = 0; read < list.size(); ++read)
+        {
+        	WeakReference<T> ref = list.get(read);
+        	if (ref.get() != l)
+        	{
+        		list.set(write++, ref);
+        	}
+        }
+        removeRange(list, write, list.size());
 	}
 }

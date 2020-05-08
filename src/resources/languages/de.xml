@@ -37,4 +37,12 @@
 <rotate_object>Objekt rotieren</rotate_object>
 <settings>Einstellungen</settings>
 <options>Optionen</options>
+<exit>Schließen</exit>
+<edit>Bearbeiten</edit>
+<save>Speichern</save>
+<about>Über</about>
+<controls>Steuerung</controls>
+<tetris>Tetris</tetris>
+<files>Dateien</files>
+<extras>Extras</extras>
 </xml>

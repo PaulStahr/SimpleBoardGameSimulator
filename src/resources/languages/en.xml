@@ -44,5 +44,12 @@
 <rotate_object>Rotate Object</rotate_object>
 <settings>Settings</settings>
 <options>Options</options>
-
+<exit>Exit</exit>
+<edit>Edit</edit>
+<save>Save</save>
+<about>About</about>
+<controls>Controls</controls>
+<tetris>Tetris</tetris>
+<files>Files</files>
+<extras>Extras</extras>
 </xml>
