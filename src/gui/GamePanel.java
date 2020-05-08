@@ -48,6 +48,7 @@ import gameObjects.instance.ObjectInstance;
 import geometry.Matrix3d;
 import geometry.Vector2d;
 import main.Player;
+import util.Pair;
 import util.data.IntegerArrayList;
 
 import static gameObjects.functions.DrawFunctions.*;
@@ -117,8 +118,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public PrivateArea privateArea;
 
 	public float cardOverlap = (float) (2/3.0);
+	public int scalingFactor = 3;
+	public ArrayList<Pair<ObjectInstance, Float>> scaledObjects = new ArrayList<>();
 
 	public BufferedImage[] playerImages = new BufferedImage[10];
+
+
 
 
 	public GamePanel(GameInstance gameInstance)
@@ -572,6 +577,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			for (ObjectInstance oi : activeObjects) {
 				ObjectFunctions.dropObjects(this, gameInstance, player, oi);
 			}
+		} else if (e.getKeyCode() == KeyEvent.VK_ALT){
+			for (ObjectInstance oi: activeObjects){
+				if (!scaledObjects.contains(oi)) {
+					oi.scale *= scalingFactor;
+					scaledObjects.add(oi);
+				}
+			}
 		}
 
 
@@ -613,6 +625,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+		if (e.getKeyCode() == KeyEvent.VK_ALT){
+			for (ObjectInstance oi: scaledObjects){
+				oi.scale = 1.0/scalingFactor;
+			}
+			scaledObjects.clear();
+		}
 		if(!isLeftMouseKeyHold) {
 			if (activeObject!=null){
 				activeObject.state.isActive = false;
@@ -625,6 +643,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 			activeObject = null;
 		}
+
 		repaint();
 	}
 

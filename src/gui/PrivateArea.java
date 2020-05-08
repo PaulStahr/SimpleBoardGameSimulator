@@ -67,7 +67,10 @@ public class PrivateArea {
 
     public boolean containsBoardCoordinates(int posX, int posY) {
         Point2D transformedPoint = boardToScreenTransformation.transform(new Point2D.Double(posX, posY), null);
-        return transformedPoint != null && shape.contains(transformedPoint);
+        if (shape != null) {
+            return transformedPoint != null && shape.contains(transformedPoint);
+        }
+        return false;
     }
     public boolean containsScreenCoordinates(int posX, int posY) {
         return shape.contains(posX, posY);
