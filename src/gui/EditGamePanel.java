@@ -77,8 +77,13 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final GeneralPanel panelGeneral = new GeneralPanel();	
 	private final JTabbedPane tabPane = new JTabbedPane();
 	public int id = (int)(Math.random() * Integer.MAX_VALUE);
+	private boolean isUpdating = false;
+	private Entry<String, BufferedImage>[] imageArray;
+	private final LanguageHandler lh;
+
 	public EditGamePanel(GameInstance gi, LanguageHandler lh) {
 		this.gi = gi;
+		this.lh = lh;
 		Language language = lh.getCurrentLanguage();
 		GroupLayout layout = new GroupLayout(this);
 		setLayout(layout);
@@ -135,8 +140,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  	private final ButtonColumn deleteObjectInstanceColumn = new ButtonColumn(tableGameObjects,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
  	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableImages,tableAction, IMAGE_TYPES.indexOf(ImageColumnType.DELETE));
  	private final ButtonColumn deletePlayerColumn = new ButtonColumn(tablePlayer,tableAction, Player.TYPES.indexOf(PlayerColumnType.DELETE));
-	private boolean isUpdating = false;
-	private Entry<String, BufferedImage>[] imageArray;
 	 	
  	private class GeneralPanel extends JPanel implements ItemListener, DocumentListener
  	{
@@ -295,12 +298,12 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		}
 	}
 	
-	public class ObjectEditPanel extends JPanel implements DocumentListener, ItemListener{
-		private final JLabel labelName = new JLabel("Name");
+	public class ObjectEditPanel extends JPanel implements DocumentListener, ItemListener, LanguageChangeListener{
+		private final JLabel labelName = new JLabel();
 		private final JTextField textFieldName = new JTextField();
-		private final JLabel labelWidth = new JLabel("Width");
+		private final JLabel labelWidth = new JLabel();
 		private final JTextField textFieldWidth = new JTextField();
-		private final JLabel labelHeight = new JLabel("Height");
+		private final JLabel labelHeight = new JLabel();
 		private final JTextField textFieldHeight = new JTextField();
 		private final GameObject go;
 		private final GameInstance gi;
@@ -308,6 +311,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		private final ArrayList<JComboBox> imageComboBoxes = new ArrayList<>();
 		private final JComboBox<String> comboBoxFrontImage;
 		private final JComboBox<String> comboBoxBackImage;
+		private final LanguageHandler lh;
 		
 		private void updateImages()
 		{
@@ -318,9 +322,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 		}
 		
-		public ObjectEditPanel(GameObject go, GameInstance gi)
+		public ObjectEditPanel(GameObject go, GameInstance gi, LanguageHandler lh)
 		{
 			this.gi = gi;
+			this.lh = lh;
 			//GroupLayout layout = new GroupLayout(this);
 			//setLayout(layout);YES_NO_OPTION
 			setLayout(JFrameUtils.DOUBLE_COLUMN_LAUYOUT);
@@ -337,7 +342,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			add(textFieldWidth);
 			add(labelHeight);
 			add(textFieldHeight);
-			
 			
 			/*layout.setHorizontalGroup(
  					layout.createSequentialGroup()
@@ -372,6 +376,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				comboBoxFrontImage = null;
 				comboBoxBackImage = null;
 			}
+			languageChanged(lh.getCurrentLanguage());
 		}
 		@Override
 		public void changedUpdate(DocumentEvent e) {
@@ -420,6 +425,13 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				isUpdating = false;
 			}
 		}
+
+		@Override
+		public void languageChanged(Language language) {
+			labelName.setText(language.getString(Words.name));
+			labelWidth.setText(language.getString(Words.width));
+			labelHeight.setText(language.getString(Words.height));
+		}
 	}
 	
 	@Override
@@ -442,7 +454,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	        if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
 	            JFrame frame = new JFrame();
 	            frame.setLayout(JFrameUtils.SINGLE_COLUMN_LAYOUT);
-	            frame.add(new ObjectEditPanel(gi.game.objects.get(row), gi));
+	            frame.add(new ObjectEditPanel(gi.game.objects.get(row), gi, lh));
 	            frame.setSize(300,300);
 	            frame.setVisible(true);
 	        }

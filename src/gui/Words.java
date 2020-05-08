@@ -46,4 +46,10 @@ public enum Words {
     tetris,
     files,
     extras,
+    width,
+    height,
+    shift,
+    ctrl,
+    drag,
+    grab
 }

@@ -52,4 +52,10 @@
 <tetris>Tetris</tetris>
 <files>Files</files>
 <extras>Extras</extras>
+<width>width</width>
+<height>height</height>
+<shift>Shift</shift>
+<ctrl>Ctrl</ctrl>
+<drag>Drag</drag>
+<grab>Grab</grab>
 </xml>

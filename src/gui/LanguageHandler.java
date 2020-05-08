@@ -69,7 +69,7 @@ public class LanguageHandler {
         return currentLanguage;
     }
 
-	public Object getCurrentSummary() {
+	public LanguageSummary getCurrentSummary() {
 		return currentLanguage.summary;
 	}
 
@@ -79,10 +79,8 @@ public class LanguageHandler {
         Document document = null;
         try {
             document = saxBuilder.build(DataHandler.getResourceAsStream("languages/languages.xml"));
-        } catch (JDOMException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (JDOMException | IOException e) {
+            logger.error("Can't read language file");
         }
         Element root = document.getRootElement();
         for (Element elem : root.getChildren())
@@ -113,7 +111,7 @@ public class LanguageHandler {
 	        	if (l != null)
 	        	{
 	        		l.languageChanged(currentLanguage);
-	        		languageChangeListeners.set(write, ref);
+	        		languageChangeListeners.set(write++, ref);
 	        	}
 	        }
 	        ListTools.removeRange(languageChangeListeners, write, languageChangeListeners.size());

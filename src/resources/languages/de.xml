@@ -45,4 +45,10 @@
 <tetris>Tetris</tetris>
 <files>Dateien</files>
 <extras>Extras</extras>
+<width>Breite</width>
+<height>Höhe</height>
+<shift>Umschalt</shift>
+<ctrl>Strg</ctrl>
+<drag>Drag</drag>
+<grab>Grab</grab>
 </xml>

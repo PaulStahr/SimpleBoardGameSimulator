@@ -79,7 +79,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuExtras.add(menuItemAbout);
 		menuControls.add(menuItemControls);
 		gi.addPlayer(player);
-		gamePanel = new GamePanel(gi);
+		gamePanel = new GamePanel(gi, lh);
 		gamePanel.player = player;
 		chatPanel = new IngameChatPanel(gi, player);
 		slider = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,gamePanel, chatPanel);
@@ -92,6 +92,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		slider.setDividerLocation(0.5);
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		languageChanged(lh.getCurrentLanguage());
+		lh.addLanguageChangeListener(this);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 
@@ -147,7 +148,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuItemTetris.setText(language.getString(Words.tetris));
 		menuFile.setText(language.getString(Words.files));
 		menuExtras.setText(language.getString(Words.extras));
-		menuControls.setText(language.getString(Words.tetris));
+		menuControls.setText(language.getString(Words.controls));
 	}
 	
 }

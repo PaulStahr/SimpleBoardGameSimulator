@@ -1,5 +1,14 @@
 package gui;
 
+import static gameObjects.functions.DrawFunctions.drawBoard;
+import static gameObjects.functions.DrawFunctions.drawDiceObjects;
+import static gameObjects.functions.DrawFunctions.drawFigureObjects;
+import static gameObjects.functions.DrawFunctions.drawPlayerPositions;
+import static gameObjects.functions.DrawFunctions.drawPrivateArea;
+import static gameObjects.functions.DrawFunctions.drawSelection;
+import static gameObjects.functions.DrawFunctions.drawTokenObjects;
+import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -10,6 +19,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -49,8 +59,6 @@ import geometry.Matrix3d;
 import geometry.Vector2d;
 import main.Player;
 import util.data.IntegerArrayList;
-
-import static gameObjects.functions.DrawFunctions.*;
 
 //import gameObjects.GameObjectInstanceEditAction;
 
@@ -120,8 +128,62 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public BufferedImage[] playerImages = new BufferedImage[10];
 
+	private static class ControlCombination
+	{
+		int keyModifier;
+		int mouse;
+		char key;
+		int additional;
+		
+		public ControlCombination(int keyModifier, int mouse, char key, int additional)
+		{
+			this.keyModifier = keyModifier;
+			this.mouse = mouse;
+			this.key = key;
+			this.additional = additional;
+		}
+		
+		StringBuilder appendPlus(StringBuilder strB)
+		{
+			if (strB.length() != 0)
+			{
+				strB.append(' ').append('+').append(' ');
+			}
+			return strB;
+		}
+		
+		public String toString(Language lang)
+		{
+			StringBuilder strB = new StringBuilder();
+			if ((keyModifier & InputEvent.SHIFT_DOWN_MASK) != 0)
+			{
+				appendPlus(strB).append(lang.getString(Words.shift));
+			}
+			if ((keyModifier & InputEvent.CTRL_DOWN_MASK) != 0)
+			{
+				appendPlus(strB).append(lang.getString(Words.ctrl));
+			}
+			if (key != 0)
+			{
+				appendPlus(strB).append(Character.toUpperCase(key));
+			}
+			if (mouse != -1)
+			{
+				appendPlus(strB).append(mouse == 0 ? "Left Click" : mouse == 1 ? "Middle Click" : "Right Click");
+			}
+			if ((additional & 1) != 0)
+			{
+				appendPlus(strB).append(lang.getString(Words.drag));
+			}
+			if ((additional & 2) != 0)
+			{
+				appendPlus(strB).append(lang.getString(Words.grab));
+			}
+			return strB.toString();
+		}
+	}
 
-	public GamePanel(GameInstance gameInstance)
+	public GamePanel(GameInstance gameInstance, LanguageHandler lh)
 	{
 		this.gameInstance = gameInstance;
 		this.privateArea = new PrivateArea(this, gameInstance, boardToScreenTransformation, screenToBoardTransformation);
@@ -131,26 +193,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		addMouseWheelListener(this);
 		setFocusable(true);
 		gameInstance.addChangeListener(this);
-
+	
 		// This is the cheat sheet showing the user how he can interact with the game board
-		JPanel p = new JPanel();
-		p.setLayout(new GridLayout(4, 4, 20, 0));
-		p.add(new JLabel("Move Top Card: Left Click + Drag"));
-		p.add(new JLabel("Move Stack: Middle Click + Drag"));
-		p.add(new JLabel("Take Objects to Hand: T"));
-		p.add(new JLabel("Drop All Object from Hand: D"));
-		p.add(new JLabel("Get Bottom Card: Shift + Grab"));
-		p.add(new JLabel("Shuffle Stack: S"));
-		p.add(new JLabel("Flip Card/Roll Dice: F"));
-		p.add(new JLabel("Flip Card Stack: Strg + F"));
-		p.add(new JLabel("View + Collect Stack: V"));
-		p.add(new JLabel("Collect Selected Objects: M"));
-		p.add(new JLabel("Collect All Objects: Strg + M"));
-		p.add(new JLabel("Rotate Object: R"));
-		p.add(new JLabel("Dissolve Stack: Strg + R"));
-		p.add(new JLabel("Count Objects: C"));
-		p.add(new JLabel("Count Values: Strg + C"));
-		this.add(p);
+		SheetPanel shP = new SheetPanel();
+		lh.addLanguageChangeListener(shP);
+		shP.languageChanged(lh.getCurrentLanguage());
+		add(shP);
+		
 		updateGameTransform();
 		addComponentListener(this);
 
@@ -766,4 +815,34 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 
 	}
+
+	class SheetPanel extends JPanel implements LanguageChangeListener{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -9066866830480740588L;
+
+		@Override
+		public void languageChanged(Language lang) {
+			removeAll();
+			setLayout(new GridLayout(4, 4, 20, 0));
+			add(new JLabel("Move Top Card: " 			+ new ControlCombination(0, 0, '\0', 1).toString(lang)));
+			add(new JLabel("Move Stack: " 				+ new ControlCombination(0, 1, '\0', 1).toString(lang)));
+			add(new JLabel("Take Objects to Hand: " 	+ new ControlCombination(0, -1, 'T', 0).toString(lang)));
+			add(new JLabel("Drop All Object from Hand:" + new ControlCombination(0, -1, 'D', 0).toString(lang)));
+			add(new JLabel("Get Bottom Card: " 			+ new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, '\0', 2).toString(lang)));
+			add(new JLabel("Shuffle Stack: " 			+ new ControlCombination(0, -1, 'S', 0).toString(lang)));
+			add(new JLabel("Flip Card/Roll Dice: "		+ new ControlCombination(0, -1, 'F', 0).toString(lang)));
+			add(new JLabel("Flip Card Stack: " 			+ new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1, 'F', 0).toString(lang)));
+			add(new JLabel("View + Collect Stack: " 	+ new ControlCombination(0, -1, 'V', 0).toString(lang)));
+			add(new JLabel("Collect Selected Objects: "	+ new ControlCombination(0, -1, 'M', 0).toString(lang)));
+			add(new JLabel("Collect All Objects: " 		+ new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1, 'T', 0).toString(lang)));
+			add(new JLabel("Rotate Object: " 			+ new ControlCombination(0, -1, 'R', 0).toString(lang)));
+			add(new JLabel("Dissolve Stack: "			+ new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1, 'R', 0).toString(lang)));
+			add(new JLabel("Count Objects: "			+ new ControlCombination(0, -1, 'C', 0).toString(lang)));
+			add(new JLabel("Count Values: "				+ new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1, 'C', 0).toString(lang)));
+			revalidate();
+		}
+	}
+	
 }
