@@ -58,4 +58,11 @@
 <ctrl>Ctrl</ctrl>
 <drag>Drag</drag>
 <grab>Grab</grab>
+<start_server>Start Server</start_server>
+<left_click>Left Click</left_click>
+<middle_click>Middle Click</middle_click>
+<right_click>Right Click</right_click>
+<view_collect_stack>View + Collect Stack</view_collect_stack>
+<get_bottom_card>Get Bottom Card</get_bottom_card>
+<collect_all_objects>Collect All Objects</collect_all_objects>
 </xml>

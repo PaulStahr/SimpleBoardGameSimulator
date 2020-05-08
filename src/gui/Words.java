@@ -51,5 +51,12 @@ public enum Words {
     shift,
     ctrl,
     drag,
-    grab
+    grab,
+    start_server,
+    left_click,
+    middle_click,
+    right_click,
+    view_collect_stack,
+    collect_all_objects,
+    get_bottom_card,
 }

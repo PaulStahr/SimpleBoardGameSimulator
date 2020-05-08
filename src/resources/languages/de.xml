@@ -51,4 +51,12 @@
 <ctrl>Strg</ctrl>
 <drag>Drag</drag>
 <grab>Grab</grab>
+<start_server>Starte Server</start_server>
+<left_click>Linke Maustaste</left_click>
+<middle_click>Mittlere Maustaste</middle_click>
+<right_click>Rechte Maustaste</right_click>
+<view_collect_stack>View + Stapel einsammeln</view_collect_stack>
+<get_bottom_card>Unterste Karte ziehen</get_bottom_card>
+<collect_all_objects>Alle Objekte einsammeln</collect_all_objects>
+
 </xml>

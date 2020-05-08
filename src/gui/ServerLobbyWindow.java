@@ -19,7 +19,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -48,7 +47,7 @@ import util.jframe.PasswordDialog;
 import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableModel;
 
-public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener{
+public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener, LanguageChangeListener{
 	/**
 	 * 
 	 */
@@ -56,13 +55,10 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private static final long serialVersionUID = 6569919447688866509L;
 	public final SynchronousGameClientLobbyConnection client;
 	private final JTextField textFieldName = new JTextField(Options.getString("last_connection.name"));
-	private final JTextField textFieldChat = new JTextField();
-	private final JTextArea textAreaChat = new JTextArea();
+	//private final JTextField textFieldChat = new JTextField();
+	//private final JTextArea textAreaChat = new JTextArea();
 	/*TODOS here:
-	show a list of the current running games
 	show a list of lokally installed games
-	Start a new game session
-	Connect to an existing game session
 	*/
 	
 
@@ -70,14 +66,14 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private final DefaultTableModel tableModelOpenGames = new TableModel(GameInstance.TYPES);
 	private final JTable tableOpenGames = new JTable(tableModelOpenGames);
 	private final JScrollPane scrollPaneOpenGames = new JScrollPane(tableOpenGames);
-    private final JButton buttonPoll = new JButton("Refresh");
-    private final JButton buttonCreateGame = new JButton("New Game");
-    private final JButton buttonCreateServer = new JButton("Start New Server");
+    private final JButton buttonPoll = new JButton();
+    private final JButton buttonCreateGame = new JButton();
+    private final JButton buttonStartServer = new JButton();
     private final JTextField textFieldId = new JTextField(String.valueOf(Options.getInteger("last_connection.id")));
-    private final JLabel labelAddress = new JLabel("Server Address");
-    private final JLabel labelPort = new JLabel("Port");
-    private final JLabel labelName = new JLabel("Name");
-    private final JLabel labelId = new JLabel("Id");
+    private final JLabel labelAddress = new JLabel();
+    private final JLabel labelPort = new JLabel();
+    private final JLabel labelName = new JLabel();
+    private final JLabel labelId = new JLabel();
     private final JTextField textFieldAddress = new JTextField(Options.getString("last_connection.address"));
     private final JTextField textFieldPort = new JTextField(String.valueOf(Options.getInteger("last_connection.port")));
 	private boolean isUpdating = false;
@@ -159,7 +155,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				}
 			}
 		}
-		else if (source == buttonCreateServer)
+		else if (source == buttonStartServer)
 		{
 			GameServer gs = new GameServer(Integer.parseUnsignedInt(textFieldPort.getText()));
 			gs.start();
@@ -225,6 +221,8 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	public ServerLobbyWindow(SynchronousGameClientLobbyConnection client, LanguageHandler lh)
 	{
 		this.lh = lh;
+		lh.addLanguageChangeListener(this);
+		languageChanged(lh.getCurrentLanguage());
 		Container content = getContentPane();
 		GroupLayout layout = new GroupLayout(content);
 		layout.setHorizontalGroup(layout.createParallelGroup()
@@ -241,7 +239,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				.addGroup(layout.createSequentialGroup()
 						.addComponent(buttonPoll)
 						.addComponent(buttonCreateGame)
-						.addComponent(buttonCreateServer)));
+						.addComponent(buttonStartServer)));
 		layout.setVerticalGroup(layout.createSequentialGroup()
 				.addGroup(layout
 						.createParallelGroup()
@@ -258,14 +256,14 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						.createParallelGroup()
 						.addComponent(buttonPoll)
 						.addComponent(buttonCreateGame)
-						.addComponent(buttonCreateServer)));
+						.addComponent(buttonStartServer)));
 		setLayout(layout);
 		buttonPoll.addActionListener(this);
 		tableOpenGames.getSelectionModel().addListSelectionListener(this);
 		tableOpenGames.getModel().addTableModelListener(this);
 		this.client = client;
 		buttonCreateGame.addActionListener(this);
-		buttonCreateServer.addActionListener(this);
+		buttonStartServer.addActionListener(this);
 		textFieldAddress.setText(client.getAddress());
 		textFieldPort.setText(Integer.toString(client.getPort()));
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
@@ -304,5 +302,16 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	public void valueChanged(ListSelectionEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void languageChanged(Language language) {
+		buttonPoll.setText(language.getString(Words.refresh));
+		buttonCreateGame.setText(language.getString(Words.new_game));
+		buttonStartServer.setText(language.getString(Words.start_server));
+		labelAddress.setText(language.getString(Words.server_address));
+		labelPort.setText(language.getString(Words.port));
+		labelName.setText(language.getString(Words.name));
+		labelId.setText(language.getString(Words.id));
 	}
 }
