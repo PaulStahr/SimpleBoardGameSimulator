@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import gameObjects.GameInstanceColumnType;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
+import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GamePlayerEditAction;
 import gameObjects.definition.GameObject;
 import main.Player;
@@ -27,6 +28,7 @@ public class GameInstance {
 	private final ArrayList<Player> players = new ArrayList<>();
 	private final ArrayList<GameAction> actions = new ArrayList<>();
 	private final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
+	private long maxDrawValue = 0;
 	
 	public static interface GameChangeListener
 	{
@@ -45,6 +47,17 @@ public class GameInstance {
 		players.clear();
 		game.clear();
 	}
+	
+	public long getMaxDrawValue()
+	{
+		return maxDrawValue;
+        /*long maxDrawValue = 0;
+        for (int idx = 0; idx<getObjectNumber(); ++idx){
+            maxDrawValue = max(maxDrawValue, getObjectInstanceByIndex(idx).state.drawValue);
+        }
+        return maxDrawValue;*/
+	}
+	
 	
 	public Player addPlayer(Player player)
 	{
@@ -148,6 +161,11 @@ public class GameInstance {
 		{
 			GameObject obj = ((GameObjectEditAction) action).getObject(this);
 			obj.updateImages(this);
+		}
+		else if (action instanceof GameObjectInstanceEditAction)
+		{
+			ObjectInstance oi = ((GameObjectInstanceEditAction) action).getObject(this);
+			maxDrawValue = Math.max(maxDrawValue , oi.state.drawValue);
 		}
 		for (int i = 0; i < changeListener.size(); ++i)
 		{

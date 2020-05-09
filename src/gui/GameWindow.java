@@ -30,7 +30,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	 * 
 	 */
 	private static final long serialVersionUID = -1441104795154034811L;
-	GameInstance gi;
+	private final GameInstance gi;
 	private final JSplitPane slider;
 	public GamePanel gamePanel;
 	public IngameChatPanel chatPanel;
@@ -105,7 +105,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		}
 		else if (source == menuItemEditGame )
 		{
-			new EditGameWindow(gi, lh).setVisible(true);
+			new EditGameWindow(gi, lh, gamePanel.player).setVisible(true);
 		}
 		else if (source == menuItemSaveGame)
 		{

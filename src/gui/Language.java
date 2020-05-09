@@ -20,7 +20,7 @@ public class Language {
         }
     }
 
-    String getString(Words languageWords){
+    public final String getString(Words languageWords){
         return wordsToString.get(languageWords);
     }
     

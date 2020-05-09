@@ -80,10 +80,12 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private boolean isUpdating = false;
 	private Entry<String, BufferedImage>[] imageArray;
 	private final LanguageHandler lh;
+	private final Player player;
 
-	public EditGamePanel(GameInstance gi, LanguageHandler lh) {
+	public EditGamePanel(GameInstance gi, LanguageHandler lh, Player player) {
 		this.gi = gi;
 		this.lh = lh;
+		this.player = player;
 		Language language = lh.getCurrentLanguage();
 		GroupLayout layout = new GroupLayout(this);
 		setLayout(layout);
@@ -121,11 +123,11 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	
 	@Override
 	public void languageChanged(Language language) {
-		tabPane.setTitleAt(tabPane.indexOfComponent(panelGeneral), language.getString(Words.general));
-		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPaneGameObjects), language.getString(Words.game_objects));
+		tabPane.setTitleAt(tabPane.indexOfComponent(panelGeneral), 					language.getString(Words.general));
+		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPaneGameObjects), 		language.getString(Words.game_objects));
 		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPaneGameObjectInstances), language.getString(Words.game_object_instances));
-		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPaneImages), language.getString(Words.images));
-		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPanePlayer), language.getString(Words.player));
+		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPaneImages), 				language.getString(Words.images));
+		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPanePlayer), 				language.getString(Words.player));
 	}
 	
     private final AbstractAction tableAction = new AbstractAction() {
@@ -137,7 +139,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  	    }
     };
  	private final ButtonColumn deleteObjectColumn = new ButtonColumn(tableGameObjects,tableAction, GameObject.TYPES.indexOf(GameObjectColumnType.DELETE));
- 	private final ButtonColumn deleteObjectInstanceColumn = new ButtonColumn(tableGameObjects,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
+ 	private final ButtonColumn resetObjectInstanceColumn = new ButtonColumn(tableGameObjectInstances,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.RESET));
+ 	private final ButtonColumn deleteObjectInstanceColumn = new ButtonColumn(tableGameObjectInstances,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
  	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableImages,tableAction, IMAGE_TYPES.indexOf(ImageColumnType.DELETE));
  	private final ButtonColumn deletePlayerColumn = new ButtonColumn(tablePlayer,tableAction, Player.TYPES.indexOf(PlayerColumnType.DELETE));
 	 	
@@ -147,7 +150,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		 * 
 		 */
 		private static final long serialVersionUID = 3667665407550359889L;
-		private final JLabel labelName = new JLabel("Name");
+		private final JLabel labelName = new JLabel();
  		private final JTextField textFieldName = new JTextField();
  		private final JLabel labelBackground = new JLabel("Background");
  		private final JComboBox<String> comboBoxBackground = new JComboBox<String>();
@@ -242,7 +245,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
     	}
 		isUpdating = true;
 		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, deleteObjectColumn);
-		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, deleteObjectInstanceColumn);
+		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, resetObjectInstanceColumn, deleteObjectInstanceColumn);
 		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.entrySet().toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, deleteImageColumn);
 		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(), Player.TYPES, tableModelPlayer, deletePlayerColumn);
 		panelGeneral.update();
@@ -261,9 +264,25 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			Object tableSource = event.getSource();
 			int col = event.getCol();
 			int row = event.getRow();
+			ButtonColumn button = event.getButton();
 			if (tableSource== tableModelGameObjectInstances)
 			{
-				gi.remove(gi.getObjectInstanceByIndex(row));
+				
+				if (button == resetObjectInstanceColumn)
+				{
+					ObjectInstance oi = gi.getObjectInstanceByIndex(row);
+					//ObjectFunctions.removeObject(id, gi, player, oi);
+					oi.state.reset();
+					gi.update(new GameObjectInstanceEditAction(id, player, oi));
+				}
+				else if (button == deleteObjectInstanceColumn)
+				{
+					gi.remove(gi.getObjectInstanceByIndex(row));				
+				}
+				else
+				{
+					throw new RuntimeException("Unknown Button");
+				}
 			}
 			else if (tableSource == tableModelImages)
 			{

@@ -76,6 +76,12 @@ public class GameObjectFigure extends GameObject{
 		public ObjectState copy() {
 			return new FigureState(this);
 		}
+
+		@Override
+		public void reset() {
+			super.reset();
+			standing = true;
+		}
 	}
 	
 	public BufferedImage getStandingLook()

@@ -1359,17 +1359,9 @@ public class ObjectFunctions {
         return ial;
     }
 
-    public static long getMaxDrawValue(GameInstance gameInstance){
-        long maxDrawValue = 0;
-        for (int idx = 0; idx<gameInstance.getObjectNumber(); ++idx){
-            maxDrawValue = max(maxDrawValue, gameInstance.getObjectInstanceByIndex(idx).state.drawValue);
-        }
-        return maxDrawValue;
-    }
-
     public static void setNewDrawValue(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
         if (objectInstance != null) {
-            objectInstance.state.drawValue = getMaxDrawValue(gameInstance) + 1;
+            objectInstance.state.drawValue = gameInstance.getMaxDrawValue() + 1;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance));
         }
     }

@@ -84,6 +84,12 @@ public class GameObjectDice extends GameObject{
 		public ObjectState copy() {
 			return new DiceState(this);
 		}
+
+		@Override
+		public void reset() {
+			super.reset();
+			side = 0;
+		}
 	}
 	
 	/** Outputs a random side of the dice and saves the new state.
