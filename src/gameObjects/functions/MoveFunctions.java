@@ -1,5 +1,6 @@
 package gameObjects.functions;
 
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
@@ -39,7 +40,8 @@ public class MoveFunctions {
             }
         }
          /*Get bottom card with shift*/
-        else if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0)) && arg0.isShiftDown() && activeObject != null && activeObject.state.owner_id != -1) {
+        else if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0)) && arg0.isShiftDown() && activeObject != null && activeObject.state.owner_id == -1 && activeObject.go instanceof GameObjectToken) {
+            activeObject = ObjectFunctions.getStackBottom(gameInstance,activeObject);
             ObjectFunctions.removeObject(gamePanel, gameInstance, player, activeObject);
             ObjectFunctions.moveObjectTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player.id, activeObject.id));

@@ -45,8 +45,15 @@ public class DrawFunctions {
 
     public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, IntegerArrayList ial){
         //Draw all objects not in some private area
-        for (int idx:ial) {
-            ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
+        ArrayList<ObjectInstance> oiList = new ArrayList<>();
+        for (int idx : ial){
+            oiList.add(gameInstance.getObjectInstanceByIndex(idx));
+        }
+        drawObjectsFromList(gamePanel,g,gameInstance,player,oiList,ial);
+    }
+
+    public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList, IntegerArrayList ial) {
+        for (ObjectInstance oi:oiList) {
             if (oi.state.owner_id != player.id || !oi.state.inPrivateArea || oi.state.isActive) {
                 try {
                     if (oi.go instanceof GameObjectToken) {
@@ -64,14 +71,6 @@ public class DrawFunctions {
                 }
             }
         }
-    }
-
-    public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList, IntegerArrayList ial) {
-        ial.clear();
-        for(ObjectInstance oi : oiList){
-            ial.add(oi.id);
-        }
-        drawObjectsFromList(gamePanel, g, gameInstance, player, ial);
     }
 
         public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, IntegerArrayList tmp){

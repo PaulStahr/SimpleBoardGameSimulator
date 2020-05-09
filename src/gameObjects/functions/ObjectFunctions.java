@@ -913,6 +913,9 @@ public class ObjectFunctions {
             for (int id : stackIds) {
                 removeFromOwnStack(gamePanel, gameInstance, player, id);
             }
+            //stack all dropped objects
+            //ObjectInstance oi = gameInstance.getObjectInstanceByIndex(stackIds.getI(0));
+            makeStack(gamePanel.id, gameInstance, player,stackIds);
         }
     }
 
