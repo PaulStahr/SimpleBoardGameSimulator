@@ -209,7 +209,16 @@ public class GameInstance {
 		game.objects.remove(object);
 	}
 
-	public void remove(Player player) {
+	public void remove(int source, Player player) {
+		for (int i = 0; i < objects.size(); ++i)
+		{
+			if (objects.get(i).state.owner_id == player.id)
+			{
+				objects.get(i).state.owner_id = -1;
+				objects.get(i).state.inPrivateArea = false;
+				update(new GameObjectInstanceEditAction(source, player, objects.get(i)));
+			}
+		}
 		players.remove(player);
 	}
 }

@@ -297,7 +297,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			else if (tableSource == tableModelPlayer)
 			{
-				gi.remove(gi.getPlayerByIndex(row));
+				gi.remove(id, gi.getPlayerByIndex(row));
 			}
 		}
 		updateTables();
