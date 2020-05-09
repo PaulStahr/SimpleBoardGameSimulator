@@ -129,7 +129,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						GameIO.readSnapshotFromZip(new FileInputStream(file), gi);
 					}
 					else
-					{
+					{//TODO
 						JFrameUtils.logErrorAndShow("Can't interpret Game", new IOException(), logger);
 					}
 					if (gi.name == null)
