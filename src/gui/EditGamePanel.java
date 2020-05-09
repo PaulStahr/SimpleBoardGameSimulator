@@ -150,7 +150,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		 * 
 		 */
 		private static final long serialVersionUID = 3667665407550359889L;
-		private final JLabel labelName = new JLabel("Name");
+		private final JLabel labelName = new JLabel();
  		private final JTextField textFieldName = new JTextField();
  		private final JLabel labelBackground = new JLabel("Background");
  		private final JComboBox<String> comboBoxBackground = new JComboBox<String>();
