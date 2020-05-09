@@ -29,7 +29,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -42,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import data.ControlCombination;
 import data.DataHandler;
+import data.SystemFileUtil;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
@@ -54,7 +59,9 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import geometry.Matrix3d;
 import geometry.Vector2d;
+import io.GameIO;
 import main.Player;
+import util.TimedUpdateHandler;
 import util.data.IntegerArrayList;
 
 //import gameObjects.GameObjectInstanceEditAction;
@@ -128,6 +135,30 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public float cardOverlap = (float) (2/3.0);
 
 	public BufferedImage[] playerImages = new BufferedImage[10];
+	
+	TimedUpdateHandler autosave = new TimedUpdateHandler() {
+		@Override
+		public void update() {
+			if (isVisible())
+			{
+				try {
+					File tmpFile = new File(SystemFileUtil.defaultProgramDirectory() + "/autosave-tmp.zip");
+					FileOutputStream fOut = new FileOutputStream(tmpFile);
+					GameIO.writeSnapshotToZip(gameInstance, fOut);
+					fOut.close();
+					Files.move(tmpFile.toPath(), new File(SystemFileUtil.defaultProgramDirectory() + "/autosave.zip").toPath(), StandardCopyOption.REPLACE_EXISTING);
+				} catch (IOException e) {
+					logger.error("Can't create autosave", e);
+				}
+			}
+			
+		}
+		
+		@Override
+		public int getUpdateInterval() {
+			return 60000;
+		}
+	};
 
 	public GamePanel(GameInstance gameInstance, LanguageHandler lh)
 	{
@@ -149,7 +180,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		updateGameTransform();
 		addComponentListener(this);
 
-
 		for (int i = 0; i < 10; ++i) {
 			try {
 				playerImages[i] = ImageIO.read(DataHandler.getResourceAsStream("images/kenney-animalpack/PNG/Round/id" + String.valueOf(i) + ".png"));
@@ -157,6 +187,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				e.printStackTrace();
 			}
 		}
+		DataHandler.timedUpdater.add(autosave);
 	}
 
 	/** Drawing of all the game objects, draws the board, object instances and the players

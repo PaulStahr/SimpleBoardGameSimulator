@@ -99,42 +99,14 @@ public abstract class Options
 	public static synchronized void set(OptionTreeNode root, String key, Object value)
 	{
 		OptionTreeNode otn = createNode(key, root, value);
-		/*if (otn == null)
-		{
-			otn = 
-		}*/
-		if (otn instanceof OptionTreeLeafBigInteger)
-		{
-			((OptionTreeLeafBigInteger)otn).value = (BigInteger)value;
-		}
-		else if (otn instanceof OptionTreeLeafString)
-		{
-			((OptionTreeLeafString)otn).value = (String)value;				
-		}
-		else if (otn instanceof OptionTreeLeafColor)
-		{
-			((OptionTreeLeafColor)otn).value = (Color)value;				
-		}
-		else if (otn instanceof OptionTreeLeafDouble)
-		{
-			((OptionTreeLeafDouble)otn).value = (double)value;				
-		}
-		else if (otn instanceof OptionTreeLeafInteger)
-		{
-			((OptionTreeLeafInteger)otn).value = value instanceof Integer ? (int)value : (byte)value;				
-		}
-		else if (otn instanceof OptionTreeLeafBoolean)
-		{
-			((OptionTreeLeafBoolean)otn).value = (boolean)value;			
-		}
-		else if (otn instanceof OptionTreeLeafFloat)
-		{
-			((OptionTreeLeafFloat)otn).value = (float)value;			
-		}
-		else
-		{
-			throw new IllegalArgumentException("missmatched type for key " + key + ':' + value.getClass().getName() + " should be " + otn.typeValue());
-		}
+		if (otn instanceof OptionTreeLeafBigInteger)			{((OptionTreeLeafBigInteger)otn).value 	= (BigInteger)value;}
+		else if (otn instanceof OptionTreeLeafString)			{((OptionTreeLeafString)otn).value 		= (String)value;}
+		else if (otn instanceof OptionTreeLeafColor)			{((OptionTreeLeafColor)otn).value 		= (Color)value;}
+		else if (otn instanceof OptionTreeLeafDouble)			{((OptionTreeLeafDouble)otn).value 		= (double)value;}
+		else if (otn instanceof OptionTreeLeafInteger)			{((OptionTreeLeafInteger)otn).value 	= value instanceof Integer ? (int)value : (byte)value;}
+		else if (otn instanceof OptionTreeLeafBoolean)			{((OptionTreeLeafBoolean)otn).value 	= (boolean)value;}
+		else if (otn instanceof OptionTreeLeafFloat)			{((OptionTreeLeafFloat)otn).value 		= (float)value;}
+		else													{throw new IllegalArgumentException("missmatched type for key " + key + ':' + value.getClass().getName() + " should be " + otn.typeValue());}
 		optionsUpdated();
 		otn.lastModification = modCount;
 	}
@@ -164,14 +136,14 @@ public abstract class Options
 		{
 			switch (type)
 			{
-				case "void":toAdd = new OptionTreeInnerNode(elem.getName(), modCount);break;
-				case "string":toAdd = new OptionTreeLeafString(elem.getName(), init, modCount);break;
-				case "int":toAdd = new OptionTreeLeafInteger(elem.getName(), Integer.parseInt(init), modCount);break;
-				case "float":toAdd = new OptionTreeLeafFloat(elem.getName(), Float.parseFloat(init), modCount);break;
-				case "double":toAdd = new OptionTreeLeafDouble(elem.getName(), Double.parseDouble(init), modCount);break;
-				case "bigint":toAdd = new OptionTreeLeafBigInteger(elem.getName(), new BigInteger(init), modCount);break;
-				case "color":toAdd = new OptionTreeLeafColor(elem.getName(), new Color(Integer.parseInt(init)), modCount);break;
-				case "bool":toAdd = new OptionTreeLeafBoolean(elem.getName(), Boolean.parseBoolean(init), modCount);break;
+				case "void":toAdd 	= new OptionTreeInnerNode(		elem.getName(), modCount);break;
+				case "string":toAdd = new OptionTreeLeafString(		elem.getName(), init, modCount);break;
+				case "int":toAdd 	= new OptionTreeLeafInteger(	elem.getName(), Integer.parseInt(init), modCount);break;
+				case "float":toAdd 	= new OptionTreeLeafFloat(		elem.getName(), Float.parseFloat(init), modCount);break;
+				case "double":toAdd = new OptionTreeLeafDouble(		elem.getName(), Double.parseDouble(init), modCount);break;
+				case "bigint":toAdd = new OptionTreeLeafBigInteger(	elem.getName(), new BigInteger(init), modCount);break;
+				case "color":toAdd 	= new OptionTreeLeafColor(		elem.getName(), new Color(Integer.parseInt(init)), modCount);break;
+				case "bool":toAdd 	= new OptionTreeLeafBoolean(	elem.getName(), Boolean.parseBoolean(init), modCount);break;
 				default:logger.error("Type " + type + " not known");break;
 			}
 		}
@@ -201,13 +173,13 @@ public abstract class Options
 			{
 				switch (type)
 				{
-					case "string":((OptionTreeLeafString)node).value = init;break;
-					case "int":((OptionTreeLeafInteger)node).value = Integer.parseInt(init);break;
-					case "float":((OptionTreeLeafFloat)node).value = Float.parseFloat(init);break;
-					case "double":((OptionTreeLeafDouble)node).value = Double.parseDouble(init);break;
-					case "bigint":((OptionTreeLeafBigInteger)node).value = new BigInteger(init);break;
-					case "color":((OptionTreeLeafColor)node).value = new Color(Integer.parseInt(init));break;
-					case "bool":((OptionTreeLeafBoolean)node).value = Boolean.parseBoolean(init);break;
+					case "string":	((OptionTreeLeafString)		node).value = init;break;
+					case "int":		((OptionTreeLeafInteger)	node).value = Integer.parseInt(init);break;
+					case "float":	((OptionTreeLeafFloat)		node).value = Float.parseFloat(init);break;
+					case "double":	((OptionTreeLeafDouble)		node).value = Double.parseDouble(init);break;
+					case "bigint":	((OptionTreeLeafBigInteger)	node).value = new BigInteger(init);break;
+					case "color":	((OptionTreeLeafColor)		node).value = new Color(Integer.parseInt(init));break;
+					case "bool":	((OptionTreeLeafBoolean)	node).value = Boolean.parseBoolean(init);break;
 				}
 			}catch (Exception e)
 			{
@@ -264,7 +236,6 @@ public abstract class Options
     };
     
     private static OptionTreeNode root = createNodeInstance("options", null, modCount);
-    private static String folder = "cardgamesimulator";
     
     static
     {
@@ -280,7 +251,7 @@ public abstract class Options
         }
     	try
     	{
-	    	final File file = new File(defaultDirectory() + '/' + '.' + folder + '/' + "options" + '.' + "xml");
+	    	final File file = new File(SystemFileUtil.defaultProgramDirectory() + '/' + "options" + '.' + "xml");
 		    if (!file.exists() || file.isDirectory())
 		    {
 		        new XMLOutputter(Format.getPrettyFormat()).output(getDocument(), new FileWriter(file));
@@ -320,7 +291,7 @@ public abstract class Options
     	if (lastFileSync == modCount)
     		return true;
         try{
-            final File dir = new File(defaultDirectory() + '/' + '.' + folder);
+            final File dir = new File(SystemFileUtil.defaultProgramDirectory());
             if (!dir.exists())
                 dir.mkdir();
             if (!dir.isDirectory()){
@@ -894,16 +865,5 @@ public abstract class Options
  
     public static final BigInteger getBigInteger (final CharSequence name){
     	return getBigInteger (name, null);
-    }
-    
-    public static final String defaultDirectory(){
-        final String os = System.getProperty("os.name").toUpperCase();
-        if (os.contains("WIN"))
-            return System.getenv("APPDATA");
-        if (os.contains("MAC"))
-            return System.getProperty("user.home") + "/Library/Application Support";
-        if (os.contains("NUX"))
-            return System.getProperty("user.home");
-        return System.getProperty("user.dir");
     }
 }
