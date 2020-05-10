@@ -33,6 +33,8 @@ public class DrawFunctions {
         //TODO Florian:sometimes images are drawn twice (the active object?)
         g.drawString(String.valueOf(gamePanel.mouseWheelValue), gamePanel.mouseScreenX, gamePanel.mouseScreenY);
         g.drawImage(gameInstance.game.background, 0, 0, gamePanel.getWidth(), gamePanel.getHeight(), Color.BLACK, null);
+
+        gamePanel.table.drawTable(gamePanel, g);
     }
 
     public static void drawPrivateArea(GamePanel gamePanel, Graphics g){
@@ -53,7 +55,8 @@ public class DrawFunctions {
     }
 
     public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList, IntegerArrayList ial) {
-        for (ObjectInstance oi:oiList) {
+        for (int i = 0; i < oiList.size(); ++i){
+            ObjectInstance oi = oiList.get(i);
             if (oi.state.owner_id != player.id || !oi.state.inPrivateArea || oi.state.isActive) {
                 try {
                     if (oi.go instanceof GameObjectToken) {
