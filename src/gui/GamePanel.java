@@ -7,12 +7,7 @@ import static gameObjects.functions.DrawFunctions.drawPrivateArea;
 import static gameObjects.functions.DrawFunctions.drawSelection;
 import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
-import java.awt.KeyEventDispatcher;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -37,9 +32,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -165,9 +158,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
     public GamePanel(GameInstance gameInstance, LanguageHandler lh)
 	{
+		this.setLayout(new FlowLayout(FlowLayout.LEFT));
 		this.gameInstance = gameInstance;
 		this.privateArea = new PrivateArea(this, gameInstance, boardToScreenTransformation, screenToBoardTransformation);
-		this.table = new Table(0,500,new Point2D.Double(500,500));
+		this.table = new Table(gameInstance, 1000,new Point2D.Double(-500,-500));
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
@@ -176,10 +170,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		gameInstance.addChangeListener(this);
 	
 		// This is the cheat sheet showing the user how he can interact with the game board
-		SheetPanel shP = new SheetPanel();
+		SheetPanel shP = new SheetPanel(new BorderLayout());
 		lh.addLanguageChangeListener(shP);
 		shP.languageChanged(lh.getCurrentLanguage());
 		add(shP);
+
 
 		
 		updateGameTransform();
@@ -751,14 +746,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	}
 
+	public AffineTransform getBoardToScreenTransform(){
+		return boardToScreenTransformation;
+	}
+
 	public void screenToBoardPos(int x, int y, Vector2d out)
 	{
 		gameTransform.transformAffine(x, y, out);
 	}
 	public void boardToScreenPos(Point2D boardCoordinates, Point2D screenCooardinates)
 	{
-		screenCooardinates.setLocation(boardCoordinates.getX(), boardCoordinates.getY());
-		boardToScreenTransformation.transform(screenCooardinates, null);
+		boardToScreenTransformation.transform(boardCoordinates, screenCooardinates);
 	}
 
 	public void translateBoard(MouseEvent arg0)
@@ -811,10 +809,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		 */
 		private static final long serialVersionUID = -9066866830480740588L;
 
+		public SheetPanel(BorderLayout borderLayout) {
+			this.setBorder( BorderFactory.createLineBorder( Color.black ) );
+		}
+
 		@Override
 		public void languageChanged(Language lang) {
 			removeAll();
-			setLayout(new GridLayout(4, 4, 20, 0));
+			setLayout(new GridLayout(15, 1, 20, 0));
 			add(new JLabel(lang.getString(Words.move_top_card) 				+ ": " + new ControlCombination(0, 0, '\0', 1).toString(lang)));
 			add(new JLabel(lang.getString(Words.move_stack) 				+ ": " + new ControlCombination(0, 1, '\0', 1).toString(lang)));
 			add(new JLabel(lang.getString(Words.take_objects_to_hand)	 	+ ": " + new ControlCombination(0, -1, 'T', 0).toString(lang)));
