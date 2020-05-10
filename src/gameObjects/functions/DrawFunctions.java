@@ -34,7 +34,9 @@ public class DrawFunctions {
         g.drawString(String.valueOf(gamePanel.mouseWheelValue), gamePanel.mouseScreenX, gamePanel.mouseScreenY);
         g.drawImage(gameInstance.game.background, 0, 0, gamePanel.getWidth(), gamePanel.getHeight(), Color.BLACK, null);
 
-        gamePanel.table.drawCompleteTable(gamePanel, gameInstance, g);
+        if(gamePanel.table != null) {
+            gamePanel.table.drawCompleteTable(gamePanel, gameInstance, g);
+        }
     }
 
     public static void drawPrivateArea(GamePanel gamePanel, Graphics g){
