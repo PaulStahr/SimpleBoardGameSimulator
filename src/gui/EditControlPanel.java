@@ -1,104 +1,48 @@
 package gui;
 
 
-import java.awt.EventQueue;
-import java.awt.Point;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.text.Document;
 
-import gameObjects.GameObjectColumnType;
-import gameObjects.GameObjectInstanceColumnType;
-import gameObjects.ImageColumnType;
-import gameObjects.PlayerColumnType;
-import gameObjects.action.AddObjectAction;
+import data.ControlCombination;
 import gameObjects.action.GameAction;
-import gameObjects.action.GameObjectEditAction;
-import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.GamePlayerEditAction;
-import gameObjects.action.GameStructureEditAction;
-import gameObjects.definition.GameObject;
-import gameObjects.definition.GameObjectToken;
-import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
-import gameObjects.instance.ObjectInstance;
-import main.Player;
-import util.ArrayTools;
-import util.JFrameUtils;
-import util.jframe.table.ButtonColumn;
-import util.jframe.table.TableColumnType;
-import util.jframe.table.TableModel;
 
 public class EditControlPanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener{
 
 
-    private String[] columnNames = {"Description", "Key"};
-
-    private Object[][] boardControls = {{"Move Board", "Strg + Left Mouse Button"},
-            {"Rotate Board", "Strg + Right Mouse Button"},
-            {"Zoom", "Strg + Mouse Wheel"},
-    };
     JLabel boardControlsLabel = new JLabel("Board Controls");
-    JTable boardControlsTable = new JTable(boardControls, columnNames);
+    JTable boardControlsTable = new JTable(3, 2);
     JScrollPane boardControlPane = new JScrollPane(boardControlsTable);
 
-    private Object[][] objectControls = {{"Move Object", "Click + Drag"},
-            {"Move Stack", "Click Mouse Wheel + Drag"},
-            {"Get Top n Card", "Rotate Mouse Wheel + Click Mouse Wheel + Drag"},
-            {"Get Bottom Card", "Shift + Click + Drag"},
-            {"Rotate object", "R"},
-            {"Select objects", "Click  + Drag"},
-            {"Shuffle Stack", "S"},
-            {"Merge objects", "M"},
-            {"Collect all objects of a group", "Strg + M"},
-            {"Flip objects/Roll dice", "F"},
-    };
     JLabel objectControlsLabel = new JLabel("Object Controls");
-    JTable objectControlsTable = new JTable(objectControls, columnNames);
+    JTable objectControlsTable = new JTable(10, 2);
     JScrollPane objectControlsPane = new JScrollPane(objectControlsTable);
 
-    private Object[][] privateAreaControls = {{"Take Objects to Hand Cards", "T, Left Mouse + Drag"},
-            {"Take Objects to Hand Cards face down", "Right Mouse + Drag"},
-            {"Play card face up", "Left Mouse + Drop Outside Hand Cards"},
-            {"Play card face down", "Right Mouse + Drop Outside Hand Cards"},
-            {"Drop All Hand Cards", "D"},
-    };
     JLabel privateAreaControlsLabel = new JLabel("Control Hand Cards");
-    JTable privateAreaControlsTable = new JTable(privateAreaControls, columnNames);
+    JTable privateAreaControlsTable = new JTable(5, 2);
     JScrollPane privateAreaControlsPane = new JScrollPane(privateAreaControlsTable);
 
 
-    private Object[][] countControls = {{"Count Card Number", "C"},
-            {"Count Card Value", "Strg + C"},
-    };
     JLabel countControlsLabel = new JLabel("Control Hand Cards");
-    JTable countControlsTable = new JTable(countControls, columnNames);
+    JTable countControlsTable = new JTable(2, 2);
     JScrollPane countControlsPane = new JScrollPane(countControlsTable);
     //keyAssignmentTable.setFillsViewportHeight(true);
 
-    public EditControlPanel(){
+    public EditControlPanel(LanguageHandler lh){
+        languageChanged(lh.getCurrentLanguage());
+        lh.addLanguageChangeListener(this);
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(boardControlsLabel);
         this.add(boardControlPane);
@@ -113,10 +57,94 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
     public void changeUpdate(GameAction action) {
 
     }
+    
+	
+	private static class FuncControl
+	{
+		Words word;
+		ControlCombination cc[];
+		
+		public FuncControl(Words word, ControlCombination... cc){
+			this.word = word;
+			this.cc = cc;
+		}
 
+		public String toString(Language lang) {
+			StringBuilder strB = new StringBuilder();
+			for (int i = 0; i < cc.length; ++i)
+			{
+				cc[i].toString(strB, lang);
+				if (i != 0)
+				{
+					strB.append(',');
+				}
+			}
+			return strB.toString();
+		}
+	}
+
+	private static final FuncControl[] boardControls = {
+			new FuncControl(Words.move_board, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 0, '\0', 0)),
+			new FuncControl(Words.rotate, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2, '\0', 0)),
+			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 0, '\0', 4)),
+	};
+
+	private static final FuncControl[] objectControls= {
+			new FuncControl(Words.move_object, 		new ControlCombination(0, 0, '\0', 1)),
+			new FuncControl(Words.move_stack,	 	new ControlCombination(0, 1, '\0', 1)),
+			new FuncControl(Words.get_top_n_card, 	new ControlCombination(0, 1, '\0', 5)),
+			new FuncControl(Words.get_bottom_card, 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 0, '\0', 1)),
+			new FuncControl(Words.rotate_object, 	new ControlCombination(0, -1, 'R', 0)),
+			new FuncControl(Words.select_objects, 	new ControlCombination(0, 0, '\0', 1)),
+			new FuncControl(Words.shuffle_stack, 	new ControlCombination(0, -1, 'S', 0)),
+			new FuncControl(Words.merge_objects, 	new ControlCombination(0, -1, 'M', 0)),
+			new FuncControl(Words.collect_all_objects_of_a_group, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2, 'M', 0)),			
+			new FuncControl(Words.flip_objects_roll_dice, new ControlCombination(0, 2, 'F', 1)),			
+	};
+	
+	private static final FuncControl[] privateAreaControls= {
+			new FuncControl(Words.take_object_to_hand, new ControlCombination(0, -1, 'T', 0), new ControlCombination(0, 0, '\0', 1)),
+			new FuncControl(Words.take_object_to_hand_face_down, new ControlCombination(0, 2, '\0', 1)),
+			new FuncControl(Words.play_card_face_up, new ControlCombination(0, 1, '\0', 8)),
+			new FuncControl(Words.play_card_face_down, new ControlCombination(0, 2, '\0', 8)),
+			new FuncControl(Words.drop_all_hand_cards, new ControlCombination(0, -1, 'D', 0)),			
+	};
+	
+	private static final FuncControl[] countControls = {
+			new FuncControl(Words.count_card_number, new ControlCombination(0, -1, 'C', 0)),
+			new FuncControl(Words.count_card_value, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1, 'C', 0)),			
+	};
+	
     @Override
-    public void languageChanged(Language language) {
-
+    public void languageChanged(Language lang) {
+		String[] columnNames = {lang.getString(Words.description), lang.getString(Words.key)};
+		for (int col = 0; col < 2; ++col)
+		{
+		 	boardControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
+		 	privateAreaControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
+     		objectControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
+		 	countControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
+		}
+        for (int row = 0; row < boardControls.length; ++row)
+ 		{
+            boardControlsTable.getModel().setValueAt(lang.getString(boardControls[row].word), row, 0);
+            boardControlsTable.getModel().setValueAt(boardControls[row].toString(lang), row, 1);
+ 		}
+ 		for (int row = 0; row < objectControls.length; ++row)
+ 		{
+ 			objectControlsTable.getModel().setValueAt(lang.getString(objectControls[row].word), row, 0);
+            objectControlsTable.getModel().setValueAt(objectControls[row].toString(lang), row, 1);
+ 		}
+ 		for (int row = 0; row < privateAreaControls.length; ++row)
+ 		{
+ 			privateAreaControlsTable.getModel().setValueAt(lang.getString(privateAreaControls[row].word), row, 0);
+            privateAreaControlsTable.getModel().setValueAt(privateAreaControls[row].toString(lang), row, 1);
+ 		}
+ 		for (int row = 0; row < countControls.length; ++row)
+ 		{
+ 			countControlsTable.getModel().setValueAt(lang.getString(countControls[row].word), row, 0);
+            countControlsTable.getModel().setValueAt(countControls[row].toString(lang), row, 1);
+ 		}
     }
 
     @Override
@@ -156,7 +184,7 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 
     @Override
     public void tableChanged(TableModelEvent e) {
-
+       
     }
 }
 

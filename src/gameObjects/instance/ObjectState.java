@@ -45,4 +45,19 @@ public abstract class ObjectState implements Serializable {
 	{
 		return Math.toRadians(rotation);
 	}
+
+	public void reset()
+	{
+		posX = 0;
+		posY = 0;
+		rotation = 0;
+		owner_id = -1;
+		isActive = false;
+		inPrivateArea = false;
+		aboveInstanceId = -1;
+		belowInstanceId = -1;
+		value = 0;
+		drawValue = 0;
+		rotationStep = 90;
+	}
 }

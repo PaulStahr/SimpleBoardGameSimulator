@@ -11,6 +11,7 @@ import util.jframe.table.ValueColumnTypes;
 public enum GameObjectInstanceColumnType implements TableColumnType{
 	ID("id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
+	RESET("Reset", ValueColumnTypes.TYPE_TEXTFIELD, "Delete", null),
 	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
 	
     private static final GameObjectInstanceColumnType ct[] = GameObjectInstanceColumnType.values();
@@ -73,6 +74,7 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
 			case DELETE:	return "Delete";
 			case ID:		return gi.id;
 			case NAME:		return gi.go.uniqueName;
+			case RESET:		return "Reset";
 			default:throw new IllegalArgumentException(getName());
 		}
 	}

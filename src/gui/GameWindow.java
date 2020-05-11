@@ -25,22 +25,26 @@ import io.GameIO;
 import main.Player;
 import util.JFrameUtils;
 
-public class GameWindow extends JFrame implements ActionListener{
+public class GameWindow extends JFrame implements ActionListener, LanguageChangeListener{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -1441104795154034811L;
-	GameInstance gi;
+	private final GameInstance gi;
 	private final JSplitPane slider;
 	public GamePanel gamePanel;
 	public IngameChatPanel chatPanel;
-	public final JMenuItem menuItemExit = new JMenuItem("Exit");
-	private final JMenuItem menuItemEditGame = new JMenuItem("Edit");
-	private final JMenuItem menuItemSaveGame = new JMenuItem("Save");
-	private final JMenuItem menuItemSettings = new JMenuItem("Settings");
-	private final JMenuItem menuItemAbout = new JMenuItem("About");
-	private final JMenuItem menuItemControls = new JMenuItem("Controls");
-	private final JMenuItem menuItemTetris = new JMenuItem("Tetris");
+	private final JMenuItem menuItemExit = new JMenuItem();
+	private final JMenuItem menuItemEditGame = new JMenuItem();
+	private final JMenuItem menuItemSaveGame = new JMenuItem();
+	private final JMenuItem menuItemSettings = new JMenuItem();
+	private final JMenuItem menuItemAbout = new JMenuItem();
+	private final JMenuItem menuItemControls = new JMenuItem();
+	private final JMenuItem menuItemTetris = new JMenuItem();
+	private final JMenu menuFile = new JMenu();
+	private final JMenu menuExtras = new JMenu();
+	private final JMenu menuControls = new JMenu();
+
 	private final LanguageHandler lh;
 	
 	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -56,9 +60,6 @@ public class GameWindow extends JFrame implements ActionListener{
 		this.gi = gi;
 		this.lh = lh;
 		JMenuBar menuBar = new JMenuBar();
-		JMenu menuFile = new JMenu("File");
-		JMenu menuExtras = new JMenu("Extras");
-		JMenu menuControls = new JMenu("Controls");
 		menuBar.add(menuFile);
 		menuBar.add(menuExtras);
 		menuBar.add(menuControls);
@@ -78,7 +79,7 @@ public class GameWindow extends JFrame implements ActionListener{
 		menuExtras.add(menuItemAbout);
 		menuControls.add(menuItemControls);
 		gi.addPlayer(player);
-		gamePanel = new GamePanel(gi);
+		gamePanel = new GamePanel(gi, lh);
 		gamePanel.player = player;
 		chatPanel = new IngameChatPanel(gi, player);
 		slider = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,gamePanel, chatPanel);
@@ -90,6 +91,8 @@ public class GameWindow extends JFrame implements ActionListener{
 		setSize((int) screenSize.getWidth(), (int) screenSize.getHeight());
 		slider.setDividerLocation(0.5);
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
+		languageChanged(lh.getCurrentLanguage());
+		lh.addLanguageChangeListener(this);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 
@@ -102,7 +105,7 @@ public class GameWindow extends JFrame implements ActionListener{
 		}
 		else if (source == menuItemEditGame )
 		{
-			new EditGameWindow(gi, lh).setVisible(true);
+			new EditGameWindow(gi, lh, gamePanel.player).setVisible(true);
 		}
 		else if (source == menuItemSaveGame)
 		{
@@ -132,6 +135,20 @@ public class GameWindow extends JFrame implements ActionListener{
 			TetrisWindow tw = new TetrisWindow();
 			tw.setVisible(true);
 		}
+	}
+
+	@Override
+	public void languageChanged(Language language) {
+		menuItemExit.setText(language.getString(Words.exit));
+		menuItemEditGame.setText(language.getString(Words.edit));
+		menuItemSaveGame.setText(language.getString(Words.save));
+		menuItemSettings.setText(language.getString(Words.settings));
+		menuItemAbout.setText(language.getString(Words.about));
+		menuItemControls.setText(language.getString(Words.controls));
+		menuItemTetris.setText(language.getString(Words.tetris));
+		menuFile.setText(language.getString(Words.files));
+		menuExtras.setText(language.getString(Words.extras));
+		menuControls.setText(language.getString(Words.controls));
 	}
 	
 }

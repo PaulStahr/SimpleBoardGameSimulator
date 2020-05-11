@@ -84,6 +84,12 @@ public class GameObjectToken extends GameObject{
 		public ObjectState copy() {
 			return new TokenState(this);
 		}
+
+		@Override
+		public void reset() {
+			super.reset();
+			side = true;
+		}
 	}
 	
 	public BufferedImage getUpsideLook()

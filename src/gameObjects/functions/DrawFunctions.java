@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -33,6 +34,10 @@ public class DrawFunctions {
         //TODO Florian:sometimes images are drawn twice (the active object?)
         g.drawString(String.valueOf(gamePanel.mouseWheelValue), gamePanel.mouseScreenX, gamePanel.mouseScreenY);
         g.drawImage(gameInstance.game.background, 0, 0, gamePanel.getWidth(), gamePanel.getHeight(), Color.BLACK, null);
+
+        if(gamePanel.table != null) {
+            gamePanel.table.drawCompleteTable(gamePanel, gameInstance, g);
+        }
     }
 
     public static void drawPrivateArea(GamePanel gamePanel, Graphics g){
@@ -45,8 +50,16 @@ public class DrawFunctions {
 
     public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, IntegerArrayList ial){
         //Draw all objects not in some private area
-        for (int idx:ial) {
-            ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
+        ArrayList<ObjectInstance> oiList = new ArrayList<>();
+        for (int idx : ial){
+            oiList.add(gameInstance.getObjectInstanceByIndex(idx));
+        }
+        drawObjectsFromList(gamePanel,g,gameInstance,player,oiList,ial);
+    }
+
+    public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList, IntegerArrayList ial) {
+        for (int i = 0; i < oiList.size(); ++i){
+            ObjectInstance oi = oiList.get(i);
             if (oi.state.owner_id != player.id || !oi.state.inPrivateArea || oi.state.isActive) {
                 try {
                     if (oi.go instanceof GameObjectToken) {
@@ -64,14 +77,6 @@ public class DrawFunctions {
                 }
             }
         }
-    }
-
-    public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList, IntegerArrayList ial) {
-        ial.clear();
-        for(ObjectInstance oi : oiList){
-            ial.add(oi.id);
-        }
-        drawObjectsFromList(gamePanel, g, gameInstance, player, ial);
     }
 
         public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, IntegerArrayList tmp){
@@ -110,20 +115,29 @@ public class DrawFunctions {
                 BufferedImage img = gamePanel.playerImages[imageNumber];
                 g2.translate((p.screenWidth-img.getWidth())/2, p.screenHeight - 20);
                 g2.drawImage(img, null, 0, 20);
-                //g2.scale(1/(gamePanel.zooming)*1/p.screenToBoardTransformation.getScaleX(), 1/(gamePanel.zooming)*1/p.screenToBoardTransformation.getScaleY());
                 g2.drawString(p.getName(), 0, 0);
 			}
             g2.setTransform(tmp);
             //draw mouse position of other players
             g2.setStroke(basicStroke);
             g2.translate(p.mouseXPos-5, p.mouseYPos-5);
-            g2.scale(1/gamePanel.zooming, 1/gamePanel.zooming);
-            g.fillRect(0, 0, 10, 10);
-            g.drawString(p.getName(),  15,  5);
+
+
+
+            AffineTransform newTmp = g2.getTransform();
+            AffineTransform newTransform = new AffineTransform();
+            newTransform.translate(newTmp.getTranslateX(), newTmp.getTranslateY());
+
+
+
+            g2.setTransform(newTransform);
+
+            g2.fillRect(0, 0, 10, 10);
+            g2.drawString(p.getName(),  15,  5);
 
             if (p.id == player.id){
-                g.drawString(player.actionString,  0, -15);
-                g.drawString(infoText, -20, 10);
+                g2.drawString(player.actionString,  0, -15);
+                g2.drawString(infoText, -20, 10);
             }
         }
 

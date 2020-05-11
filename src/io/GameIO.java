@@ -76,15 +76,15 @@ public class GameIO {
 	 */
 	private static void writeStateToElement(ObjectState state, Element elem)
 	{
-		elem.setAttribute(IOString.X, Integer.toString(state.posX));
-		elem.setAttribute(IOString.Y, Integer.toString(state.posY));
-		elem.setAttribute(IOString.R, Integer.toString(state.rotation));
-		elem.setAttribute(IOString.OWNER_ID, Integer.toString(state.owner_id));
-		elem.setAttribute(IOString.DRAW_VALUE, Long.toString(state.drawValue));
-		elem.setAttribute(IOString.ABOVE, Integer.toString(state.aboveInstanceId));
-		elem.setAttribute(IOString.BELOW, Integer.toString(state.belowInstanceId));
-		elem.setAttribute(IOString.VALUE, Integer.toString(state.value));
-		elem.setAttribute(IOString.ROTATION_STEP, Integer.toString(state.rotationStep));
+		elem.setAttribute(IOString.X, 				Integer.toString(state.posX));
+		elem.setAttribute(IOString.Y, 				Integer.toString(state.posY));
+		elem.setAttribute(IOString.R, 				Integer.toString(state.rotation));
+		elem.setAttribute(IOString.OWNER_ID, 		Integer.toString(state.owner_id));
+		elem.setAttribute(IOString.DRAW_VALUE, 		Long.toString(state.drawValue));
+		elem.setAttribute(IOString.ABOVE, 			Integer.toString(state.aboveInstanceId));
+		elem.setAttribute(IOString.BELOW,			Integer.toString(state.belowInstanceId));
+		elem.setAttribute(IOString.VALUE, 			Integer.toString(state.value));
+		elem.setAttribute(IOString.ROTATION_STEP, 	Integer.toString(state.rotationStep));
 		if (state instanceof TokenState)
     	{
 			elem.setAttribute(IOString.SIDE, Boolean.toString(((TokenState)state).side));
