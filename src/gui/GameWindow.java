@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
@@ -110,10 +111,15 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		else if (source == menuItemSaveGame)
 		{
 			JFileChooser fileChooser = new JFileChooser();
-			if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
+			if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
 			{
 				try {
-					FileOutputStream out = new FileOutputStream(fileChooser.getSelectedFile());
+					File file = fileChooser.getSelectedFile();
+					if (!file.getName().endsWith(".zip"))
+					{
+						file = new File(file.getAbsolutePath() + ".zip");
+					}
+					FileOutputStream out = new FileOutputStream(file);
 					GameIO.writeSnapshotToZip(gi, out);
 					out.close();
 				} catch (IOException e) {
