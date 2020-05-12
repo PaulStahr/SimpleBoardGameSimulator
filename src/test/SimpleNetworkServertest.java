@@ -37,10 +37,9 @@ public class SimpleNetworkServertest {
 		} catch (InterruptedException e) {
 			logger.error("Unecpected interrupt", e);
 		}
-    	sclc.addPlayerToGameSession(player, gi.name, gi.password);
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi, null);
     	connection.start();
-    	gi.addPlayer(player);
+    	gi.addPlayer(null, player);
     	gw.setVisible(true);
     }
     
@@ -49,16 +48,11 @@ public class SimpleNetworkServertest {
     	SynchronousGameClientLobbyConnection sclc = new SynchronousGameClientLobbyConnection(address,  port);
     	GameInstance gi = sclc.getGameInstance(gameInstanceId);
     	sclc.addPlayerToGameSession(player, gi.name, gi.password);
-    	player = gi.addPlayer(player);
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi, null);
     	connection.syncPull();
     	connection.start();
-    	Player pl = gi.getPlayerById(player.id);
-    	if (pl == null)
-    	{
-    		logger.error("Player " + player.id+ " doesn't exist");
-    	}
-    	GameWindow gw = new GameWindow(gi, pl, lh);
+    	player = gi.addPlayer(null, player);
+    	GameWindow gw = new GameWindow(gi, player, lh);
     	gw.setVisible(true);
     	return gw;
     }
@@ -83,7 +77,7 @@ public class SimpleNetworkServertest {
 			GameInstance gi = new GameInstance(new Game(), null);
 			GameIO.readSnapshotFromZip(fis, gi);
 			gi.name = "Testsession";
-			gi.addPlayer(player);
+			gi.addPlayer(null, player);
 	    	fis.close();
 	    	connectAndStartGame(address, port, player, gi, lh);
     	}

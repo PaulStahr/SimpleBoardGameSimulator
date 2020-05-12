@@ -79,4 +79,8 @@ public class StreamUtil {
 			return new ObjectInputStream(input);
 		}
 	}
+
+	public static void skip(ObjectInputStream is, int i) throws IOException {
+		while ((i -= is.skip(i)) != 0);
+	}
 }

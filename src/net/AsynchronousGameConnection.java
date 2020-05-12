@@ -1,7 +1,6 @@
 package net;
 
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -21,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.action.AddObjectAction;
+import gameObjects.action.AddPlayerAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
@@ -33,9 +33,7 @@ import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
 import io.GameIO;
 import main.Player;
-import util.ArrayUtil;
 import util.StringUtils;
-import util.data.UniqueObjects;
 import util.io.StreamUtil;
 import util.stream.CappedInputStreamWrapper;
 
@@ -393,23 +391,38 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    	{ 
 				    		GameStructureEditAction gs = (GameStructureEditAction)action;
 				    		objOut.writeUnshared(gs);
-				    		switch(gs.type)
+				    		if (action instanceof AddPlayerAction)
+			    			{
+				    			GameIO.writePlayerToStreamObject(objOut, ((AddPlayerAction)action).getPlayer(gi));
+			    			}
+				    		else
 				    		{
-				    			case GameStructureEditAction.EDIT_BACKGROUND: objOut.writeUnshared(gi.game.getImageKey(gi.game.background));break;
-								case GameStructureEditAction.EDIT_GAME_NAME: objOut.writeUnshared(gi.game.name);break;
-								case GameStructureEditAction.EDIT_SESSION_NAME: objOut.writeUnshared(gi.name);break;
-								case GameStructureEditAction.EDIT_SESSION_PASSWORD:objOut.writeUnshared(gi.password);break;
-								case GameStructureEditAction.ADD_IMAGE:
-								{
-									Map.Entry<String, BufferedImage> entry = gi.game.getImage(((AddObjectAction)gs).objectId);
-									objOut.writeObject(entry.getKey());
-									GameIO.writeImageToStream(entry.getValue(), "png", byteStream);
-									objOut.writeInt(byteStream.size());
-									byteStream.writeTo(objOut);
-									byteStream.reset();
-									break;
-								}
+					    		switch(gs.type)
+					    		{
+					    			case GameStructureEditAction.EDIT_BACKGROUND: objOut.writeUnshared(gi.game.getImageKey(gi.game.background));break;
+									case GameStructureEditAction.EDIT_GAME_NAME: objOut.writeUnshared(gi.game.name);break;
+									case GameStructureEditAction.EDIT_SESSION_NAME: objOut.writeUnshared(gi.name);break;
+									case GameStructureEditAction.EDIT_SESSION_PASSWORD:objOut.writeUnshared(gi.password);break;
+									case AddObjectAction.ADD_IMAGE:
+									{
+										Map.Entry<String, BufferedImage> entry = gi.game.getImage(((AddObjectAction)gs).objectId);
+										objOut.writeObject(entry.getKey());
+										GameIO.writeImageToStream(entry.getValue(), "png", byteStream);
+										objOut.writeInt(byteStream.size());
+										byteStream.writeTo(objOut);
+										byteStream.reset();
+										break;
+									}
+									case GameStructureEditAction.REMOVE_OBJECT:
+									case GameStructureEditAction.REMOVE_OBJECT_INSTANCE:
+									case GameStructureEditAction.REMOVE_PLAYER:
+										break;
+									default:
+										logger.warn("Structure edit action " + gs.type + " is unknown");
+										break;
+					    		}
 							}
+				    		
 				    		++outputEvents;
 						}
 					    else if (action instanceof UserSoundMessageAction)
@@ -435,7 +448,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 			    }
 			}catch(IOException e)
 			{
-		    	logger.error("Error at input Loop", e);
+		    	logger.error("Error at output Loop", e);
 			}
 		}
 	}
@@ -443,7 +456,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	public void inputLoop()
 	{
 		ArrayList<String> split = new ArrayList<>();
-		byte data[] = UniqueObjects.EMPTY_BYTE_ARRAY;
 		//Scanner in = new Scanner( input);
 		if (objIn == null)
 		{
@@ -495,10 +507,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				{
 					GamePlayerEditAction action = (GamePlayerEditAction)inputObject;
 					Player editedPlayer = action.getEditedPlayer(gi);
-					if (editedPlayer == null)
-					{
-						editedPlayer = gi.addPlayer(new Player("", action.editedPlayer));
-					}
 					GameIO.editPlayerFromStreamObject(objIn, editedPlayer);
 					gi.update(action);
 					++inputEvents;
@@ -514,23 +522,57 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				if (inputObject instanceof GameStructureEditAction)
 				{
 					GameStructureEditAction action = (GameStructureEditAction)inputObject;
-					switch(action.type)
+					if (action instanceof AddObjectAction)
 					{
-						case GameStructureEditAction.EDIT_BACKGROUND:gi.game.background = gi.game.images.get(objIn.readObject());break;
-						case GameStructureEditAction.EDIT_GAME_NAME:gi.game.name = (String)objIn.readObject();break;
-						case GameStructureEditAction.EDIT_SESSION_NAME:gi.name = (String)objIn.readObject();break;
-						case GameStructureEditAction.EDIT_SESSION_PASSWORD:gi.password = (String)objIn.readObject();break;
-						case GameStructureEditAction.ADD_IMAGE:
+						AddObjectAction addAction = (AddObjectAction)action;
+						switch(action.type)
 						{
-							String name = (String)objIn.readObject();
-							int cap = objIn.readInt();
-							cappedIn.setCap(cap);
-							gi.game.images.put(name, ImageIO.read(cappedIn));
-							cappedIn.drain();
-							break;
+							case AddObjectAction.ADD_IMAGE:
+							{
+								String name = (String)objIn.readObject();
+								int cap = objIn.readInt();
+								cappedIn.setCap(cap);
+								gi.game.images.put(name, ImageIO.read(cappedIn));
+								cappedIn.drain();
+								gi.update(action);
+								break;
+							}
+							case AddObjectAction.ADD_PLAYER:
+							{
+								Player player =((AddPlayerAction)action).getPlayer(gi);
+								if (player == null)
+								{
+									player = new Player("", addAction.objectId);
+								}
+								GameIO.editPlayerFromStreamObject(objIn, player);
+								gi.addPlayer((AddPlayerAction)action, player);
+								break;
+							}
+							case AddObjectAction.ADD_GAME_OBJECT:
+							{
+								//TODO
+								break;
+							}
+							case AddObjectAction.ADD_GAME_OBJECT_INSTANCE:
+							{
+								//todo
+								break;
+							}
+							default: logger.error("Unknown type: " + action.type);
 						}
 					}
-					gi.update(action);
+					else
+					{
+						switch(action.type)
+						{
+							case GameStructureEditAction.EDIT_BACKGROUND:gi.game.background = gi.game.images.get(objIn.readObject());break;
+							case GameStructureEditAction.EDIT_GAME_NAME:gi.game.name = (String)objIn.readObject();break;
+							case GameStructureEditAction.EDIT_SESSION_NAME:gi.name = (String)objIn.readObject();break;
+							case GameStructureEditAction.EDIT_SESSION_PASSWORD:gi.password = (String)objIn.readObject();break;
+							default: logger.error("Unknown type: " + action.type);						
+						}
+						gi.update(action);
+					}
 					++inputEvents;
 					continue;
 				}
@@ -585,9 +627,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 										if (logger.isDebugEnabled()){logger.debug("Do local instance write " + split.get(3));}
 										int size = Integer.parseInt(split.get(3));
 										//byte data[] = (byte[])objIn.readObject();
-										data = ArrayUtil.ensureLength(data, size);
-										objIn.readFully(data, 0, size);
-										GameIO.editGameInstanceFromZip(new ByteArrayInputStream(data, 0, size), gi, this);
+										cappedIn.setCap(size);
+										GameIO.editGameInstanceFromZip(cappedIn, gi, this);
+										cappedIn.drain();
 										break;
 									}
 								}
@@ -645,8 +687,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								int sourcePlayerId = Integer.parseInt(split.get(5));
 								int editPlayerId = Integer.parseInt(split.get(6));
 								int size = Integer.parseInt(split.get(7));
-								data = ArrayUtil.ensureLength(data, size);
-								
 								//objIn.readFully(data, 0, size);
 								Player object = gi.getPlayerById(editPlayerId);
 								if (object != null)
@@ -658,7 +698,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								{
 									object = new Player("",  editPlayerId);
 									GameIO.editPlayerFromStreamObject(objIn, object);
-									gi.addPlayer(object);
 									//gi.addPlayer(GameIO.readPlayerFromStream(new ByteArrayInputStream(data, 0, size)));
 								}
 								Player sourcePlayer = gi.getPlayerById(sourcePlayerId);

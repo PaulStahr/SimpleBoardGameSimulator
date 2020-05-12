@@ -130,15 +130,14 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 					}
 					else
 					{//TODO
-						JFrameUtils.logErrorAndShow("Can't interpret Game", new IOException(), logger);
+						JFrameUtils.logErrorAndShow("Unknown filetype", new IOException(), logger);
 					}
 					if (gi.name == null)
 					{
 						gi.name = "Unnamed";
 					}
 					Player player = new Player(textFieldName.getText(), Integer.parseInt(textFieldId.getText()));
-					GameWindow gw = new GameWindow(gi, player, lh);
-			    	client.pushGameSession(gi);
+					client.pushGameSession(gi);
 			    	try {
 						Thread.sleep(5000);
 					} catch (InterruptedException e1) {
@@ -147,7 +146,8 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			    	client.addPlayerToGameSession(player, gi.name, gi.password);
 			    	AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
 			    	connection.start();
-			    	gi.addPlayer(player);
+			    	gi.addPlayer(null, player);
+			    	GameWindow gw = new GameWindow(gi, player, lh);
 			    	gw.setVisible(true);
 				}catch(IOException | JDOMException ex)
 				{
