@@ -48,6 +48,7 @@ import gameObjects.instance.ObjectState;
 import main.Player;
 import net.AsynchronousGameConnection;
 import util.ArrayUtil;
+import util.io.StreamUtil;
 
 public class GameIO {
 
@@ -162,7 +163,7 @@ public class GameIO {
 			{
 				case IOString.PLAYER:
 					Player player = createPlayerFromElement(elem);
-					gi.addPlayer(player);
+					gi.addPlayer(null, player);
 					break;
 				case IOString.NAME:gi.name = elem.getValue();break;
 				case IOString.OBJECT:
@@ -845,6 +846,12 @@ public class GameIO {
 	
 	public static void editPlayerFromStreamObject(ObjectInputStream is, Player player) throws ClassNotFoundException, IOException
 	{
+		if (player == null)
+		{
+			is.readObject();
+			StreamUtil.skip(is, 68);
+			throw new NullPointerException();
+		}
 		player.setName((String)is.readObject());
 		//read player color
 		player.color = new Color(is.readInt());

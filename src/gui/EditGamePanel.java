@@ -111,7 +111,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		                evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 		            for (File file : droppedFiles) {
 		            	gi.game.images.put(file.getName(), ImageIO.read(file));
-		            	gi.update(new AddObjectAction(id, GameStructureEditAction.ADD_IMAGE, file.getName().hashCode()));
+		            	gi.update(new AddObjectAction(id, AddObjectAction.ADD_IMAGE, file.getName().hashCode()));
 		            }
 		        } catch (Exception ex) {
 		            ex.printStackTrace();
@@ -277,7 +277,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				}
 				else if (button == deleteObjectInstanceColumn)
 				{
-					gi.remove(gi.getObjectInstanceByIndex(row));				
+					gi.remove(id, gi.getObjectInstanceByIndex(row));				
 				}
 				else
 				{
@@ -293,7 +293,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			else if (tableSource == tableModelGameObjects)
 			{
-				gi.remove(gi.game.getObjectByIndex(row));
+				gi.remove(id, gi.game.getObjectByIndex(row));
 			}
 			else if (tableSource == tableModelPlayer)
 			{

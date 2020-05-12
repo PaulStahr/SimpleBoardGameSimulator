@@ -147,7 +147,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			    	client.addPlayerToGameSession(player, gi.name, gi.password);
 			    	AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
 			    	connection.start();
-			    	gi.addPlayer(player);
+			    	gi.addPlayer(null, player);
 			    	gw.setVisible(true);
 				}catch(IOException | JDOMException ex)
 				{

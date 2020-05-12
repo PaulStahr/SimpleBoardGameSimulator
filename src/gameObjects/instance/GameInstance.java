@@ -8,10 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.GameInstanceColumnType;
+import gameObjects.action.AddPlayerAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GamePlayerEditAction;
+import gameObjects.action.GameStructureEditAction;
+import gameObjects.action.GameStructureObjectEditAction;
 import gameObjects.definition.GameObject;
 import main.Player;
 import util.ArrayTools;
@@ -59,18 +62,19 @@ public class GameInstance {
 	}
 	
 	
-	public Player addPlayer(Player player)
+	public Player addPlayer(AddPlayerAction action, Player player)
 	{
-		Player pl = getPlayerById(player.id);
+		Player pl = action == null ? getPlayerById(player.id) : action.getPlayer(this);
 		if (pl != null)
 		{
 			pl.set(player);
+			update(new GamePlayerEditAction(action == null ? 0 : action.source, pl, pl));
+			return pl;
 		}else {
 			players.add(player);
-			pl = player;
+			update(action == null ? new AddPlayerAction(0, player) : action);
+			return player;
 		}
-		update(new GamePlayerEditAction(0, pl, pl));
-		return pl;		
 	}
 	
 	public Player getPlayerById(int id)
@@ -167,6 +171,27 @@ public class GameInstance {
 			ObjectInstance oi = ((GameObjectInstanceEditAction) action).getObject(this);
 			maxDrawValue = Math.max(maxDrawValue , oi.state.drawValue);
 		}
+		else if (action instanceof GameStructureEditAction)
+		{
+			GameStructureEditAction structureAction = (GameStructureEditAction)action;
+			if (structureAction instanceof GameStructureObjectEditAction)
+			{
+				GameStructureObjectEditAction gsoea = (GameStructureObjectEditAction)structureAction;
+				if (gsoea.type == GameStructureEditAction.REMOVE_PLAYER)
+				{
+					
+					for (int i = 0; i < objects.size(); ++i)
+					{
+						if (objects.get(i).state.owner_id == gsoea.objectId)
+						{
+							objects.get(i).state.owner_id = -1;
+							objects.get(i).state.inPrivateArea = false;
+						}
+					}
+					players.remove(getPlayerById(gsoea.objectId));
+				}
+			}
+		}
 		for (int i = 0; i < changeListener.size(); ++i)
 		{
 			try
@@ -188,8 +213,9 @@ public class GameInstance {
 		return names;
 	}
 
-	public void remove(ObjectInstance objectInstance) {
+	public void remove(int source, ObjectInstance objectInstance) {
 		objects.remove(objectInstance);
+		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_OBJECT_INSTANCE, objectInstance.id));
 		//TODO clean up references
 	}
 
@@ -205,8 +231,9 @@ public class GameInstance {
 		return Collections.unmodifiableList(players);
 	}
 
-	public void remove(GameObject object) {
+	public void remove(int source, GameObject object) {
 		game.objects.remove(object);
+		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_OBJECT, object.uniqueName.hashCode()));
 	}
 
 	public void remove(int source, Player player) {
@@ -220,5 +247,6 @@ public class GameInstance {
 			}
 		}
 		players.remove(player);
+		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_PLAYER, player.id));
 	}
 }

@@ -78,7 +78,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuExtras.add(menuItemTetris);
 		menuExtras.add(menuItemAbout);
 		menuControls.add(menuItemControls);
-		gi.addPlayer(player);
+		//gi.addPlayer(null, player);
 		gamePanel = new GamePanel(gi, lh);
 		gamePanel.player = player;
 		chatPanel = new IngameChatPanel(gi, player);
