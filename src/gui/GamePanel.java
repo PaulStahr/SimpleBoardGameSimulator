@@ -283,33 +283,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					translateX = 0;
 					translateY = 0;
 					zooming = 1;
-					rotation = -(360/this.table.playerShapes.size())*i;
-					gameTransform.setIdentity();
-					gameTransform.affineTranslate(-getWidth() / 2, -getHeight() / 2);
-					gameTransform.scale(1 / zooming);
-					gameTransform.rotateZ(rotation);
-					gameTransform.affineTranslate(-translateX, -translateY);
-					boardToScreenTransformation.setToIdentity();
-					boardToScreenTransformation.translate(getWidth() / 2, getHeight() / 2);
-					boardToScreenTransformation.scale(zooming, zooming);
-					boardToScreenTransformation.rotate(Math.toRadians(rotation));
-					boardToScreenTransformation.translate(translateX, translateY);
-
-					try {
-						screenToBoardTransformation.setTransform(boardToScreenTransformation);
-						screenToBoardTransformation.invert();
-					} catch (NoninvertibleTransformException e) {
-						logger.error("Transformation not invertible");
-					}
-					if (player != null) {
-						player.screenToBoardTransformation.setTransform(screenToBoardTransformation);
-						player.screenWidth = getWidth();
-						player.screenHeight = getHeight();
-						gameInstance.update(new GamePlayerEditAction(id, player, player));
-					}
-					screenToBoardPos(mouseScreenX = arg0.getX(), mouseScreenY = arg0.getY(), mouseBoardPos);
-					player.setMousePos(mouseBoardPos.getXI(), mouseBoardPos.getYI());
-					gameInstance.update(new GamePlayerEditAction(id, player, player));
+					rotation = 0;
+					updateGameTransform();
+					rotation = Math.toRadians(- 360/this.table.playerShapes.size() * i);
+					updateGameTransform();
 					break;
 				}
 			}
