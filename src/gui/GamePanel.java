@@ -34,17 +34,13 @@ import java.util.ArrayList;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+import gameObjects.action.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.ControlCombination;
 import data.DataHandler;
 import data.SystemFileUtil;
-import gameObjects.action.GameAction;
-import gameObjects.action.GameObjectEditAction;
-import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.GamePlayerEditAction;
-import gameObjects.action.GameStructureEditAction;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.functions.MoveFunctions;
 import gameObjects.functions.ObjectFunctions;
@@ -163,7 +159,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		this.privateArea = new PrivateArea(this, gameInstance, boardToScreenTransformation, screenToBoardTransformation);
 		this.table = new Table(gameInstance, tableDiameter,new Point2D.Double(-tableDiameter/2,-tableDiameter/2));
 		this.gameInstance = gameInstance;
-		gameInstance.table = table;
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -519,6 +514,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			repaint();
 		}
+
+		if (action instanceof AddPlayerAction){
+			if (table != null) {
+				this.table.updatePlayers(gameInstance);
+			}
+		}
 	}
 
 	@Override
@@ -610,11 +611,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}else if (e.getKeyCode() == KeyEvent.VK_ENTER){
 			int posPlayer = gameInstance.getPlayerList().indexOf(player);
-			for (int i = 0; i < this.table.playerShapes.size();++i) {
-				if(i == posPlayer) {
-					sitDown(i);
-					break;
-				}
+			if (0<=posPlayer && this.table != null && posPlayer<this.table.playerShapes.size()){
+				sitDown(posPlayer);
 			}
 		}
 

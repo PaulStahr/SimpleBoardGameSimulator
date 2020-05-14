@@ -134,12 +134,10 @@ public class DrawFunctions {
 
             g2.fillRect(0, 0, 10, 10);
             g2.drawString(p.getName(),  15,  5);
-
-            if (p.id == player.id){
-                g2.drawString(player.actionString,  0, -15);
-                g2.drawString(infoText, -20, 10);
-            }
         }
+
+        g2.drawString(player.actionString,  0, -15);
+        g2.drawString(infoText, -20, 10);
 
         g2.setTransform(tmp);
     }
