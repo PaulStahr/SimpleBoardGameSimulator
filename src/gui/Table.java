@@ -5,8 +5,10 @@ import main.Player;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
+import java.nio.file.attribute.AclFileAttributeView;
 import java.util.ArrayList;
 
 public class Table {
@@ -46,14 +48,42 @@ public class Table {
             setPlayerParameter(i, (int) rotatedPoint.getX() - playerDiameter/2, (int) rotatedPoint.getY() - playerDiameter/2, playerDiameter);
             AffineTransform.getRotateInstance(Math.toRadians(angle), tableMiddle.getX(), tableMiddle.getY())
                     .transform(originPlayerBottom, rotatedPoint);
+
             Graphics2D graphics2D = (Graphics2D) g;
             AffineTransform tmp = graphics2D.getTransform();
             graphics2D.setTransform(new AffineTransform());
-            graphics2D.rotate(Math.toRadians(angle));
-            graphics2D.translate((int) rotatedPoint.getX(), (int) rotatedPoint.getY());
-            graphics2D.drawString(gameInstance.getPlayerList().get(i).getName(),0,0);
+            //graphics2D.translate((int) rotatedPoint.getX(), (int) rotatedPoint.getY());
+
+            gameInstance.getPlayerByIndex(i).playerAtTableTransform.setTransform(new AffineTransform());
+            gameInstance.getPlayerByIndex(i).playerAtTableTransform.translate(rotatedPoint.getX(), rotatedPoint.getY());
+            gameInstance.getPlayerByIndex(i).playerAtTableTransform.rotate(Math.toRadians(angle));
+            gameInstance.getPlayerByIndex(i).playerAtTableTransform.translate(-100, -2*playerDiameter);
+            gameInstance.getPlayerByIndex(i).playerAtTableTransform.preConcatenate(graphics2D.getTransform());
+            gameInstance.getPlayerByIndex(i).playerAtTableRotation = (int) angle;
+            //gameInstance.getPlayerByIndex(i).playerAtTableTransform.preConcatenate(gamePanel.getBoardToScreenTransform());
+
+
             graphics2D.setTransform(tmp);
+            //Set screen transform
             this.playerShapes.set(i, gamePanel.getBoardToScreenTransform().createTransformedShape(this.playerShapes.get(i)));
+            Rectangle rectangle = new Rectangle(  0, 0, 200, 200);
+
+            AffineTransform testTransform = new AffineTransform();
+            testTransform.setTransform(gameInstance.getPlayerByIndex(i).playerAtTableTransform);
+            testTransform.preConcatenate(gamePanel.getBoardToScreenTransform());
+
+            graphics2D.setTransform(testTransform);
+            graphics2D.setColor(gameInstance.getPlayerList().get(i).color);
+            graphics2D.fill(rectangle);
+            AffineTransform playerString = new AffineTransform();
+            playerString.translate(0, -100);
+            testTransform.preConcatenate(playerString);
+            graphics2D.setTransform(new AffineTransform());
+            graphics2D.drawString("Test",0,0);
+            //graphics2D.setTransform(testTransform);
+
+            graphics2D.setTransform(tmp);
+
         }
 
         drawTable(g);
@@ -129,10 +159,15 @@ public class Table {
                 Shape playerShape = new Ellipse2D.Double(screenOrigin.getX() + this.diameter, screenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
                 playerShapes.add(playerShape);
             }
+            ++counter;
         }
     }
 
     public Point2D getBoardOrigin(){
         return this.boardOrigin;
+    }
+
+    public int getDiameter(){
+        return diameter;
     }
 }

@@ -125,6 +125,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public PrivateArea privateArea;
 	public Table table = null;
+	public int tableDiameter = 1500;
+	public int activePlayer = -1;
 
 	public float cardOverlap = (float) (2/3.0);
 
@@ -158,9 +160,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public GamePanel(GameInstance gameInstance, LanguageHandler lh)
 	{
 		this.setLayout(new FlowLayout(FlowLayout.LEFT));
-		this.gameInstance = gameInstance;
 		this.privateArea = new PrivateArea(this, gameInstance, boardToScreenTransformation, screenToBoardTransformation);
-		this.table = new Table(gameInstance, 1000,new Point2D.Double(-500,-500));
+		this.table = new Table(gameInstance, tableDiameter,new Point2D.Double(-tableDiameter/2,-tableDiameter/2));
+		this.gameInstance = gameInstance;
+		gameInstance.table = table;
+
 		addMouseListener(this);
 		addMouseMotionListener(this);
 		addKeyListener(this);
@@ -280,13 +284,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			int posPlayer = gameInstance.getPlayerList().indexOf(player);
 			for (int i = 0; i < this.table.playerShapes.size();++i) {
 				if(this.table.playerShapes.get(i).contains(mouseScreenX, mouseScreenY) && i == posPlayer) {
-					translateX = 0;
-					translateY = 0;
-					zooming = 1;
-					rotation = 0;
-					updateGameTransform();
-					rotation = Math.toRadians(- 360/this.table.playerShapes.size() * i);
-					updateGameTransform();
+					sitDown(i);
 					break;
 				}
 			}
@@ -303,6 +301,16 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				activeObject.newObjectActionMenu(gameInstance, player, this).showPopup(arg0);
 			}
 		}*/
+	}
+
+	private void sitDown(int pos){
+		translateX = 0;
+		translateY = 0;
+		zooming = getHeight()/ ((float) this.table.getDiameter() + 200);
+		rotation = 0;
+		updateGameTransform();
+		rotation = Math.toRadians(- 360/this.table.playerShapes.size() * pos);
+		updateGameTransform();
 	}
 
 	private boolean checkFirstMouseClick(MouseEvent arg0) {
@@ -600,6 +608,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					oi.scale *= scalingFactor;
 				}
 			}
+		}else if (e.getKeyCode() == KeyEvent.VK_ENTER){
+			int posPlayer = gameInstance.getPlayerList().indexOf(player);
+			for (int i = 0; i < this.table.playerShapes.size();++i) {
+				if(i == posPlayer) {
+					sitDown(i);
+					break;
+				}
+			}
 		}
 
 
@@ -749,13 +765,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		//move own stack to private bottom
 		if (player != null) {
-			IntegerArrayList ial = new IntegerArrayList();
 			ObjectFunctions.getOwnedStack(gameInstance,player,ial);
 			if (ial.size() >0) {
 				ObjectInstance oi = gameInstance.getObjectInstanceById(ial.get(0));
 				if (oi.state.owner_id == player.id) {
-					Point2D targetPoint = new Point2D.Double(this.getWidth()/2-oi.getWidth(player.id)/2, this.getHeight()-oi.getHeight(player.id));
-					player.screenToBoardTransformation.transform(targetPoint,targetPoint);
+					Point2D targetPoint = new Point2D.Double(0, 0);
+					player.playerAtTableTransform.transform(targetPoint,targetPoint);
+					ObjectFunctions.rotateStack(gameInstance, ial, player.playerAtTableRotation);
 					ObjectFunctions.moveStackTo(id, gameInstance, player, ial, (int) targetPoint.getX(), (int) targetPoint.getY());
 				}
 			}
@@ -884,7 +900,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		@Override
 		public void languageChanged(Language lang) {
 			removeAll();
-			setLayout(new GridLayout(15, 1, 20, 0));
+			setLayout(new GridLayout(16, 1, 20, 0));
+			add(new JLabel(lang.getString(Words.sit_down) 				+ ": " + new ControlCombination(0, -1, 'E', 0).toString(lang)));
 			add(new JLabel(lang.getString(Words.move_top_card) 				+ ": " + new ControlCombination(0, 0, '\0', 1).toString(lang)));
 			add(new JLabel(lang.getString(Words.move_stack) 				+ ": " + new ControlCombination(0, 1, '\0', 1).toString(lang)));
 			add(new JLabel(lang.getString(Words.take_objects_to_hand)	 	+ ": " + new ControlCombination(0, -1, 'T', 0).toString(lang)));

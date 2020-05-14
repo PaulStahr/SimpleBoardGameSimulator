@@ -18,6 +18,8 @@ public class Player {
 	public int mouseYPos = 0;
 	public int screenWidth = 0, screenHeight = 0;
 	public final AffineTransform screenToBoardTransformation = new AffineTransform();
+	public final AffineTransform playerAtTableTransform = new AffineTransform();
+	public int playerAtTableRotation = 0;
 
 	public String actionString = "";
 	private transient int nameModCount = 0;

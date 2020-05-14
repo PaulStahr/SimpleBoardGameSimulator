@@ -1371,6 +1371,14 @@ public class ObjectFunctions {
         return ial.indexOf(objectInstance.id);
     }
 
+    public static void rotateStack(GameInstance gameInstance, IntegerArrayList ial, int rotation){
+        for (int id : ial){
+            ObjectInstance oi = gameInstance.getObjectInstanceById(id);
+            oi.state.rotation = rotation;
+        }
+    }
+
+
     public static void rotateStep(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial){
         ial.clear();
         getStack(gameInstance,objectInstance,ial);

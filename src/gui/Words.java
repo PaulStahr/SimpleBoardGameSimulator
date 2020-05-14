@@ -79,6 +79,6 @@ public enum Words {
     drop_all_hand_cards,
     play_card_face_down,
     rotate_wheel,
-    drop_on_board
+    sit_down, drop_on_board
     
 }

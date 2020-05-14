@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import gui.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +21,8 @@ import main.Player;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 
+import static java.lang.Math.max;
+
 public class GameInstance {
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.NUM_PLAYERS, GameInstanceColumnType.CONNECT, GameInstanceColumnType.DELETE});
 	public static final Logger logger = LoggerFactory.getLogger(GameInstance.class);
@@ -32,6 +35,7 @@ public class GameInstance {
 	private final ArrayList<GameAction> actions = new ArrayList<>();
 	private final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
 	private long maxDrawValue = 0;
+	public Table table = null;
 	
 	public static interface GameChangeListener
 	{
@@ -53,12 +57,12 @@ public class GameInstance {
 	
 	public long getMaxDrawValue()
 	{
-		return maxDrawValue;
-        /*long maxDrawValue = 0;
+		//return maxDrawValue;
+        long maxDrawValue = 0;
         for (int idx = 0; idx<getObjectNumber(); ++idx){
             maxDrawValue = max(maxDrawValue, getObjectInstanceByIndex(idx).state.drawValue);
         }
-        return maxDrawValue;*/
+        return maxDrawValue;
 	}
 	
 	
@@ -72,6 +76,9 @@ public class GameInstance {
 			return pl;
 		}else {
 			players.add(player);
+			if (table != null) {
+				this.table.updatePlayers(this);
+			}
 			update(action == null ? new AddPlayerAction(0, player) : action);
 			return player;
 		}
@@ -169,7 +176,7 @@ public class GameInstance {
 		else if (action instanceof GameObjectInstanceEditAction)
 		{
 			ObjectInstance oi = ((GameObjectInstanceEditAction) action).getObject(this);
-			maxDrawValue = Math.max(maxDrawValue , oi.state.drawValue);
+			maxDrawValue = max(maxDrawValue , oi.state.drawValue);
 		}
 		else if (action instanceof GameStructureEditAction)
 		{

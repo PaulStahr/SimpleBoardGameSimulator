@@ -108,7 +108,7 @@ public class DrawFunctions {
             g2.setTransform(tmp);
 			g2.transform(p.screenToBoardTransformation);
 	        g2.setStroke(wideStroke);
-            g2.drawLine(40, p.screenHeight, p.screenWidth, p.screenHeight);
+            //g2.drawLine(40, p.screenHeight, p.screenWidth, p.screenHeight);
             int imageNumber = p.id % 10;
             if (p.id != player.id)
 			{
