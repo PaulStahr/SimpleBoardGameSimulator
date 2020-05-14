@@ -4,6 +4,7 @@ package gui;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -55,7 +56,6 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	private final JComboBox<String> sendTo = new JComboBox<String>();
 	private	 int playerModCount = 0;
 	private int receiverPlayerId;
-
 	
 	void updatePlayerList()
 	{
@@ -69,21 +69,19 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 			return;
 		}
 		playerModCount = modCount;
-		String[] sendToNames = new String[game.getPlayerNumber()];
+		ArrayList<String> sendToNames = new ArrayList<>();
 		// The first option in the sendTo combobox is to send the message to everybody "all"
-		sendToNames[0] = "all";
+		sendToNames.add("all");
 
-		int targetIndex = 1;
 		for(int playerIndex=0; playerIndex<game.getPlayerNumber(); playerIndex++) {
-			String name = game.getPlayerByIndex(playerIndex).getName();
+			Player current = game.getPlayerByIndex(playerIndex);
 			// copy all player names to the combobox. 
 			// Omit the own name, since you don't want to send messages to yourself.
-			if (!name.equals(player.getName())) {
-				sendToNames[targetIndex] = name;
-				targetIndex++;
+			if (current.id != player.id) {
+				sendToNames.add(current.getName());
 			}
 		}
-		JFrameUtils.updateComboBox(sendTo, sendToNames);
+		JFrameUtils.updateComboBox(sendTo, sendToNames.toArray(new String[sendToNames.size()]));
 	}
 
 	public IngameChatPanel(GameInstance game, Player player)
