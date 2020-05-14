@@ -7,7 +7,14 @@ import static gameObjects.functions.DrawFunctions.drawPrivateArea;
 import static gameObjects.functions.DrawFunctions.drawSelection;
 import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.KeyEventDispatcher;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -32,7 +39,10 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -609,13 +619,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 			}
 		}else if (e.getKeyCode() == KeyEvent.VK_ENTER){
-			int posPlayer = gameInstance.getPlayerList().indexOf(player);
-			for (int i = 0; i < this.table.playerShapes.size();++i) {
-				if(i == posPlayer) {
-					sitDown(i);
-					break;
+			int place = 0;
+			for (int i = 0; i < gameInstance.getPlayerNumber(); ++i)
+			{
+				if (gameInstance.getPlayerByIndex(i).id < player.id)
+				{
+					++place;
 				}
 			}
+			sitDown(place);
 		}
 
 
