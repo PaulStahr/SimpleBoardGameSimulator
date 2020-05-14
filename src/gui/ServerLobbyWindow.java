@@ -194,11 +194,12 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				    		gi.password = password;
 				    	}
 						
-						client.addPlayerToGameSession(player, gi.name, gi.password);
-				    	GameWindow gw = new GameWindow(gi, player, lh);
+						//client.addPlayerToGameSession(player, gi.name, gi.password);
 				    	AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
+				    	player = gi.addPlayer(null, player);
 				    	connection.syncPull();
 				    	connection.start();
+				    	GameWindow gw = new GameWindow(gi, player, lh);
 				    	gw.setVisible(true);
 					} catch (IOException | JDOMException e1) {
 						JFrameUtils.logErrorAndShow("Can't connect to server", e1, logger);
