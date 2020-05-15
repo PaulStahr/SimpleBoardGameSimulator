@@ -611,14 +611,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				ObjectFunctions.dropObjects(this, gameInstance, player, oi);
 			}
 
-		}else if (controlDown && !boardTranslation){
-			for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)){
-				if(!scaledObjects.contains(oi.id)){
-					scaledObjects.add(oi.id);
-					savedScalingFactors.add(oi.scale);
-					oi.scale *= scalingFactor;
-				}
-			}
 		}else if (e.getKeyCode() == KeyEvent.VK_ENTER){
 
 			int place = 0;
@@ -656,6 +648,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 			} else if (e.getKeyCode() == KeyEvent.VK_Y && !controlDown) {
 				ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
+			}else if (controlDown && !boardTranslation){
+				for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)){
+					if(!scaledObjects.contains(oi.id)){
+						scaledObjects.add(oi.id);
+						savedScalingFactors.add(oi.scale);
+						oi.scale *= scalingFactor;
+					}
+				}
 			}
 		}
 	}

@@ -3,6 +3,7 @@ package gameObjects.functions;
 import static gameObjects.functions.ObjectFunctions.isStackCollected;
 import static java.lang.Integer.min;
 import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -114,6 +115,9 @@ public class DrawFunctions {
 			{
                 BufferedImage img = gamePanel.playerImages[imageNumber];
                 g2.translate((p.screenWidth-img.getWidth())/2, p.screenHeight - 20);
+                double scaleX = g2.getTransform().getScaleX();
+                double scaleY = g2.getTransform().getScaleY();
+                g2.scale(1/sqrt(g2.getTransform().getDeterminant()), 1/sqrt(g2.getTransform().getDeterminant()));
                 g2.drawImage(img, null, 0, 20);
                 g2.drawString(p.getName(), 0, 0);
 			}
