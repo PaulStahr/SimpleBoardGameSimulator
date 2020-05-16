@@ -25,7 +25,7 @@ public class Table {
         this.boardOrigin.setLocation(boardOrigin.getX(), boardOrigin.getY());
         this.screenOrigin.setLocation(boardOrigin.getX(), boardOrigin.getY());
         setTableParameters((int) screenOrigin.getX(), (int) screenOrigin.getY(), this.diameter);
-        for (Player player : gameInstance.getPlayerList()){
+        for (int i = 0; i < gameInstance.getPlayerList().size(); ++i){
             Shape playerShape = new Ellipse2D.Double(screenOrigin.getX() + this.diameter, screenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
             playerShapes.add(playerShape);
         }
@@ -153,13 +153,11 @@ public class Table {
     }
 
     public void updatePlayers(GameInstance gameInstance){
-        int counter = 0;
-        for (Player player : gameInstance.getPlayerList()){
-            if (counter >= this.playerShapes.size()){
+        for (int i = 0; i<gameInstance.getPlayerList().size(); ++i){
+            if (i >= this.playerShapes.size()){
                 Shape playerShape = new Ellipse2D.Double(screenOrigin.getX() + this.diameter, screenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
                 playerShapes.add(playerShape);
             }
-            ++counter;
         }
     }
 

@@ -35,7 +35,7 @@ public class GameInstance {
 	private final ArrayList<GameAction> actions = new ArrayList<>();
 	private final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
 	private long maxDrawValue = 0;
-	public Table table = null;
+
 	
 	public static interface GameChangeListener
 	{
@@ -76,9 +76,6 @@ public class GameInstance {
 			return pl;
 		}else {
 			players.add(player);
-			if (table != null) {
-				this.table.updatePlayers(this);
-			}
 			update(action == null ? new AddPlayerAction(0, player) : action);
 			return player;
 		}

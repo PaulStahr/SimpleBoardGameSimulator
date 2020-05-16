@@ -7,7 +7,14 @@ import static gameObjects.functions.DrawFunctions.drawPrivateArea;
 import static gameObjects.functions.DrawFunctions.drawSelection;
 import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.KeyEventDispatcher;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentEvent;
@@ -32,19 +39,18 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
+import gameObjects.action.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.ControlCombination;
 import data.DataHandler;
 import data.SystemFileUtil;
-import gameObjects.action.GameAction;
-import gameObjects.action.GameObjectEditAction;
-import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.GamePlayerEditAction;
-import gameObjects.action.GameStructureEditAction;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.functions.MoveFunctions;
 import gameObjects.functions.ObjectFunctions;
@@ -163,7 +169,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		this.privateArea = new PrivateArea(this, gameInstance, boardToScreenTransformation, screenToBoardTransformation);
 		this.table = new Table(gameInstance, tableDiameter,new Point2D.Double(-tableDiameter/2,-tableDiameter/2));
 		this.gameInstance = gameInstance;
-		gameInstance.table = table;
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -519,6 +524,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			repaint();
 		}
+
+		if (action instanceof AddPlayerAction){
+			if (table != null) {
+				this.table.updatePlayers(gameInstance);
+			}
+		}
 	}
 
 	@Override
@@ -600,22 +611,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				ObjectFunctions.dropObjects(this, gameInstance, player, oi);
 			}
 
-		}else if (controlDown && !boardTranslation){
-			for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)){
-				if(!scaledObjects.contains(oi.id)){
-					scaledObjects.add(oi.id);
-					savedScalingFactors.add(oi.scale);
-					oi.scale *= scalingFactor;
-				}
-			}
 		}else if (e.getKeyCode() == KeyEvent.VK_ENTER){
-			int posPlayer = gameInstance.getPlayerList().indexOf(player);
-			for (int i = 0; i < this.table.playerShapes.size();++i) {
-				if(i == posPlayer) {
-					sitDown(i);
-					break;
+
+			int place = 0;
+			for (int i = 0; i < gameInstance.getPlayerNumber(); ++i)
+			{
+				if (gameInstance.getPlayerByIndex(i).id < player.id)
+				{
+					++place;
 				}
 			}
+			sitDown(place);
 		}
 
 
@@ -642,6 +648,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 			} else if (e.getKeyCode() == KeyEvent.VK_Y && !controlDown) {
 				ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
+			}else if (controlDown && !boardTranslation){
+				for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)){
+					if(!scaledObjects.contains(oi.id)){
+						scaledObjects.add(oi.id);
+						savedScalingFactors.add(oi.scale);
+						oi.scale *= scalingFactor;
+					}
+				}
 			}
 		}
 	}
