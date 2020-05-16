@@ -32,8 +32,6 @@ public interface TableColumnType {
 		}
 		return -1;
 	}
-	
-
 
 	static TableColumnType getItemByName(TableColumnType[] tct, String name) {
 		int index = getIndexByName(tct,  name);
