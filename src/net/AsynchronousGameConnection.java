@@ -31,6 +31,7 @@ import gameObjects.action.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
+import gui.minigames.TetrisGameInstance.TetrisGameEvent;
 import io.GameIO;
 import main.Player;
 import util.StringUtils;
@@ -441,6 +442,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					     	strB.setLength(0);*/
 				    		++outputEvents;
 					    }
+					    else if (action instanceof TetrisGameEvent)
+					    {
+					    	objOut.writeUnshared(action);
+					    	++outputEvents;
+					    }
 					}
 				    catch ( Exception e ) {
 				    	logger.error("Error at emmiting Game Action", e);
@@ -515,6 +521,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				if (inputObject instanceof UsertextMessageAction)
 				{
 					UsertextMessageAction action = (UsertextMessageAction)inputObject;
+					gi.update(action);
+					++inputEvents;
+					continue;
+				}
+				if (inputObject instanceof TetrisGameEvent)
+				{
+					TetrisGameEvent action = (TetrisGameEvent)inputObject;
 					gi.update(action);
 					++inputEvents;
 					continue;

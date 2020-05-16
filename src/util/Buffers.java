@@ -21,7 +21,12 @@
  ******************************************************************************/
 package util;
 
-import java.nio.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 
 import geometry.Vector3d;
 /**
@@ -233,7 +238,7 @@ public abstract class Buffers
      * @param data[] Inhalt des Buffers
      */
     public static final ByteBuffer createByteBuffer(byte data[]){
-        return fillByteBuffer(createByteBuffer(data.length), data);
+        return fillByteBuffer(createByteBuffer(data.length), data, data.length);
     }
     
     /**
@@ -242,9 +247,7 @@ public abstract class Buffers
      * @param data[] die Daten mit denen der IntBuffer gef\u00FCllt werden soll
      */
     public static final IntBuffer fillIntBuffer(IntBuffer buf, int data[]){
-        for (int i=0;i<data.length;i++)
-            buf.put(i,data[i]);
-        return buf;
+        return fillIntBuffer(buf, data, data.length);
     }
 
     public static final IntBuffer fillIntBuffer(IntBuffer buf, int data[], int size){
@@ -258,8 +261,8 @@ public abstract class Buffers
      * @param buf der ByteBuffer der gef\u00FCllt werden soll
      * @param data[] die Daten mit denen der ByteBuffer gef\u00FCllt werden soll
      */
-    public static final ByteBuffer fillByteBuffer(ByteBuffer buf, byte data[]){
-        for (int i=0;i<data.length;i++)
+    public static final ByteBuffer fillByteBuffer(ByteBuffer buf, byte data[], int size){
+        for (int i=0;i<size;i++)
             buf.put(i,data[i]);        
         return buf;
     }

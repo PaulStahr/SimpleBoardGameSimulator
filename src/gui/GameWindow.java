@@ -21,6 +21,9 @@ import org.slf4j.LoggerFactory;
 
 import data.JFrameLookAndFeelUtil;
 import gameObjects.instance.GameInstance;
+import gui.minigames.TetrisGameInstance;
+import gui.minigames.TetrisGameInstance.TetrisGameEvent;
+import gui.minigames.TetrisGameInstance.TetrisGameListener;
 import gui.minigames.TetrisWindow;
 import io.GameIO;
 import main.Player;
@@ -139,6 +142,18 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		else if (source == menuItemTetris)
 		{
 			TetrisWindow tw = new TetrisWindow();
+			TetrisGameInstance tgi = tw.getGameInstance();
+			tgi.addGameListener(new TetrisGameListener() {
+				
+				@Override
+				public void actionPerformed(TetrisGameEvent event) {
+					if (event.source == tgi.source)
+					{
+						gamePanel.gameInstance.update(event);
+					}
+				}
+			});
+			gamePanel.gameInstance.addChangeListener(tgi);
 			tw.setVisible(true);
 		}
 	}

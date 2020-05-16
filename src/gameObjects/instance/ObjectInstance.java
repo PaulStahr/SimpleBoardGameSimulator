@@ -10,7 +10,7 @@ import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 
 public class ObjectInstance {
-	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectInstanceColumnType.ID, GameObjectInstanceColumnType.NAME, GameObjectInstanceColumnType.RESET, GameObjectInstanceColumnType.DELETE});
+	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectInstanceColumnType.ID, GameObjectInstanceColumnType.NAME, GameObjectInstanceColumnType.OWNER, GameObjectInstanceColumnType.RESET, GameObjectInstanceColumnType.DELETE});
 	public final ObjectState state;
 	public final GameObject go;
 	public final int id;
