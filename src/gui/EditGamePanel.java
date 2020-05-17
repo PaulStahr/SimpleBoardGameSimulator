@@ -144,7 +144,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableImages,tableAction, IMAGE_TYPES.indexOf(ImageColumnType.DELETE));
  	private final ButtonColumn deletePlayerColumn = new ButtonColumn(tablePlayer,tableAction, Player.TYPES.indexOf(PlayerColumnType.DELETE));
 	 	
- 	private class GeneralPanel extends JPanel implements ItemListener, DocumentListener
+ 	private class GeneralPanel extends JPanel implements ItemListener, DocumentListener, LanguageChangeListener
  	{
  		/**
 		 * 
@@ -156,7 +156,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  		private final JComboBox<String> comboBoxBackground = new JComboBox<String>();
  		private final JLabel labelPassword = new JLabel("Password");
  		private final JTextField textFieldPassword = new JTextField();
-		
+		//private final JButton buttonResetAll = new JButton("Reset All");
+
  		public GeneralPanel()
  		{
  			GroupLayout layout = new GroupLayout(this);
@@ -178,27 +179,47 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  		}
 
 		public void update() {
-			textFieldName.setText(gi.name);
-			JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
-			comboBoxBackground.setSelectedItem(gi.game.getImageKey(gi.game.background));
-			textFieldPassword.setText(gi.password);
-		}
-
-		@Override
-		public void itemStateChanged(ItemEvent arg0) {
+	    	if (!EventQueue.isDispatchThread())
+	    	{
+	    		throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");
+	    	}
 			if (isUpdating)
 			{
 				return;
 			}
+			isUpdating = true;
+			textFieldName.setText(gi.name);
+			JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
+			comboBoxBackground.setSelectedItem(gi.game.getImageKey(gi.game.background));
+			textFieldPassword.setText(gi.password);
+			isUpdating = false;
+		}
+
+		@Override
+		public void itemStateChanged(ItemEvent arg0) {
+	    	if (!EventQueue.isDispatchThread())
+	    	{
+	    		throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");
+	    	}
+			if (isUpdating)
+			{
+				return;
+			}
+			isUpdating = true;
 			if (arg0.getStateChange() == ItemEvent.SELECTED) {
 		        gi.game.background = gi.game.images.get(arg0.getItem());
 		        gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_BACKGROUND));
 			}
+			isUpdating = false;
 		}
 		
 		
 		public void update(DocumentEvent event)
 		{
+	    	if (!EventQueue.isDispatchThread())
+	    	{
+	    		throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");
+	    	}
 			if (isUpdating)
 			{
 				return;
@@ -207,7 +228,9 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			if (source == textFieldName.getDocument())
 			{
 				gi.name = textFieldName.getText();
+				isUpdating = true;
 				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_SESSION_NAME));
+				isUpdating = false;
 			}
 			else if (source == textFieldPassword.getDocument())
 			{
@@ -226,6 +249,12 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 
 		@Override
 		public void removeUpdate(DocumentEvent arg0) {update(arg0);}
+
+		@Override
+		public void languageChanged(Language language) {
+			
+		}
+		
  	}
  	
 	/**

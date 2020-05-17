@@ -1,10 +1,11 @@
 package gameObjects.instance;
 
+import static java.lang.Math.max;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import gui.Table;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,11 +18,10 @@ import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.GameStructureObjectEditAction;
 import gameObjects.definition.GameObject;
+import gui.Table;
 import main.Player;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
-
-import static java.lang.Math.max;
 
 public class GameInstance {
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.NUM_PLAYERS, GameInstanceColumnType.CONNECT, GameInstanceColumnType.DELETE});

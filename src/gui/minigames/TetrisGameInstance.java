@@ -3,30 +3,91 @@ package gui.minigames;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import gameObjects.action.GameAction;
+import gameObjects.instance.GameInstance.GameChangeListener;
+import util.ArrayUtil;
+import util.data.ByteArrayList;
 import util.data.IntegerArrayList;
 
-public class TetrisGameInstance {
+public class TetrisGameInstance implements GameChangeListener {
 	public final ArrayList<TetrisGameListener> gameListener = new ArrayList<>();
-	private final IntegerArrayList ial = new IntegerArrayList();
+	private final IntegerArrayList removeRowList = new IntegerArrayList();
+	public final int source = (int)System.nanoTime() * Integer.MAX_VALUE;
 	
 	public static interface TetrisGameListener{
 		public void actionPerformed(TetrisGameEvent event);
 	};
 	
-	public static class TetrisGameEvent
+	public static class TetrisGameEvent extends GameAction
 	{
-		public TetrisGameEvent(){}
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -1533769225129432885L;
+
+		public TetrisGameEvent(int source){
+			super(source);
+		}
 	}
 	
-	public static class TetrisGameResetEvent extends TetrisGameEvent{}
+	public static class TetrisGameResetEvent extends TetrisGameEvent{
+
+		public TetrisGameResetEvent(int source) {
+			super(source);
+		}
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 329308199229617837L;}
 	
-	public static class TetrisGameChangePixelEvent extends TetrisGameEvent{}
+	public static class TetrisGameStateEvent extends TetrisGameEvent{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -5170488736137761342L;
+		private final byte values[];
+		public TetrisGameStateEvent(int source, byte values[])
+		{
+			super(source);
+			this.values = values.clone();
+		}
+	}
+	
+	public static class TetrisRequestStateEvent extends TetrisGameEvent{
+
+		public TetrisRequestStateEvent(int source) {super(source);}
+
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 4660642893285105594L;}
+	
+	public static class TetrisGameChangePixelEvent extends TetrisGameEvent{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -8420972247190408813L;
+		private final int indices[];
+		private final byte values[];
+		public TetrisGameChangePixelEvent(int source, int indices[], byte values[])
+		{
+			super(source);
+			this.indices = indices;
+			this.values = values;
+		}
+	}
 
 	public static class TetrisGameRemoveRowsEvent extends TetrisGameEvent{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -3616384518013910773L;
 		public final int rows[];
 		
-		public TetrisGameRemoveRowsEvent(int rows[])
+		public TetrisGameRemoveRowsEvent(int source, int rows[])
 		{
+			super(source);
 			this.rows = rows;
 		}
 	}
@@ -124,6 +185,7 @@ public class TetrisGameInstance {
 		rows = 20;
 		cols = 10;
 		gameWindow = new byte[rows * cols];
+		actionPerformed(new TetrisRequestStateEvent(source));
 	}
 	
 	private final ArrayList<FallingObject> toRemove = new ArrayList<>();
@@ -148,11 +210,33 @@ public class TetrisGameInstance {
 		}
 	}
 	
-	public byte isPlacable(FallingObject fo)
+	private void setPixels(FallingObject fo, byte multiply, IntegerArrayList indices, ByteArrayList values)
 	{
 		TetrisObjectType type = objectTypes[fo.type];
 		int fox = fo.x;
 		int foy = fo.y;
+		byte pxvalue = (byte)(multiply * (objectTypes[fo.type].id + 1));
+		for (int y = 0; y < type.height; ++y)
+		{
+			for (int x = 0; x < type.width; ++x)
+			{
+				if (type.get(x, y) && foy + y < rows)
+				{
+					indices.add(fox + x + (foy + y) * cols);
+					values.add(pxvalue);
+				}
+			}
+		}
+	}
+	
+	public byte isPlacable(FallingObject fo, int fox, int foy, byte tp)
+	{
+		if (foy < 0)
+		{
+			return 1;
+		}
+		TetrisObjectType type = objectTypes[tp];
+		setPixels(fo, (byte)0);
 		byte ret = 0;
 		for (int y = 0; y < type.height; ++y)
 		{
@@ -173,6 +257,7 @@ public class TetrisGameInstance {
 				}
 			}
 		}
+		setPixels(fo, (byte)-1);
 		return ret;
 	}
 	
@@ -189,48 +274,47 @@ public class TetrisGameInstance {
 		return true;
 	}
 	
+	private final IntegerArrayList indices = new IntegerArrayList();
+	private final ByteArrayList values = new ByteArrayList();
+	
+
 	public void logic_step()
 	{
 		for (int i = 0; i < fallingObject.size(); ++i)
 		{
 			FallingObject fo = fallingObject.get(i);
-			int fox = fo.x;
-			int foy = fo.y;
-			TetrisObjectType type = objectTypes[fo.type];
-			falling:
+			int placeable = isPlacable(fo, fo.x, fo.y - 1, fo.type);
+			if (placeable > 0)
 			{
-				setPixels(fo, (byte)0);
-				for (int y = 0; y < type.height; ++y)
-				{
-					for (int x = 0; x < type.width; ++x)
-					{
-						if (type.get(x, y) && foy + y < rows && (foy + y == 0 || 0 < getPixel(fox + x, foy + y - 1)))
-						{
-							toRemove.add(fo);
-							setPixels(fo, (byte)1);
-							++placedObjects;
-							break falling;
-						}
-					}
-				}
+				toRemove.add(fo);
+				++placedObjects;
+				setPixels(fo, (byte)1, indices, values);
+				
+			}
+			else if (placeable == 0)
+			{
+				setPixels(fo, (byte)0, indices, values);
 				--fo.y; 
-				setPixels(fo, (byte)-1);
+				setPixels(fo, (byte)-1, indices, values);
 			}
 		}
+		actionPerformed(new TetrisGameChangePixelEvent(source, indices.toArrayI(), values.toArrayB()));
+		indices.clear();
+		values.clear();
 		if (toRemove.size() != 0)
 		{
 			for (int y = 0; y < rows; ++y)
 			{
 				if (row_filled(y))
 				{
-					ial.add(y);
+					removeRowList.add(y);
 				}
 			}
 		}
-		if (ial.size() != 0)
+		if (removeRowList.size() != 0)
 		{
-			actionPerformed(new TetrisGameRemoveRowsEvent(ial.toArrayI()));
-			ial.clear();
+			actionPerformed(new TetrisGameRemoveRowsEvent(source, removeRowList.toArrayI()));
+			removeRowList.clear();
 		}
 		fallingObject.removeAll(toRemove);
 		toRemove.clear();
@@ -252,13 +336,15 @@ public class TetrisGameInstance {
 		FallingObject fo = fallingObject.get(i);
 		if (fo.x < cols - 1)
 		{
-			setPixels(fo, (byte)0);
-			++fo.x;
-			if (isPlacable(fo) != 0)
+			if (isPlacable(fo, fo.x + 1, fo.y, fo.type) == 0)
 			{
-				--fo.x;
+				setPixels(fo, (byte)0, indices, values);
+				++fo.x;
+				setPixels(fo, (byte)-1, indices, values);
+				actionPerformed(new TetrisGameChangePixelEvent(source, indices.toArrayI(), values.toArrayB()));				
+				indices.clear();
+				values.clear();
 			}
-			setPixels(fo, (byte)-1);
 		}
 	}
 
@@ -266,32 +352,40 @@ public class TetrisGameInstance {
 		FallingObject fo = fallingObject.get(i);
 		if (fo.x > 0)
 		{
-			setPixels(fo, (byte)0);
-			--fo.x;
-			if (isPlacable(fo) != 0)
+			if (isPlacable(fo, fo.x - 1, fo.y, fo.type) == 0)
 			{
-				++fo.x;
-			}
-			setPixels(fo, (byte)-1);		
+				setPixels(fo, (byte)0, indices, values);
+				--fo.x;
+				setPixels(fo, (byte)-1, indices, values);
+				actionPerformed(new TetrisGameChangePixelEvent(source, indices.toArrayI(), values.toArrayB()));
+				indices.clear();
+				values.clear();
+			}	
 		}
 	}
 	
 	public void rotate(int index) {
 		FallingObject fo = fallingObject.get(index);
 		setPixels(fo, (byte)0);
+		byte type = fo.type;
 		for (int i = 0; i < 4; ++i)
 		{
-			fo.type = objectTypes[fo.type].next;
-			if (isPlacable(fo) == 0)
+			type = objectTypes[type].next;
+			if (isPlacable(fo, fo.x, fo.y, type) == 0)
 			{
-				setPixels(fo, (byte)-1);
-				return;
-			}
+				setPixels(fo, (byte)0, indices, values);
+				fo.type = type;
+				setPixels(fo, (byte)-1, indices, values);
+				actionPerformed(new TetrisGameChangePixelEvent(source, indices.toArrayI(), values.toArrayB()));
+				indices.clear();
+				values.clear();
+				break;
+			}	
 		}
 	}
 
 	public byte add(FallingObject fo) {
-		byte placable = isPlacable(fo);
+		byte placable = isPlacable(fo, fo.x, fo.y, fo.type);
 		if (placable == 0)
 		{
 			setPixels(fo, (byte)1);
@@ -307,6 +401,19 @@ public class TetrisGameInstance {
 			placedObjects = 0;
 			fallingObject.clear();
 			Arrays.fill(gameWindow, (byte)0);			
+		}
+		else if (event instanceof TetrisGameStateEvent)
+		{
+			System.arraycopy(((TetrisGameStateEvent) event).values, 0, gameWindow, 0, gameWindow.length);
+		}
+		else if (event instanceof TetrisRequestStateEvent)
+		{
+			actionPerformed(new TetrisGameStateEvent(source, gameWindow));
+		}
+		else if (event instanceof TetrisGameChangePixelEvent)
+		{
+			TetrisGameChangePixelEvent pixelEvent = (TetrisGameChangePixelEvent)event;
+			ArrayUtil.setLementsAt(gameWindow, pixelEvent.indices, pixelEvent.values);
 		}
 		else if (event instanceof TetrisGameRemoveRowsEvent)
 		{
@@ -326,5 +433,21 @@ public class TetrisGameInstance {
 		{
 			gameListener.get(i).actionPerformed(event);
 		}
+	}
+
+	public void addGameListener(TetrisGameListener tetrisGameListener) {
+		gameListener.add(tetrisGameListener);
+	}
+
+	@Override
+	public void changeUpdate(GameAction action) {
+		if (action instanceof TetrisGameEvent && action.source != source)
+		{
+			actionPerformed((TetrisGameEvent)action);
+		}
+	}
+
+	public void reset() {
+		actionPerformed(new TetrisGameResetEvent(source));
 	}
 }

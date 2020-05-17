@@ -31,6 +31,7 @@ import gameObjects.action.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
+import gui.minigames.TetrisGameInstance.TetrisGameEvent;
 import io.GameIO;
 import main.Player;
 import util.StringUtils;
@@ -54,6 +55,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	private boolean stopOnError = true;
 	private int outputEvents = 0;
 	private int inputEvents = 0;
+	private long timingOffset;
+	private long otherTimingOffset;
 	
 	public int getInEvents()
 	{
@@ -182,6 +185,15 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		String type;
 		public CommandHash(String type) {
 			this.type = type;
+		}
+	}
+	
+	class TimingOffsetChanged{
+		public final long offset;
+		
+		public TimingOffsetChanged(long offset)
+		{
+			this.offset = offset;
 		}
 	}
 	
@@ -327,6 +339,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				else if (outputObject instanceof String)
 				{
 				}
+				else if (outputObject instanceof TimingOffsetChanged)
+				{
+					objOut.writeUnshared(outputObject);
+				}
 				else if (outputObject instanceof GameAction)
 				{
 					GameAction action = (GameAction)outputObject;
@@ -384,7 +400,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    	else if (action instanceof GameObjectEditAction)
 				    	{
 				    		++outputEvents;
-				    		objOut.writeObject(action);
+				    		objOut.writeUnshared(action);
 				    		GameIO.writeObjectToStreamObject(objOut, ((GameObjectEditAction)action).getObject(gi));
 				    	}
 				    	else if (action instanceof GameStructureEditAction)
@@ -441,6 +457,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					     	strB.setLength(0);*/
 				    		++outputEvents;
 					    }
+					    else if (action instanceof TetrisGameEvent)
+					    {
+					    	objOut.writeUnshared(action);
+					    	++outputEvents;
+					    }
 					}
 				    catch ( Exception e ) {
 				    	logger.error("Error at emmiting Game Action", e);
@@ -487,38 +508,59 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						return;
 					}
 				}
-				if (inputObject instanceof GameObjectInstanceEditAction)
+				if (inputObject instanceof TimingOffsetChanged)
 				{
-					GameObjectInstanceEditAction action = (GameObjectInstanceEditAction)inputObject;
-					GameIO.editStateFromStreamObject(objIn, action.getObject(gi).state);					
-					gi.update(action);
-					++inputEvents;
-					continue;
+					otherTimingOffset = ((TimingOffsetChanged) inputObject).offset;
 				}
-				if (inputObject instanceof GameObjectEditAction)
+				if (inputObject instanceof GameAction)
 				{
-					GameObjectEditAction action = (GameObjectEditAction)inputObject;
-					GameIO.editGameObjectFromStreamObject(objIn, action.getObject(gi));
-					gi.update(action);
-					++inputEvents;
-					continue;
+					long nanoTime = System.nanoTime();
+					GameAction action = ((GameAction)inputObject);
+					if (action.when + timingOffset > nanoTime)
+					{
+						timingOffset = nanoTime - action.when;
+						queueOutput(new TimingOffsetChanged(timingOffset));
+					}
+					action.when += timingOffset;
+					if (action instanceof GameObjectInstanceEditAction)
+					{
+						GameObjectInstanceEditAction actionEdit = (GameObjectInstanceEditAction)inputObject;
+						GameIO.editStateFromStreamObject(objIn, actionEdit.getObject(gi).state);					
+						gi.update(action);
+						++inputEvents;
+						continue;
+					}
+					if (action instanceof GameObjectEditAction)
+					{
+						GameObjectEditAction actionEdit = (GameObjectEditAction)inputObject;
+						GameIO.editGameObjectFromStreamObject(objIn, actionEdit.getObject(gi));
+						gi.update(action);
+						++inputEvents;
+						continue;
+					}
+					if (action instanceof GamePlayerEditAction)
+					{
+						GamePlayerEditAction actionEdit = (GamePlayerEditAction)inputObject;
+						Player editedPlayer = actionEdit.getEditedPlayer(gi);
+						GameIO.editPlayerFromStreamObject(objIn, editedPlayer);
+						gi.update(action);
+						++inputEvents;
+						continue;
+					}
+					if (action instanceof UsertextMessageAction)
+					{
+						gi.update(action);
+						++inputEvents;
+						continue;
+					}
+					if (action instanceof TetrisGameEvent)
+					{
+						gi.update(action);
+						++inputEvents;
+						continue;
+					}
 				}
-				if (inputObject instanceof GamePlayerEditAction)
-				{
-					GamePlayerEditAction action = (GamePlayerEditAction)inputObject;
-					Player editedPlayer = action.getEditedPlayer(gi);
-					GameIO.editPlayerFromStreamObject(objIn, editedPlayer);
-					gi.update(action);
-					++inputEvents;
-					continue;
-				}
-				if (inputObject instanceof UsertextMessageAction)
-				{
-					UsertextMessageAction action = (UsertextMessageAction)inputObject;
-					gi.update(action);
-					++inputEvents;
-					continue;
-				}
+				
 				if (inputObject instanceof GameStructureEditAction)
 				{
 					GameStructureEditAction action = (GameStructureEditAction)inputObject;

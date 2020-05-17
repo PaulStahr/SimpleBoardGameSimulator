@@ -12,9 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gui.minigames.TetrisGameInstance.FallingObject;
-import gui.minigames.TetrisGameInstance.TetrisGameResetEvent;
 
 public class TetrisPanel extends JPanel implements Runnable, KeyListener{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 9138747418672277372L;
 	private static final Logger logger = LoggerFactory.getLogger(TetrisPanel.class);
 	private final TetrisGameInstance tgi;
 	private static final Color colors[] = new Color[] {Color.BLACK, Color.RED, Color.GREEN, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.PINK, Color.GRAY};
@@ -22,6 +25,13 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 	private boolean isRunning = false;
 	private final Random rand = new Random();
 	private boolean down;
+	
+	public TetrisGameInstance getGameInstance()
+	{
+		return tgi;
+	}
+	
+	
 	public TetrisPanel(TetrisGameInstance tetrisInstance)
 	{
 		this.tgi = tetrisInstance;
@@ -70,7 +80,7 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 				byte successfull = tgi.add(new FallingObject((byte)rand.nextInt(18), 4, 18));
 				if (successfull > 0)
 				{
-					tgi.actionPerformed(new TetrisGameResetEvent());
+					tgi.reset();
 				}
 			}
 			tgi.logic_step();

@@ -312,6 +312,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		translateX = 0;
 		translateY = 0;
 		zooming = getHeight()/ ((float) this.table.getDiameter() + 200);
+		zoomFactor = (int)(-10*Math.log(zooming));
 		rotation = 0;
 		updateGameTransform();
 		rotation = Math.toRadians(- 360/this.table.playerShapes.size() * pos);
