@@ -54,12 +54,23 @@ public class Table {
             graphics2D.setTransform(new AffineTransform());
             //graphics2D.translate((int) rotatedPoint.getX(), (int) rotatedPoint.getY());
 
-            gameInstance.getPlayerByIndex(i).playerAtTableTransform.setTransform(new AffineTransform());
-            gameInstance.getPlayerByIndex(i).playerAtTableTransform.translate(rotatedPoint.getX(), rotatedPoint.getY());
-            gameInstance.getPlayerByIndex(i).playerAtTableTransform.rotate(Math.toRadians(angle));
-            gameInstance.getPlayerByIndex(i).playerAtTableTransform.translate(-100, -2*playerDiameter);
-            gameInstance.getPlayerByIndex(i).playerAtTableTransform.preConcatenate(graphics2D.getTransform());
-            gameInstance.getPlayerByIndex(i).playerAtTableRotation = (int) angle;
+            int place = 0;
+            for (int j = 0; j < gameInstance.getPlayerNumber(); ++j)
+            {
+                if (gameInstance.getPlayerByIndex(j).id < gameInstance.getPlayerByIndex(i).id)
+                {
+                    ++place;
+                }
+            }
+
+            Player player = gameInstance.getPlayerByIndex(place);
+
+            player.playerAtTableTransform.setTransform(new AffineTransform());
+            player.playerAtTableTransform.translate(rotatedPoint.getX(), rotatedPoint.getY());
+            player.playerAtTableTransform.rotate(Math.toRadians(angle));
+            player.playerAtTableTransform.translate(-100, -2*playerDiameter);
+            player.playerAtTableTransform.preConcatenate(graphics2D.getTransform());
+            player.playerAtTableRotation = (int) angle;
             //gameInstance.getPlayerByIndex(i).playerAtTableTransform.preConcatenate(gamePanel.getBoardToScreenTransform());
 
 
@@ -69,11 +80,11 @@ public class Table {
             Rectangle rectangle = new Rectangle(  0, 0, 200, 200);
 
             AffineTransform testTransform = new AffineTransform();
-            testTransform.setTransform(gameInstance.getPlayerByIndex(i).playerAtTableTransform);
+            testTransform.setTransform(player.playerAtTableTransform);
             testTransform.preConcatenate(gamePanel.getBoardToScreenTransform());
 
             graphics2D.setTransform(testTransform);
-            graphics2D.setColor(gameInstance.getPlayerList().get(i).color);
+            graphics2D.setColor(player.color);
             graphics2D.fill(rectangle);
             AffineTransform playerString = new AffineTransform();
             playerString.translate(0, -100);
@@ -98,7 +109,15 @@ public class Table {
         int counter = 0;
         for (Shape shape : playerShapes){
             // set background color
-            Player player = gameInstance.getPlayerList().get(counter);
+            int place = 0;
+            for (int j = 0; j < gameInstance.getPlayerNumber(); ++j)
+            {
+                if (gameInstance.getPlayerByIndex(j).id < gameInstance.getPlayerByIndex(counter).id)
+                {
+                    ++place;
+                }
+            }
+            Player player = gameInstance.getPlayerByIndex(place);
             graphics2D.setPaint(player.color);
             graphics2D.fill(shape);
             ++counter;

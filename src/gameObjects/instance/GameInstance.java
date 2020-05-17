@@ -92,10 +92,12 @@ public class GameInstance {
 		}
 		return null;
 	}
+
 	public Player getPlayerByIndex(int idx)
 	{
 		return players.get(idx);
 	}
+
 	public int getPlayerNumber()
 	{
 		return players.size();
@@ -234,6 +236,7 @@ public class GameInstance {
 	public List<Player> getPlayerList() {
 		return Collections.unmodifiableList(players);
 	}
+
 
 	public void remove(int source, GameObject object) {
 		game.objects.remove(object);
