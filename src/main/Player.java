@@ -9,7 +9,7 @@ import gameObjects.PlayerColumnType;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 
-public class Player {
+public class Player implements Comparable {
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{PlayerColumnType.ID, PlayerColumnType.NAME, PlayerColumnType.DELETE});
 	private String name;
 	public final int id;
@@ -84,5 +84,11 @@ public class Player {
 		this.mouseXPos = player.mouseXPos;
 		this.mouseYPos = player.mouseYPos;
 		System.out.println(this.mouseXPos);
+	}
+
+	@Override
+	public int compareTo(Object o) {
+		int compareId = ((Player)o).id;
+		return this.id - compareId;
 	}
 }

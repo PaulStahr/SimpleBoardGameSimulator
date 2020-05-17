@@ -72,7 +72,7 @@ public class SimpleNetworkServertest {
 	    	}
     	}
     	{
-    	   	Player player = new Player("Paul", 1);
+    	   	Player player = new Player("Paul", 3);
     	   	FileInputStream fis = new FileInputStream("Games/Doppelkopf.zip");
 			GameInstance gi = new GameInstance(new Game(), null);
 			GameIO.readSnapshotFromZip(fis, gi);
@@ -101,7 +101,7 @@ public class SimpleNetworkServertest {
     	//gi.update(new GameObjectInstanceEditAction(0, gi.players.get(0), gi.objects.get(0)));    	
 
 
-		Player player2 = new Player("Melissa", 3);
+		Player player2 = new Player("Melissa", 1);
     	//FileInputStream fis = new FileInputStream("Doppelkopf.zip");
 		//GameInstance gi = GameIO.readSnapshotFromZip(fis);
 		//GameInstance gi = new GameInstance(new Game());
@@ -113,6 +113,5 @@ public class SimpleNetworkServertest {
     	}catch(InterruptedException e) {
 			logger.error("Unecpected interrupt", e);
     	}
-
 	}
 }
