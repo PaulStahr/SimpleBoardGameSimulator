@@ -122,11 +122,10 @@ public class DrawFunctions {
                 g2.drawString(p.getName(), 0, 0);
 			}
             g2.setTransform(tmp);
+
             //draw mouse position of other players
             g2.setStroke(basicStroke);
             g2.translate(p.mouseXPos-5, p.mouseYPos-5);
-
-
 
             AffineTransform newTmp = g2.getTransform();
             AffineTransform newTransform = new AffineTransform();
@@ -155,14 +154,22 @@ public class DrawFunctions {
         }
     }
 
+    /** Draws all objects which are in the private area of player
+     * @param gamePanel
+     * @param g
+     * @param gameInstance
+     * @param player
+     * @param activeObject
+     */
     public static void drawTokensInPrivateArea(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, ObjectInstance activeObject){
         Graphics2D g2 = (Graphics2D)g;
         AffineTransform tmp = g2.getTransform();
         g2.setTransform(new AffineTransform());
         int playerId = gamePanel.player == null ? -1 : gamePanel.player.id;
         g2.translate(gamePanel.getWidth() / 2, gamePanel.getHeight());
+
         if (gamePanel.privateArea.objects.size() != 0) {
-            int extraSpace = 0;
+            int extraSpace; //Private Area needs extra space if object is dragged into it
             if (gamePanel.privateArea.currentDragPosition != -1 && gamePanel.activeObject != null && gamePanel.activeObjects.size() != 0 && !gamePanel.isSelectStarted) {
                 extraSpace = 1;
             } else {
@@ -170,12 +177,14 @@ public class DrawFunctions {
             }
 
             g2.rotate(-Math.PI * 0.5 + Math.PI / ((gamePanel.privateArea.objects.size() + extraSpace) * 2));
+            g2.scale(gamePanel.privateArea.zooming, gamePanel.privateArea.zooming);
             for (int i = 0; i < gamePanel.privateArea.objects.size() + extraSpace; ++i) {
                 if (extraSpace == 0) {
                     ObjectInstance objectInstance = gameInstance.getObjectInstanceById(gamePanel.privateArea.objects.getI(i));
                     if (!objectInstance.state.isActive) {
                         BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
                         g2.translate(0, -250);
+
                         g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * 0.5), -(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
                         g2.translate(0, 250);
                         g2.rotate(Math.PI / (gamePanel.privateArea.objects.size() + extraSpace));
@@ -208,17 +217,19 @@ public class DrawFunctions {
                 }
             }
         }
+
         g2.setTransform(tmp);
         if (activeObject != null && !activeObject.state.isActive && activeObject.state.owner_id == playerId) {
             Graphics2D g2d = (Graphics2D)g;
             tmp = g2d.getTransform();
             AffineTransform transform = new AffineTransform();
+
             transform.translate(gamePanel.getWidth()/2, gamePanel.getHeight());
             transform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));
             transform.rotate(gamePanel.privateArea.objects.indexOf(activeObject.id) * Math.PI / (gamePanel.privateArea.objects.size()));
+            transform.scale(gamePanel.privateArea.zooming, gamePanel.privateArea.zooming);
             transform.translate(-activeObject.getWidth(player.id) / 2, -activeObject.getHeight(player.id) / 2);
             transform.translate(0, -250);
-
             drawPrivateAreaBorder(g, player, activeObject, 5, player.color, transform);
             g2d.setTransform(tmp);
         }
@@ -237,6 +248,15 @@ public class DrawFunctions {
         }
     }
 
+    /** Draw the objects in the game
+     * @param gamePanel
+     * @param g
+     * @param gameInstance
+     * @param objectInstance
+     * @param player
+     * @param zooming
+     * @param borderWidth
+     */
     public static void drawObject(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, double zooming, int borderWidth) {
         BufferedImage img = objectInstance.go.getLook(objectInstance.state, player.id);
         if (objectInstance.state == null || img == null) {
@@ -256,7 +276,9 @@ public class DrawFunctions {
                 //g2.rotate(player.screenToBoardTransformation.getDeterminant());
                 g2.rotate(-Math.PI * 0.5 + Math.PI / ((gamePanel.privateArea.objects.size() + 1) * 2));
                 g2.rotate(insertPosition * Math.PI / (gamePanel.privateArea.objects.size() + 1));
-                g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+                g2.rotate(-gamePanel.rotation);
+                g2.scale(gamePanel.privateArea.zooming/(sqrt(g2.getTransform().getDeterminant())), gamePanel.privateArea.zooming/(sqrt(g2.getTransform().getDeterminant())));
+                g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth()  * 0.5), -(int) (objectInstance.scale * img.getHeight()  * 0.5), (int) (objectInstance.scale * img.getWidth() ), (int) (objectInstance.scale * img.getHeight() ), null);
             }
 
             //Draw Border around objects
