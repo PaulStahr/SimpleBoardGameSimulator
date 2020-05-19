@@ -21,6 +21,8 @@ public class PrivateArea {
     public int height = 0;
     public Shape shape = null;
     public int elementNumber = 0;
+    public double zooming = 1;
+    public double zoomingFactor = 1;
 
     private final IntegerArrayList privateObjects = new IntegerArrayList();
     public final ReadOnlyIntegerArrayList objects = privateObjects.readOnly();
@@ -39,14 +41,17 @@ public class PrivateArea {
     public void setArea(double posX, double posY, double width,  double height, int translateX, int translateY, double rotation, double zooming) {
     	if (this.shape instanceof Arc2D.Double)
     	{
-    		((Arc2D.Double)this.shape).setArc(posX, posY, width, height, 0, 180, Arc2D.OPEN);
+    		((Arc2D.Double)this.shape).setArc(posX, posY, width*zooming, height*zooming, 0, 180, Arc2D.OPEN);
     	}
     	else
     	{
-	        Shape privateArea = new Arc2D.Double(posX, posY, width, height, 0, 180, Arc2D.OPEN);
+	        Shape privateArea = new Arc2D.Double(posX, posY, width*zooming, height*zooming, 0, 180, Arc2D.OPEN);
 	        this.shape = privateArea;
+	        this.width = (int) width;
+	        this.height = (int) height;
+            this.origin.setLocation(posX + width/2, posY + height/2);
     	}
-    	this.origin.setLocation(posX + width/2, posY + height/2);
+
     }
 
     public void draw(Graphics g) {
@@ -57,10 +62,12 @@ public class PrivateArea {
 
         // set background color
         Color privateAreaBackgound = new Color(255,153,153,127);
+
         graphics.setPaint(privateAreaBackgound);
         // set border color
         graphics.setColor(privateAreaBackgound);
         graphics.setStroke(new BasicStroke(2));
+        setArea(this.origin.getX()-(width/2.*zooming), this.origin.getY()-(height/2.*zooming), width, height, 0, 0, 0, zooming);
         graphics.fill(this.shape);
         graphics.setTransform(tmp);
     }

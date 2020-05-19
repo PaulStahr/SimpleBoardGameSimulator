@@ -1,7 +1,5 @@
 package gui;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
@@ -9,12 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JSplitPane;
+import javax.swing.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +28,10 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	 */
 	private static final long serialVersionUID = -1441104795154034811L;
 	private final GameInstance gi;
-	private final JSplitPane slider;
+	private final JSplitPane sliderRight;
 	public GamePanel gamePanel;
 	public IngameChatPanel chatPanel;
+	public JToolBar toolBar;
 	private final JMenuItem menuItemExit = new JMenuItem();
 	private final JMenuItem menuItemEditGame = new JMenuItem();
 	private final JMenuItem menuItemSaveGame = new JMenuItem();
@@ -64,6 +58,17 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		this.gi = gi;
 		this.lh = lh;
 		JMenuBar menuBar = new JMenuBar();
+		JToolBar toolBar = new JToolBar();
+		toolBar.setOrientation(SwingConstants.VERTICAL);
+		toolBar.add(new JLabel("TableSize"));
+
+		Integer[] tableSizes = new Integer[10];
+		for (int i = 0; i < 10; ++i){
+			tableSizes[i] = i;
+		}
+		toolBar.add(new JComboBox(tableSizes));
+
+		//this.add(toolBar, BorderLayout.WEST);
 		menuBar.add(menuFile);
 		menuBar.add(menuExtras);
 		menuBar.add(menuControls);
@@ -86,14 +91,15 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		gamePanel = new GamePanel(gi, lh);
 		gamePanel.player = player;
 		chatPanel = new IngameChatPanel(gi, player);
-		slider = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,gamePanel, chatPanel);
-		slider.setOneTouchExpandable(true);
-		slider.setResizeWeight(1); // the chat panel will not be resized when resizing the window
-		this.add(slider);
+
+		sliderRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,gamePanel, chatPanel);
+		sliderRight.setOneTouchExpandable(true);
+		sliderRight.setResizeWeight(1); // the chat panel will not be resized when resizing the window
+		this.add(sliderRight);
 
 		setLayout(new GridLayout(1, 1));
 		setSize((int) screenSize.getWidth(), (int) screenSize.getHeight());
-		slider.setDividerLocation(0.5);
+		sliderRight.setDividerLocation(0.5);
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		languageChanged(lh.getCurrentLanguage());
 		lh.addLanguageChangeListener(this);
