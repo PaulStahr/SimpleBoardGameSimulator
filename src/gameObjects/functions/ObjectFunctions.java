@@ -761,7 +761,7 @@ public class ObjectFunctions {
         int distance = Integer.MAX_VALUE;
         if (isInPrivateArea(gamePanel, xPos, yPos)) {
             Point2D transformedPoint = gamePanel.privateArea.transformPoint(xPos, yPos);
-        	int id = gamePanel.privateArea.getObjectIdByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY());
+        	int id = gamePanel.privateArea.getObjectIdByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY(), gamePanel.getWidth()/2, gamePanel.getHeight());
             activeObject = gameInstance.getObjectInstanceById(id);
         } else {
             for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
@@ -973,7 +973,7 @@ public class ObjectFunctions {
                     removeStackRelations(gamePanel.id, gameInstance, player, activeObject);
                     for (int id : stackIds) {
                         ObjectInstance currentObject = gameInstance.getObjectInstanceById(id);
-                        int index = gamePanel.privateArea.getInsertPosition(posX, posY);
+                        int index = gamePanel.privateArea.getInsertPosition(posX, posY, gamePanel.getWidth()/2, gamePanel.getHeight());
                         if (SwingUtilities.isRightMouseButton(arg0)){
                             flipTokenObject(gamePanel.id,gameInstance,player,currentObject);
                         }
@@ -981,7 +981,7 @@ public class ObjectFunctions {
                     }
                 } else if (gamePanel.privateArea != null && activeObject.state.owner_id == player.id && activeObject.state.isActive && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                     removeFromOwnStack(gamePanel, gameInstance, player, activeObject.id);
-                    int index = gamePanel.privateArea.getInsertPosition(posX, posY);
+                    int index = gamePanel.privateArea.getInsertPosition(posX, posY, gamePanel.getWidth()/2, gamePanel.getHeight());
                     insertIntoOwnStack(gamePanel, gameInstance, player, activeObject, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
                 } else if (activeObject.state.owner_id == player.id && !gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                     removeFromOwnStack(gamePanel, gameInstance, player, activeObject.id);
