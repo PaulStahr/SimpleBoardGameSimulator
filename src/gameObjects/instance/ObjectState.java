@@ -12,6 +12,7 @@ public abstract class ObjectState implements Serializable {
 	public int rotation;
 	public int owner_id = -1;
 	transient public boolean isActive = false;
+	transient public long lastChange = System.nanoTime();
 	public boolean inPrivateArea = false;
 
 	/*stacking objects on top of each other*/

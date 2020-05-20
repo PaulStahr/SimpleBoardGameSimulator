@@ -31,6 +31,7 @@ import gameObjects.action.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.ObjectState;
 import gui.minigames.TetrisGameInstance.TetrisGameEvent;
 import io.GameIO;
 import main.Player;
@@ -57,6 +58,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	private int inputEvents = 0;
 	private long timingOffset;
 	private long otherTimingOffset;
+	private boolean stop = false;
 	
 	public int getInEvents()
 	{
@@ -153,6 +155,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	{
 	}
 	
+	static class StopConnection{}
 	
 	class CommandRead
 	{
@@ -209,7 +212,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		} catch (IOException e1) {
 			logger.error("Can't initialize ObjectStream", e1);
 		}
-    	while (true)
+    	while (!stop)
 		{
 			Object outputObject = null;
 			synchronized(queuedOutputs)
@@ -353,49 +356,17 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    		objOut.writeUnshared(action);
 				    		GameIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).getObject(gi).state);
 				    		++outputEvents;
-					    	/*strB.append(NetworkString.ACTION).append(' ')
-					 			.append(NetworkString.EDIT).append(' ')
-					 			.append(NetworkString.STATE).append(' ')
-					 			.append(connectionId).append(' ')
-					 			.append(action.source).append(' ')
-					 			.append(((GameObjectInstanceEditAction) action).player).append(' ')
-					 			.append(((GameObjectInstanceEditAction) action).object).append(' ')
-					 			.append( byteStream.size());
-					 		GameIO.writeGameObjectInstanceEditActionToStreamObject(objOut, (GameObjectInstanceEditAction)action);
-					 		GameIO.writeStateToStreamObject(objOut, gi.getObjectInstanceById(((GameObjectInstanceEditAction)action).object).state);
-					 		byteStream.reset();
-					     	strB.setLength(0);*/
 				 		}
 				    	else if (action instanceof GamePlayerEditAction)
 				 		{
 				    		objOut.writeUnshared(action);
 				    		GameIO.writePlayerToStreamObject(objOut, ((GamePlayerEditAction)action).getEditedPlayer(gi));
 				    		++outputEvents;
-					    	/*strB.append(NetworkString.ACTION).append(' ')
-					 			.append(NetworkString.EDIT).append(' ')
-					 			.append(NetworkString.PLAYER).append(' ')
-					 			.append(connectionId).append(' ')
-					 			.append(action.source).append(' ')
-					 			.append(((GamePlayerEditAction) action).sourcePlayer).append(' ')
-					 			.append(((GamePlayerEditAction) action).editedPlayer.id).append(' ')
-					 			.append( byteStream.size());
-					 		objOut.writeObject(strB.toString());
-					 		GameIO.writePlayerToStreamObject(objOut, ((GamePlayerEditAction)action).editedPlayer);
-					 		strB.setLength(0);*/
 				 		}
 				    	else if (action instanceof UsertextMessageAction)
 				    	{
 				    		objOut.writeUnshared(action);
 				    		++outputEvents;
-					    	/*strB.append(NetworkString.ACTION).append(' ')
-					 			.append(NetworkString.TEXTMESSAGE).append(' ')
-					 			.append(connectionId).append(' ')
-					 			.append(action.source).append(' ')
-					 			.append(((UsertextMessageAction) action).destinationPlayer).append(' ')
-					 			.append(((UsertextMessageAction) action).sourcePlayer);
-					 		objOut.writeObject(strB.toString());
-					 		objOut.writeObject(((UsertextMessageAction) action).message);
-					     	strB.setLength(0);*/
 					   	}
 				    	else if (action instanceof GameObjectEditAction)
 				    	{
@@ -445,17 +416,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					    {
 				    		objOut.writeUnshared(action);
 				    		++outputEvents;
-					    	/*strB.append(NetworkString.ACTION).append(' ')
-					 			.append(NetworkString.SOUNDMESSAGE).append(' ')
-					 			.append(((UsertextMessageAction) action).sourcePlayer).append(' ')
-					 			.append(connectionId).append(' ')
-					 			.append(action.source).append(' ')
-					 			.append(((GameObjectInstanceEditAction) action).player).append(' ')
-					 			.append(((GameObjectInstanceEditAction) action).object).append(' ');
-					 		objOut.writeObject(strB.toString());
-					 		objOut.writeObject(((UsertextMessageAction) action).message);
-					     	strB.setLength(0);*/
-				    		++outputEvents;
 					    }
 					    else if (action instanceof TetrisGameEvent)
 					    {
@@ -492,7 +452,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 			}
 		}
 		CappedInputStreamWrapper cappedIn = new CappedInputStreamWrapper(objIn, 0);
-		while (true)
+		while (!stop)
 		{
 			try {
 				//String line = in.nextLine();
@@ -525,7 +485,16 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					if (action instanceof GameObjectInstanceEditAction)
 					{
 						GameObjectInstanceEditAction actionEdit = (GameObjectInstanceEditAction)inputObject;
-						GameIO.editStateFromStreamObject(objIn, actionEdit.getObject(gi).state);					
+						ObjectState state = actionEdit.getObject(gi).state;
+						if (state.lastChange > action.when)
+						{
+							GameIO.simulateStateFromStreamObject(objIn, state);
+						}
+						else
+						{
+							GameIO.editStateFromStreamObject(objIn, state);			
+							state.lastChange = action.when;
+						}
 						gi.update(action);
 						++inputEvents;
 						continue;
@@ -780,7 +749,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	
 	public void stop()
 	{
-		
+		queueOutput(new StopConnection());
+		stop = true;
 	}
 	
 	@Override

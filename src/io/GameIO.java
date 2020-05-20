@@ -883,6 +883,23 @@ public class GameIO {
 		out.writeInt(player.screenHeight);
 	}
 	
+	public static void simulateStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
+	{
+		StreamUtil.skip(is, 39);
+		if (state instanceof TokenState)
+		{
+			StreamUtil.skip(is, 1);
+		}
+		else if (state instanceof DiceState)
+		{
+			StreamUtil.skip(is, 4);
+		}
+		else if (state instanceof FigureState)
+		{
+			StreamUtil.skip(is, 1);
+		}
+	}
+	
 	public static void editStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
 	{
 		state.aboveInstanceId = is.readInt();
