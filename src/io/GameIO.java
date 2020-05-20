@@ -885,7 +885,7 @@ public class GameIO {
 	
 	public static void simulateStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
 	{
-		StreamUtil.skip(is, 39);
+		StreamUtil.skip(is, 41);
 		if (state instanceof TokenState)
 		{
 			StreamUtil.skip(is, 1);
