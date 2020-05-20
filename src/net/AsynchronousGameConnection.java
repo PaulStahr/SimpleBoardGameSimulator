@@ -488,7 +488,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						ObjectState state = actionEdit.getObject(gi).state;
 						if (state.lastChange > action.when)
 						{
-							GameIO.simulateStateFromStreamObject(objIn, state);
+							GameIO.editStateFromStreamObject(objIn, state);			
+							//GameIO.simulateStateFromStreamObject(objIn, state);
 						}
 						else
 						{
