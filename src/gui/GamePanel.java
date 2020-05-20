@@ -85,6 +85,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	boolean isRightMouseKeyHold = false;
 	boolean isMiddleMouseKeyHold = false;
 
+	int keyPressed = 0;
+
 	//-1 no key, 0 left, 1 middle, 2 right
 	int firstMouseClick = -1;
 
@@ -539,6 +541,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		++keyPressed;
 		boolean controlDown = e.isControlDown();
 		boolean shiftDown = e.isShiftDown();
 
@@ -546,8 +549,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 		if (!mouseInPrivateArea) {
 			setActiveObjects();
-		}
-		else {
+		} else {
 			activeObjects.clear();
 			if (activeObject != null) {
 				activeObjects.add(activeObject);
@@ -664,6 +666,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void keyReleased(KeyEvent e) {
+		--keyPressed;
 		if (!mouseInPrivateArea) {
 			if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
 				for (int i = 0; i < scaledObjects.size(); i++) {
