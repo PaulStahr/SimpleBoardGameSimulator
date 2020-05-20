@@ -267,7 +267,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    					throw new RuntimeException();
 		    				}
 		    				GameIO.writeSnapshotToZip(gi, byteStream);
-		    				//byte data[] = byteStream.toByteArray();
 		    				if (logger.isDebugEnabled()){logger.debug("Write game instance to stream " + byteStream.size());}
 		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(byteStream.size());
 		    				objOut.writeUnshared(strB.toString());
@@ -301,7 +300,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		    				GameIO.writeObjectInstanceToZip(gi.getObjectInstanceById(id), byteStream);
 		    				strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_OBJECT_INSTANCE).append(' ').append(byteStream.size());
 		    				objOut.writeObject(strB.toString());
-		    				//objOut.writeObject(byteStream.toByteArray());
 		    				byteStream.writeTo(objOut);
 		    				strB.setLength(0);
 		    				byteStream.reset();
@@ -350,7 +348,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}
 				else if (outputObject instanceof TimingOffsetChanged)
 				{
-					objOut.writeUnshared(outputObject);
+					//objOut.writeUnshared(outputObject);
 				}
 				else if (outputObject instanceof GameAction)
 				{
@@ -478,7 +476,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				{
 					otherTimingOffset = ((TimingOffsetChanged) inputObject).offset;
 				}
-				if (inputObject instanceof GameAction)
+				else if (inputObject instanceof GameAction)
 				{
 					long nanoTime = System.nanoTime();
 					GameAction action = ((GameAction)inputObject);
