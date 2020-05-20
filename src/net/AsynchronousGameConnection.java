@@ -475,8 +475,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				if (inputObject instanceof TimingOffsetChanged)
 				{
 					otherTimingOffset = ((TimingOffsetChanged) inputObject).offset;
+					continue;
 				}
-				else if (inputObject instanceof GameAction)
+				if (inputObject instanceof GameAction)
 				{
 					long nanoTime = System.nanoTime();
 					GameAction action = ((GameAction)inputObject);
