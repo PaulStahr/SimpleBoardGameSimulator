@@ -88,26 +88,26 @@ public class PrivateArea {
     	ObjectFunctions.getOwnedStack(gameInstance, player, privateObjects);
     }
 
-    public double getAngle(int posX, int posY) {
+    public double getAngle(int posX, int posY, int originX, int originY) {
         Point2D baseLine = new Point2D.Double(1, 0);
-        Point2D point = new Point2D.Double(posX - origin.getX(), origin.getY() - posY);
+        Point2D point = new Point2D.Double(posX - originX, originY - posY);
         double angle = 180 - Math.toDegrees(Math.atan2(point.getY() - baseLine.getY(), point.getX() - baseLine.getX()));
         return angle;
     }
 
-    public int getSectionByPosition(int posX, int posY){
+    public int getSectionByPosition(int posX, int posY, int originX, int originY){
         if (privateObjects.size() > 0) {
             double sectionSize = 180 / privateObjects.size();
-            double angle = getAngle(posX, posY);
+            double angle = getAngle(posX, posY, originX, originY);
             return (int) ( angle/ sectionSize);
         } else {
             return -1;
         }
     }
 
-    public int getObjectIdByPosition(int posX, int posY) {
+    public int getObjectIdByPosition(int posX, int posY, int originX, int originY) {
         if (privateObjects.size() > 0) {
-            int section = getSectionByPosition(posX, posY);
+            int section = getSectionByPosition(posX, posY, originX, originY);
             if (section>privateObjects.size()-1){
                 section = privateObjects.size()-1;
             }
@@ -121,10 +121,10 @@ public class PrivateArea {
 
     }
 
-    public int getInsertPosition(int posX, int posY) {
+    public int getInsertPosition(int posX, int posY, int originX, int originY) {
         if (privateObjects.size() > 0) {
             double sectionSize = 180 / (privateObjects.size()*2);
-            double angle = getAngle(posX, posY);
+            double angle = getAngle(posX, posY, originX, originY);
             int sectionNum = (int) (angle / sectionSize);
             return (sectionNum + 1)/2;
         } else {

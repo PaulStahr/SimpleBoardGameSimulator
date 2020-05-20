@@ -408,7 +408,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			//Handle all drags of Objects
 			MoveFunctions.dragObjects(this, gameInstance, player, arg0, activeObjects, objOrigPosX, objOrigPosY, mousePressedGamePos, mouseBoardPos, mouseWheelValue);
 			if (this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)) {
-				this.privateArea.currentDragPosition = this.privateArea.getInsertPosition(mouseScreenX, mouseScreenY);
+				this.privateArea.currentDragPosition = this.privateArea.getInsertPosition(mouseScreenX, mouseScreenY, this.getWidth()/2, this.getHeight());
 				outText = "Position:" + String.valueOf(this.privateArea.currentDragPosition);
 			}
 			else{
@@ -442,7 +442,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				MoveFunctions.dragObjects(this,gameInstance,player,arg0,activeObjects,objOrigPosX,objOrigPosY,mousePressedGamePos,mouseBoardPos,mouseWheelValue);
 				/*Handle all drags of Token Objects*/
 				if (this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)){
-					this.privateArea.currentDragPosition = this.privateArea.getInsertPosition(mouseScreenX, mouseScreenY);
+					this.privateArea.currentDragPosition = this.privateArea.getInsertPosition(mouseScreenX, mouseScreenY, this.getWidth()/2, this.getHeight());
 					outText = "Position:" + String.valueOf(this.privateArea.currentDragPosition);
 				}
 				else{
@@ -637,7 +637,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					ObjectFunctions.removeStackRelations(id, gameInstance, player, oi);
 				}
 			} else if (e.getKeyCode() == KeyEvent.VK_T) {
-				for (ObjectInstance oi : activeObjects) {
+				for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
 					ObjectFunctions.takeObjects(this, gameInstance, player, oi);
 					oi.state.isActive = false;
 				}

@@ -278,7 +278,7 @@ public class DrawFunctions {
             }
             //draw object above private area
             else if (objectInstance.state.isActive){
-                int insertPosition = gamePanel.privateArea.getInsertPosition(gamePanel.mouseScreenX, gamePanel.mouseScreenY);
+                int insertPosition = gamePanel.privateArea.getInsertPosition(gamePanel.mouseScreenX, gamePanel.mouseScreenY, gamePanel.getWidth()/2, gamePanel.getHeight());
                 //g2.rotate(player.screenToBoardTransformation.getDeterminant());
                 g2.rotate(-Math.PI * 0.5 + Math.PI / ((gamePanel.privateArea.objects.size() + 1) * 2));
                 g2.rotate(insertPosition * Math.PI / (gamePanel.privateArea.objects.size() + 1));
