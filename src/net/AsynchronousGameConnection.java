@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -191,7 +192,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		}
 	}
 	
-	class TimingOffsetChanged{
+	class TimingOffsetChanged implements Serializable{
+		
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -8508545232652768659L;
 		public final long offset;
 		
 		public TimingOffsetChanged(long offset)
