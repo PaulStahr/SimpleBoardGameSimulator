@@ -45,7 +45,7 @@ public class DrawFunctions {
         int privateAreaHeight = 700;
         int privateAreaWidth = 700;
         gamePanel.privateArea.setArea(gamePanel.getWidth()/2 - privateAreaWidth/2, gamePanel.getHeight()-privateAreaHeight/2, privateAreaWidth, privateAreaHeight, gamePanel.translateX, gamePanel.translateY, gamePanel.rotation, gamePanel.zooming);
-        gamePanel.privateArea.draw(g);
+        gamePanel.privateArea.draw(g, gamePanel.getWidth()/2, gamePanel.getHeight());
     }
 
 
@@ -117,9 +117,11 @@ public class DrawFunctions {
                 g2.translate((p.screenWidth-img.getWidth())/2, p.screenHeight - 20);
                 double scaleX = g2.getTransform().getScaleX();
                 double scaleY = g2.getTransform().getScaleY();
-                g2.scale(1/sqrt(g2.getTransform().getDeterminant()), 1/sqrt(g2.getTransform().getDeterminant()));
-                g2.drawImage(img, null, 0, 20);
-                g2.drawString(p.getName(), 0, 0);
+                g2.scale(1/sqrt(g2.getTransform().getDeterminant()) * 0.5, 1/sqrt(g2.getTransform().getDeterminant())*0.5);
+                g2.translate(img.getWidth()/2, 0);
+                g2.drawImage(img, null, 0, -10);
+                g2.scale(5, 5);
+                g2.drawString(p.getName(), 15, 60);
 			}
             g2.setTransform(tmp);
 
@@ -137,10 +139,14 @@ public class DrawFunctions {
 
             g2.fillRect(0, 0, 10, 10);
             g2.drawString(p.getName(),  15,  5);
+
+            if(p.id == player.id) {
+                g2.drawString(player.actionString, 0, -15);
+                g2.drawString(infoText, -20, 10);
+            }
         }
 
-        g2.drawString(player.actionString,  0, -15);
-        g2.drawString(infoText, -20, 10);
+
 
         g2.setTransform(tmp);
     }

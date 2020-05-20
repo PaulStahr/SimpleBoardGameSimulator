@@ -54,7 +54,7 @@ public class PrivateArea {
 
     }
 
-    public void draw(Graphics g) {
+    public void draw(Graphics g, int originX, int originY) {
         Graphics2D graphics = (Graphics2D) g;
         AffineTransform tmp = graphics.getTransform();
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
@@ -67,7 +67,7 @@ public class PrivateArea {
         // set border color
         graphics.setColor(privateAreaBackgound);
         graphics.setStroke(new BasicStroke(2));
-        setArea(this.origin.getX()-(width/2.*zooming), this.origin.getY()-(height/2.*zooming), width, height, 0, 0, 0, zooming);
+        setArea(originX-(width/2.*zooming), originY-(height/2.*zooming), width, height, 0, 0, 0, zooming);
         graphics.fill(this.shape);
         graphics.setTransform(tmp);
     }

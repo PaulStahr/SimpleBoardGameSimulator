@@ -6,8 +6,6 @@ import static gameObjects.functions.DrawFunctions.drawPlayerPositions;
 import static gameObjects.functions.DrawFunctions.drawPrivateArea;
 import static gameObjects.functions.DrawFunctions.drawSelection;
 import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -609,7 +607,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					}
 				}
 			}
-		} else if (e.getKeyCode() == KeyEvent.VK_D) {
+		} else if (e.getKeyCode() == KeyEvent.VK_D && shiftDown) {
 			for (ObjectInstance oi : activeObjects) {
 				ObjectFunctions.dropObjects(this, gameInstance, player, oi);
 			}
@@ -736,8 +734,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			mouseWheelValue = 0;
 			infoText = "";
 		}
-		else
+		else {
 			infoText = String.valueOf(mouseWheelValue);
+		}
 
 		repaint();
 	}
@@ -936,7 +935,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			add(new JLabel(lang.getString(Words.move_top_card) 				+ ": " + new ControlCombination(0, 0, '\0', 1).toString(lang)));
 			add(new JLabel(lang.getString(Words.move_stack) 				+ ": " + new ControlCombination(0, 1, '\0', 1).toString(lang)));
 			add(new JLabel(lang.getString(Words.take_objects_to_hand)	 	+ ": " + new ControlCombination(0, -1, 'T', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.drop_all_objects_from_hand) + ": " + new ControlCombination(0, -1, 'D', 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.drop_all_objects_from_hand) + ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, 'D', 0).toString(lang)));
 			add(new JLabel(lang.getString(Words.get_bottom_card) 			+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, '\0', 2).toString(lang)));
 			add(new JLabel(lang.getString(Words.shuffle_stack) 				+ ": " + new ControlCombination(0, -1, 'S', 0).toString(lang)));
 			add(new JLabel(lang.getString(Words.flip_card)					+ ": " + new ControlCombination(0, -1, 'F', 0).toString(lang)));
