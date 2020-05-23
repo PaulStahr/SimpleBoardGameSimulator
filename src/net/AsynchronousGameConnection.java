@@ -152,13 +152,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		}
 	}
 	
-	class CommandObject
+	static class CommandObject
 	{
 	}
 	
 	static class StopConnection{}
 	
-	class CommandRead
+	static class CommandRead
 	{
 		String type;
 		public CommandRead(String type) {
@@ -166,7 +166,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		}
 	}
 	
-	class CommandWrite
+	static class CommandWrite
 	{
 		String type;
 		public int id;
@@ -176,7 +176,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		}
 	}
 	
-	class CommandList
+	static class CommandList
 	{
 		String type;
 		public CommandList(String type) {
@@ -184,7 +184,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		}
 	}
 	
-	class CommandHash
+	static class CommandHash
 	{
 		String type;
 		public CommandHash(String type) {
@@ -192,7 +192,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		}
 	}
 	
-	class TimingOffsetChanged implements Serializable{
+	static class TimingOffsetChanged implements Serializable{
 		
 		/**
 		 * 
@@ -348,7 +348,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}
 				else if (outputObject instanceof TimingOffsetChanged)
 				{
-					//objOut.writeUnshared(outputObject);
+					objOut.writeUnshared(outputObject);
 				}
 				else if (outputObject instanceof GameAction)
 				{
@@ -441,7 +441,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	public void inputLoop()
 	{
 		ArrayList<String> split = new ArrayList<>();
-		//Scanner in = new Scanner( input);
 		if (objIn == null)
 		{
 			try {
@@ -459,7 +458,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		while (!stop)
 		{
 			try {
-				//String line = in.nextLine();
 				Object inputObject = null;
 				try
 				{
@@ -493,8 +491,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						ObjectState state = actionEdit.getObject(gi).state;
 						if (state.lastChange > action.when)
 						{
-							GameIO.editStateFromStreamObject(objIn, state);			
-							//GameIO.simulateStateFromStreamObject(objIn, state);
+							GameIO.simulateStateFromStreamObject(objIn, state);
 						}
 						else
 						{
