@@ -1,15 +1,13 @@
 package gameObjects.action;
 
-public class UserSoundMessageAction extends GameAction{
+public class UserSoundMessageAction extends UserMessage{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 2599913200789247263L;
-	public final String message;
-	public final int player;
-	public UserSoundMessageAction(int source, int player, String message) {
-		super(source);
-		this.player = player;
+	public final byte message[];
+	public UserSoundMessageAction(int source, int sourcePlayer, int destinationPlayer, byte message[]) {
+		super(source, sourcePlayer, destinationPlayer);
 		this.message = message;
 	}
 
