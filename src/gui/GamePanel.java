@@ -924,22 +924,22 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		public void languageChanged(Language lang) {
 			removeAll();
 			setLayout(new GridLayout(16, 1, 20, 0));
-			add(new JLabel(lang.getString(Words.sit_down) 					+ ": " + new ControlCombination(0, -1, 'E', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.move_top_card) 				+ ": " + new ControlCombination(0, 0, '\0', 1).toString(lang)));
-			add(new JLabel(lang.getString(Words.move_stack) 				+ ": " + new ControlCombination(0, 1, '\0', 1).toString(lang)));
-			add(new JLabel(lang.getString(Words.take_objects_to_hand)	 	+ ": " + new ControlCombination(0, -1, 'T', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.drop_all_objects_from_hand) + ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, 'D', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.get_bottom_card) 			+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, '\0', 2).toString(lang)));
-			add(new JLabel(lang.getString(Words.shuffle_stack) 				+ ": " + new ControlCombination(0, -1, 'S', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.flip_card)					+ ": " + new ControlCombination(0, -1, 'F', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.flip_stack)					+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, 'F', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.view_collect_stack)	 		+ ": " + new ControlCombination(0, -1, 'V', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.collect_selected_objects)	+ ": " + new ControlCombination(0, -1, 'Y', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.collect_all_objects)  		+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, 'Y', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.rotate_object)  			+ ": " + new ControlCombination(0, -1, 'R', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.dissolve_stack)				+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, 'R', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.count_objects)				+ ": " + new ControlCombination(0, -1, 'C', 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.count_values)				+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, 'C', 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.sit_down) 					+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_ENTER, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.move_top_card) 				+ ": " + new ControlCombination(0, 0,  -1, 1).toString(lang)));
+			add(new JLabel(lang.getString(Words.move_stack) 				+ ": " + new ControlCombination(0, 1, -1, 1).toString(lang)));
+			add(new JLabel(lang.getString(Words.take_objects_to_hand)	 	+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_T, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.drop_all_objects_from_hand) + ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_D, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.get_bottom_card) 			+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  -1, 2).toString(lang)));
+			add(new JLabel(lang.getString(Words.shuffle_stack) 				+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_S, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.flip_card)					+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_F, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.flip_stack)					+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_F, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.view_collect_stack)	 		+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_V, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.collect_selected_objects)	+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_Y, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.collect_all_objects)  		+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_Y, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.rotate_object)  			+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_R, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.dissolve_stack)				+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_R, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.count_objects)				+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_C, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.count_values)				+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_C, 0).toString(lang)));
 			revalidate();
 		}
 	}

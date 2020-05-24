@@ -1,11 +1,8 @@
 package gui;
 
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
+import java.security.Key;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -27,11 +24,11 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
     JScrollPane boardControlPane = new JScrollPane(boardControlsTable);
 
     JLabel objectControlsLabel = new JLabel("Object Controls");
-    JTable objectControlsTable = new JTable(10, 2);
+    JTable objectControlsTable = new JTable(11, 2);
     JScrollPane objectControlsPane = new JScrollPane(objectControlsTable);
 
     JLabel privateAreaControlsLabel = new JLabel("Control Hand Cards");
-    JTable privateAreaControlsTable = new JTable(5, 2);
+    JTable privateAreaControlsTable = new JTable(6, 2);
     JScrollPane privateAreaControlsPane = new JScrollPane(privateAreaControlsTable);
 
 
@@ -73,46 +70,50 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 			StringBuilder strB = new StringBuilder();
 			for (int i = 0; i < cc.length; ++i)
 			{
-				cc[i].toString(strB, lang);
+				StringBuilder strC = new StringBuilder();
 				if (i != 0)
 				{
 					strB.append(',');
 				}
+				cc[i].toString(strC, lang);
+				strB.append(strC);
 			}
 			return strB.toString();
 		}
 	}
 
 	private static final FuncControl[] boardControls = {
-			new FuncControl(Words.move_board, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 0, '\0', 0)),
-			new FuncControl(Words.rotate, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2, '\0', 0)),
-			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 0, '\0', 4)),
+			new FuncControl(Words.move_board, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 0,  -1,0), new ControlCombination(0, -1,  -1,16)),
+			new FuncControl(Words.rotate, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2,  -1, 0), new ControlCombination(0, -1,  KeyEvent.VK_UP, 0), new ControlCombination(0, -1,  KeyEvent.VK_DOWN, 0)),
+			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
 	};
 
 	private static final FuncControl[] objectControls= {
-			new FuncControl(Words.move_object, 		new ControlCombination(0, 0, '\0', 1)),
-			new FuncControl(Words.move_stack,	 	new ControlCombination(0, 1, '\0', 1)),
-			new FuncControl(Words.get_top_n_card, 	new ControlCombination(0, 1, '\0', 5)),
-			new FuncControl(Words.get_bottom_card, 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 0, '\0', 1)),
-			new FuncControl(Words.rotate_object, 	new ControlCombination(0, -1, 'R', 0)),
-			new FuncControl(Words.select_objects, 	new ControlCombination(0, 0, '\0', 1)),
-			new FuncControl(Words.shuffle_stack, 	new ControlCombination(0, -1, 'S', 0)),
-			new FuncControl(Words.merge_objects, 	new ControlCombination(0, -1, 'M', 0)),
-			new FuncControl(Words.collect_all_objects_of_a_group, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2, 'M', 0)),			
-			new FuncControl(Words.flip_objects_roll_dice, new ControlCombination(0, 2, 'F', 1)),			
+			new FuncControl(Words.move_object, 		new ControlCombination(0, 0, -1, 1)),
+			new FuncControl(Words.move_stack,	 	new ControlCombination(0, 1, -1, 1)),
+			new FuncControl(Words.get_top_n_card, 	new ControlCombination(0, 1, -1, 5)),
+			new FuncControl(Words.get_bottom_card, 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 0,  -1, 1)),
+			new FuncControl(Words.rotate_object, 	new ControlCombination(0, -1,  KeyEvent.VK_R, 0)),
+			new FuncControl(Words.select_objects, 	new ControlCombination(0, 0,  -1,1)),
+			new FuncControl(Words.shuffle_stack, 	new ControlCombination(0, -1, KeyEvent.VK_S, 0)),
+			new FuncControl(Words.merge_objects, 	new ControlCombination(0, -1, KeyEvent.VK_M, 0)),
+			new FuncControl(Words.collect_all_objects_of_a_group, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2,  KeyEvent.VK_M, 0)),
+			new FuncControl(Words.flip_objects_roll_dice, new ControlCombination(0, 2,  KeyEvent.VK_F, 1)),
+			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
 	};
 	
 	private static final FuncControl[] privateAreaControls= {
-			new FuncControl(Words.take_object_to_hand, new ControlCombination(0, -1, 'T', 0), new ControlCombination(0, 0, '\0', 1)),
-			new FuncControl(Words.take_object_to_hand_face_down, new ControlCombination(0, 2, '\0', 1)),
-			new FuncControl(Words.play_card_face_up, new ControlCombination(0, 1, '\0', 8)),
-			new FuncControl(Words.play_card_face_down, new ControlCombination(0, 2, '\0', 8)),
-			new FuncControl(Words.drop_all_hand_cards, new ControlCombination(0, -1, 'D', 0)),			
+			new FuncControl(Words.take_object_to_hand, new ControlCombination(0, -1,  KeyEvent.VK_T, 0), new ControlCombination(0, 0,  -1, 1)),
+			new FuncControl(Words.take_object_to_hand_face_down, new ControlCombination(0, 2,  -1,1)),
+			new FuncControl(Words.play_card_face_up, new ControlCombination(0, 1,  -1, 8)),
+			new FuncControl(Words.play_card_face_down, new ControlCombination(0, 2,  -1, 8)),
+			new FuncControl(Words.drop_all_hand_cards, new ControlCombination(0, -1, KeyEvent.VK_D, 0)),
+			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
 	};
 	
 	private static final FuncControl[] countControls = {
-			new FuncControl(Words.count_card_number, new ControlCombination(0, -1, 'C', 0)),
-			new FuncControl(Words.count_card_value, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1, 'C', 0)),			
+			new FuncControl(Words.count_card_number, new ControlCombination(0, -1,  KeyEvent.VK_C, 0)),
+			new FuncControl(Words.count_card_value, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1, KeyEvent.VK_C, 0)),
 	};
 	
     @Override

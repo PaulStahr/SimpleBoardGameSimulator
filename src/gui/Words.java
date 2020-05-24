@@ -80,6 +80,6 @@ public enum Words {
     play_card_face_down,
     rotate_wheel,
     sit_down,
-    drop_on_board
-    
+    drop_on_board,
+    arrow_keys
 }

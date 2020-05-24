@@ -181,10 +181,12 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		{
 			OptionWindow ow = new OptionWindow(lh);
 			ow.setVisible(true);
+			ow.setAlwaysOnTop(true);
 		}
 		else if (source == menuItemControls){
 			ControlWindow cw = new ControlWindow(gi, lh);
 			cw.setVisible(true);
+			cw.setAlwaysOnTop(true);
 		}
 		else if (source == menuItemTetris)
 		{
@@ -202,6 +204,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 			});
 			gamePanel.gameInstance.addChangeListener(tgi);
 			tw.setVisible(true);
+			tw.setAlwaysOnTop(true);
 		}
 		else if (source == menuItemStatusConsistency)
 		{

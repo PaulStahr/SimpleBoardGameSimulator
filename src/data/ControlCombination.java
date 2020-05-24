@@ -1,6 +1,8 @@
 package data;
 
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.security.Key;
 
 import gui.Language;
 import gui.Words;
@@ -11,13 +13,14 @@ public class ControlCombination
 	int mouse;
 	char key;
 	int additional;
+	int keyCode;
 	
-	public ControlCombination(int keyModifier, int mouse, char key, int additional)
+	public ControlCombination(int keyModifier, int mouse, int keyCode, int additional)
 	{
 		this.keyModifier = keyModifier;
 		this.mouse = mouse;
-		this.key = key;
 		this.additional = additional;
+		this.keyCode = keyCode;
 	}
 	
 	StringBuilder appendPlus(StringBuilder strB)
@@ -43,9 +46,8 @@ public class ControlCombination
 		{
 			appendPlus(strB).append(lang.getString(Words.ctrl));
 		}
-		if (key != 0)
-		{
-			appendPlus(strB).append(Character.toUpperCase(key));
+		if (keyCode != -1){
+			appendPlus(strB).append(KeyEvent.getKeyText(keyCode));
 		}
 		if (mouse != -1)
 		{
@@ -69,10 +71,13 @@ public class ControlCombination
 		{
 			appendPlus(strB).append(lang.getString(Words.rotate_wheel));			
 		}
-		if ((additional & 8) != 0)
-		{
+		if ((additional & 8) != 0) {
 			appendPlus(strB).append(lang.getString(Words.drop_on_board));
 		}
+		if ((additional & 16) != 0) {
+			appendPlus(strB).append(lang.getString(Words.arrow_keys));
+		}
+
 		return strB;
 	}
 }

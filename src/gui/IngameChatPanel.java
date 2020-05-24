@@ -91,6 +91,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 			}
 		}
 		JFrameUtils.updateComboBox(sendTo, sendToNames.toArray(new String[sendToNames.size()]));
+		sendTo.setSelectedIndex(0);
 	}
 
 	public IngameChatPanel(GameInstance game, Player player)
