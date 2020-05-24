@@ -1001,7 +1001,7 @@ public class ObjectFunctions {
                     } else if (objectInstance != null) {
                         activeOIds.clear();
                         getStack(gameInstance, activeObject, activeOIds);
-                        Pair<ObjectInstance, ObjectInstance> insertObjects = getInsertObjects(gamePanel, gameInstance, player, activeObject.state.posX + activeObject.getWidth(player.id) / 2, activeObject.state.posY + activeObject.getHeight(player.id) / 2, zooming, activeOIds);
+                        Pair<ObjectInstance, ObjectInstance> insertObjects = getInsertObjects(gamePanel, gameInstance, player, activeObject.state.posX, activeObject.state.posY, zooming, activeOIds);
                         insertIntoStack(gamePanel, gameInstance, player, activeObject, insertObjects.getKey(), insertObjects.getValue(), (int) (activeObject.getWidth(player.id) * gamePanel.cardOverlap));
                     }
                 }
@@ -1083,30 +1083,30 @@ public class ObjectFunctions {
 
     //TODO here are some errors
     public static Pair<ObjectInstance, ObjectInstance> getInsertObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, int posX, int posY, double zooming, IntegerArrayList ignoredObjects) {
-        ObjectInstance objectInstance = getNearestObjectByPosition(gamePanel, gameInstance, player, posX, posY, zooming, ignoredObjects);
-        if (hasAboveObject(objectInstance) && hasBelowObject(objectInstance)) {
-            if (getDistanceToObjectCenter(getAboveObject(gameInstance, objectInstance), posX, posY, player.id) < getDistanceToObjectCenter(getBelowObject(gameInstance, objectInstance), posX, posY, player.id)) {
-                return new Pair<>(getAboveObject(gameInstance, objectInstance), objectInstance);
+        ObjectInstance nearestObject = getNearestObjectByPosition(gamePanel, gameInstance, player, posX, posY, zooming, ignoredObjects);
+        if (hasAboveObject(nearestObject) && hasBelowObject(nearestObject)) {
+            if (getObjectDistanceTo(getAboveObject(gameInstance, nearestObject), posX, posY) < getObjectDistanceTo(getBelowObject(gameInstance, nearestObject), posX, posY)) {
+                return new Pair<>(getAboveObject(gameInstance, nearestObject), nearestObject);
             } else {
-                return new Pair<>(objectInstance, getBelowObject(gameInstance, objectInstance));
+                return new Pair<>(nearestObject, getBelowObject(gameInstance, nearestObject));
             }
-        } else if (hasAboveObject(objectInstance)) {
-            if (posX > objectInstance.state.posX + objectInstance.getWidth(player.id) * gamePanel.cardOverlap) {
-                return new Pair<>(objectInstance, null);
+        } else if (hasAboveObject(nearestObject)) {
+            if (posX > nearestObject.state.posX + nearestObject.getWidth(player.id) * gamePanel.cardOverlap) {
+                return new Pair<>(nearestObject, null);
             }
-            return new Pair<>(getAboveObject(gameInstance, objectInstance), objectInstance);
-        } else if (hasBelowObject(objectInstance)) {
-            if (posX < objectInstance.state.posX + objectInstance.getWidth(player.id) * gamePanel.cardOverlap) {
-                return new Pair<>(null, objectInstance);
+            return new Pair<>(getAboveObject(gameInstance, nearestObject), nearestObject);
+        } else if (hasBelowObject(nearestObject)) {
+            if (posX < nearestObject.state.posX + nearestObject.getWidth(player.id) * gamePanel.cardOverlap) {
+                return new Pair<>(null, nearestObject);
             }
-            return new Pair<>(objectInstance, getBelowObject(gameInstance, objectInstance));
+            return new Pair<>(nearestObject, getBelowObject(gameInstance, nearestObject));
         } else
             return new Pair<>(null, null);
     }
 
-    public static int getDistanceToObjectCenter(ObjectInstance objectInstance, int posX, int posY, int playerId) {
-        int diffX = (posX - (objectInstance.state.posX + objectInstance.getWidth(playerId) / 2));
-        int diffY = (posY - (objectInstance.state.posY + objectInstance.getHeight(playerId) / 2));
+    public static int getObjectDistanceTo(ObjectInstance objectInstance, int posX, int posY) {
+        int diffX = (posX - (objectInstance.state.posX));
+        int diffY = (posY - (objectInstance.state.posY));
         return diffX * diffX + diffY * diffY;
     }
 
