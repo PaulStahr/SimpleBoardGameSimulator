@@ -201,6 +201,10 @@ public class ObjectFunctions {
             }
             ObjectInstance currentObjectInstance = objectInstance;
             while (currentObjectInstance.state.belowInstanceId != -1) {
+            	if (objectStack.size() > gameInstance.getObjectInstanceList().size())
+            	{
+            		throw new RuntimeException();
+            	}
                 objectStack.add(currentObjectInstance.state.belowInstanceId);
                 currentObjectInstance = gameInstance.getObjectInstanceById(currentObjectInstance.state.belowInstanceId);
             }
