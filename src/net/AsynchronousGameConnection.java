@@ -58,8 +58,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	private boolean stopOnError = true;
 	private int outputEvents = 0;
 	private int inputEvents = 0;
-	private long timingOffset;
-	private long otherTimingOffset;
+	private long otherToThisOffset = Long.MAX_VALUE / 10;
+	private long otherTimingOffset = Long.MIN_VALUE;
 	private boolean stop = false;
 	
 	public int getInEvents()
@@ -480,12 +480,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				{
 					long nanoTime = System.nanoTime();
 					GameAction action = ((GameAction)inputObject);
-					if (action.when + timingOffset > nanoTime)
+					if (action.when + otherToThisOffset >= nanoTime)
 					{
-						timingOffset = nanoTime - action.when;
-						queueOutput(new TimingOffsetChanged(timingOffset));
+						otherToThisOffset = nanoTime - action.when;
+						queueOutput(new TimingOffsetChanged(otherToThisOffset));
 					}
-					action.when += timingOffset;
+					action.when += otherToThisOffset;
 					if (action instanceof GameObjectInstanceEditAction)
 					{
 						GameObjectInstanceEditAction actionEdit = (GameObjectInstanceEditAction)inputObject;
