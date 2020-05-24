@@ -97,7 +97,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public int mouseScreenX = -1;
 	public int mouseScreenY = -1;
-	private final Vector2d mouseScreenPos = new Vector2d();
 	private final Vector2d mouseBoardPos = new Vector2d();
 	private final Vector2d mousePressedGamePos = new Vector2d();
 	private final Matrix3d gameTransform = new Matrix3d();

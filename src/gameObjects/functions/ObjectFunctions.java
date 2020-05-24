@@ -287,15 +287,13 @@ public class ObjectFunctions {
         IntegerArrayList relativeY = new IntegerArrayList();
         relativeX.add(0);
         relativeY.add(0);
-        for (int i = 0; i < idList.size(); i++) {
-            if (i != 0) {
-                relativeX.add(gameInstance.getObjectInstanceById(idList.get(i)).state.posX - gameInstance.getObjectInstanceById(idList.get(0)).state.posX);
-                relativeY.add(gameInstance.getObjectInstanceById(idList.get(i)).state.posY - gameInstance.getObjectInstanceById(idList.get(0)).state.posY);
-            }
+        for (int i = 1; i < idList.size(); i++) {
+            relativeX.add(gameInstance.getObjectInstanceById(idList.getI(i)).state.posX - gameInstance.getObjectInstanceById(idList.getI(0)).state.posX);
+            relativeY.add(gameInstance.getObjectInstanceById(idList.getI(i)).state.posY - gameInstance.getObjectInstanceById(idList.getI(0)).state.posY);
         }
         for (int i = 0; i < idList.size(); i++) {
-            ObjectInstance currentObject = gameInstance.getObjectInstanceById(idList.get(i));
-            moveObjectTo(gamePanelId, gameInstance, player, currentObject, posX + relativeX.get(i), posY + relativeY.get(i));
+            ObjectInstance currentObject = gameInstance.getObjectInstanceById(idList.getI(i));
+            moveObjectTo(gamePanelId, gameInstance, player, currentObject, posX + relativeX.getI(i), posY + relativeY.getI(i));
         }
     }
 

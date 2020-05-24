@@ -94,7 +94,6 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	{
 		this.gi = gi;
 		this.lh = lh;
-		DataHandler.timedUpdater.add(new GameWindowUpdater());
 		JMenuBar menuBar = new JMenuBar();
 		JToolBar toolBar = new JToolBar();
 		toolBar.setOrientation(SwingConstants.VERTICAL);
@@ -142,6 +141,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		languageChanged(lh.getCurrentLanguage());
 		lh.addLanguageChangeListener(this);
+		DataHandler.timedUpdater.add(new GameWindowUpdater());
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 
