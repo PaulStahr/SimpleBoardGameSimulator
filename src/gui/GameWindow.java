@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
+import gameObjects.functions.CheckingFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gui.minigames.TetrisGameInstance;
@@ -56,7 +57,8 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	private final JMenuItem menuItemControls = new JMenuItem();
 	private final JMenuItem menuItemTetris = new JMenuItem();
 	private final JMenu menuStatus = new JMenu("Status");
-	private final JMenuItem menuItemStatusConsistency = new JMenuItem("Correct Card-Consistency");
+	private final JMenuItem menuItemStatusPlayerConsistency = new JMenuItem("Correct Card-Consistency");
+	private final JMenuItem menuItemStatusGaiaConsistency = new JMenuItem("Correct Free-Object-Consistency");
 	private final JMenu menuFile = new JMenu();
 	private final JMenu menuExtras = new JMenu();
 	private final JMenu menuControls = new JMenu();
@@ -76,9 +78,11 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 
 		@Override
 		public void update() {
-			boolean consistent = gi.checkPlayerConsistency(gamePanel.player.id, tmp ); 
-			menuItemStatusConsistency.setEnabled(!consistent);
-			menuStatus.setForeground(consistent ? Color.BLACK : Color.RED);
+			boolean playerConsistent = CheckingFunctions.checkPlayerConsistency(gamePanel.player.id, tmp, gi); 
+			menuItemStatusPlayerConsistency.setEnabled(!playerConsistent);
+			boolean gaiaConsistent = CheckingFunctions.checkPlayerConsistency(-1, tmp, gi);
+			menuItemStatusGaiaConsistency.setEnabled(!gaiaConsistent);
+			menuStatus.setForeground(playerConsistent && gaiaConsistent ? Color.BLACK : Color.RED);
 		}
 	}
 	GameWindowUpdater gww = new GameWindowUpdater();
@@ -126,8 +130,10 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuExtras.add(menuItemTetris);
 		menuExtras.add(menuItemAbout);
 		menuControls.add(menuItemControls);
-		menuStatus.add(menuItemStatusConsistency);
-		menuItemStatusConsistency.addActionListener(this);
+		menuStatus.add(menuItemStatusPlayerConsistency);
+		menuStatus.add(menuItemStatusGaiaConsistency);
+		menuItemStatusPlayerConsistency.addActionListener(this);
+		menuItemStatusGaiaConsistency.addActionListener(this);
 		gamePanel = new GamePanel(gi, lh);
 		gamePanel.player = player;
 		chatPanel = new IngameChatPanel(gi, player);
@@ -203,9 +209,13 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 			gamePanel.gameInstance.addChangeListener(tgi);
 			tw.setVisible(true);
 		}
-		else if (source == menuItemStatusConsistency)
+		else if (source == menuItemStatusPlayerConsistency)
 		{
 			gi.repairPlayerConsistency(gamePanel.player.id, gamePanel.player, new ArrayList<>());
+		}
+		else if (source == menuItemStatusGaiaConsistency)
+		{
+			gi.repairPlayerConsistency(-1, gamePanel.player, new ArrayList<>());
 		}
 	}
 
