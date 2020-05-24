@@ -1,4 +1,4 @@
-package gameObjects.action;
+package gameObjects.action.message;
 
 public class UserSoundMessageAction extends UserMessage{
 	/**

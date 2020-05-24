@@ -3,8 +3,15 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -28,7 +35,9 @@ import org.slf4j.LoggerFactory;
 
 import gameObjects.action.GameAction;
 import gameObjects.action.GamePlayerEditAction;
-import gameObjects.action.UsertextMessageAction;
+import gameObjects.action.message.UserCombinedMessage;
+import gameObjects.action.message.UserFileMessage;
+import gameObjects.action.message.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import main.Player;
@@ -118,6 +127,27 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		messagePanel.add(messageInput);
 	
 		this.add(messagePanel);
+		messageInput.setDropTarget(new DropTarget() {
+		    /**
+			 * 
+			 */
+			private static final long serialVersionUID = 8601119174600655506L;
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public synchronized void drop(DropTargetDropEvent evt) {
+		        try {
+		            evt.acceptDrop(DnDConstants.ACTION_COPY);
+		            List<? extends File> droppedFiles = (List<? extends File>)
+		                evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
+	                for (File file : droppedFiles) {
+		            	game.update(new UserFileMessage(id, player.id, receiverPlayerId, file.getName(), Files.readAllBytes(file.toPath())));
+		            }
+		        } catch (Exception ex) {
+		            ex.printStackTrace();
+		        }
+		    }
+		});
 
 	}
 
@@ -166,6 +196,14 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		if (action instanceof GamePlayerEditAction)
 		{
 			JFrameUtils.runByDispatcher(updatePlayerListRunnable);
+		}
+		else if (action instanceof UserFileMessage)
+		{
+			//TODO
+		}
+		else if (action instanceof UserCombinedMessage)
+		{
+			//TODO
 		}
 		else if (action instanceof UsertextMessageAction)
 		{

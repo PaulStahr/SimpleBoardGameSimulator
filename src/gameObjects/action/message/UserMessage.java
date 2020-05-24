@@ -1,4 +1,6 @@
-package gameObjects.action;
+package gameObjects.action.message;
+
+import gameObjects.action.GameAction;
 
 public class UserMessage extends GameAction{
 	/**
