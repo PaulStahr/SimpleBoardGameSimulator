@@ -1,19 +1,34 @@
 package gui;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JSplitPane;
+import javax.swing.JToolBar;
+import javax.swing.SwingConstants;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
 import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectInstance;
 import gui.minigames.TetrisGameInstance;
 import gui.minigames.TetrisGameInstance.TetrisGameEvent;
 import gui.minigames.TetrisGameInstance.TetrisGameListener;
@@ -21,6 +36,7 @@ import gui.minigames.TetrisWindow;
 import io.GameIO;
 import main.Player;
 import util.JFrameUtils;
+import util.TimedUpdateHandler;
 
 public class GameWindow extends JFrame implements ActionListener, LanguageChangeListener{
 	/**
@@ -39,13 +55,33 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	private final JMenuItem menuItemAbout = new JMenuItem();
 	private final JMenuItem menuItemControls = new JMenuItem();
 	private final JMenuItem menuItemTetris = new JMenuItem();
+	private final JMenu menuStatus = new JMenu("Status");
+	private final JMenuItem menuItemStatusConsistency = new JMenuItem("Correct Card-Consistency");
 	private final JMenu menuFile = new JMenu();
 	private final JMenu menuExtras = new JMenu();
 	private final JMenu menuControls = new JMenu();
 
 	private final LanguageHandler lh;
 	
-	Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	private class GameWindowUpdater implements TimedUpdateHandler
+	{
+		
+		private final ArrayList<ObjectInstance> tmp = new ArrayList<>();
+
+		@Override
+		public int getUpdateInterval() {
+			return 1000;
+		}
+
+		@Override
+		public void update() {
+			boolean consistent = gi.checkPlayerConsistency(gamePanel.player.id, tmp ); 
+			menuItemStatusConsistency.setEnabled(!consistent);
+			menuStatus.setForeground(consistent ? Color.BLACK : Color.RED);
+		}
+		
+	}
 	private static final Logger logger = LoggerFactory.getLogger(GameWindow.class);
 	
 	public GameWindow(GameInstance gi, LanguageHandler lh)
@@ -53,10 +89,12 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		this(gi, null, lh);
 	}
 	
+	
 	public GameWindow(GameInstance gi, Player player, LanguageHandler lh)
 	{
 		this.gi = gi;
 		this.lh = lh;
+		DataHandler.timedUpdater.add(new GameWindowUpdater());
 		JMenuBar menuBar = new JMenuBar();
 		JToolBar toolBar = new JToolBar();
 		toolBar.setOrientation(SwingConstants.VERTICAL);
@@ -66,12 +104,13 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		for (int i = 0; i < 10; ++i){
 			tableSizes[i] = i;
 		}
-		toolBar.add(new JComboBox(tableSizes));
+		toolBar.add(new JComboBox<Integer>(tableSizes));
 
 		//this.add(toolBar, BorderLayout.WEST);
 		menuBar.add(menuFile);
 		menuBar.add(menuExtras);
 		menuBar.add(menuControls);
+		menuBar.add(menuStatus);
 		setJMenuBar(menuBar);
 		menuItemExit.addActionListener(this);
 		menuItemEditGame.addActionListener(this);
@@ -87,7 +126,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuExtras.add(menuItemTetris);
 		menuExtras.add(menuItemAbout);
 		menuControls.add(menuItemControls);
-		//gi.addPlayer(null, player);
+		menuStatus.add(menuItemStatusConsistency);
 		gamePanel = new GamePanel(gi, lh);
 		gamePanel.player = player;
 		chatPanel = new IngameChatPanel(gi, player);
@@ -161,6 +200,10 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 			});
 			gamePanel.gameInstance.addChangeListener(tgi);
 			tw.setVisible(true);
+		}
+		else if (source == menuItemStatusConsistency)
+		{
+			gi.repairPlayerConsistency(gamePanel.player.id, gamePanel.player, new ArrayList<>());
 		}
 	}
 
