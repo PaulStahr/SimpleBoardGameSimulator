@@ -80,8 +80,9 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 			menuItemStatusConsistency.setEnabled(!consistent);
 			menuStatus.setForeground(consistent ? Color.BLACK : Color.RED);
 		}
-		
 	}
+	GameWindowUpdater gww = new GameWindowUpdater();
+	
 	private static final Logger logger = LoggerFactory.getLogger(GameWindow.class);
 	
 	public GameWindow(GameInstance gi, LanguageHandler lh)
@@ -126,6 +127,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuExtras.add(menuItemAbout);
 		menuControls.add(menuItemControls);
 		menuStatus.add(menuItemStatusConsistency);
+		menuItemStatusConsistency.addActionListener(this);
 		gamePanel = new GamePanel(gi, lh);
 		gamePanel.player = player;
 		chatPanel = new IngameChatPanel(gi, player);
@@ -141,7 +143,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		languageChanged(lh.getCurrentLanguage());
 		lh.addLanguageChangeListener(this);
-		DataHandler.timedUpdater.add(new GameWindowUpdater());
+		DataHandler.timedUpdater.add(gww);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 

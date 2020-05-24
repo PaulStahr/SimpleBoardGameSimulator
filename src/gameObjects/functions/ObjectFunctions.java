@@ -13,9 +13,6 @@ import java.util.Random;
 
 import javax.swing.SwingUtilities;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GamePlayerEditAction;
 import gameObjects.definition.GameObject;
@@ -31,7 +28,7 @@ import util.Pair;
 import util.data.IntegerArrayList;
 
 public class ObjectFunctions {
-    private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
+    //private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
 
     /**
      * Get the top of the stack with with element objectInstance
@@ -204,6 +201,10 @@ public class ObjectFunctions {
             }
             ObjectInstance currentObjectInstance = objectInstance;
             while (currentObjectInstance.state.belowInstanceId != -1) {
+            	if (objectStack.size() > gameInstance.getObjectInstanceList().size())
+            	{
+            		throw new RuntimeException();
+            	}
                 objectStack.add(currentObjectInstance.state.belowInstanceId);
                 currentObjectInstance = gameInstance.getObjectInstanceById(currentObjectInstance.state.belowInstanceId);
             }
@@ -746,10 +747,10 @@ public class ObjectFunctions {
         double sin = Math.sin(radians), cos = Math.cos(radians);
         double transformedX = -xDiff * cos + yDiff * sin + xCenter;
         double transformedY = -xDiff * sin - yDiff * cos + yCenter;
-        boolean leftIn = (transformedX > (oi.state.posX - maxInaccuracy - oiw/2));
+        boolean leftIn 	= (transformedX > (oi.state.posX - maxInaccuracy - oiw/2));
         boolean rightIn = (transformedX < (oi.state.posX + maxInaccuracy + oiw/2));
-        boolean topIn = (transformedY < (oi.state.posY + maxInaccuracy + oih/2));
-        boolean bottomIn = (transformedY > (oi.state.posY - maxInaccuracy - oih/2));
+        boolean topIn 	= (transformedY < (oi.state.posY + maxInaccuracy + oih/2));
+        boolean bottomIn= (transformedY > (oi.state.posY - maxInaccuracy - oih/2));
         return leftIn && rightIn && topIn && bottomIn;
     }
 
@@ -839,38 +840,22 @@ public class ObjectFunctions {
 
     //check if objectInstance is at the bottom of a stack
     public static boolean isStackBottom(ObjectInstance objectInstance) {
-        if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
-            if (objectInstance.state.belowInstanceId == -1) {
-                return true;
-            }
-        }
-        return false;
+        return objectInstance != null && objectInstance.go instanceof GameObjectToken && objectInstance.state.belowInstanceId == -1;
     }
 
     //Check if object Instance is at the top of a stack
     public static boolean isStackTop(ObjectInstance objectInstance) {
-        if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
-            if (objectInstance.state.aboveInstanceId == -1) {
-                return true;
-            }
-        }
-        return false;
+        return objectInstance != null && objectInstance.go instanceof GameObjectToken && objectInstance.state.aboveInstanceId == -1;
     }
 
     //check if two objects have the same position
     public static boolean haveSamePositions(ObjectInstance objectInstanceA, ObjectInstance objectInstanceB) {
-        if (objectInstanceA != null && objectInstanceB != null && objectInstanceA.go instanceof GameObjectToken && objectInstanceB.go instanceof GameObjectToken)
-            return (objectInstanceA.state.posX == objectInstanceB.state.posX && objectInstanceA.state.posY == objectInstanceB.state.posY);
-        else
-            return false;
+        return objectInstanceA != null && objectInstanceB != null && objectInstanceA.go instanceof GameObjectToken && objectInstanceB.go instanceof GameObjectToken && objectInstanceA.state.posX == objectInstanceB.state.posX && objectInstanceA.state.posY == objectInstanceB.state.posY;
     }
 
     //check if two objects have the same position
     public static boolean isStackCollected(GameInstance gameInstance, ObjectInstance objectInstance) {
-        if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
-            return haveSamePositions(getStackTop(gameInstance, objectInstance), getStackBottom(gameInstance, objectInstance));
-        }
-        return false;
+        return objectInstance != null && objectInstance.go instanceof GameObjectToken && haveSamePositions(getStackTop(gameInstance, objectInstance), getStackBottom(gameInstance, objectInstance));
     }
 
     //remove all relations in an object stack
@@ -1149,7 +1134,7 @@ public class ObjectFunctions {
             insertId = 0;
         }
 
-        if (insertId <= stackIds.size() - 1) {
+        if (insertId < stackIds.size()) {
             aboveInstance = gameInstance.getObjectInstanceById(stackIds.getI(insertId));
         } else {
             insertId = stackIds.size();
