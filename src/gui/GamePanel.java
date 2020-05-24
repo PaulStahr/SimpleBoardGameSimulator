@@ -925,7 +925,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		public void languageChanged(Language lang) {
 			removeAll();
 			setLayout(new GridLayout(16, 1, 20, 0));
-			add(new JLabel(lang.getString(Words.sit_down) 				+ ": " + new ControlCombination(0, -1, 'E', 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.sit_down) 					+ ": " + new ControlCombination(0, -1, 'E', 0).toString(lang)));
 			add(new JLabel(lang.getString(Words.move_top_card) 				+ ": " + new ControlCombination(0, 0, '\0', 1).toString(lang)));
 			add(new JLabel(lang.getString(Words.move_stack) 				+ ": " + new ControlCombination(0, 1, '\0', 1).toString(lang)));
 			add(new JLabel(lang.getString(Words.take_objects_to_hand)	 	+ ": " + new ControlCombination(0, -1, 'T', 0).toString(lang)));
