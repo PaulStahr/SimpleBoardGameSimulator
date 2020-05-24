@@ -739,17 +739,19 @@ public class ObjectFunctions {
     }
 
     private static boolean isOnObject(int xPos, int yPos, ObjectInstance oi, int playerId, int maxInaccuracy) {
-        int xMiddle = oi.state.posX + oi.getWidth(playerId) / 2;
-        int yMiddle = oi.state.posY + oi.getHeight(playerId) / 2;
-        int xDiff = xPos - xMiddle, yDiff = yPos - yMiddle;
+    	int oiw = oi.getWidth(playerId), oih = oi.getHeight(playerId);
+        int xCenter = oi.state.posX;
+        int yCenter = oi.state.posY;
+        int xDiff = xPos - xCenter, yDiff = yPos - yCenter;
 
-        double sin = Math.sin(oi.state.rotation*2*PI/360), cos = Math.cos(oi.state.rotation*2*PI/360);
-        double transformedX = -xDiff * cos + yDiff * sin + xMiddle;
-        double transformedY = -xDiff * sin - yDiff * cos + yMiddle;
-        boolean leftIn = (transformedX > (oi.state.posX - maxInaccuracy));
-        boolean rightIn = (transformedX < (oi.state.posX + oi.getWidth(playerId) + maxInaccuracy));
-        boolean topIn = (transformedY < (oi.state.posY + oi.getHeight(playerId) + maxInaccuracy));
-        boolean bottomIn = (transformedY > (oi.state.posY - maxInaccuracy));
+        double radians = oi.state.rotation*2*PI/360;
+        double sin = Math.sin(radians), cos = Math.cos(radians);
+        double transformedX = -xDiff * cos + yDiff * sin + xCenter;
+        double transformedY = -xDiff * sin - yDiff * cos + yCenter;
+        boolean leftIn = (transformedX > (oi.state.posX - maxInaccuracy - oiw/2));
+        boolean rightIn = (transformedX < (oi.state.posX + maxInaccuracy + oiw/2));
+        boolean topIn = (transformedY < (oi.state.posY + maxInaccuracy + oih/2));
+        boolean bottomIn = (transformedY > (oi.state.posY - maxInaccuracy - oih/2));
         return leftIn && rightIn && topIn && bottomIn;
     }
 

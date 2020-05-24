@@ -9,6 +9,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -265,7 +266,7 @@ public class DrawFunctions {
         } else {
             Graphics2D g2 = (Graphics2D) g;
             AffineTransform tmp = g2.getTransform();
-            g2.translate(objectInstance.state.posX + objectInstance.scale * img.getWidth() * zooming * 0.5, objectInstance.state.posY + objectInstance.scale * img.getHeight() * zooming * 0.5);
+            g2.translate(objectInstance.state.posX, objectInstance.state.posY);
             //draw object not in private area
             if (gamePanel.privateArea == null || !gamePanel.privateArea.containsBoardCoordinates(objectInstance.state.posX, objectInstance.state.posY) || !objectInstance.state.isActive){
                 g2.rotate(Math.toRadians(objectInstance.state.rotation));
@@ -281,9 +282,9 @@ public class DrawFunctions {
                 g2.scale(gamePanel.privateArea.zooming/(sqrt(g2.getTransform().getDeterminant())), gamePanel.privateArea.zooming/(sqrt(g2.getTransform().getDeterminant())));
                 g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth()  * 0.5), -(int) (objectInstance.scale * img.getHeight()  * 0.5), (int) (objectInstance.scale * img.getWidth() ), (int) (objectInstance.scale * img.getHeight() ), null);
             }
-
+            Stroke stroke = new BasicStroke(borderWidth);
             //Draw Border around objects
-            g2.setStroke(new BasicStroke(borderWidth));
+            g2.setStroke(stroke);
 
             if (objectInstance.state.owner_id != -1) {
                     Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
@@ -294,7 +295,7 @@ public class DrawFunctions {
                 g2.setColor(player.color);
             }
             else if(ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance)){
-                g2.setStroke(new BasicStroke(borderWidth));
+                g2.setStroke(stroke);
                 g2.setColor(gamePanel.stackColor);
             }
 
