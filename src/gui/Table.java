@@ -46,15 +46,13 @@ public class Table {
         Graphics2D graphics2D = (Graphics2D) g;
         AffineTransform tmp = graphics2D.getTransform();
         Point2D rotatedPoint = new Point2D.Double();
-        Rectangle rectangle = new Rectangle(  0, 0, 200, 200);
+        Rectangle rectangle = new Rectangle(  -100, 0, 200, 200);
         for (int i = 0; i< playerShapes.size(); ++i){
             double angle = 360./playerShapes.size()*i;
             AffineTransform rotateAroundCenterTransform = AffineTransform.getRotateInstance(Math.toRadians(angle), tableMiddle.getX(), tableMiddle.getY());
             rotateAroundCenterTransform.transform(originPlayerMiddle, rotatedPoint);
             setPlayerParameter(i, (int) rotatedPoint.getX() - playerDiameter/2, (int) rotatedPoint.getY() - playerDiameter/2, playerDiameter);
-          
-            //graphics2D.translate((int) rotatedPoint.getX(), (int) rotatedPoint.getY());
-
+      
             int place = 0;
             for (int j = 0; j < gameInstance.getPlayerNumber(); ++j)
             {
@@ -68,12 +66,9 @@ public class Table {
 
             player.playerAtTableTransform.setToIdentity();
             player.playerAtTableTransform.rotate(Math.toRadians(angle));
-            player.playerAtTableTransform.translate(originPlayerBottom.getX()-100, originPlayerBottom.getY()-2*playerDiameter);
+            player.playerAtTableTransform.translate(originPlayerBottom.getX(), originPlayerBottom.getY()-2*playerDiameter);
             player.playerAtTableRotation = (int) angle;
-            //gameInstance.getPlayerByIndex(i).playerAtTableTransform.preConcatenate(gamePanel.getBoardToScreenTransform());
-
-
-            graphics2D.setTransform(tmp);
+          
             //Set screen transform
             this.playerShapes.set(i, gamePanel.getBoardToScreenTransform().createTransformedShape(this.playerShapes.get(i)));
 
@@ -82,11 +77,8 @@ public class Table {
             graphics2D.setColor(player.color);
             graphics2D.fill(rectangle);
             graphics2D.drawString("Test",0,0);
-            //graphics2D.setTransform(testTransform);
-
-            graphics2D.setTransform(tmp);
-
         }
+        graphics2D.setTransform(tmp);
 
         drawTable(g);
         drawPlayers(gameInstance, g);
