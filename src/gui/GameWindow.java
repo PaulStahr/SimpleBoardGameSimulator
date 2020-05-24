@@ -209,16 +209,16 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 
 	@Override
 	public void languageChanged(Language language) {
-		menuItemExit.setText(language.getString(Words.exit));
-		menuItemEditGame.setText(language.getString(Words.edit));
-		menuItemSaveGame.setText(language.getString(Words.save));
-		menuItemSettings.setText(language.getString(Words.settings));
-		menuItemAbout.setText(language.getString(Words.about));
-		menuItemControls.setText(language.getString(Words.controls));
-		menuItemTetris.setText(language.getString(Words.tetris));
-		menuFile.setText(language.getString(Words.files));
-		menuExtras.setText(language.getString(Words.extras));
-		menuControls.setText(language.getString(Words.controls));
+		menuItemExit.setText(		language.getString(Words.exit));
+		menuItemEditGame.setText(	language.getString(Words.edit));
+		menuItemSaveGame.setText(	language.getString(Words.save));
+		menuItemSettings.setText(	language.getString(Words.settings));
+		menuItemAbout.setText(		language.getString(Words.about));
+		menuItemControls.setText(	language.getString(Words.controls));
+		menuItemTetris.setText(		language.getString(Words.tetris));
+		menuFile.setText(			language.getString(Words.files));
+		menuExtras.setText(			language.getString(Words.extras));
+		menuControls.setText(		language.getString(Words.controls));
 	}
 	
 }
