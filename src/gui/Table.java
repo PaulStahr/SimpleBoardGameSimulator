@@ -1,15 +1,18 @@
 package gui;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+
 import gameObjects.instance.GameInstance;
 import main.Player;
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Point2D;
-import java.awt.geom.Ellipse2D;
-import java.nio.file.attribute.AclFileAttributeView;
-import java.util.ArrayList;
 
 public class Table {
     private int diameter;
@@ -39,19 +42,21 @@ public class Table {
         Point2D originPlayerMiddle = new Point2D.Double(screenOrigin.getX() + diameter/2, screenOrigin.getY() + diameter + playerDiameter/2);
         Point2D originPlayerBottom = new Point2D.Double(screenOrigin.getX() + diameter/2, screenOrigin.getY() + diameter + playerDiameter + 50);
         Point2D tableMiddle = new Point2D.Double(screenOrigin.getX() + diameter/2, screenOrigin.getY() + diameter/2);
-
+        final AffineTransform identity = new AffineTransform();
+        
+        Graphics2D graphics2D = (Graphics2D) g;
+        AffineTransform tmp = graphics2D.getTransform();
+        Point2D rotatedPoint = new Point2D.Double();
         for (int i = 0; i< playerShapes.size(); ++i){
             double angle = 360/playerShapes.size()*i;
-            Point2D rotatedPoint = new Point2D.Double();
+            rotatedPoint.setLocation(0, 0);
             AffineTransform.getRotateInstance(Math.toRadians(angle), tableMiddle.getX(), tableMiddle.getY())
                     .transform(originPlayerMiddle, rotatedPoint);
             setPlayerParameter(i, (int) rotatedPoint.getX() - playerDiameter/2, (int) rotatedPoint.getY() - playerDiameter/2, playerDiameter);
             AffineTransform.getRotateInstance(Math.toRadians(angle), tableMiddle.getX(), tableMiddle.getY())
                     .transform(originPlayerBottom, rotatedPoint);
 
-            Graphics2D graphics2D = (Graphics2D) g;
-            AffineTransform tmp = graphics2D.getTransform();
-            graphics2D.setTransform(new AffineTransform());
+            graphics2D.setTransform(identity);
             //graphics2D.translate((int) rotatedPoint.getX(), (int) rotatedPoint.getY());
 
             int place = 0;
@@ -65,7 +70,7 @@ public class Table {
 
             Player player = gameInstance.getPlayerByIndex(place);
 
-            player.playerAtTableTransform.setTransform(new AffineTransform());
+            player.playerAtTableTransform.setTransform(identity);
             player.playerAtTableTransform.translate(rotatedPoint.getX(), rotatedPoint.getY());
             player.playerAtTableTransform.rotate(Math.toRadians(angle));
             player.playerAtTableTransform.translate(-100, -2*playerDiameter);
@@ -79,17 +84,12 @@ public class Table {
             this.playerShapes.set(i, gamePanel.getBoardToScreenTransform().createTransformedShape(this.playerShapes.get(i)));
             Rectangle rectangle = new Rectangle(  0, 0, 200, 200);
 
-            AffineTransform testTransform = new AffineTransform();
-            testTransform.setTransform(player.playerAtTableTransform);
+            AffineTransform testTransform = new AffineTransform(player.playerAtTableTransform);
             testTransform.preConcatenate(gamePanel.getBoardToScreenTransform());
 
             graphics2D.setTransform(testTransform);
             graphics2D.setColor(player.color);
             graphics2D.fill(rectangle);
-            AffineTransform playerString = new AffineTransform();
-            playerString.translate(0, -100);
-            testTransform.preConcatenate(playerString);
-            graphics2D.setTransform(new AffineTransform());
             graphics2D.drawString("Test",0,0);
             //graphics2D.setTransform(testTransform);
 
