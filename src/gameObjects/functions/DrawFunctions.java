@@ -103,6 +103,7 @@ public class DrawFunctions {
         AffineTransform tmp = g2.getTransform();
         BasicStroke wideStroke = new BasicStroke(4);
         BasicStroke basicStroke = new BasicStroke();
+
         for(int pIdx = 0;pIdx < gameInstance.getPlayerNumber();++pIdx) {
             Player p = gameInstance.getPlayerByIndex(pIdx);
             g.setColor(p.color);
@@ -114,11 +115,9 @@ public class DrawFunctions {
             if (p.id != player.id)
 			{
                 BufferedImage img = gamePanel.playerImages[imageNumber];
-                g2.translate((p.screenWidth-img.getWidth())/2, p.screenHeight - 20);
-                double scaleX = g2.getTransform().getScaleX();
-                double scaleY = g2.getTransform().getScaleY();
+                g2.translate((p.screenWidth)/2, p.screenHeight - 20);
                 g2.scale(1/sqrt(g2.getTransform().getDeterminant()) * 0.5, 1/sqrt(g2.getTransform().getDeterminant())*0.5);
-                g2.translate(img.getWidth()/2, 0);
+                g2.translate(-img.getWidth()/2, 0);
                 g2.drawImage(img, null, 0, -10);
                 g2.scale(5, 5);
                 g2.drawString(p.getName(), 15, 60);
@@ -132,11 +131,7 @@ public class DrawFunctions {
             AffineTransform newTmp = g2.getTransform();
             AffineTransform newTransform = new AffineTransform();
             newTransform.translate(newTmp.getTranslateX(), newTmp.getTranslateY());
-
-
-
             g2.setTransform(newTransform);
-
             g2.fillRect(0, 0, 10, 10);
             g2.drawString(p.getName(),  15,  5);
 

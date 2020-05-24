@@ -963,8 +963,7 @@ public class ObjectFunctions {
         getOwnedStack(gameInstance,player,idList,true);
     }
 
-
-        public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
+    public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
         if (activeObject != null) {
             if (activeObject.go instanceof GameObjectToken) {
                 if (gamePanel.privateArea != null && activeObject.state.owner_id != player.id && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
@@ -979,10 +978,15 @@ public class ObjectFunctions {
                         }
                         insertIntoOwnStack(gamePanel, gameInstance, player, currentObject, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
                     }
+
+                    stackIds.clear();
+                    moveOwnStackToPosition(gamePanel, gameInstance, player, stackIds);
                 } else if (gamePanel.privateArea != null && activeObject.state.owner_id == player.id && activeObject.state.isActive && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                     removeFromOwnStack(gamePanel, gameInstance, player, activeObject.id);
                     int index = gamePanel.privateArea.getInsertPosition(posX, posY, gamePanel.getWidth()/2, gamePanel.getHeight());
                     insertIntoOwnStack(gamePanel, gameInstance, player, activeObject, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
+                    IntegerArrayList stackIds = new IntegerArrayList();
+                    moveOwnStackToPosition(gamePanel, gameInstance, player, stackIds);
                 } else if (activeObject.state.owner_id == player.id && !gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                     removeFromOwnStack(gamePanel, gameInstance, player, activeObject.id);
                     if (SwingUtilities.isLeftMouseButton(arg0)) {
@@ -1016,6 +1020,21 @@ public class ObjectFunctions {
         }
     }
 
+    public static void moveOwnStackToBoardPosition(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList ial){
+        //move own stack to private bottom
+        if (player != null) {
+            ObjectFunctions.getOwnedStack(gameInstance,player,ial);
+            if (ial.size() >0) {
+                ObjectInstance oi = gameInstance.getObjectInstanceById(ial.get(0));
+                if (oi.state.owner_id == player.id) {
+                    Point2D targetPoint = new Point2D.Double(0, 0);
+                    player.playerAtTableTransform.transform(targetPoint,targetPoint);
+                    ObjectFunctions.rotateStack(gameInstance, ial, player.playerAtTableRotation);
+                    ObjectFunctions.moveStackTo(gamePanel.id, gameInstance, player, ial, (int) targetPoint.getX(), (int) targetPoint.getY());
+                }
+            }
+        }
+    }
 
     public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming) {
         releaseObjects(arg0, gamePanel, gameInstance, player, activeObject, posX, posY, zooming, 0);
