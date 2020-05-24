@@ -4,6 +4,7 @@ import static java.lang.Math.max;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -18,7 +19,6 @@ import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.GameStructureObjectEditAction;
 import gameObjects.definition.GameObject;
-import gui.Table;
 import main.Player;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
@@ -241,6 +241,147 @@ public class GameInstance {
 	public void remove(int source, GameObject object) {
 		game.objects.remove(object);
 		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_OBJECT, object.uniqueName.hashCode()));
+	}
+	
+	public void getOwnedObjects(int player_id, ArrayList<ObjectInstance> result)
+	{
+		for (int i = 0; i < objects.size(); ++i)
+		{
+			if (objects.get(i).owner_id() == player_id)
+			{
+				result.add(objects.get(i));
+			}
+		}
+	}
+	
+	public boolean checkPlayerConsistency(int player_id, ArrayList<ObjectInstance> tmp)
+	{
+		tmp.clear();
+		getOwnedObjects(player_id, tmp);
+		ObjectInstance bottom = null;
+		ObjectInstance top = null;
+		for (int i = 0; i < tmp.size(); ++i)
+		{
+			ObjectInstance oi = tmp.get(i);
+			if (oi.state.belowInstanceId == -1)
+			{
+				if (bottom != null)
+				{
+					return false;
+				}
+				bottom = oi;
+			}
+			if (oi.state.aboveInstanceId == -1)
+			{
+				if (top != null)
+				{
+					return false;
+				}
+				top = oi;
+			}
+		}
+		ObjectInstance current = bottom;
+		for (int i = 1; i < tmp.size(); ++i)
+		{
+			ObjectInstance next = getObjectInstanceById(current.state.aboveInstanceId);
+			if (next == null || next.state.belowInstanceId != current.id)
+			{
+				return false;
+			}
+			current = next;
+		}
+		return current == top;
+	}
+	
+	private static final Comparator<ObjectInstance> aboveCompare = new Comparator<ObjectInstance>() {
+		@Override
+		public int compare(ObjectInstance a, ObjectInstance b) {
+			if (a.state.aboveInstanceId == b.id)
+			{
+				return 1;
+			}
+			if (b.state.aboveInstanceId == a.id)
+			{
+				return -1;
+			}
+			return 0;
+		}
+	};
+	
+	private void makeStack(ArrayList<ObjectInstance> tmp)
+	{
+		if (tmp.size() != 0)
+		{
+			ObjectInstance last = tmp.get(0);
+			last.state.belowInstanceId = -1;
+			for (int i = 1; i < tmp.size(); ++i)
+			{
+				ObjectInstance current = tmp.get(i);
+				last.state.aboveInstanceId = current.id;
+				current.state.belowInstanceId = last.id;
+				last = current;
+			}
+			last.state.aboveInstanceId = -1;
+		}
+	}
+	
+	/**
+	 * Collects all cards of a given player and makes a new stack out of it. Only the aboveId is considered. If there are more than one stack, then these will be merged, keeping the parial order. Circles will be put in at random order
+	 * @param player_id
+	 * @param player
+	 * @param tmp
+	 */
+	public void repairPlayerConsistency(int player_id, Player player, ArrayList<ObjectInstance> tmp)
+	{
+		tmp.clear();
+		getOwnedObjects(player_id, tmp);
+		
+		tmp.sort(ObjectInstance.ID_COMPARATOR);
+		int incoming[] = new int[tmp.size()];
+		for (int i = 0; i < tmp.size(); ++i)
+		{
+			ObjectInstance current = tmp.get(i);
+			if (current.state.aboveInstanceId != -1)
+			{
+				int aboveIdx = ArrayTools.binarySearch(tmp, current.state.aboveInstanceId, ObjectInstance.OBJECT_TO_ID);
+				if (aboveIdx >= 0)
+				{
+					++incoming[aboveIdx];
+				}
+			}
+		}
+		for (int read = 0, write = 0; read < incoming.length; ++read)
+		{
+			read = Math.max(write, read);
+			if (incoming[read] == 0)
+			{
+				ObjectInstance current = tmp.get(read);
+				int curIdx = read;
+				while(true){
+					incoming[curIdx] = incoming[write];
+					incoming[write] = 0;
+					tmp.set(curIdx, tmp.get(write));
+					tmp.set(write, current);
+					++write;
+					curIdx = ArrayTools.binarySearch(tmp, current.state.aboveInstanceId, ObjectInstance.OBJECT_TO_ID);
+					if (curIdx < 0)
+					{
+						break;
+					}
+					current = tmp.get(curIdx);
+					--incoming[curIdx];
+					if (incoming[curIdx] != 0)
+					{
+						break;
+					}
+				}
+			}
+		}
+		makeStack(tmp);
+		for (int i = 0; i < tmp.size(); ++i)
+		{
+			update(new GameObjectInstanceEditAction(-1, player, tmp.get(i)));
+		}
 	}
 
 	public void remove(int source, Player player) {

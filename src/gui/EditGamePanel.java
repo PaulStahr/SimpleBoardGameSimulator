@@ -103,7 +103,13 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		tableModelPlayer.addTableModelListener(this);
 		
 		scrollPaneImages.setDropTarget(new DropTarget() {
-		    @Override
+		    /**
+			 * 
+			 */
+			private static final long serialVersionUID = 8601119174600655506L;
+
+			@SuppressWarnings("unchecked")
+			@Override
 			public synchronized void drop(DropTargetDropEvent evt) {
 		        try {
 		            evt.acceptDrop(DnDConstants.ACTION_COPY);
@@ -143,7 +149,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  	private final ButtonColumn deleteObjectInstanceColumn = new ButtonColumn(tableGameObjectInstances,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
  	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableImages,tableAction, IMAGE_TYPES.indexOf(ImageColumnType.DELETE));
  	private final ButtonColumn deletePlayerColumn = new ButtonColumn(tablePlayer,tableAction, Player.TYPES.indexOf(PlayerColumnType.DELETE));
-	 	
+	private final ButtonColumn repairPlayerColumn = new ButtonColumn(tablePlayer, tableAction, Player.TYPES.indexOf(PlayerColumnType.REPAIR)); 	
+ 	
  	private class GeneralPanel extends JPanel implements ItemListener, DocumentListener, LanguageChangeListener
  	{
  		/**
@@ -276,7 +283,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, deleteObjectColumn);
 		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, resetObjectInstanceColumn, deleteObjectInstanceColumn);
 		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.entrySet().toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, deleteImageColumn);
-		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(), Player.TYPES, tableModelPlayer, deletePlayerColumn);
+		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(), Player.TYPES, tableModelPlayer, deletePlayerColumn, repairPlayerColumn);
 		panelGeneral.update();
 		isUpdating = false;
 	}
@@ -326,7 +333,14 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			else if (tableSource == tableModelPlayer)
 			{
-				gi.remove(id, gi.getPlayerByIndex(row));
+				if (button == deletePlayerColumn)
+				{
+					gi.remove(id, gi.getPlayerByIndex(row));
+				}
+				else if (button == repairPlayerColumn)
+				{
+					gi.repairPlayerConsistency(gi.getPlayerByIndex(row).id, player, new ArrayList<>());
+				}
 			}
 		}
 		updateTables();

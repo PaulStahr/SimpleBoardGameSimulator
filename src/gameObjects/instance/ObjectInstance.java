@@ -1,5 +1,6 @@
 package gameObjects.instance;
 import java.awt.Image;
+import java.util.Comparator;
 import java.util.List;
 
 import gameObjects.GameObjectInstanceColumnType;
@@ -7,10 +8,24 @@ import gameObjects.definition.GameObject;
 import gui.GamePanel;
 import main.Player;
 import util.ArrayTools;
+import util.ArrayTools.ObjectToIntTransform;
 import util.jframe.table.TableColumnType;
 
 public class ObjectInstance {
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectInstanceColumnType.ID, GameObjectInstanceColumnType.NAME, GameObjectInstanceColumnType.OWNER, GameObjectInstanceColumnType.RESET, GameObjectInstanceColumnType.DELETE});
+	public static final Comparator<? super ObjectInstance> ID_COMPARATOR = new Comparator<ObjectInstance>() {
+		@Override
+		public int compare(ObjectInstance o1, ObjectInstance o2) {
+			return o1.id - o2.id;
+		}
+	};
+	public static final ObjectToIntTransform<ObjectInstance> OBJECT_TO_ID = new ObjectToIntTransform<ObjectInstance>() {
+
+		@Override
+		public int toInt(ObjectInstance o) {
+			return o.id;
+		}
+	};
 	public final ObjectState state;
 	public final GameObject go;
 	public final int id;
