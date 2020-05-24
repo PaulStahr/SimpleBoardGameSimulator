@@ -32,7 +32,7 @@ public class Main {
 		/*ServerLobbyWindow tmp = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection("212.201.75.217", 20));
 		tmp.setVisible(true);
     	tmp.setSize(500,200);*/
-		LockbackUtil.setLoglevel("WARN");
+		LockbackUtil.setLoglevel("DEBUG");
 		/*if (true)
 		{
 			return;

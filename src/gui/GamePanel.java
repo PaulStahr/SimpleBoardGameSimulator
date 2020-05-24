@@ -399,8 +399,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				ObjectFunctions.setNewDrawValue(this.id, gameInstance, player, activeObject);
 				gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
 
-				activeObject.state.posX = player.mouseXPos - activeObject.getWidth(player.id) / 2;
-				activeObject.state.posY = player.mouseYPos - activeObject.getHeight(player.id) / 2;
+				activeObject.state.posX = player.mouseXPos;
+				activeObject.state.posY = player.mouseYPos;
 			}
 			if (activeObjects.size() > 0) {
 				objOrigPosX.clear();
