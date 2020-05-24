@@ -9,6 +9,7 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
 import gameObjects.instance.GameInstance;
@@ -20,6 +21,7 @@ public class Table {
     private final Point2D boardOrigin = new Point2D.Double();
     private final Point2D screenOrigin = new Point2D.Double();
     public Shape tableShape = null;
+    public Shape stackerShape = null;
     public ArrayList<Shape> playerShapes = new ArrayList<>();
 
     public Table(GameInstance gameInstance, int diameter, Point2D boardOrigin){
@@ -134,10 +136,12 @@ public class Table {
         if (this.tableShape instanceof Ellipse2D)
         {
             ((Ellipse2D)this.tableShape).setFrame(posX, posY, diameter, diameter);
+            ((Rectangle2D)this.stackerShape).setFrame(posX, posY, 200, 200);
         }
         else
         {
             Shape tableArea = new Ellipse2D.Double(posX, posY, diameter, diameter);
+            Shape stackerShape = new Rectangle2D.Double(posX, posY, 200, 200);
             this.tableShape = tableArea;
         }
     }
