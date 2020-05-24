@@ -1,4 +1,4 @@
-package gameObjects.action;
+package gameObjects.action.message;
 
 public class UsertextMessageAction extends UserMessage{
 	/**

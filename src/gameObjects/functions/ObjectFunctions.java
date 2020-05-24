@@ -980,13 +980,13 @@ public class ObjectFunctions {
                     }
 
                     stackIds.clear();
-                    moveOwnStackToPosition(gamePanel, gameInstance, player, stackIds);
+                    moveOwnStackToBoardPosition(gamePanel, gameInstance, player, stackIds);
                 } else if (gamePanel.privateArea != null && activeObject.state.owner_id == player.id && activeObject.state.isActive && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                     removeFromOwnStack(gamePanel, gameInstance, player, activeObject.id);
                     int index = gamePanel.privateArea.getInsertPosition(posX, posY, gamePanel.getWidth()/2, gamePanel.getHeight());
                     insertIntoOwnStack(gamePanel, gameInstance, player, activeObject, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
                     IntegerArrayList stackIds = new IntegerArrayList();
-                    moveOwnStackToPosition(gamePanel, gameInstance, player, stackIds);
+                    moveOwnStackToBoardPosition(gamePanel, gameInstance, player, stackIds);
                 } else if (activeObject.state.owner_id == player.id && !gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                     removeFromOwnStack(gamePanel, gameInstance, player, activeObject.id);
                     if (SwingUtilities.isLeftMouseButton(arg0)) {

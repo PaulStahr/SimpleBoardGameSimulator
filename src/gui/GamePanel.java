@@ -44,13 +44,18 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import gameObjects.action.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.ControlCombination;
 import data.DataHandler;
 import data.SystemFileUtil;
+import gameObjects.action.AddPlayerAction;
+import gameObjects.action.GameAction;
+import gameObjects.action.GameObjectEditAction;
+import gameObjects.action.GameObjectInstanceEditAction;
+import gameObjects.action.GamePlayerEditAction;
+import gameObjects.action.GameStructureEditAction;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.functions.MoveFunctions;
 import gameObjects.functions.ObjectFunctions;

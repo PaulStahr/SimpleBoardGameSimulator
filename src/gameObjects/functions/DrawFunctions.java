@@ -10,16 +10,14 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectFigure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -103,12 +101,13 @@ public class DrawFunctions {
         AffineTransform tmp = g2.getTransform();
         BasicStroke wideStroke = new BasicStroke(4);
         BasicStroke basicStroke = new BasicStroke();
-
+        double determinant = tmp.getDeterminant();
         for(int pIdx = 0;pIdx < gameInstance.getPlayerNumber();++pIdx) {
             Player p = gameInstance.getPlayerByIndex(pIdx);
             g.setColor(p.color);
             g2.setTransform(tmp);
 			g2.transform(p.screenToBoardTransformation);
+			double playerDeterminant = p.screenToBoardTransformation.getDeterminant();
 	        g2.setStroke(wideStroke);
             //g2.drawLine(40, p.screenHeight, p.screenWidth, p.screenHeight);
             int imageNumber = p.id % 10;
@@ -116,7 +115,8 @@ public class DrawFunctions {
 			{
                 BufferedImage img = gamePanel.playerImages[imageNumber];
                 g2.translate((p.screenWidth)/2, p.screenHeight - 20);
-                g2.scale(1/sqrt(g2.getTransform().getDeterminant()) * 0.5, 1/sqrt(g2.getTransform().getDeterminant())*0.5);
+                double scale = 0.5 / Math.sqrt(playerDeterminant * determinant);
+                g2.scale(scale, scale);
                 g2.translate(-img.getWidth()/2, 0);
                 g2.drawImage(img, null, 0, -10);
                 g2.scale(5, 5);

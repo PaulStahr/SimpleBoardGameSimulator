@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.GameMetaInfo;
-import gameObjects.action.UsertextMessageAction;
+import gameObjects.action.message.UsertextMessageAction;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import io.GameIO;

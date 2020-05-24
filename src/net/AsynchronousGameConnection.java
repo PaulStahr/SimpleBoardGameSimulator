@@ -27,8 +27,9 @@ import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.GameStructureEditAction;
-import gameObjects.action.UserSoundMessageAction;
-import gameObjects.action.UsertextMessageAction;
+import gameObjects.action.message.UserFileMessage;
+import gameObjects.action.message.UserSoundMessageAction;
+import gameObjects.action.message.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
@@ -520,6 +521,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						continue;
 					}
 					if (action instanceof UsertextMessageAction)
+					{
+						gi.update(action);
+						++inputEvents;
+						continue;
+					}
+					if (action instanceof UserFileMessage)
 					{
 						gi.update(action);
 						++inputEvents;
