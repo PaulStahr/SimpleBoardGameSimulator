@@ -11,7 +11,8 @@ import util.jframe.table.ValueColumnTypes;
 public enum PlayerColumnType implements TableColumnType{
 	ID("id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
-	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
+	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null),
+	REPAIR("Repair", ValueColumnTypes.TYPE_BUTTON, "Repair", null);
 	
     private static final PlayerColumnType ct[] = PlayerColumnType.values();
     private static final String[] columnNames = TableColumnType.getColumnNames(ct);
@@ -71,6 +72,7 @@ public enum PlayerColumnType implements TableColumnType{
 		switch (this)
 		{
 			case DELETE:	return "Delete";
+			case REPAIR:	return "Repair";
 			case ID:		return gi.id;
 			case NAME:		return gi.getName();
 			default:throw new IllegalArgumentException(getName());

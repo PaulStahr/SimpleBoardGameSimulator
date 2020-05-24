@@ -46,7 +46,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	}
 
 	private static final Logger logger = LoggerFactory.getLogger(AsynchronousGameConnection.class);
-	GameInstance gi;
+	private final GameInstance gi;
 	Thread outputThread;
 	Thread inputThread;
 	InputStream input;

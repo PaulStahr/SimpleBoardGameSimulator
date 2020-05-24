@@ -3,7 +3,10 @@ package util;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 
+import gameObjects.instance.ObjectInstance;
 import util.data.DoubleList;
 import util.data.IntegerList;
 
@@ -512,6 +515,24 @@ public class ArrayUtil {
 		for (int i = 0; i < inputIndices.length; ++i)
 		{
 			output[inputIndices[i]] = inputValues[i];
+		}
+	}
+
+	public static void sortWeak(ArrayList<ObjectInstance> tmp, Comparator<ObjectInstance> comparator) {
+		for (int i = 0; i < tmp.size(); ++i)
+		{
+			ObjectInstance current_min = tmp.get(i);
+			int current_min_index = i;
+			for (int j = i + 1; j < tmp.size(); ++j)
+			{
+				if (comparator.compare(tmp.get(j), current_min) > 0)
+				{
+					current_min = tmp.get(j);
+					current_min_index = j;
+				}
+			}
+			tmp.set(current_min_index, tmp.get(i));
+			tmp.set(i, current_min);
 		}
 	}
 }

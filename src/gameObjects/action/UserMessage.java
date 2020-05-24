@@ -1,6 +1,11 @@
 package gameObjects.action;
 
 public class UserMessage extends GameAction{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7825265253504323824L;
+
 	public final int sourcePlayer;
 	public final int destinationPlayer;
 
@@ -9,10 +14,5 @@ public class UserMessage extends GameAction{
 		this.sourcePlayer = sourcePlayer;
 		this.destinationPlayer = destinationPlayer;
 	}
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 7825265253504323824L;
 
 }
