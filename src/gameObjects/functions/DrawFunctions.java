@@ -308,7 +308,18 @@ public class DrawFunctions {
                     g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth/2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth/2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth/2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
                 }
             }
+            if (logger.isDebugEnabled())
+            {
+	            g2.setColor(Color.GREEN);
+	            g2.drawArc(-5, -5, 10, 10, 0, 360);
+            }
+            
             g2.setTransform(tmp);
+            if (logger.isDebugEnabled())
+            {
+	            g2.setColor(Color.RED);
+	            g2.drawArc(objectInstance.state.posX-5, objectInstance.state.posY-5, 10, 10, 0, 360);
+            }
         }
     }
 
