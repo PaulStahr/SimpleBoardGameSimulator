@@ -33,7 +33,8 @@
 <flip_stack>Stapel umdrehen</flip_stack>
 <collect_all_objects_from_group>Alle Objekte einer Gruppe stapeln</collect_all_objects_from_group>
 <count_values>Objektwerte zählen</count_values>
-<drop_all_objects_from_hand>Alle Handkarten ablegen</drop_all_objects_from_hand>
+<drop_active_hand_card>Aktive Handkarte ablegen</drop_active_hand_card>
+<play_active_hand_card>Aktive Handkarte ausspielen</play_active_hand_card>
 <rotate_object>Objekt rotieren</rotate_object>
 <settings>Einstellungen</settings>
 <options>Optionen</options>
@@ -63,12 +64,12 @@
 <move_board>Board verschieben</move_board>
 <rotate>Rotieren</rotate>
 <zoom>Zoomen</zoom>
-<move_object>Object verschieben</move_object>
+<move_object>Objekt verschieben</move_object>
 <get_top_n_card>Die ersten n Karten abheben</get_top_n_card>
 <select_objects>Objekte auswählen</select_objects>
 <merge_objects>Objekte vereinigen</merge_objects>
 <collect_all_objects_of_a_group>Alle Objekte aus Gruppe stapeln</collect_all_objects_of_a_group>
-<flip_objects_roll_dice>Object flippen oder Würfel rollen</flip_objects_roll_dice>
+<flip_objects_roll_dice>Objekt umdrehen oder Würfel rollen</flip_objects_roll_dice>
 <take_object_to_hand>Objekte auf die Hand nehmen</take_object_to_hand>
 <take_object_to_hand_face_down>Objekte verkehrt herum auf die Hand nehmen</take_object_to_hand_face_down>
 <play_card_face_up>Karten richtig herum ausspielen</play_card_face_up>

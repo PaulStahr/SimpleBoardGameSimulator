@@ -888,18 +888,35 @@ public class ObjectFunctions {
         }
     }
 
-    //drop an object from the hand of player
+    //drop all objects from the hand of player
     public static void dropObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
             IntegerArrayList stackIds = new IntegerArrayList();
             getOwnedStack(gameInstance, player, stackIds);
             for (int id : stackIds) {
                 removeFromOwnStack(gamePanel, gameInstance, player, id);
+                ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, gameInstance.getObjectInstanceById(id));
             }
             //stack all dropped objects
             //ObjectInstance oi = gameInstance.getObjectInstanceByIndex(stackIds.getI(0));
             makeStack(gamePanel.id, gameInstance, player,stackIds);
         }
+    }
+
+    public static void dropObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
+        if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
+            removeFromOwnStack(gamePanel, gameInstance, player, objectInstance.id);
+            ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, objectInstance);
+        }
+    }
+
+    public static void playObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
+        if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
+            removeFromOwnStack(gamePanel, gameInstance, player, objectInstance.id);
+            ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, objectInstance);
+        }
+        moveObjectTo(gamePanel.id, gameInstance,player, objectInstance, (int) gamePanel.table.getTableCenter().getX(), (int) gamePanel.table.getTableCenter().getY());
+        flipTokenObject(gamePanel.id, gameInstance, player, objectInstance);
     }
 
 
@@ -1048,6 +1065,7 @@ public class ObjectFunctions {
             for (int i = 0; i < stackElements.size(); ++i) {
                 ObjectInstance currentObject = gameInstance.getObjectInstanceById(stackElements.get(i));
                 if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1) {
+                    currentObject.state.rotation = 0;
                     if (i == 0 && stackElements.size() > 1) {
                         currentObject.state.belowInstanceId = -1;
                         currentObject.state.aboveInstanceId = gameInstance.getObjectInstanceById(stackElements.get(i + 1)).id;

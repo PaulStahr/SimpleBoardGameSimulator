@@ -18,41 +18,44 @@ import main.Player;
 public class Table {
     private int diameter;
     private int playerDiameter;
-    private final Point2D boardOrigin = new Point2D.Double();
-    private final Point2D screenOrigin = new Point2D.Double();
+    private int stackerWidth;
+    private final Point2D tableOrigin = new Point2D.Double();
+    private final Point2D tableScreenOrigin = new Point2D.Double();
     public Shape tableShape = null;
     public Shape stackerShape = null;
     public ArrayList<Shape> playerShapes = new ArrayList<>();
 
-    public Table(GameInstance gameInstance, int diameter, Point2D boardOrigin){
+    public Table(GameInstance gameInstance, int diameter, Point2D tableOrigin){
         this.diameter = diameter;
         this.playerDiameter = diameter/10;
-        this.boardOrigin.setLocation(boardOrigin.getX(), boardOrigin.getY());
-        this.screenOrigin.setLocation(boardOrigin.getX(), boardOrigin.getY());
-        setTableParameters((int) screenOrigin.getX(), (int) screenOrigin.getY(), this.diameter);
+        this.stackerWidth = diameter/5;
+        this.tableOrigin.setLocation(tableOrigin.getX(), tableOrigin.getY());
+        this.tableScreenOrigin.setLocation(tableOrigin.getX(), tableOrigin.getY());
+        setTableParameters((int) tableScreenOrigin.getX(), (int) tableScreenOrigin.getY(), this.diameter);
         for (int i = 0; i < gameInstance.getPlayerList().size(); ++i){
-            Shape playerShape = new Ellipse2D.Double(screenOrigin.getX() + this.diameter, screenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
+            Shape playerShape = new Ellipse2D.Double(tableScreenOrigin.getX() + this.diameter, tableScreenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
             playerShapes.add(playerShape);
         }
     }
 
     public void drawCompleteTable(GamePanel gamePanel, GameInstance gameInstance, Graphics g){
-        setTableParameters((int) screenOrigin.getX(), (int) screenOrigin.getY(), diameter);
+        setTableParameters((int) tableScreenOrigin.getX(), (int) tableScreenOrigin.getY(), diameter);
 
         this.tableShape = gamePanel.getBoardToScreenTransform().createTransformedShape(this.tableShape);
+        this.stackerShape = gamePanel.getBoardToScreenTransform().createTransformedShape(this.stackerShape);
 
-        Point2D originPlayerMiddle = new Point2D.Double(screenOrigin.getX() + diameter/2, screenOrigin.getY() + diameter + playerDiameter/2);
-        Point2D originPlayerBottom = new Point2D.Double(screenOrigin.getX() + diameter/2, screenOrigin.getY() + diameter + playerDiameter + 50);
-        Point2D tableMiddle = new Point2D.Double(screenOrigin.getX() + diameter/2, screenOrigin.getY() + diameter/2);
-        
+        Point2D originPlayerCenter = new Point2D.Double(tableScreenOrigin.getX() + diameter/2, tableScreenOrigin.getY() + diameter + playerDiameter/2);
+        Point2D originPlayerBottom = new Point2D.Double(tableScreenOrigin.getX() + diameter/2, tableScreenOrigin.getY() + diameter + playerDiameter + 50);
+        Point2D tableCenter = new Point2D.Double(tableScreenOrigin.getX() + diameter/2, tableScreenOrigin.getY() + diameter/2);
+
         Graphics2D graphics2D = (Graphics2D) g;
         AffineTransform tmp = graphics2D.getTransform();
         Point2D rotatedPoint = new Point2D.Double();
         Rectangle rectangle = new Rectangle(  -100, 0, 200, 200);
         for (int i = 0; i< playerShapes.size(); ++i){
             double angle = 360./playerShapes.size()*i;
-            AffineTransform rotateAroundCenterTransform = AffineTransform.getRotateInstance(Math.toRadians(angle), tableMiddle.getX(), tableMiddle.getY());
-            rotateAroundCenterTransform.transform(originPlayerMiddle, rotatedPoint);
+            AffineTransform rotateAroundCenterTransform = AffineTransform.getRotateInstance(Math.toRadians(angle), tableCenter.getX(), tableCenter.getY());
+            rotateAroundCenterTransform.transform(originPlayerCenter, rotatedPoint);
             setPlayerParameter(i, (int) rotatedPoint.getX() - playerDiameter/2, (int) rotatedPoint.getY() - playerDiameter/2, playerDiameter);
       
             int place = 0;
@@ -121,6 +124,10 @@ public class Table {
         graphics2D.setPaint(tableBackground);
         // set border color
         graphics2D.fill(this.tableShape);
+
+        graphics2D.setPaint(Color.gray);
+        graphics2D.fill(this.stackerShape);
+
         graphics2D.setTransform(tmp);
     }
 
@@ -129,19 +136,20 @@ public class Table {
     }
 
     public void updateBoardOrigin(Point2D boardOrigin){
-        this.boardOrigin.setLocation(boardOrigin.getX(), boardOrigin.getY());
+        this.tableOrigin.setLocation(boardOrigin.getX(), boardOrigin.getY());
     }
 
     public void setTableParameters(int posX, int posY, int diameter) {
         if (this.tableShape instanceof Ellipse2D)
         {
             ((Ellipse2D)this.tableShape).setFrame(posX, posY, diameter, diameter);
-            ((Rectangle2D)this.stackerShape).setFrame(posX, posY, 200, 200);
+            ((Rectangle2D)this.stackerShape).setFrame(posX + diameter/2-stackerWidth/2, posY + diameter/2-stackerWidth/2, stackerWidth, stackerWidth);
         }
         else
         {
             Shape tableArea = new Ellipse2D.Double(posX, posY, diameter, diameter);
-            Shape stackerShape = new Rectangle2D.Double(posX, posY, 200, 200);
+            Shape stackerShape = new Rectangle2D.Double(posX + diameter/2-stackerWidth/2, posY+diameter/2-stackerWidth/2, stackerWidth, stackerWidth);
+            this.stackerShape = stackerShape;
             this.tableShape = tableArea;
         }
     }
@@ -161,14 +169,24 @@ public class Table {
     public void updatePlayers(GameInstance gameInstance){
         for (int i = 0; i<gameInstance.getPlayerList().size(); ++i){
             if (i >= this.playerShapes.size()){
-                Shape playerShape = new Ellipse2D.Double(screenOrigin.getX() + this.diameter, screenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
+                Shape playerShape = new Ellipse2D.Double(tableScreenOrigin.getX() + this.diameter, tableScreenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
                 playerShapes.add(playerShape);
             }
         }
     }
 
-    public Point2D getBoardOrigin(){
-        return this.boardOrigin;
+    public Point2D getTableOrigin(){
+        return this.tableOrigin;
+    }
+
+    public Point2D getTableCenter(){
+        Point2D tableCenter = new Point2D.Double();
+        tableCenter.setLocation(this.tableOrigin.getX() + diameter/2, this.tableOrigin.getY() + diameter/2);
+        return tableCenter;
+    }
+
+    public Point2D getTableScreenOrigin(){
+        return this.tableScreenOrigin;
     }
 
     public int getDiameter(){

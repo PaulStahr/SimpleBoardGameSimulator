@@ -184,10 +184,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		gameInstance.addChangeListener(this);
 	
 		// This is the cheat sheet showing the user how he can interact with the game board
-		SheetPanel shP = new SheetPanel(new BorderLayout());
-		lh.addLanguageChangeListener(shP);
-		shP.languageChanged(lh.getCurrentLanguage());
-		add(shP);
+		//SheetPanel shP = new SheetPanel(new BorderLayout());
+		//lh.addLanguageChangeListener(shP);
+		//shP.languageChanged(lh.getCurrentLanguage());
+		//add(shP);
 
 
 		
@@ -618,6 +618,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				ObjectFunctions.dropObjects(this, gameInstance, player, oi);
 			}
 
+		}else if (e.getKeyCode() == KeyEvent.VK_D && !shiftDown) {
+			ObjectFunctions.dropObject(this, gameInstance, player, activeObject);
+		}else if (e.getKeyCode() == KeyEvent.VK_P && !shiftDown) {
+			ObjectFunctions.playObject(this, gameInstance, player, activeObject);
 		}else if (e.getKeyCode() == KeyEvent.VK_ENTER){
 
 			int place = 0;
@@ -649,11 +653,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 				selectedObjects.clear();
 				activeObjects.clear();
-			} else if (e.getKeyCode() == KeyEvent.VK_Y && shiftDown) {
+			} else if (e.getKeyCode() == KeyEvent.VK_M && shiftDown) {
 				for (ObjectInstance oi : activeObjects) {
 					ObjectFunctions.getAllObjectsOfGroup(id, gameInstance, player, oi);
 				}
-			} else if (e.getKeyCode() == KeyEvent.VK_Y && !shiftDown) {
+			} else if (e.getKeyCode() == KeyEvent.VK_M && !shiftDown) {
 				ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
 			}else if (controlDown && !boardTranslation){
 				for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)){
@@ -928,14 +932,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			add(new JLabel(lang.getString(Words.move_top_card) 				+ ": " + new ControlCombination(0, 0,  -1, 1).toString(lang)));
 			add(new JLabel(lang.getString(Words.move_stack) 				+ ": " + new ControlCombination(0, 1, -1, 1).toString(lang)));
 			add(new JLabel(lang.getString(Words.take_objects_to_hand)	 	+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_T, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.drop_all_objects_from_hand) + ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_D, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.drop_all_hand_cards) + ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_D, 0).toString(lang)));
 			add(new JLabel(lang.getString(Words.get_bottom_card) 			+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  -1, 2).toString(lang)));
 			add(new JLabel(lang.getString(Words.shuffle_stack) 				+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_S, 0).toString(lang)));
 			add(new JLabel(lang.getString(Words.flip_card)					+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_F, 0).toString(lang)));
 			add(new JLabel(lang.getString(Words.flip_stack)					+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_F, 0).toString(lang)));
 			add(new JLabel(lang.getString(Words.view_collect_stack)	 		+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_V, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.collect_selected_objects)	+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_Y, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.collect_all_objects)  		+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_Y, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.collect_selected_objects)	+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_M, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.collect_all_objects)  		+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_M, 0).toString(lang)));
 			add(new JLabel(lang.getString(Words.rotate_object)  			+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_R, 0).toString(lang)));
 			add(new JLabel(lang.getString(Words.dissolve_stack)				+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_R, 0).toString(lang)));
 			add(new JLabel(lang.getString(Words.count_objects)				+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_C, 0).toString(lang)));
