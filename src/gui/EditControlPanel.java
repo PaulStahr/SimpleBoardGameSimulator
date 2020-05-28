@@ -28,7 +28,7 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
     JScrollPane objectControlsPane = new JScrollPane(objectControlsTable);
 
     JLabel privateAreaControlsLabel = new JLabel("Control Hand Cards");
-    JTable privateAreaControlsTable = new JTable(6, 2);
+    JTable privateAreaControlsTable = new JTable(8, 2);
     JScrollPane privateAreaControlsPane = new JScrollPane(privateAreaControlsTable);
 
 
@@ -90,9 +90,9 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 
 	private static final FuncControl[] objectControls= {
 			new FuncControl(Words.move_object, 		new ControlCombination(0, 0, -1, 1)),
-			new FuncControl(Words.move_stack,	 	new ControlCombination(0, 1, -1, 1)),
+			new FuncControl(Words.move_stack,	 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 0, -1, 1),new ControlCombination(0, 1, -1, 1)),
 			new FuncControl(Words.get_top_n_card, 	new ControlCombination(0, 1, -1, 5)),
-			new FuncControl(Words.get_bottom_card, 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 0,  -1, 1)),
+			new FuncControl(Words.get_bottom_card, 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 2,  -1, 1)),
 			new FuncControl(Words.rotate_object, 	new ControlCombination(0, -1,  KeyEvent.VK_R, 0)),
 			new FuncControl(Words.select_objects, 	new ControlCombination(0, 0,  -1,1)),
 			new FuncControl(Words.shuffle_stack, 	new ControlCombination(0, -1, KeyEvent.VK_S, 0)),

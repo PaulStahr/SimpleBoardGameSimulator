@@ -260,7 +260,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			//get nearest object concerning the mouse position
 			ObjectInstance nearestObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			//do actions if mouse is in the private area or not and there is some nearest object
-			if (mouseInPrivateArea && nearestObject != null && !arg0.isControlDown())
+			if (mouseInPrivateArea && nearestObject != null && !arg0.isControlDown() && !arg0.isShiftDown())
 			{
 				if (activeObject != null){
 					activeObject.state.isActive = false;
@@ -454,7 +454,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				else{
 					this.privateArea.currentDragPosition = -1;
 				}
-				if (activeObject == null && selectedObjects.size() == 0 && !SwingUtilities.isMiddleMouseButton(arg0) && !mouseInPrivateArea) {
+				if (activeObject == null && selectedObjects.size() == 0 && !SwingUtilities.isMiddleMouseButton(arg0) && !(SwingUtilities.isLeftMouseButton(arg0) && arg0.isShiftDown()) && !mouseInPrivateArea) {
 					selectWidth = mouseScreenX - beginSelectPosScreenX;
 					selectHeight = mouseScreenY - beginSelectPosScreenY;
 				}
@@ -551,120 +551,122 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 		translateBoard(e);
 
-		if (!mouseInPrivateArea) {
-			setActiveObjects();
-		} else {
-			activeObjects.clear();
-			if (activeObject != null) {
-				activeObjects.add(activeObject);
-			}
-		}
-		if (e.getKeyCode() == KeyEvent.VK_C && !shiftDown) {
-			int count = 0;
-			for (ObjectInstance oi : activeObjects) {
-				count += ObjectFunctions.countStack(gameInstance, oi);
-			}
-			player.actionString = "Object Number: " + String.valueOf(count);
-		} else if (e.getKeyCode() == KeyEvent.VK_F && !shiftDown) {
-			for (ObjectInstance oi : activeObjects) {
-				ObjectFunctions.flipTokenObject(id, gameInstance, player, oi);
-				ObjectFunctions.rollTheDice(id, gameInstance, player, oi);
-			}
-		} else if (shiftDown && e.getKeyCode() == KeyEvent.VK_F) {
-			for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
-				ObjectFunctions.flipTokenStack(id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, oi));
-			}
-		} else if (e.getKeyCode() == KeyEvent.VK_S) {
-			for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
-				ObjectFunctions.shuffleStack(id, gameInstance, player, oi);
-			}
-
-		} else if (shiftDown && e.getKeyCode() == KeyEvent.VK_C) {
-			int count = 0;
-			for (ObjectInstance oi : activeObjects) {
-				count += ObjectFunctions.countStackValues(gameInstance, oi);
-			}
-			player.actionString = "Value: " + String.valueOf(count);
-		} else if (e.getKeyCode() == KeyEvent.VK_V) {
+		if (!(isLeftMouseKeyHold || isRightMouseKeyHold || isMiddleMouseKeyHold)) {
 			if (!mouseInPrivateArea) {
-				for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
-					if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, oi), ObjectFunctions.getStackBottom(gameInstance, oi))) {
-						ObjectFunctions.displayStack(id, gameInstance, player, oi, (int) (oi.getWidth(player.id) * cardOverlap));
-					} else {
-						if (activeObjects.size() == 1) {
-							ObjectFunctions.collectStack(id, gameInstance, player, activeObjects.get(0));
-						} else {
-							ObjectFunctions.collectStack(id, gameInstance, player, oi);
-						}
-					}
-				}
+				setActiveObjects();
 			} else {
-				ObjectFunctions.getOwnedStack(gameInstance, player, ial);
-				if (ial.size() > 0) {
-					ObjectInstance oi = gameInstance.getObjectInstanceById(ial.getI(0));
-					if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, oi), ObjectFunctions.getStackBottom(gameInstance, oi))) {
-						ObjectFunctions.displayStack(id, gameInstance, player, oi, (int) (oi.getWidth(player.id) * cardOverlap));
-					} else {
-						if (activeObjects.size() == 1) {
-							ObjectFunctions.collectStack(id, gameInstance, player, activeObjects.get(0));
+				activeObjects.clear();
+				if (activeObject != null) {
+					activeObjects.add(activeObject);
+				}
+			}
+
+			if (e.getKeyCode() == KeyEvent.VK_C && !shiftDown) {
+				int count = 0;
+				for (ObjectInstance oi : activeObjects) {
+					count += ObjectFunctions.countStack(gameInstance, oi);
+				}
+				player.actionString = "Object Number: " + String.valueOf(count);
+			} else if (e.getKeyCode() == KeyEvent.VK_F && !shiftDown) {
+				for (ObjectInstance oi : activeObjects) {
+					ObjectFunctions.flipTokenObject(id, gameInstance, player, oi);
+					ObjectFunctions.rollTheDice(id, gameInstance, player, oi);
+				}
+			} else if (shiftDown && e.getKeyCode() == KeyEvent.VK_F) {
+				for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
+					ObjectFunctions.flipTokenStack(id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, oi));
+				}
+			} else if (e.getKeyCode() == KeyEvent.VK_S) {
+				for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
+					ObjectFunctions.shuffleStack(id, gameInstance, player, oi);
+				}
+
+			} else if (shiftDown && e.getKeyCode() == KeyEvent.VK_C) {
+				int count = 0;
+				for (ObjectInstance oi : activeObjects) {
+					count += ObjectFunctions.countStackValues(gameInstance, oi);
+				}
+				player.actionString = "Value: " + String.valueOf(count);
+			} else if (e.getKeyCode() == KeyEvent.VK_V) {
+				if (!mouseInPrivateArea) {
+					for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
+						if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, oi), ObjectFunctions.getStackBottom(gameInstance, oi))) {
+							ObjectFunctions.displayStack(id, gameInstance, player, oi, (int) (oi.getWidth(player.id) * cardOverlap));
 						} else {
-							ObjectFunctions.collectStack(id, gameInstance, player, oi);
+							if (activeObjects.size() == 1) {
+								ObjectFunctions.collectStack(id, gameInstance, player, activeObjects.get(0));
+							} else {
+								ObjectFunctions.collectStack(id, gameInstance, player, oi);
+							}
+						}
+					}
+				} else {
+					ObjectFunctions.getOwnedStack(gameInstance, player, ial);
+					if (ial.size() > 0) {
+						ObjectInstance oi = gameInstance.getObjectInstanceById(ial.getI(0));
+						if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, oi), ObjectFunctions.getStackBottom(gameInstance, oi))) {
+							ObjectFunctions.displayStack(id, gameInstance, player, oi, (int) (oi.getWidth(player.id) * cardOverlap));
+						} else {
+							if (activeObjects.size() == 1) {
+								ObjectFunctions.collectStack(id, gameInstance, player, activeObjects.get(0));
+							} else {
+								ObjectFunctions.collectStack(id, gameInstance, player, oi);
+							}
 						}
 					}
 				}
-			}
-		} else if (e.getKeyCode() == KeyEvent.VK_D && shiftDown) {
-			for (ObjectInstance oi : activeObjects) {
-				ObjectFunctions.dropObjects(this, gameInstance, player, oi);
-			}
-
-		}else if (e.getKeyCode() == KeyEvent.VK_D && !shiftDown) {
-			ObjectFunctions.dropObject(this, gameInstance, player, activeObject);
-		}else if (e.getKeyCode() == KeyEvent.VK_P && !shiftDown) {
-			ObjectFunctions.playObject(this, gameInstance, player, activeObject);
-		}else if (e.getKeyCode() == KeyEvent.VK_ENTER){
-
-			int place = 0;
-			for (int i = 0; i < gameInstance.getPlayerNumber(); ++i)
-			{
-				if (gameInstance.getPlayerByIndex(i).id < player.id)
-				{
-					++place;
-				}
-			}
-			sitDown(place);
-		}
-
-
-		if(!mouseInPrivateArea) {
-			if (e.getKeyCode() == KeyEvent.VK_R) {
-				for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
-					ObjectFunctions.rotateStep(id, gameInstance, player, oi, ial);
-				}
-				repaint();
-			} else if (e.getKeyCode() == KeyEvent.VK_R && shiftDown) {
+			} else if (e.getKeyCode() == KeyEvent.VK_D && shiftDown) {
 				for (ObjectInstance oi : activeObjects) {
-					ObjectFunctions.removeStackRelations(id, gameInstance, player, oi);
+					ObjectFunctions.dropObjects(this, gameInstance, player, oi);
 				}
-			} else if (e.getKeyCode() == KeyEvent.VK_T) {
-				for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
-					ObjectFunctions.takeObjects(this, gameInstance, player, oi);
-					oi.state.isActive = false;
+			} else if (e.getKeyCode() == KeyEvent.VK_D && !shiftDown) {
+				ObjectFunctions.dropObject(this, gameInstance, player, activeObject);
+			} else if (e.getKeyCode() == KeyEvent.VK_P && !shiftDown) {
+				if (activeObject.state.inPrivateArea) {
+					ObjectFunctions.playObject(this, gameInstance, player, activeObject);
 				}
-				selectedObjects.clear();
-				activeObjects.clear();
-			} else if (e.getKeyCode() == KeyEvent.VK_M && shiftDown) {
-				for (ObjectInstance oi : activeObjects) {
-					ObjectFunctions.getAllObjectsOfGroup(id, gameInstance, player, oi);
+			} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+
+				int place = 0;
+				for (int i = 0; i < gameInstance.getPlayerNumber(); ++i) {
+					if (gameInstance.getPlayerByIndex(i).id < player.id) {
+						++place;
+					}
 				}
-			} else if (e.getKeyCode() == KeyEvent.VK_M && !shiftDown) {
-				ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
-			}else if (controlDown && !boardTranslation){
-				for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)){
-					if(!scaledObjects.contains(oi.id)){
-						scaledObjects.add(oi.id);
-						savedScalingFactors.add(oi.scale);
-						oi.scale *= scalingFactor;
+				sitDown(place);
+			}
+
+
+			if (!mouseInPrivateArea) {
+				if (e.getKeyCode() == KeyEvent.VK_R) {
+					for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
+						ObjectFunctions.rotateStep(id, gameInstance, player, oi, ial);
+					}
+					repaint();
+				} else if (e.getKeyCode() == KeyEvent.VK_R && shiftDown) {
+					for (ObjectInstance oi : activeObjects) {
+						ObjectFunctions.removeStackRelations(id, gameInstance, player, oi);
+					}
+				} else if (e.getKeyCode() == KeyEvent.VK_T) {
+					for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
+						ObjectFunctions.takeObjects(this, gameInstance, player, oi);
+						oi.state.isActive = false;
+					}
+					selectedObjects.clear();
+					activeObjects.clear();
+				} else if (e.getKeyCode() == KeyEvent.VK_M && shiftDown) {
+					for (ObjectInstance oi : activeObjects) {
+						ObjectFunctions.getAllObjectsOfGroup(id, gameInstance, player, oi);
+					}
+				} else if (e.getKeyCode() == KeyEvent.VK_M && !shiftDown) {
+					ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
+				} else if (controlDown && !boardTranslation) {
+					for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
+						if (!scaledObjects.contains(oi.id)) {
+							scaledObjects.add(oi.id);
+							savedScalingFactors.add(oi.scale);
+							oi.scale *= scalingFactor;
+						}
 					}
 				}
 			}
@@ -675,6 +677,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	@Override
 	public void keyReleased(KeyEvent e) {
 		--keyPressed;
+
 		if (!mouseInPrivateArea) {
 			if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
 				for (int i = 0; i < scaledObjects.size(); i++) {
@@ -684,13 +687,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				savedScalingFactors.clear();
 				scalingFactor = originalScalingFactor;
 			} else {
-				if (!isLeftMouseKeyHold) {
-					if (activeObject != null) {
-						activeObject.state.isActive = false;
-					}
-					activeObject = null;
-				}
-				if (!isRightMouseKeyHold) {
+				if (!(isLeftMouseKeyHold || isRightMouseKeyHold || isMiddleMouseKeyHold) && activeObject == null) {
 					if (activeObject != null) {
 						activeObject.state.isActive = false;
 					}

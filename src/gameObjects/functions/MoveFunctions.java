@@ -23,7 +23,7 @@ public class MoveFunctions {
         /* Drag when left mouse down or middle mouse button is down*/
          if((SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0)) && activeObject != null && activeObject.go instanceof GameObjectToken) {
              /*Remove dragged object from stack if middle mouse button is not held*/
-             if (!(SwingUtilities.isMiddleMouseButton(arg0) &&!gamePanel.privateArea.containsScreenCoordinates(arg0.getX(), arg0.getY())) && !(SwingUtilities.isLeftMouseButton(arg0) && arg0.isShiftDown()) && !selectedDrag) {
+             if (!(SwingUtilities.isMiddleMouseButton(arg0) && !gamePanel.privateArea.containsScreenCoordinates(arg0.getX(), arg0.getY())) && !(SwingUtilities.isLeftMouseButton(arg0) && arg0.isShiftDown()) && !selectedDrag) {
                  ObjectFunctions.removeObject(gamePanel.id, gameInstance, player, activeObject);
              }
              /*Remove top N dragged objects from stack if middle mouse button is held*/

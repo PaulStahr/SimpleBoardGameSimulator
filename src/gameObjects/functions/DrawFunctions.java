@@ -150,7 +150,7 @@ public class DrawFunctions {
     public static void drawSelection(GamePanel gamePanel, Graphics g, Player player){
         Graphics2D g2 = (Graphics2D)g;
         g2.setTransform(new AffineTransform());
-        if (gamePanel.activeObject == null  && !gamePanel.mouseInPrivateArea){
+        if (gamePanel.selectWidth > 0 && gamePanel.selectHeight >0 && gamePanel.activeObject == null  && !gamePanel.mouseInPrivateArea){
             g.setColor(player.color);
             g.drawRect(min(gamePanel.beginSelectPosScreenX, gamePanel.beginSelectPosScreenX+gamePanel.selectWidth),min(gamePanel.beginSelectPosScreenY, gamePanel.beginSelectPosScreenY+gamePanel.selectHeight), abs(gamePanel.selectWidth), abs(gamePanel.selectHeight));
         }
