@@ -391,10 +391,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    		{
 					    		switch(gs.type)
 					    		{
-					    			case GameStructureEditAction.EDIT_BACKGROUND: objOut.writeUnshared(gi.game.getImageKey(gi.game.background));break;
-									case GameStructureEditAction.EDIT_GAME_NAME: objOut.writeUnshared(gi.game.name);break;
-									case GameStructureEditAction.EDIT_SESSION_NAME: objOut.writeUnshared(gi.name);break;
-									case GameStructureEditAction.EDIT_SESSION_PASSWORD:objOut.writeUnshared(gi.password);break;
+					    			case GameStructureEditAction.EDIT_BACKGROUND: 		objOut.writeUnshared(gi.game.getImageKey(gi.game.background));break;
+					    			case GameStructureEditAction.EDIT_TABLE_RADIUS: 	objOut.writeFloat(gi.tableRadius);break;
+									case GameStructureEditAction.EDIT_GAME_NAME: 		objOut.writeUnshared(gi.game.name);break;
+									case GameStructureEditAction.EDIT_SESSION_NAME: 	objOut.writeUnshared(gi.name);break;
+									case GameStructureEditAction.EDIT_SESSION_PASSWORD:	objOut.writeUnshared(gi.password);break;
 									case AddObjectAction.ADD_IMAGE:
 									{
 										Map.Entry<String, BufferedImage> entry = gi.game.getImage(((AddObjectAction)gs).objectId);
@@ -586,6 +587,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					{
 						switch(action.type)
 						{
+							case GameStructureEditAction.EDIT_TABLE_RADIUS: gi.tableRadius = objIn.readFloat();break;
 							case GameStructureEditAction.EDIT_BACKGROUND:gi.game.background = gi.game.images.get(objIn.readObject());break;
 							case GameStructureEditAction.EDIT_GAME_NAME:gi.game.name = (String)objIn.readObject();break;
 							case GameStructureEditAction.EDIT_SESSION_NAME:gi.name = (String)objIn.readObject();break;
