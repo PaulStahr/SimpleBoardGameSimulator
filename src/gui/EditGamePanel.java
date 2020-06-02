@@ -161,6 +161,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  		private final JTextField textFieldName = new JTextField();
  		private final JLabel labelBackground = new JLabel("Background");
  		private final JComboBox<String> comboBoxBackground = new JComboBox<String>();
+ 		private final JLabel labelTableRadius = new JLabel("Table Radius");
+ 		private final JTextField textFieldTableRadius = new JTextField();
  		private final JLabel labelPassword = new JLabel("Password");
  		private final JTextField textFieldPassword = new JTextField();
 		//private final JButton buttonResetAll = new JButton("Reset All");
@@ -172,17 +174,19 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  			
  			layout.setHorizontalGroup(
  					layout.createSequentialGroup()
- 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelBackground).addComponent(labelPassword))
- 					.addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(comboBoxBackground).addComponent(textFieldPassword)));
+ 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelBackground).addComponent(labelTableRadius).addComponent(labelPassword))
+ 					.addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(comboBoxBackground).addComponent(textFieldTableRadius).addComponent(textFieldPassword)));
  			layout.setVerticalGroup(
  					layout.createSequentialGroup()
  					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName))
  					.addGroup(layout.createParallelGroup().addComponent(labelBackground).addComponent(comboBoxBackground))
+ 					.addGroup(layout.createParallelGroup().addComponent(labelTableRadius).addComponent(textFieldTableRadius))
  					.addGroup(layout.createParallelGroup().addComponent(labelPassword).addComponent(textFieldPassword)));
  			
  			textFieldName.getDocument().addDocumentListener(this);
 			comboBoxBackground.addItemListener(this);
 			textFieldPassword.getDocument().addDocumentListener(this);
+			textFieldTableRadius.getDocument().addDocumentListener(this);
  		}
 
 		public void update() {
@@ -196,6 +200,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			isUpdating = true;
 			textFieldName.setText(gi.name);
+			textFieldTableRadius.setText(Float.toString(gi.tableRadius));
 			JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
 			comboBoxBackground.setSelectedItem(gi.game.getImageKey(gi.game.background));
 			textFieldPassword.setText(gi.password);
@@ -237,6 +242,13 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				gi.name = textFieldName.getText();
 				isUpdating = true;
 				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_SESSION_NAME));
+				isUpdating = false;
+			}
+			else if (source == textFieldTableRadius.getDocument())
+			{
+				gi.tableRadius = Float.parseFloat(textFieldTableRadius.getText());
+				isUpdating = true;
+				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_TABLE_RADIUS));
 				isUpdating = false;
 			}
 			else if (source == textFieldPassword.getDocument())
@@ -361,6 +373,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	}
 	
 	public class ObjectEditPanel extends JPanel implements DocumentListener, ItemListener, LanguageChangeListener{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = -1555265079401333395L;
 		private final JLabel labelName = new JLabel();
 		private final JTextField textFieldName = new JTextField();
 		private final JLabel labelWidth = new JLabel();

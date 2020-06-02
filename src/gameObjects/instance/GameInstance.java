@@ -35,7 +35,7 @@ public class GameInstance {
 	private final ArrayList<GameAction> actions = new ArrayList<>();
 	private final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
 	private long maxDrawValue = 0;
-
+	public float tableRadius = 10;
 	
 	public static interface GameChangeListener
 	{
@@ -183,18 +183,37 @@ public class GameInstance {
 			if (structureAction instanceof GameStructureObjectEditAction)
 			{
 				GameStructureObjectEditAction gsoea = (GameStructureObjectEditAction)structureAction;
-				if (gsoea.type == GameStructureEditAction.REMOVE_PLAYER)
-				{
-					
-					for (int i = 0; i < objects.size(); ++i)
+				switch (gsoea.type) {
+					case GameStructureEditAction.REMOVE_PLAYER:
 					{
-						if (objects.get(i).state.owner_id == gsoea.objectId)
+						
+						for (int i = 0; i < objects.size(); ++i)
 						{
-							objects.get(i).state.owner_id = -1;
-							objects.get(i).state.inPrivateArea = false;
+							if (objects.get(i).state.owner_id == gsoea.objectId)
+							{
+								objects.get(i).state.owner_id = -1;
+								objects.get(i).state.inPrivateArea = false;
+							}
 						}
+						players.remove(getPlayerById(gsoea.objectId));
+						break;
 					}
-					players.remove(getPlayerById(gsoea.objectId));
+					case GameStructureEditAction.REMOVE_OBJECT_INSTANCE:
+					{
+						ObjectInstance oi = getObjectInstanceById(gsoea.objectId);
+						if (oi.state.aboveInstanceId != -1)
+						{
+							getObjectInstanceById(oi.state.aboveInstanceId).state.belowInstanceId = oi.state.belowInstanceId;
+							oi.state.aboveInstanceId = -1;
+						}
+						if (oi.state.belowInstanceId != -1)
+						{
+							getObjectInstanceById(oi.state.belowInstanceId).state.aboveInstanceId = oi.state.aboveInstanceId;
+							oi.state.belowInstanceId = -1;
+						}
+						objects.remove(gsoea.objectId);
+						break;
+					}
 				}
 			}
 		}
@@ -220,9 +239,7 @@ public class GameInstance {
 	}
 
 	public void remove(int source, ObjectInstance objectInstance) {
-		objects.remove(objectInstance);
 		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_OBJECT_INSTANCE, objectInstance.id));
-		//TODO clean up references
 	}
 
 	public void addChangeListener(GameChangeListener listener) {
@@ -318,15 +335,6 @@ public class GameInstance {
 	}
 
 	public void remove(int source, Player player) {
-		for (int i = 0; i < objects.size(); ++i)
-		{
-			if (objects.get(i).state.owner_id == player.id)
-			{
-				objects.get(i).state.owner_id = -1;
-				objects.get(i).state.inPrivateArea = false;
-				update(new GameObjectInstanceEditAction(source, player, objects.get(i)));
-			}
-		}
 		players.remove(player);
 		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_PLAYER, player.id));
 	}
