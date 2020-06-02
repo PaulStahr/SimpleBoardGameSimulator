@@ -1,6 +1,6 @@
 package gui;
 
-import static gameObjects.functions.DrawFunctions.drawBoard;
+import static gameObjects.functions.DrawFunctions.drawBackground;
 import static gameObjects.functions.DrawFunctions.drawObjectsFromList;
 import static gameObjects.functions.DrawFunctions.drawPlayerPositions;
 import static gameObjects.functions.DrawFunctions.drawPrivateArea;
@@ -212,7 +212,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	{
 		super.paintComponent(g);
 		//Draw the board and the table
-		drawBoard(this, g, gameInstance);
+		drawBackground(this, g, gameInstance);
 		Graphics2D g2 = (Graphics2D)g;
         RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHints(rh);
@@ -638,7 +638,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 
 			if (!mouseInPrivateArea) {
-				if (e.getKeyCode() == KeyEvent.VK_R) {
+				if (e.getKeyCode() == KeyEvent.VK_R && !shiftDown) {
 					for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
 						ObjectFunctions.rotateStep(id, gameInstance, player, oi, ial);
 					}

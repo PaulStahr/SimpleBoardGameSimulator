@@ -1,6 +1,6 @@
 package gameObjects.functions;
 
-import static gameObjects.functions.ObjectFunctions.isStackCollected;
+import static gameObjects.functions.ObjectFunctions.*;
 import static java.lang.Integer.min;
 import static java.lang.Math.abs;
 import static java.lang.Math.sqrt;
@@ -29,7 +29,7 @@ import util.data.IntegerArrayList;
 public class DrawFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
 
-    public static void drawBoard(GamePanel gamePanel, Graphics g, GameInstance gameInstance){
+    public static void drawBackground(GamePanel gamePanel, Graphics g, GameInstance gameInstance){
         g.clearRect(0, 0, gamePanel.getWidth(), gamePanel.getHeight());
         //TODO Florian:sometimes images are drawn twice (the active object?)
         g.drawString(String.valueOf(gamePanel.mouseWheelValue), gamePanel.mouseScreenX, gamePanel.mouseScreenY);
@@ -244,8 +244,8 @@ public class DrawFunctions {
                 stackList.clear();
                 stackList.add(oiId);
             }
-            for (int id : stackList) {
-                drawObject(gamePanel, g, gameInstance, gameInstance.getObjectInstanceById(id), player, zooming, 5);
+            for (int idx = stackList.size() - 1 ; idx >= 0; --idx) {
+                drawObject(gamePanel, g, gameInstance, gameInstance.getObjectInstanceById(stackList.get(idx)), player, zooming, 5);
             }
         }
     }
@@ -282,10 +282,10 @@ public class DrawFunctions {
                 g2.scale(gamePanel.privateArea.zooming/(sqrt(g2.getTransform().getDeterminant())), gamePanel.privateArea.zooming/(sqrt(g2.getTransform().getDeterminant())));
                 g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth()  * 0.5), -(int) (objectInstance.scale * img.getHeight()  * 0.5), (int) (objectInstance.scale * img.getWidth() ), (int) (objectInstance.scale * img.getHeight() ), null);
             }
-            Stroke stroke = new BasicStroke(borderWidth);
-            //Draw Border around objects
-            g2.setStroke(stroke);
 
+            //Draw Border around objects
+            Stroke stroke = new BasicStroke(borderWidth);
+            g2.setStroke(stroke);
             if (objectInstance.state.owner_id != -1) {
                     Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
                     g2.setColor(playerOwner.color);
@@ -301,7 +301,16 @@ public class DrawFunctions {
 
             if (objectInstance.go instanceof GameObjectToken) {
                 if (objectInstance.state.isActive || gamePanel.selectedObjects.contains(objectInstance.id) || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
-                    g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth/2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth/2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth/2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
+                    if (isStackCollected(gameInstance, objectInstance)) {
+                        g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth / 2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth / 2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth / 2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
+                    }
+                    else {
+                        if (isStackTop(objectInstance)) {
+                            g2.drawLine(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth / 2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth / 2, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth / 2, (int) (objectInstance.scale * img.getHeight() * zooming * 0.5) + borderWidth / 2);
+                        } else if (isStackBottom(objectInstance)) {
+                            g2.drawLine((int) (objectInstance.scale * img.getWidth() * zooming * 0.5) + borderWidth / 2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth / 2, (int) (objectInstance.scale * img.getWidth() * zooming * 0.5) + borderWidth / 2, (int) (objectInstance.scale * img.getHeight() * zooming * 0.5) + borderWidth / 2);
+                        }
+                    }
                 }
             }
             else{

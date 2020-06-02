@@ -1,8 +1,5 @@
 package gameObjects.functions;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.max;
-
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -26,6 +23,8 @@ import gui.GamePanel;
 import main.Player;
 import util.Pair;
 import util.data.IntegerArrayList;
+
+import static java.lang.Math.*;
 
 public class ObjectFunctions {
     //private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -536,14 +535,15 @@ public class ObjectFunctions {
                         int aboveId = currentObject.state.aboveInstanceId;
                         currentObject.state.aboveInstanceId = currentObject.state.belowInstanceId;
                         currentObject.state.belowInstanceId = aboveId;
-                        if (i <= objectStack.size() / 2) {
+                        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject));
+                        if (false && i <= objectStack.size() / 2) {
                             int posX = currentObject.state.posX;
                             int posY = currentObject.state.posY;
+                            int posXNew = gameInstance.getObjectInstanceById(objectStack.get(size - i)).state.posX;
+                            int posYNew = gameInstance.getObjectInstanceById(objectStack.get(size - i)).state.posY;
 
-                            currentObject.state.posX = gameInstance.getObjectInstanceById(objectStack.get(size - i)).state.posX;
-                            currentObject.state.posY = gameInstance.getObjectInstanceById(objectStack.get(size - i)).state.posY;
-                            gameInstance.getObjectInstanceById(objectStack.get(size - i)).state.posX = posX;
-                            gameInstance.getObjectInstanceById(objectStack.get(size - i)).state.posY = posY;
+                            moveObjectTo(gamePanelId,gameInstance,player,currentObject, posXNew, posYNew);
+                            moveObjectTo(gamePanelId,gameInstance,player,gameInstance.getObjectInstanceById(objectStack.get(size - i)), posX, posY);
                         }
                     }
                     flipTokenObject(gamePanelId, gameInstance, player, currentObject);
@@ -915,6 +915,7 @@ public class ObjectFunctions {
             removeFromOwnStack(gamePanel, gameInstance, player, objectInstance.id);
             ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, objectInstance);
         }
+        objectInstance.state.rotation = 0;
         moveObjectTo(gamePanel.id, gameInstance,player, objectInstance, (int) gamePanel.table.getTableCenter().getX(), (int) gamePanel.table.getTableCenter().getY());
         flipTokenObject(gamePanel.id, gameInstance, player, objectInstance);
     }

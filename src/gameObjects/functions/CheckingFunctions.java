@@ -141,7 +141,4 @@ public class CheckingFunctions {
 		}
 		return write == incoming.length;
 	}
-	
-
-
 }
