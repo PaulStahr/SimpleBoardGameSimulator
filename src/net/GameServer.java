@@ -10,7 +10,16 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
@@ -334,7 +343,7 @@ public class GameServer implements Runnable {
 			    	case NetworkString.CONNECT:
 			    	{
 			    		GameInstance gi = getGameInstance(split.get(1));
-			    		if (!"".equals(gi.password) && !split.get(2).equals(gi.password))
+			    		if (gi.password.length() != 0 && !split.get(2).equals(gi.password))
 			    		{
 			    			ObjectOutputStream out = new ObjectOutputStream(output);
 			    			out.writeObject("Wrong Password");
@@ -343,9 +352,26 @@ public class GameServer implements Runnable {
 			    			break;
 			    		}
 			    		AsynchronousGameConnection asc;
+			    		int bs = 0;
+			    		if (gi.password.length() != 0)
+		    			{
+			    			logger.debug("Connect to Object Input");
+			    			try {
+			    				final KeyGenerator kg = KeyGenerator.getInstance("AES");
+		    		            kg.init(new SecureRandom(gi.password.getBytes()));
+		    		            final SecretKey key = kg.generateKey();
+
+		    		            final Cipher c = Cipher.getInstance("AES");
+		    		            c.init(Cipher.ENCRYPT_MODE, key);
+		    		            output = new CipherOutputStream(output, c);
+		    		            bs = 512;
+							} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+								logger.error("Can't create encrypted stream",e);
+							}
+		    			}
+			    		
 			    		if (input instanceof ObjectInputStream)
 			    		{
-			    			logger.debug("Connect to Object Input");
 			    			asc = new AsynchronousGameConnection(gi, (ObjectInputStream)input, output);
 			    		}
 			    		else
@@ -353,6 +379,7 @@ public class GameServer implements Runnable {
 			    			logger.debug("Connect to Stream Input");
 			    			asc = new AsynchronousGameConnection(gi, input, output);
 				    	}
+			    		asc.blocksize = bs;
 			    		input = null;
 			    		output = null;
 			    		client = null;
