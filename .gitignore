@@ -13,3 +13,5 @@ Server/
 doc/documentation.synctex.gz
 doc/documentation.log
 doc/documentation.aux
+replay_pid*.log
+hs_err_pid*.log
