@@ -7,8 +7,17 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherInputStream;
+import javax.crypto.KeyGenerator;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
@@ -184,7 +193,23 @@ public class SynchronousGameClientLobbyConnection {
 	    	strB.append(' ').append(password);
     	}
 	    output = writeCommand(strB, output);
-	    return new AsynchronousGameConnection(gi, server.getInputStream(), output);
+	    
+	    if (password != null && password.length() != 0)
+	    {
+			try {
+				final KeyGenerator kg = KeyGenerator.getInstance("AES");
+	            kg.init(new SecureRandom(password.getBytes()));
+	            final SecretKey key = kg.generateKey();
+	
+	            final Cipher c = Cipher.getInstance("AES");
+	            c.init(Cipher.ENCRYPT_MODE, key);
+	            CipherInputStream input = new CipherInputStream(server.getInputStream(), c);
+	    	    return new AsynchronousGameConnection(gi, input, output);
+			} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+				logger.error("Can't create encrypted stream",e);
+			}
+	    }
+	    return new AsynchronousGameConnection(gi, server.getInputStream(), output);	    	
 	}
 
 	public GameInstance getGameInstance(String gameInstanceId) throws UnknownHostException, IOException, JDOMException

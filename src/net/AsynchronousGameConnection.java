@@ -61,6 +61,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	private long otherToThisOffset = Long.MAX_VALUE / 10;
 	private long otherTimingOffset = Long.MIN_VALUE;
 	private boolean stop = false;
+	public int blocksize = 0;
 	
 	public int getInEvents()
 	{
@@ -193,6 +194,14 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		}
 	}
 	
+	static class CommandScip implements Serializable
+	{
+		int bytes;
+		public CommandScip(int bytes) {
+			this.bytes = bytes;
+		}
+	}
+	
 	static class TimingOffsetChanged implements Serializable{
 		
 		/**
@@ -229,6 +238,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 			if (outputObject == null)
 			{
 				try {
+					if (blocksize  != 0)
+					{
+						objOut.writeUnshared(new CommandScip(blocksize));
+						for (int i = 0; i < blocksize; ++i){objOut.writeByte(0);}
+					}
 					objOut.flush();
 					output.flush();
 				} catch (IOException e1) {
@@ -476,6 +490,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				{
 					otherTimingOffset = ((TimingOffsetChanged) inputObject).offset;
 					continue;
+				}
+				if (inputObject instanceof CommandScip)
+				{
+					for (int i = ((CommandScip)inputObject).bytes; i != 0; --i)
+					{
+						objIn.readByte();
+					}
 				}
 				if (inputObject instanceof GameAction)
 				{
