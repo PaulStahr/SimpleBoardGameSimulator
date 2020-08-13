@@ -14,6 +14,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -38,6 +39,7 @@ import gui.minigames.TetrisGameInstance.TetrisGameEvent;
 import io.GameIO;
 import main.Player;
 import util.StringUtils;
+import util.data.UniqueObjects;
 import util.io.StreamUtil;
 import util.stream.CappedInputStreamWrapper;
 
@@ -62,6 +64,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	private long otherTimingOffset = Long.MIN_VALUE;
 	private boolean stop = false;
 	public int blocksize = 0;
+	private final Random random = new Random();
+	private byte[] randBytes = UniqueObjects.EMPTY_BYTE_ARRAY;
 	
 	public int getInEvents()
 	{
@@ -220,7 +224,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	{
 		ArrayList<String> split = new ArrayList<>();
 		StringBuilder strB = new StringBuilder();
-		//PrintWriter writer = new PrintWriter(output, true);
 		ObjectOutputStream objOut = null;
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 		try {
@@ -241,7 +244,19 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					if (blocksize  != 0)
 					{
 						objOut.writeUnshared(new CommandScip(blocksize));
-						for (int i = 0; i < blocksize; ++i){objOut.writeByte(0);}
+						if (random == null)//TODO write only as much as needed
+						{
+							for (int i = 0; i < blocksize; ++i){objOut.writeByte(0);}
+						}
+						else
+						{
+							if (randBytes.length < blocksize)
+							{
+								randBytes = new byte[blocksize];
+							}
+							random.nextBytes(randBytes);
+							for (int i = 0; i < blocksize; ++i){objOut.writeByte(randBytes[i]);}							
+						}
 					}
 					objOut.flush();
 					output.flush();
