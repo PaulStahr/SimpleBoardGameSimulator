@@ -149,6 +149,11 @@ public class GameInstance {
 		return this.objects.size();
 	}
 	
+	public GameObject getObjectByIndex(int index)
+	{
+		return this.game.objects.get(index);
+	}
+	
 	public int getHash()
 	{
 		int result = 0;

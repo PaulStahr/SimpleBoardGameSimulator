@@ -187,6 +187,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			comboBoxBackground.addItemListener(this);
 			textFieldPassword.getDocument().addDocumentListener(this);
 			textFieldTableRadius.getDocument().addDocumentListener(this);
+			tableModelImages.addTableModelListener(EditGamePanel.this);
+			tableModelGameObjects.addTableModelListener(EditGamePanel.this);
+			tableModelGameObjectInstances.addTableModelListener(EditGamePanel.this);
+			
  		}
 
 		public void update() {
@@ -310,7 +314,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		{
 			ButtonColumn.TableButtonActionEvent event = (ButtonColumn.TableButtonActionEvent)ae;
 			Object tableSource = event.getSource();
-			int col = event.getCol();
 			int row = event.getRow();
 			ButtonColumn button = event.getButton();
 			if (tableSource== tableModelGameObjectInstances)
@@ -544,6 +547,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 
 	@Override
 	public void tableChanged(TableModelEvent event) {
+    	if (!EventQueue.isDispatchThread())
+    	{
+    		throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");
+    	}
 		if (isUpdating)
 		{
 			return;
@@ -573,7 +580,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 					}
 				}
 			}
-		}else if (source == tableModelImages)
+		}
+		else if (source == tableModelImages)
 		{
 			for (int col = colBegin; col < colEnd; ++col)
 			{
@@ -587,10 +595,48 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 					}
 				}
 			}
-		}else if (source == tableModelGameObjectInstances)
+		}
+		else if (source == tableModelGameObjectInstances)
 		{
-		}else if (source == tableModelGameObjects)
+			for (int col = colBegin; col < colEnd; ++col)
+			{
+				GameObjectInstanceColumnType type = GameObjectInstanceColumnType.get(col);
+				for (int row = rowBegin; row < rowEnd; ++row)
+				{
+					ObjectInstance instance = gi.getObjectInstanceByIndex(row);
+					switch (type) {
+						case NAME: instance.go.uniqueName = tableModelGameObjectInstances.getValueAt(row, col).toString();break;
+						case OWNER:instance.state.owner_id = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
+						case ABOVE:instance.state.aboveInstanceId = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
+						case BELOW:instance.state.belowInstanceId = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
+						default:break;
+					}
+					if (type == GameObjectInstanceColumnType.NAME)
+					{
+						gi.update(new GameObjectEditAction(-1, instance.go));
+					}
+					else
+					{
+						gi.update(new GameObjectInstanceEditAction(-1, player, instance));
+					}
+				}
+			}
+		}
+		else if (source == tableModelGameObjects)
 		{
+			for (int col = colBegin; col < colEnd; ++col)
+			{
+				GameObjectColumnType type = GameObjectColumnType.get(col);
+				for (int row = rowBegin; row < rowEnd; ++row)
+				{
+					GameObject go = gi.getObjectByIndex(row);
+					switch (type)
+					{
+						case NAME: go.uniqueName = tableModelGameObjects.getValueAt(row, col).toString(); break;
+						default: break;
+					}
+				}
+			}
 		}
 		isUpdating = false;
 	}
