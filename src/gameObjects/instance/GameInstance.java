@@ -294,6 +294,14 @@ public class GameInstance {
 		}
 	}
 	
+	private void update(ArrayList<ObjectInstance> list, int begin, int end, Player player)
+	{
+		for (int i = begin; i < end; ++i)
+		{
+			update(new GameObjectInstanceEditAction(-1, player, list.get(i)));
+		}
+	}
+	
 	/**
 	 * Collects all cards of a given player and makes a new stack out of it. Only the aboveId is considered. If there are more than one stack, then these will be merged, keeping the parial order. Circles will be put in at random order
 	 * @param player_id
@@ -316,10 +324,7 @@ public class GameInstance {
 			read = Math.max(write, read + 1);
 		}
 		makeStack(tmp, 0, tmp.size());
-		for (int i = 0; i < tmp.size(); ++i)
-		{
-			update(new GameObjectInstanceEditAction(-1, player, tmp.get(i)));
-		}
+		update(tmp, 0, tmp.size(), player);
 		tmp.clear();
 		getOwnedPrivateObjects(player_id, false, tmp);
 		tmp.sort(ObjectInstance.ID_COMPARATOR);
@@ -333,10 +338,12 @@ public class GameInstance {
 			{
 				write = CheckingFunctions.packBelongingObjects(incoming, write, read, tmp);
 				makeStack(tmp, oldWrite, write);
+				update(tmp, oldWrite, write, player);
 			}
 			read = Math.max(write, read + 1);
 		}
 		makeStack(tmp, write, tmp.size());
+		update(tmp, write, tmp.size(), player);
 	}
 
 	public void remove(int source, Player player) {

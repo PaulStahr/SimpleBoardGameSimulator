@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.net.SocketException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -496,7 +497,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}catch(OptionalDataException e)
 				{
 					logger.error("Can't extract object", e);
-					if (stopOnError )
+					if (stopOnError)
 					{
 						return;
 					}
@@ -786,7 +787,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}
 			}catch(Exception e) {
 				logger.error("Exception in input loop", e);
-				if (e instanceof EOFException)
+				if (e instanceof EOFException || (e instanceof SocketException && e.getMessage().equals("Connection reset")))
 				{
 					return;
 				}

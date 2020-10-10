@@ -77,7 +77,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		}
 
 		@Override
-		public void update() {
+		public synchronized void update() {
 			boolean playerConsistent = CheckingFunctions.checkPlayerConsistency(gamePanel.player.id, tmp, gi); 
 			menuItemStatusPlayerConsistency.setEnabled(!playerConsistent);
 			boolean gaiaConsistent = CheckingFunctions.checkPlayerConsistency(-1, tmp, gi);
@@ -85,7 +85,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 			menuStatus.setForeground(playerConsistent && gaiaConsistent ? Color.BLACK : Color.RED);
 		}
 	}
-	GameWindowUpdater gww = new GameWindowUpdater();
+	private final GameWindowUpdater gww = new GameWindowUpdater();
 	
 	private static final Logger logger = LoggerFactory.getLogger(GameWindow.class);
 	
@@ -215,10 +215,12 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		else if (source == menuItemStatusPlayerConsistency)
 		{
 			gi.repairPlayerConsistency(gamePanel.player.id, gamePanel.player, new ArrayList<>());
+			gww.update();
 		}
 		else if (source == menuItemStatusGaiaConsistency)
 		{
 			gi.repairPlayerConsistency(-1, gamePanel.player, new ArrayList<>());
+			gww.update();
 		}
 	}
 
