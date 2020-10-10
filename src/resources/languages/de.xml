@@ -81,4 +81,5 @@
 <drop_on_board>Auf das board ablegen</drop_on_board>
 <sit_down>An den Tisch setzen</sit_down>
 <arrow_keys>Pfeiltasten</arrow_keys>
+<invert_rotation>Rotation Invertieren</invert_rotation>
 </xml>

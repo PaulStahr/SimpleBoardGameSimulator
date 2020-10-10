@@ -89,4 +89,5 @@
 <drop_on_board>Drop on board</drop_on_board>
 <sit_down>Sit down</sit_down>
 <arrow_keys>Arrow keys</arrow_keys>
+<invert_rotation>Invert Rotation</invert_rotation>
 </xml>

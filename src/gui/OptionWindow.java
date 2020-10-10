@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -19,11 +20,17 @@ import gui.Language.LanguageSummary;
 import util.JFrameUtils;
 
 public class OptionWindow extends JFrame implements LanguageChangeListener, ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7299671775874755731L;
 	private final JButton buttonOk = new JButton();
 	private final JButton buttonCancel = new JButton();
 	private final JButton buttonAccept = new JButton();
 	private final JLabel labelLanguage = new JLabel();
 	private final JPanel panelSettings = new JPanel();
+	private final JLabel labelInvertRotation = new JLabel();
+	private final JCheckBox checkBoxInvertRotation = new JCheckBox();
 	private final JLabel labelLayoutmanager = new JLabel();
 	private final JComboBox<String> comboBoxLayoutManager = new JComboBox<>();
 	private final JComboBox<LanguageSummary> comboBoxLanguages = new JComboBox<>();
@@ -31,7 +38,7 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 	
 	public OptionWindow(LanguageHandler lh)
 	{
-		comboBoxLanguages.setModel(new DefaultComboBoxModel(lh.getLanguages()));
+		comboBoxLanguages.setModel(new DefaultComboBoxModel<LanguageSummary>(lh.getLanguages()));
 		comboBoxLanguages.setSelectedItem(lh.getCurrentSummary());
 		buttonOk.addActionListener(this);
 		buttonCancel.addActionListener(this);
@@ -40,6 +47,8 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		panelSettings.setLayout(JFrameUtils.DOUBLE_COLUMN_LAUYOUT);
 		panelSettings.add(labelLanguage);
 		panelSettings.add(comboBoxLanguages);
+		panelSettings.add(labelInvertRotation);
+		panelSettings.add(checkBoxInvertRotation);
 		panelSettings.add(labelLayoutmanager);
 		panelSettings.add(comboBoxLayoutManager);
 		GroupLayout layout = new GroupLayout(getContentPane());
@@ -60,6 +69,7 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		buttonAccept.setText(language.getString(Words.accept));
 		buttonCancel.setText(language.getString(Words.cancel));
 		labelLanguage.setText(language.getString(Words.language));
+		labelInvertRotation.setText(language.getString(Words.invert_rotation));
 	}
 
 	@Override
@@ -76,7 +86,7 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 			});
 		}
     	Options.set("layout_manager", JFrameLookAndFeelUtil.installedLookAndFeels.get(comboBoxLayoutManager.getSelectedIndex()).getClassName());
-
+    	Options.set("invert_rotation", checkBoxInvertRotation.isSelected());
 		if (source == buttonOk || source == buttonCancel)
 		{
 			dispose();

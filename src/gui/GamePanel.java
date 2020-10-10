@@ -49,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 import data.ControlCombination;
 import data.DataHandler;
+import data.Options;
 import data.SystemFileUtil;
 import gameObjects.action.AddPlayerAction;
 import gameObjects.action.GameAction;
@@ -75,7 +76,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	 */
 	private static final long serialVersionUID = 3579141032474558913L;
 	private static final Logger logger = LoggerFactory.getLogger(GamePanel.class);
-	GameInstance gameInstance;
+	
+	static boolean invert_rotation = false;
+	static {
+		Options.addModificationListener(new Runnable() {
+
+			@Override
+			public void run() {
+				invert_rotation = Options.getBoolean("invert_rotation", false);
+			}
+		});		
+	}
+	
+	final GameInstance gameInstance;
 	public ObjectInstance activeObject = null;
 	public ArrayList<ObjectInstance> activeObjects = new ArrayList<>();
 	IntegerArrayList objOrigPosX = new IntegerArrayList();
@@ -881,7 +894,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		if (SwingUtilities.isRightMouseButton(arg0))
 		{
-			rotation += (arg0.getX() - mouseScreenX) / 200.;
+			rotation += (arg0.getX() - mouseScreenX) / (invert_rotation ? 200. : -200.);
 		}
 		updateGameTransform();
 		screenToBoardPos(mouseScreenX = arg0.getX(), mouseScreenY = arg0.getY(), mouseBoardPos);

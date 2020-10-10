@@ -82,5 +82,6 @@ public enum Words {
     rotate_wheel,
     sit_down,
     drop_on_board,
-    arrow_keys
+    arrow_keys,
+    invert_rotation
 }
