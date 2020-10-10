@@ -59,25 +59,11 @@ public class StreamUtil {
 	}
 	
 	public static ObjectOutputStream toObjectStream(OutputStream input) throws IOException {
-		if (input instanceof ObjectOutputStream)
-		{
-			return (ObjectOutputStream)input;
-		}
-		else
-		{
-			return new ObjectOutputStream(input);
-		}
+		return input instanceof ObjectOutputStream ? (ObjectOutputStream)input : new ObjectOutputStream(input);
 	}	
 
 	public static ObjectInputStream toObjectStream(InputStream input) throws IOException {
-		if (input instanceof ObjectInputStream)
-		{
-			return (ObjectInputStream)input;
-		}
-		else
-		{
-			return new ObjectInputStream(input);
-		}
+		return input instanceof ObjectInputStream ? (ObjectInputStream)input : new ObjectInputStream(input);
 	}
 
 	public static void skip(ObjectInputStream is, int i) throws IOException {
