@@ -26,10 +26,9 @@ import java.util.List;
 import util.ArrayTools;
 
 public class ProgrammData {
-	//private static final Logger logger = LoggerFactory.getLogger(ProgrammData.class);
 	public static final String name = new String("Simple Online Board-Game Simulator");
 	private static final String version = new String("0.0.1 beta");
-	public static final List<String> authors = ArrayTools.unmodifiableList(new String[]{"Paul Stahr, Florian Seiffarth"});
+	public static final List<String> authors = ArrayTools.unmodifiableList(new String[]{"Paul Stahr","Florian Seiffarth"});
 	public static final String jarDirectory;
 	
 	public static String getVersion(){
@@ -37,16 +36,11 @@ public class ProgrammData {
 	}
 	
 	static{
-		long authorHash = 0;
+		/*long authorHash = 0;
 		for (int i=0;i<authors.size();i++)
 			authorHash += authors.get(i).hashCode();
 		authorHash %= name.hashCode();
-		authorHash *= version.hashCode();
-		/*System.out.println(authorHash);
-		if (authorHash != -401399625664877541l){
-			//logger.error("1234, please update or contact paul.stahr@gmx.de");
-			System.exit(-1);
-		}*/
+		authorHash *= version.hashCode();*/
 		jarDirectory = ProgrammData.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 	}
 	

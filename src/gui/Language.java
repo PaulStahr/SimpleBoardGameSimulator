@@ -14,8 +14,6 @@ public class Language {
         Element root = document.getRootElement();
         for (Element elem : root.getChildren())
         {
-            String name = elem.getName();
-            String value = elem.getValue();
             wordsToString.put(Words.valueOf(elem.getName()), elem.getValue());
         }
     }

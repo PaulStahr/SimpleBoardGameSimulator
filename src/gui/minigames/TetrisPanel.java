@@ -62,14 +62,7 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 			try {
 				synchronized(th)
 				{
-					if (down)
-					{
-						th.wait(50);
-					}
-					else
-					{
-						th.wait((int)(1000*Math.exp(-tgi.placedObjectCount() * 0.02)));
-					}
+					th.wait(down ? 50 : (int)(1000*Math.exp(-tgi.placedObjectCount() * 0.02)));
 				}
 			} catch (InterruptedException e) {
 				logger.error("Unexpected interruption", e);

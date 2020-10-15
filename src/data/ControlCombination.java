@@ -2,18 +2,17 @@ package data;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
-import java.security.Key;
 
 import gui.Language;
 import gui.Words;
 
 public class ControlCombination
 {
-	int keyModifier;
-	int mouse;
-	char key;
-	int additional;
-	int keyCode;
+	final int keyModifier;
+	final int mouse;
+	//final char key;
+	final int additional;
+	final int keyCode;
 	
 	public ControlCombination(int keyModifier, int mouse, int keyCode, int additional)
 	{

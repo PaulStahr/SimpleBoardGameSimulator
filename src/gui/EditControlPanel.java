@@ -1,8 +1,12 @@
 package gui;
 
 
-import java.awt.event.*;
-import java.security.Key;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -19,7 +23,11 @@ import gameObjects.instance.GameInstance.GameChangeListener;
 public class EditControlPanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener{
 
 
-    JLabel boardControlsLabel = new JLabel("Board Controls");
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1686844504581572726L;
+	JLabel boardControlsLabel = new JLabel("Board Controls");
     JTable boardControlsTable = new JTable(3, 2);
     JScrollPane boardControlPane = new JScrollPane(boardControlsTable);
 
