@@ -444,6 +444,18 @@ public class GameIO {
 	        sessionName.setText(gi.name);
 	        root_inst.addContent(sessionName);
 
+	        Element tableActivated = new Element(IOString.TABLE);
+	        tableActivated.setText(Boolean.toString(gi.table));
+	        root_inst.addContent(tableActivated);
+
+	        Element privateAreaActivated = new Element(IOString.TABLE);
+	        privateAreaActivated.setText(Boolean.toString(gi.private_area));
+	        root_inst.addContent(privateAreaActivated);
+
+	        Element tableRadius = new Element(IOString.TABLE_RADIUS);
+	        tableRadius.setText(Float.toString(gi.tableRadius));
+	        root_inst.addContent(tableRadius);
+
 			Element hidden = new Element(IOString.HIDDEN);
 			hidden.setText(String.valueOf(gi.hidden));
 			root_inst.addContent(hidden);

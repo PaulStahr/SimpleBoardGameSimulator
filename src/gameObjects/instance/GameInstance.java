@@ -184,7 +184,6 @@ public class GameInstance {
 			GameObjectInstanceEditAction editAction = (GameObjectInstanceEditAction) action;
 			ObjectInstance oi = editAction.getObject(this);
 			maxDrawValue = max(maxDrawValue , oi.state.drawValue);
-			System.out.println(editAction.state.posX);
 			oi.state.set(editAction.state);
 		}
 		else if (action instanceof GameStructureEditAction)
@@ -196,7 +195,6 @@ public class GameInstance {
 				switch (gsoea.type) {
 					case GameStructureEditAction.REMOVE_PLAYER:
 					{
-						
 						for (int i = 0; i < objects.size(); ++i)
 						{
 							if (objects.get(i).state.owner_id == gsoea.objectId)
