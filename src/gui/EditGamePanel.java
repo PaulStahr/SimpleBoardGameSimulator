@@ -52,6 +52,7 @@ import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.ObjectState;
 import main.Player;
 import util.ArrayTools;
 import util.JFrameUtils;
@@ -322,9 +323,9 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				if (button == resetObjectInstanceColumn)
 				{
 					ObjectInstance oi = gi.getObjectInstanceByIndex(row);
-					//ObjectFunctions.removeObject(id, gi, player, oi);
-					oi.state.reset();
-					gi.update(new GameObjectInstanceEditAction(id, player, oi));
+					ObjectState state = oi.state.copy();
+					state.reset();
+					gi.update(new GameObjectInstanceEditAction(id, player, oi, state));
 				}
 				else if (button == deleteObjectInstanceColumn)
 				{
@@ -604,20 +605,21 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				for (int row = rowBegin; row < rowEnd; ++row)
 				{
 					ObjectInstance instance = gi.getObjectInstanceByIndex(row);
-					switch (type) {
-						case NAME: instance.go.uniqueName = tableModelGameObjectInstances.getValueAt(row, col).toString();break;
-						case OWNER:instance.state.owner_id = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
-						case ABOVE:instance.state.aboveInstanceId = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
-						case BELOW:instance.state.belowInstanceId = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
-						default:break;
-					}
 					if (type == GameObjectInstanceColumnType.NAME)
 					{
+						instance.go.uniqueName = tableModelGameObjectInstances.getValueAt(row, col).toString();
 						gi.update(new GameObjectEditAction(-1, instance.go));
 					}
 					else
 					{
-						gi.update(new GameObjectInstanceEditAction(-1, player, instance));
+						ObjectState state = instance.state.copy();
+						switch (type) {
+							case OWNER:state.owner_id = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
+							case ABOVE:state.aboveInstanceId = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
+							case BELOW:state.belowInstanceId = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
+							default:break;
+						}
+						gi.update(new GameObjectInstanceEditAction(-1, player, instance, state));
 					}
 				}
 			}

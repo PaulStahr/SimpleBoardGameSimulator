@@ -389,7 +389,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    	if (action instanceof GameObjectInstanceEditAction)
 				 		{
 				    		objOut.writeUnshared(action);
-				    		GameIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).getObject(gi).state);
+				    		GameIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).state);
 				    		++outputEvents;
 				 		}
 				    	else if (action instanceof GamePlayerEditAction)
@@ -405,9 +405,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					   	}
 				    	else if (action instanceof GameObjectEditAction)
 				    	{
-				    		++outputEvents;
 				    		objOut.writeUnshared(action);
 				    		GameIO.writeObjectToStreamObject(objOut, ((GameObjectEditAction)action).getObject(gi));
+				    		++outputEvents;
 				    	}
 				    	else if (action instanceof GameStructureEditAction)
 				    	{ 
@@ -445,7 +445,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 										break;
 					    		}
 							}
-				    		
 				    		++outputEvents;
 						}
 					    else if (action instanceof UserSoundMessageAction)
@@ -527,9 +526,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					if (action instanceof GameObjectInstanceEditAction)
 					{
 						GameObjectInstanceEditAction actionEdit = (GameObjectInstanceEditAction)inputObject;
-						ObjectState state = actionEdit.getObject(gi).state;
+						ObjectState state = actionEdit.getObject(gi).state.copy();
+						actionEdit.state = state;
 						if (state.lastChange > action.when)
 						{
+							logger.debug("Scipping action");
 							GameIO.simulateStateFromStreamObject(objIn, state);
 						}
 						else
@@ -717,16 +718,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								Integer.parseInt(split.get(7)); //size
 								
 								ObjectInstance inst = gi.getObjectInstanceById(objectId);
-								//ObjectState state = (ObjectState)objIn.readObject();
-								//inst.state.set(state);
-								GameIO.editStateFromStreamObject(objIn, inst.state);
-								
-								/*data = ArrayUtil.ensureLength(data, size);						
-								objIn.readFully(data, 0, size);
-								if (sourceId != id)
-								{
-									GameIO.editObjectStateFromStream(inst.state, new ByteArrayInputStream(data, 0, size));
-								}*/
+								ObjectState state = inst.state.copy();
+								GameIO.editStateFromStreamObject(objIn, state);
 								Player pl = gi.getPlayerById(playerId);
 								if (pl == null)
 								{
@@ -734,7 +727,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								}
 								else
 								{
-									gi.update(new GameObjectInstanceEditAction(sourceId, pl, inst));
+									gi.update(new GameObjectInstanceEditAction(sourceId, pl, inst, state));
 								}
 								++inputEvents;
 							}

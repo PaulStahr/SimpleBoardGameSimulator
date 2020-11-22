@@ -1,6 +1,10 @@
 package gameObjects.instance;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.Serializable;
+
+import io.GameIO;
 
 public abstract class ObjectState implements Serializable {
 	/**
@@ -42,6 +46,7 @@ public abstract class ObjectState implements Serializable {
 		this.value = state.value;
 		this.rotationStep = state.rotationStep;
 		this.isFixed = state.isFixed;
+		this.lastChange = state.lastChange;
 	}
 
 	public abstract ObjectState copy();
@@ -65,5 +70,18 @@ public abstract class ObjectState implements Serializable {
 		drawValue = 0;
 		rotationStep = 90;
 		isFixed = false;
+		lastChange = System.nanoTime();
+	}
+	
+	@Override
+	public String toString()
+	{
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		try {
+			GameIO.writeObjectStateToStreamXml(this, bos);
+		} catch (IOException e) {
+			return e.toString();
+		}
+		return bos.toString();
 	}
 }

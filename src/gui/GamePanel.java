@@ -62,6 +62,7 @@ import gameObjects.functions.MoveFunctions;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.ObjectState;
 import geometry.Matrix3d;
 import geometry.Vector2d;
 import io.GameIO;
@@ -421,10 +422,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			setActiveObjects();
 			if (activeObject != null && this.privateArea.contains(activeObject.id)) {
 				ObjectFunctions.setNewDrawValue(this.id, gameInstance, player, activeObject);
-				gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject));
 
-				activeObject.state.posX = player.mouseXPos;
-				activeObject.state.posY = player.mouseYPos;
+				ObjectState state = activeObject.state.copy();
+				state.posX = player.mouseXPos;
+				state.posY = player.mouseYPos;
+				gameInstance.update(new GameObjectInstanceEditAction(id, player, activeObject, state));
 			}
 			if (activeObjects.size() > 0) {
 				objOrigPosX.clear();

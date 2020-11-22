@@ -1,14 +1,17 @@
 package gameObjects.instance;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.functions.ObjectFunctions;
 import gui.GamePanel;
 import main.Player;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 
 public class ObjectActionMenu {
     /*Popup menu for object actions*/
@@ -38,28 +41,32 @@ public class ObjectActionMenu {
 
 
         flipItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            @Override
+			public void actionPerformed(ActionEvent e) {
                 ObjectFunctions.flipTokenObject(gamePanel.id, gameInstance, player, objectInstance);
             }
         });
 
         discardRecordItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (objectInstance.state.owner_id != -1 && objectInstance.state.owner_id == player.id)
+            @Override
+			public void actionPerformed(ActionEvent e) {
+            	ObjectState state = objectInstance.state.copy();
+                if (state.owner_id != -1 && state.owner_id == player.id)
                 {
-                    objectInstance.state.owner_id = -1;
+                    state.owner_id = -1;
                 }
                 else
                 {
-                    objectInstance.state.owner_id = player.id;
+                    state.owner_id = player.id;
                 }
 
-                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance));
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance, state));
             }
         });
 
         shuffleCardItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            @Override
+			public void actionPerformed(ActionEvent e) {
                 /*Shuffle objects on a stack*/
                 ObjectFunctions.shuffleStack(gamePanel.id, gameInstance, player, objectInstance);
             }

@@ -50,7 +50,7 @@ public class GameObjectDice extends GameObject{
 		return new DiceState();
 	}
 
-	public static class DiceState  extends ObjectState
+	public static class DiceState extends ObjectState
 	{
 		/**
 		 * 

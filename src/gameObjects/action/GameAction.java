@@ -2,7 +2,7 @@ package gameObjects.action;
 
 import java.io.Serializable;
 
-public abstract class GameAction  implements Serializable{
+public abstract class GameAction implements Serializable{
 	/**
 	 * 
 	 */
