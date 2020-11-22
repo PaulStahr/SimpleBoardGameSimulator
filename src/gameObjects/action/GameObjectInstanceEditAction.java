@@ -3,6 +3,7 @@ package gameObjects.action;
 
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.ObjectState;
 import main.Player;
 public class GameObjectInstanceEditAction extends GameAction{
 	/**
@@ -13,18 +14,21 @@ public class GameObjectInstanceEditAction extends GameAction{
 	public final int player;
 	private transient Player playerObject;
 	private transient ObjectInstance activeObject;
-	public GameObjectInstanceEditAction(int source, int player, int activeObject) {
+	public transient ObjectState state;
+	public GameObjectInstanceEditAction(int source, int player, int activeObject, ObjectState state) {
 		super(source);
 		this.player = player;
 		this.object = activeObject;
+		this.state = state;
 	}
 
-	public GameObjectInstanceEditAction(int source, Player player, ObjectInstance activeObject) {
+	public GameObjectInstanceEditAction(int source, Player player, ObjectInstance activeObject, ObjectState state) {
 		super(source);
 		this.player = player.id;
 		this.playerObject = player;
 		this.object = activeObject.id;
 		this.activeObject = activeObject;
+		this.state = state;
 	}
 
 	public Player getPlayer(GameInstance instance)

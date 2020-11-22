@@ -85,4 +85,8 @@ public class ObjectInstance {
 			super(gameObject, gameInstance, player, gamePanel);
 		}
 	}
+
+	public ObjectState getState() {
+		return state;
+	}
 }

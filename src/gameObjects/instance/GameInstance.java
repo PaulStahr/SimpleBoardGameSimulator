@@ -181,8 +181,11 @@ public class GameInstance {
 		}
 		else if (action instanceof GameObjectInstanceEditAction)
 		{
-			ObjectInstance oi = ((GameObjectInstanceEditAction) action).getObject(this);
+			GameObjectInstanceEditAction editAction = (GameObjectInstanceEditAction) action;
+			ObjectInstance oi = editAction.getObject(this);
 			maxDrawValue = max(maxDrawValue , oi.state.drawValue);
+			System.out.println(editAction.state.posX);
+			oi.state.set(editAction.state);
 		}
 		else if (action instanceof GameStructureEditAction)
 		{
@@ -300,7 +303,7 @@ public class GameInstance {
 	{
 		for (int i = begin; i < end; ++i)
 		{
-			update(new GameObjectInstanceEditAction(-1, player, list.get(i)));
+			update(new GameObjectInstanceEditAction(-1, player, list.get(i), list.get(i).state)); //TODO remove states by copy
 		}
 	}
 	

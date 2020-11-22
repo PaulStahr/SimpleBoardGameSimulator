@@ -1,12 +1,10 @@
 package gameObjects.functions;
 
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
-import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
@@ -51,14 +49,12 @@ public class MoveFunctions {
     public static void dragDices(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, MouseEvent arg0, int xDiff, int yDiff, int mouseWheelValue) {
         if (activeObject != null && (activeObject.go instanceof GameObjectDice) && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
             ObjectFunctions.moveObjectTo(gamePanel.id, gameInstance, player, activeObject, xDiff, yDiff);
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player.id, activeObject.id));
         }
     }
 
     public static void dragFigures(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, MouseEvent arg0, int xDiff, int yDiff, int mouseWheelValue) {
         if (activeObject != null && (activeObject.go instanceof GameObjectFigure) && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
             ObjectFunctions.moveObjectTo(gamePanel.id, gameInstance, player, activeObject, xDiff, yDiff);
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player.id, activeObject.id));
         }
     }
 
