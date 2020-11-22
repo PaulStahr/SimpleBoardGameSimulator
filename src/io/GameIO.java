@@ -440,28 +440,23 @@ public class GameIO {
 				Player player = gi.getPlayerByIndex(idx);
 				root_inst.addContent(createElementFromPlayer(player));
 			}
-	        Element sessionName = new Element(IOString.NAME);
-	        sessionName.setText(gi.name);
-	        root_inst.addContent(sessionName);
-
 	        Element tableActivated = new Element(IOString.TABLE);
 	        tableActivated.setText(Boolean.toString(gi.table));
 	        root_inst.addContent(tableActivated);
 
-	        Element privateAreaActivated = new Element(IOString.TABLE);
-	        privateAreaActivated.setText(Boolean.toString(gi.private_area));
-	        root_inst.addContent(privateAreaActivated);
-
-	        Element tableRadius = new Element(IOString.TABLE_RADIUS);
-	        tableRadius.setText(Float.toString(gi.tableRadius));
-	        root_inst.addContent(tableRadius);
-
-			Element hidden = new Element(IOString.HIDDEN);
-			hidden.setText(String.valueOf(gi.hidden));
-			root_inst.addContent(hidden);
+	        Element settings = new Element(IOString.SETTINGS);
+	        settings.setAttribute(IOString.NAME, gi.name);
+	        settings.setAttribute(IOString.PRIVATE_AREA, Boolean.toString(gi.private_area));
+	        settings.setAttribute(IOString.TABLE_RADIUS, Integer.toString(gi.tableRadius));
+			settings.setAttribute(IOString.TABLE,Boolean.toString(gi.table));
+			settings.setAttribute(IOString.HIDDEN,Boolean.toString(gi.hidden));
+			root_inst.addContent(settings);
 
 			Element password = new Element(IOString.PASSWORD);
-			hidden.setText(String.valueOf(gi.password));
+			if (gi.password != null)
+			{
+				password.setText(String.valueOf(gi.password));
+			}
 			root_inst.addContent(password);
 	    	
 	        doc_inst.addContent(root_inst);
@@ -524,8 +519,6 @@ public class GameIO {
         Element elem_back = new Element(IOString.BACKGROUND);
         elem_back.setText(game.getImageKey(game.background));
         root_game.addContent(elem_back);
-
-
 
         ZipEntry gameZipOutput = new ZipEntry(IOString.GAME_XML);
     	zipOutputStream.putNextEntry(gameZipOutput);
