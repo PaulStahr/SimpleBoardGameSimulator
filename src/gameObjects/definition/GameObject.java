@@ -17,11 +17,12 @@ public abstract class GameObject {
 	public String objectType;
 	public int value;
 	public int rotationStep;
+	public int isFixed;
 	public String groups[] = UniqueObjects.EMPTY_STRING_ARRAY;
 
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectColumnType.ID, GameObjectColumnType.NAME, GameObjectColumnType.DELETE});
 
-	public GameObject(String uniqueName, String objectType, int widthInMM, int heightInMM, int value, int rotationStep)
+	public GameObject(String uniqueName, String objectType, int widthInMM, int heightInMM, int value, int rotationStep, int isFixed)
 	{
 		this.uniqueName = uniqueName;
 		this.objectType = objectType;
@@ -29,6 +30,7 @@ public abstract class GameObject {
 		this.heightInMM = heightInMM;
 		this.value = value;
 		this.rotationStep = rotationStep;
+		this.isFixed = isFixed;
 	}
 	
 	public abstract BufferedImage getLook(ObjectState state, int playerId);

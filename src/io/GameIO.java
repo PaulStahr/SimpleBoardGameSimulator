@@ -200,6 +200,7 @@ public class GameIO {
 		int height = 88;
 		int value = 0;
 		int rotationStep = 90;
+		int isFixed = 0;
 		if(elem.getAttributeValue(IOString.WIDTH) != null) {
 			width = Integer.parseInt(elem.getAttributeValue(IOString.WIDTH));
 		}
@@ -212,16 +213,19 @@ public class GameIO {
 		if(elem.getAttributeValue(IOString.ROTATION_STEP) != null) {
 			rotationStep = Integer.parseInt(elem.getAttributeValue(IOString.ROTATION_STEP));
 		}
+		if(elem.getAttributeValue(IOString.IS_FIXED) != null) {
+			isFixed = Integer.parseInt(elem.getAttributeValue(IOString.IS_FIXED));
+		}
 		switch(type)
 		{
 			case IOString.CARD:
 			{
-				result = new GameObjectToken(uniqueName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value, rotationStep);
+				result = new GameObjectToken(uniqueName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value, rotationStep, isFixed);
 				break;
 			}
 			case IOString.FIGURE:
 			{
-				result = new GameObjectFigure(uniqueName, type, width, height, images.get(elem.getAttributeValue(IOString.STANDING)), value, rotationStep);
+				result = new GameObjectFigure(uniqueName, type, width, height, images.get(elem.getAttributeValue(IOString.STANDING)), value, rotationStep, isFixed);
 				break;
 			}
 			case IOString.DICE:
@@ -251,7 +255,9 @@ public class GameIO {
 				groups.add(child.getText());
 			}
 		}
+
 		result.groups = groups.toArray(new String[groups.size()]);
+
 		return result;
 	}
 
@@ -918,6 +924,7 @@ public class GameIO {
 		state.rotation = is.readInt();
 		state.value = is.readInt();
 		state.rotationStep = is.readInt();
+		state.isFixed = is.readBoolean();
 		if (state instanceof TokenState)
 		{
 			((TokenState)state).side = is.readBoolean();
@@ -956,6 +963,7 @@ public class GameIO {
 		out.writeInt(state.rotation);
 		out.writeInt(state.value);
 		out.writeInt(state.rotationStep);
+		out.writeBoolean(state.isFixed);
 		if (state instanceof TokenState)
 		{
 			out.writeBoolean(((TokenState)state).side);

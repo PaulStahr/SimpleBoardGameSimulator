@@ -23,7 +23,7 @@ public class GameObjectDice extends GameObject{
 	public DiceSide dss[];
 	
 	public GameObjectDice(String uniqueName, String objectType, int widthInMM, int heightInMM, DiceSide sides[], int value, int rotationStep) {
-		super(uniqueName, objectType, widthInMM, heightInMM, value, rotationStep);
+		super(uniqueName, objectType, widthInMM, heightInMM, value, rotationStep, 0);
 		this.dss = sides;
 	}
 
