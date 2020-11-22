@@ -30,6 +30,7 @@ public class DrawFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
 
     public static void drawBackground(GamePanel gamePanel, Graphics g, GameInstance gameInstance){
+
         g.clearRect(0, 0, gamePanel.getWidth(), gamePanel.getHeight());
         //TODO Florian:sometimes images are drawn twice (the active object?)
         g.drawString(String.valueOf(gamePanel.mouseWheelValue), gamePanel.mouseScreenX, gamePanel.mouseScreenY);
@@ -51,10 +52,22 @@ public class DrawFunctions {
     public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, IntegerArrayList ial){
         //Draw all objects not in some private area
         ArrayList<ObjectInstance> oiList = new ArrayList<>();
+        ArrayList<ObjectInstance> fixedObjects = new ArrayList<>();
         for (int idx : ial){
-            oiList.add(gameInstance.getObjectInstanceByIndex(idx));
+            if (!gameInstance.getObjectInstanceByIndex(idx).state.isFixed)
+            {
+                oiList.add(gameInstance.getObjectInstanceByIndex(idx));
+            }
+            else
+            {
+                fixedObjects.add(gameInstance.getObjectInstanceByIndex(idx));
+            }
         }
+        //Draw the fixed objects first
+        drawObjectsFromList(gamePanel,g,gameInstance,player,fixedObjects,ial);
+
         drawObjectsFromList(gamePanel,g,gameInstance,player,oiList,ial);
+
     }
 
     public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList, IntegerArrayList ial) {

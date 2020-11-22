@@ -82,4 +82,9 @@
 <sit_down>An den Tisch setzen</sit_down>
 <arrow_keys>Pfeiltasten</arrow_keys>
 <invert_rotation>Rotation Invertieren</invert_rotation>
+<hide_and_show_hand_area>Handkartenbereich anzeigen oder verbergen</hide_and_show_hand_area>
+    <hide_show_table>Tisch anzeigen oder verbergen</hide_show_table>
+    <alt>Alt</alt>
+    <center_board>Ansicht zentrieren</center_board>
+    <fix_object>Object fixieren</fix_object>
 </xml>

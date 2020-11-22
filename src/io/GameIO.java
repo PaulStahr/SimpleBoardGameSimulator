@@ -86,6 +86,7 @@ public class GameIO {
 		elem.setAttribute(IOString.BELOW,			Integer.toString(state.belowInstanceId));
 		elem.setAttribute(IOString.VALUE, 			Integer.toString(state.value));
 		elem.setAttribute(IOString.ROTATION_STEP, 	Integer.toString(state.rotationStep));
+		elem.setAttribute(IOString.IS_FIXED, 		Boolean.toString(state.isFixed));
 		if (state instanceof TokenState)
     	{
 			elem.setAttribute(IOString.SIDE, Boolean.toString(((TokenState)state).side));
@@ -137,6 +138,11 @@ public class GameIO {
 		if (rotationStep != null)
 		{
 			state.rotationStep = Integer.parseInt(rotationStep.getValue());
+		}
+		Attribute isFixed = elem.getAttribute(IOString.IS_FIXED);
+		if (rotationStep != null)
+		{
+			state.isFixed = Boolean.parseBoolean(isFixed.getValue());
 		}
 		if (state instanceof TokenState && elem.getAttribute(IOString.SIDE) != null)
     	{

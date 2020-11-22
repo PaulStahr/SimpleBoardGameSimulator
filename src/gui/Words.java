@@ -83,5 +83,10 @@ public enum Words {
     sit_down,
     drop_on_board,
     arrow_keys,
-    invert_rotation
+    invert_rotation,
+    hide_and_show_hand_area,
+    hide_show_table,
+    alt,
+    center_board,
+    fix_object;
 }

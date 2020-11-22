@@ -765,7 +765,7 @@ public class ObjectFunctions {
         } else {
             for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
                 ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
-                if ((ignoredObjects == null || !ignoredObjects.contains(oi.id)) && !oi.state.inPrivateArea && (oi.state.owner_id == -1 || oi.state.owner_id == player.id)) {
+                if (!oi.state.isFixed && (ignoredObjects == null || !ignoredObjects.contains(oi.id)) && !oi.state.inPrivateArea && (oi.state.owner_id == -1 || oi.state.owner_id == player.id)) {
                     int dist = objectDist(xPos, yPos, oi);
                     if (dist < distance && isOnObject(xPos, yPos, oi, player.id, maxInaccuracy)) {
                         activeObject = oi;
@@ -1311,7 +1311,7 @@ public class ObjectFunctions {
             boolean topIn = point.getY() < highY;
             boolean bottomIn = point.getY() > lowY;
 
-            if (leftIn && rightIn && topIn && bottomIn && objectInstance.state.owner_id==-1) {
+            if (leftIn && rightIn && topIn && bottomIn && objectInstance.state.owner_id==-1 && !objectInstance.state.isFixed) {
                 idList.add(objectInstance.id);
             }
         }
@@ -1407,4 +1407,8 @@ public class ObjectFunctions {
         }
     }
 
+    public static void fixObject(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance oi) {
+        oi.state.isFixed = true;
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, oi));
+    }
 }

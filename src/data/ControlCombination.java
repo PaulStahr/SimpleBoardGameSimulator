@@ -45,6 +45,11 @@ public class ControlCombination
 		{
 			appendPlus(strB).append(lang.getString(Words.ctrl));
 		}
+		if ((keyModifier & InputEvent.ALT_DOWN_MASK) != 0)
+		{
+			appendPlus(strB).append(lang.getString(Words.alt));
+		}
+
 		if (keyCode != -1){
 			appendPlus(strB).append(KeyEvent.getKeyText(keyCode));
 		}

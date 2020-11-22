@@ -90,4 +90,9 @@
 <sit_down>Sit down</sit_down>
 <arrow_keys>Arrow keys</arrow_keys>
 <invert_rotation>Invert Rotation</invert_rotation>
+    <hide_and_show_hand_area>Hide or show hand cards</hide_and_show_hand_area>
+    <hide_show_table>Hide or show table</hide_show_table>
+    <alt>Alt</alt>
+    <center_board>Center view</center_board>
+    <fix_object>Fix object</fix_object>
 </xml>

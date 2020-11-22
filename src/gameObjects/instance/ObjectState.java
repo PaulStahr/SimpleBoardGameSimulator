@@ -21,6 +21,9 @@ public abstract class ObjectState implements Serializable {
 	public int value;
 	public long drawValue = 0;
 	public int rotationStep = 90;
+
+	/*fix an object*/
+	public boolean isFixed = false;
 	
 	@Override
 	public int hashCode()
@@ -38,6 +41,7 @@ public abstract class ObjectState implements Serializable {
 		this.belowInstanceId = state.belowInstanceId;
 		this.value = state.value;
 		this.rotationStep = state.rotationStep;
+		this.isFixed = state.isFixed;
 	}
 
 	public abstract ObjectState copy();
@@ -60,5 +64,6 @@ public abstract class ObjectState implements Serializable {
 		value = 0;
 		drawValue = 0;
 		rotationStep = 90;
+		isFixed = false;
 	}
 }
