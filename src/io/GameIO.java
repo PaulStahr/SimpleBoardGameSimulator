@@ -172,6 +172,18 @@ public class GameIO {
 					gi.addPlayer(null, player);
 					break;
 				case IOString.NAME:gi.name = elem.getValue();break;
+				case IOString.SETTINGS:
+					gi.name = elem.getAttributeValue(IOString.NAME);
+					if (elem.getAttribute(IOString.PRIVATE_AREA) != null) {
+						gi.private_area = Boolean.parseBoolean(elem.getAttributeValue(IOString.PRIVATE_AREA));
+					}
+					if (elem.getAttribute(IOString.TABLE) != null) {
+						gi.table = Boolean.parseBoolean(elem.getAttributeValue(IOString.TABLE));
+					}
+					if (elem.getAttribute(IOString.TABLE_RADIUS) != null) {
+						gi.tableRadius = Integer.parseInt(elem.getAttributeValue(IOString.TABLE_RADIUS));
+					}
+					break;
 				case IOString.OBJECT:
 					String uniqueName = elem.getAttributeValue(IOString.UNIQUE_NAME);
 					ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue(IOString.ID)));
@@ -501,7 +513,9 @@ public class GameIO {
         Element elem_back = new Element(IOString.BACKGROUND);
         elem_back.setText(game.getImageKey(game.background));
         root_game.addContent(elem_back);
-    	
+
+
+
         ZipEntry gameZipOutput = new ZipEntry(IOString.GAME_XML);
     	zipOutputStream.putNextEntry(gameZipOutput);
     	new XMLOutputter(Format.getPrettyFormat()).output(doc_game, zipOutputStream);
@@ -658,6 +672,24 @@ public class GameIO {
 				else if (name.equals(IOString.NAME))
 				{
 					result.name = elem.getValue();
+				}
+				else if (name.equals(IOString.SETTINGS))
+				{
+					if (elem.getAttribute(IOString.NAME) != null)
+					{
+						result.name = elem.getAttributeValue(IOString.NAME);
+					}
+					if (elem.getAttribute(IOString.PRIVATE_AREA) != null)
+					{
+						result.private_area = Boolean.parseBoolean(elem.getAttributeValue(IOString.PRIVATE_AREA));
+					}
+					if (elem.getAttribute(IOString.TABLE) != null)
+					{
+						result.table = Boolean.parseBoolean(elem.getAttributeValue(IOString.TABLE));
+					}
+					if (elem.getAttribute(IOString.TABLE_RADIUS) != null) {
+						result.tableRadius = Integer.parseInt(elem.getAttributeValue(IOString.TABLE_RADIUS));
+					}
 				}
 			}
 			if (result.name == null)
@@ -834,6 +866,7 @@ public class GameIO {
 		objOut.writeInt(editedObject.rotationStep);
 		objOut.writeInt(editedObject.value);
 		objOut.writeObject(editedObject.objectType);
+		objOut.writeObject(editedObject.isFixed);
 		if (editedObject instanceof GameObjectToken)
 		{
 			GameObjectToken token = (GameObjectToken)editedObject;
@@ -848,6 +881,7 @@ public class GameIO {
 		object.rotationStep = objIn.readInt();
 		object.value = objIn.readInt();
 		object.objectType = (String)objIn.readObject();
+		object.isFixed = objIn.readInt();
 		if (object instanceof GameObjectToken)
 		{
 			GameObjectToken token = (GameObjectToken)object;

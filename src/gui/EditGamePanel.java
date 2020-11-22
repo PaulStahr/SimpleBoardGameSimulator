@@ -250,7 +250,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			else if (source == textFieldTableRadius.getDocument())
 			{
-				gi.tableRadius = Float.parseFloat(textFieldTableRadius.getText());
+				gi.tableRadius = Integer.parseInt(textFieldTableRadius.getText());
 				isUpdating = true;
 				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_TABLE_RADIUS));
 				isUpdating = false;

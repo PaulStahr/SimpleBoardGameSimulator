@@ -624,7 +624,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					{
 						switch(action.type)
 						{
-							case GameStructureEditAction.EDIT_TABLE_RADIUS: gi.tableRadius = objIn.readFloat();break;
+							case GameStructureEditAction.EDIT_TABLE_RADIUS: gi.tableRadius = objIn.readInt();break;
 							case GameStructureEditAction.EDIT_BACKGROUND:gi.game.background = gi.game.images.get(objIn.readObject());break;
 							case GameStructureEditAction.EDIT_GAME_NAME:gi.game.name = (String)objIn.readObject();break;
 							case GameStructureEditAction.EDIT_SESSION_NAME:gi.name = (String)objIn.readObject();break;

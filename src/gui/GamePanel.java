@@ -154,7 +154,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public PrivateArea privateArea;
 	public Table table = null;
-	public int tableDiameter = 1500;
 	public int activePlayer = -1;
 
 	public float cardOverlap = (float) (2/3.0);
@@ -189,9 +188,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public GamePanel(GameInstance gameInstance, LanguageHandler lh)
 	{
 		this.setLayout(new FlowLayout(FlowLayout.LEFT));
-		this.privateArea = new PrivateArea(this, gameInstance, boardToScreenTransformation, screenToBoardTransformation);
-		this.table = new Table(gameInstance, tableDiameter,new Point2D.Double(-tableDiameter/2,-tableDiameter/2));
+		int tableRadius = gameInstance.tableRadius;
+		this.table = new Table(gameInstance, 2*tableRadius,new Point2D.Double(-tableRadius,-tableRadius));
 		this.gameInstance = gameInstance;
+		this.privateArea = new PrivateArea(this, gameInstance, boardToScreenTransformation, screenToBoardTransformation);
+
+		if (!this.gameInstance.private_area) {
+			this.privateArea.zooming = 0;
+		}
+		this.isTableVisible = gameInstance.table;
 
 		addMouseListener(this);
 		addMouseMotionListener(this);

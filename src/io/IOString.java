@@ -48,4 +48,8 @@ public class IOString {
 	public static final String TRANSLATE_Y = "translate_y";
 	public static final String SCREEN_W = "srceen_w";
 	public static final String SCREEN_H = "srceen_h";
+	public static final String SETTINGS = "settings";
+	public static final String PRIVATE_AREA = "private_area";
+	public static final String TABLE = "table";
+	public static final String TABLE_RADIUS = "table_radius";
 }

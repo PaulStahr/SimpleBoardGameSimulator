@@ -34,8 +34,10 @@ public class GameInstance {
 	private final ArrayList<Player> players = new ArrayList<>();
 	private final ArrayList<GameAction> actions = new ArrayList<>();
 	private final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
+    public boolean private_area = true;
+	public boolean table = true;
 	private long maxDrawValue = 0;
-	public float tableRadius = 10;
+	public int tableRadius = 750;
 	
 	public static interface GameChangeListener
 	{
