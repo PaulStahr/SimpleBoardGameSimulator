@@ -60,6 +60,7 @@ public class ControlCombination
 				case 0: appendPlus(strB).append(lang.getString(Words.left_click));break;
 				case 1: appendPlus(strB).append(lang.getString(Words.middle_click));break;
 				case 2: appendPlus(strB).append(lang.getString(Words.right_click));break;
+				case 3: appendPlus(strB).append(lang.getString(Words.left_double_click));break;
 				default: throw new IllegalArgumentException("MouseFunction not known");
 			}
 		}

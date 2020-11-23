@@ -88,5 +88,5 @@ public enum Words {
     hide_show_table,
     alt,
     center_board,
-    fix_object;
+    fix_object, left_double_click;
 }

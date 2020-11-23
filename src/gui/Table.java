@@ -42,7 +42,10 @@ public class Table {
         setTableParameters((int) tableScreenOrigin.getX(), (int) tableScreenOrigin.getY(), diameter);
 
         this.tableShape = gamePanel.getBoardToScreenTransform().createTransformedShape(this.tableShape);
-        this.stackerShape = gamePanel.getBoardToScreenTransform().createTransformedShape(this.stackerShape);
+
+        if (gamePanel.isPutDownAreaVisible) {
+            this.stackerShape = gamePanel.getBoardToScreenTransform().createTransformedShape(this.stackerShape);
+        }
 
         Point2D originPlayerCenter = new Point2D.Double(tableScreenOrigin.getX() + diameter/2, tableScreenOrigin.getY() + diameter + playerDiameter/2);
         Point2D originPlayerBottom = new Point2D.Double(tableScreenOrigin.getX() + diameter/2, tableScreenOrigin.getY() + diameter + playerDiameter + 50);

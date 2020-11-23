@@ -73,7 +73,7 @@ public class SimpleNetworkServertest {
     	}
     	{
     	   	Player player = new Player("Paul", 3);
-    	   	FileInputStream fis = new FileInputStream("Games/Doppelkopf.zip");
+    	   	FileInputStream fis = new FileInputStream("PrivateGames/Fabrik.zip");
 			GameInstance gi = new GameInstance(new Game(), null);
 			GameIO.readSnapshotFromZip(fis, gi);
 			gi.name = "Testsession";
@@ -87,31 +87,33 @@ public class SimpleNetworkServertest {
     	
     	
 	   	Player player = new Player("Florian", 2);
-    	//FileInputStream fis = new FileInputStream("Doppelkopf.zip");
-		//GameInstance gi = GameIO.readSnapshotFromZip(fis);
-		//GameInstance gi = new GameInstance(new Game());
-		//gi.name = "Testsession";
-		//gi.players.add(player);
 	    GameWindow gw = connectAndJoinGame(address, port, player, "Testsession", lh);
     	try {
     		Thread.sleep(500);
     	}catch(InterruptedException e) {
 			logger.error("Unecpected interrupt", e);
     	}
-    	//gi.update(new GameObjectInstanceEditAction(0, gi.players.get(0), gi.objects.get(0)));    	
-
 
 		Player player2 = new Player("Melissa", 1);
-    	//FileInputStream fis = new FileInputStream("Doppelkopf.zip");
-		//GameInstance gi = GameIO.readSnapshotFromZip(fis);
-		//GameInstance gi = new GameInstance(new Game());
-		//gi.name = "Testsession";
-		//gi.players.add(player);
 	    GameWindow gw2 = connectAndJoinGame(address, port, player2, "Testsession", lh);
     	try {
     		Thread.sleep(500);
     	}catch(InterruptedException e) {
 			logger.error("Unecpected interrupt", e);
     	}
+		Player player3 = new Player("Melissa", 4);
+		GameWindow gw3 = connectAndJoinGame(address, port, player3, "Testsession", lh);
+		try {
+			Thread.sleep(500);
+		}catch(InterruptedException e) {
+			logger.error("Unecpected interrupt", e);
+		}
+		Player player4 = new Player("Melissa", 5);
+		GameWindow gw4 = connectAndJoinGame(address, port, player4, "Testsession", lh);
+		try {
+			Thread.sleep(500);
+		}catch(InterruptedException e) {
+			logger.error("Unecpected interrupt", e);
+		}
 	}
 }

@@ -28,7 +28,7 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 	 */
 	private static final long serialVersionUID = -1686844504581572726L;
 	JLabel boardControlsLabel = new JLabel("Board Controls");
-    JTable boardControlsTable = new JTable(6, 2);
+    JTable boardControlsTable = new JTable(7, 2);
     JScrollPane boardControlPane = new JScrollPane(boardControlsTable);
 
     JLabel objectControlsLabel = new JLabel("Object Controls");
@@ -94,6 +94,7 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 			new FuncControl(Words.move_board, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 0,  -1,0), new ControlCombination(0, -1,  -1,16)),
 			new FuncControl(Words.rotate, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2,  -1, 0), new ControlCombination(0, -1,  KeyEvent.VK_UP, 0), new ControlCombination(0, -1,  KeyEvent.VK_DOWN, 0)),
 			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
+			new FuncControl(Words.sit_down, new ControlCombination(0, 3,  0, 0)),
 			new FuncControl(Words.center_board, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  KeyEvent.VK_ENTER, 0)),
 			new FuncControl(Words.hide_show_table, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  KeyEvent.VK_T, 0)),
 			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(0, -1, KeyEvent.VK_H,0)),

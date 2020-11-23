@@ -198,6 +198,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			this.privateArea.zooming = 0;
 		}
 		this.isTableVisible = gameInstance.table;
+		this.isPutDownAreaVisible = gameInstance.put_down_area;
 
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -323,7 +324,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (arg0.getClickCount() == 2) {
 			int posPlayer = gameInstance.getPlayerList().indexOf(player);
 			for (int i = 0; i < this.table.playerShapes.size();++i) {
-				if(this.table.playerShapes.get(i).contains(mouseScreenX, mouseScreenY) && i == posPlayer) {
+				if(this.table.playerShapes.get(i).contains(mouseScreenX, mouseScreenY)) {
 					sitDown(i);
 					break;
 				}
