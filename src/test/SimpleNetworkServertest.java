@@ -3,6 +3,8 @@ package test;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
@@ -20,6 +22,9 @@ import net.SynchronousGameClientLobbyConnection;
 
 public class SimpleNetworkServertest {
     private static final Logger logger = LoggerFactory.getLogger(SimpleNetworkServertest.class);
+    public static List<Player> PlayerList = new ArrayList<>();
+    public static List<GameWindow> GameWindowList = new ArrayList<>();
+    public static int AdditionalPlayers = 1;
     public static GameServer startNewServer(int port)
     {
     	GameServer gs = new GameServer(port);
@@ -72,8 +77,8 @@ public class SimpleNetworkServertest {
 	    	}
     	}
     	{
-    	   	Player player = new Player("Paul", 3);
-    	   	FileInputStream fis = new FileInputStream("PrivateGames/Fabrik.zip");
+    	   	Player player = new Player("Paul", 1);
+    	   	FileInputStream fis = new FileInputStream("Games/Doppelkopf.zip");
 			GameInstance gi = new GameInstance(new Game(), null);
 			GameIO.readSnapshotFromZip(fis, gi);
 			gi.name = "Testsession";
@@ -85,7 +90,8 @@ public class SimpleNetworkServertest {
     		Thread.sleep(300);
     	}catch(InterruptedException e) {}
     	
-    	
+
+
 	   	Player player = new Player("Florian", 2);
 	    GameWindow gw = connectAndJoinGame(address, port, player, "Testsession", lh);
     	try {
@@ -94,26 +100,15 @@ public class SimpleNetworkServertest {
 			logger.error("Unecpected interrupt", e);
     	}
 
-		Player player2 = new Player("Melissa", 1);
-	    GameWindow gw2 = connectAndJoinGame(address, port, player2, "Testsession", lh);
-    	try {
-    		Thread.sleep(500);
-    	}catch(InterruptedException e) {
-			logger.error("Unecpected interrupt", e);
-    	}
-		Player player3 = new Player("Melissa", 4);
-		GameWindow gw3 = connectAndJoinGame(address, port, player3, "Testsession", lh);
-		try {
-			Thread.sleep(500);
-		}catch(InterruptedException e) {
-			logger.error("Unecpected interrupt", e);
-		}
-		Player player4 = new Player("Melissa", 5);
-		GameWindow gw4 = connectAndJoinGame(address, port, player4, "Testsession", lh);
-		try {
-			Thread.sleep(500);
-		}catch(InterruptedException e) {
-			logger.error("Unecpected interrupt", e);
+		for(int i=0; i<AdditionalPlayers; ++i)
+		{
+			PlayerList.add(new Player("TestPlayer" + (i+1), 3+i));
+			GameWindowList.add(connectAndJoinGame(address, port, PlayerList.get(PlayerList.size()-1), "Testsession", lh));
+			try {
+				Thread.sleep(500);
+			}catch(InterruptedException e) {
+				logger.error("Unecpected interrupt", e);
+			}
 		}
 	}
 }

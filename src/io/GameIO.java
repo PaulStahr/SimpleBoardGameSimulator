@@ -443,6 +443,7 @@ public class GameIO {
 				Player player = gi.getPlayerByIndex(idx);
 				root_inst.addContent(createElementFromPlayer(player));
 			}
+
 	        Element sessionName = new Element(IOString.NAME);
 	        sessionName.setText(gi.name);
 	        root_inst.addContent(sessionName);
@@ -453,14 +454,14 @@ public class GameIO {
 			settings.setAttribute(IOString.PRIVATE_AREA, Boolean.toString(gi.private_area));
 			settings.setAttribute(IOString.PUT_DOWN_AREA, Boolean.toString(gi.put_down_area));
 			settings.setAttribute(IOString.TABLE_RADIUS, Integer.toString(gi.tableRadius));
+			settings.setAttribute(IOString.HIDDEN,Boolean.toString(gi.hidden));
 			root_inst.addContent(settings);
 
-			Element hidden = new Element(IOString.HIDDEN);
-			hidden.setText(String.valueOf(gi.hidden));
-			root_inst.addContent(hidden);
-
 			Element password = new Element(IOString.PASSWORD);
-			hidden.setText(String.valueOf(gi.password));
+			if (gi.password != null)
+			{
+				password.setText(String.valueOf(gi.password));
+			}
 			root_inst.addContent(password);
 	    	
 	        doc_inst.addContent(root_inst);
@@ -523,8 +524,6 @@ public class GameIO {
         Element elem_back = new Element(IOString.BACKGROUND);
         elem_back.setText(game.getImageKey(game.background));
         root_game.addContent(elem_back);
-
-
 
         ZipEntry gameZipOutput = new ZipEntry(IOString.GAME_XML);
     	zipOutputStream.putNextEntry(gameZipOutput);
