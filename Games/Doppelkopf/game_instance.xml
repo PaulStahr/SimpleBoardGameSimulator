@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <xml>
-<name>NeuesSpiel</name>
-<settings private_area="0" table="0"/>
+<name>Doppelkopf</name>
+<settings name="Doppelkopf" private_area="true" table="true" table_radius="500"/>
 <object unique_name="caro10" id="0" x="100" y="100" r="0"/>
 <object unique_name="carobube" id="1" x="100" y="100" r="0"/>
 

@@ -32,9 +32,18 @@ public class Table {
         this.tableOrigin.setLocation(tableOrigin.getX(), tableOrigin.getY());
         this.tableScreenOrigin.setLocation(tableOrigin.getX(), tableOrigin.getY());
         setTableParameters((int) tableScreenOrigin.getX(), (int) tableScreenOrigin.getY(), this.diameter);
-        for (int i = 0; i < gameInstance.getPlayerList().size(); ++i){
-            Shape playerShape = new Ellipse2D.Double(tableScreenOrigin.getX() + this.diameter, tableScreenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
-            playerShapes.add(playerShape);
+
+        if (gameInstance.seats <= -1) {
+            for (int i = 0; i < gameInstance.getPlayerList().size(); ++i) {
+                Shape playerShape = new Ellipse2D.Double(tableScreenOrigin.getX() + this.diameter, tableScreenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
+                playerShapes.add(playerShape);
+            }
+        }
+        else{
+            for (int i = 0; i < gameInstance.seats; ++i){
+                Shape playerShape = new Ellipse2D.Double(tableScreenOrigin.getX() + this.diameter, tableScreenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
+                playerShapes.add(playerShape);
+            }
         }
     }
 
@@ -55,6 +64,7 @@ public class Table {
         AffineTransform tmp = graphics2D.getTransform();
         Point2D rotatedPoint = new Point2D.Double();
         Rectangle rectangle = new Rectangle(  -100, 0, 200, 200);
+
         for (int i = 0; i< playerShapes.size(); ++i){
             double angle = 360./playerShapes.size()*i;
             AffineTransform rotateAroundCenterTransform = AffineTransform.getRotateInstance(Math.toRadians(angle), tableCenter.getX(), tableCenter.getY());
@@ -64,9 +74,10 @@ public class Table {
             int place = 0;
             for (int j = 0; j < gameInstance.getPlayerNumber(); ++j)
             {
-                if (gameInstance.getPlayerByIndex(j).id < gameInstance.getPlayerByIndex(i).id)
-                {
-                    ++place;
+                if (i < gameInstance.getPlayerNumber()) {
+                    if (gameInstance.getPlayerByIndex(j).id < gameInstance.getPlayerByIndex(i).id) {
+                        ++place;
+                    }
                 }
             }
 
@@ -88,7 +99,7 @@ public class Table {
         }
         graphics2D.setTransform(tmp);
 
-        drawTable(g);
+        drawTable(g, gamePanel);
         drawPlayers(gameInstance, g);
     }
 
@@ -103,9 +114,10 @@ public class Table {
             int place = 0;
             for (int j = 0; j < gameInstance.getPlayerNumber(); ++j)
             {
-                if (gameInstance.getPlayerByIndex(j).id < gameInstance.getPlayerByIndex(counter).id)
-                {
-                    ++place;
+                if (counter < gameInstance.getPlayerNumber()) {
+                    if (gameInstance.getPlayerByIndex(j).id < gameInstance.getPlayerByIndex(counter).id) {
+                        ++place;
+                    }
                 }
             }
             Player player = gameInstance.getPlayerByIndex(place);
@@ -117,7 +129,7 @@ public class Table {
         graphics2D.setTransform(tmp);
     }
 
-    public void drawTable(Graphics g){
+    public void drawTable(Graphics g, GamePanel gamePanel){
         Graphics2D graphics2D = (Graphics2D) g;
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
@@ -128,8 +140,10 @@ public class Table {
         // set border color
         graphics2D.fill(this.tableShape);
 
-        graphics2D.setPaint(Color.gray);
-        graphics2D.fill(this.stackerShape);
+        if (gamePanel.isPutDownAreaVisible) {
+            graphics2D.setPaint(Color.gray);
+            graphics2D.fill(this.stackerShape);
+        }
 
         graphics2D.setTransform(tmp);
     }

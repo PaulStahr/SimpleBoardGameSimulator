@@ -104,7 +104,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	boolean isRightMouseKeyHold = false;
 	boolean isMiddleMouseKeyHold = false;
 
-	//Enable and disable table
+	//Table settings
 	boolean isTableVisible = true;
 	boolean isPutDownAreaVisible = true;
 
@@ -321,8 +321,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
+
 		if (arg0.getClickCount() == 2) {
-			int posPlayer = gameInstance.getPlayerList().indexOf(player);
+			//Sit down on double click on seat
 			for (int i = 0; i < this.table.playerShapes.size();++i) {
 				if(this.table.playerShapes.get(i).contains(mouseScreenX, mouseScreenY)) {
 					sitDown(i);
@@ -408,7 +409,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (SwingUtilities.isMiddleMouseButton(arg0)) {
 				isMiddleMouseKeyHold = true;
 			}
-
+			//get nearest object concerning the mouse position
+			ObjectInstance nearestObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			mouseScreenX = arg0.getX();
 			mouseScreenY = arg0.getY();
 			screenToBoardPos(arg0.getX(), arg0.getY(), mousePressedGamePos);
@@ -416,10 +418,26 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, mouseBoardPos.getXI(), mouseBoardPos.getYI());
 
 			if (!isSelectStarted && activeObject == null) {
+				for (int i : selectedObjects) {
+					gameInstance.getObjectInstanceById(i).state.isActive = false;
+				}
+				selectedObjects.clear();
 				beginSelectPosScreenX = arg0.getX();
 				beginSelectPosScreenY = arg0.getY();
 				isSelectStarted = true;
-			} else {
+			}
+			//Select objects on click
+			else if (!mouseInPrivateArea) {
+				if(!selectedObjects.contains(nearestObject.id)) {
+					if (!arg0.isControlDown()) {
+						selectedObjects.clear();
+						selectedObjects.add(nearestObject.id);
+					} else {
+						selectedObjects.add(nearestObject.id);
+					}
+				}
+			}
+			else {
 				for (int i : selectedObjects) {
 					gameInstance.getObjectInstanceById(i).state.isActive = false;
 				}

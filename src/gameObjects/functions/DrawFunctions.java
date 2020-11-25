@@ -134,7 +134,7 @@ public class DrawFunctions {
                 g2.translate(-img.getWidth()/2, 0);
                 g2.drawImage(img, null, 0, -10);
                 g2.scale(5, 5);
-                g2.drawString(p.getName(), 15, -22);
+                g2.drawString(p.getName(), 0, -25);
 			}
             g2.setTransform(tmp);
 

@@ -37,6 +37,7 @@ public class GameInstance {
     public boolean private_area = true;
 	public boolean table = true;
     public boolean put_down_area = true;
+    public int seats = -1;
     private long maxDrawValue = 0;
 	public int tableRadius = 1200;
 	

@@ -24,7 +24,7 @@ public class SimpleNetworkServertest {
     private static final Logger logger = LoggerFactory.getLogger(SimpleNetworkServertest.class);
     public static List<Player> PlayerList = new ArrayList<>();
     public static List<GameWindow> GameWindowList = new ArrayList<>();
-    public static int AdditionalPlayers = 1;
+    public static int AdditionalPlayers = 0;
     public static GameServer startNewServer(int port)
     {
     	GameServer gs = new GameServer(port);

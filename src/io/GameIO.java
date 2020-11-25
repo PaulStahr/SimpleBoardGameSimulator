@@ -49,6 +49,8 @@ import net.AsynchronousGameConnection;
 import util.ArrayUtil;
 import util.io.StreamUtil;
 
+import static java.lang.Integer.max;
+
 public class GameIO {
 
 	private static Logger logger = LoggerFactory.getLogger(GameIO.class);
@@ -184,6 +186,10 @@ public class GameIO {
 					}
 					if (elem.getAttribute(IOString.TABLE_RADIUS) != null) {
 						gi.tableRadius = Integer.parseInt(elem.getAttributeValue(IOString.TABLE_RADIUS));
+					}
+					if (elem.getAttribute(IOString.SEATS) != null) {
+						gi.seats = Integer.parseInt(elem.getAttributeValue(IOString.SEATS));
+						gi.seats = max(-1, gi.seats);
 					}
 					break;
 				case IOString.OBJECT:
@@ -454,6 +460,7 @@ public class GameIO {
 			settings.setAttribute(IOString.PRIVATE_AREA, Boolean.toString(gi.private_area));
 			settings.setAttribute(IOString.PUT_DOWN_AREA, Boolean.toString(gi.put_down_area));
 			settings.setAttribute(IOString.TABLE_RADIUS, Integer.toString(gi.tableRadius));
+			settings.setAttribute(IOString.SEATS, Integer.toString(gi.seats));
 			settings.setAttribute(IOString.HIDDEN,Boolean.toString(gi.hidden));
 			root_inst.addContent(settings);
 
@@ -702,6 +709,9 @@ public class GameIO {
 					}
 					if (elem.getAttribute(IOString.TABLE_RADIUS) != null) {
 						result.tableRadius = Integer.parseInt(elem.getAttributeValue(IOString.TABLE_RADIUS));
+					}
+					if (elem.getAttribute(IOString.SEATS) != null) {
+						result.seats = Integer.parseInt(elem.getAttributeValue(IOString.SEATS));
 					}
 				}
 			}
