@@ -279,13 +279,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		//Convert screen to board position
 		screenToBoardPos(mouseScreenX, mouseScreenY, mouseBoardPos);
 		//Check if mouse is in the private area if private area is not hidden
-
 		mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, mouseBoardPos.getXI(), mouseBoardPos.getYI());
+		//Check if some key is pressed
 
 
 		if (player != null) {
 			//set the mouse position of the player to send to other players
 			player.setMousePos(mouseBoardPos.getXI(), mouseBoardPos.getYI());
+			//Disable action string if mouse moves and no key is pressed
+			if (keyPressed == 0)
+			{
+				player.actionString = "";
+			}
 			gameInstance.update(new GamePlayerEditAction(id, player, player));
 			//get nearest object concerning the mouse position
 			ObjectInstance nearestObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
@@ -430,6 +435,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			else if (!mouseInPrivateArea) {
 				if(!selectedObjects.contains(nearestObject.id)) {
 					if (!arg0.isControlDown()) {
+						for (int i : selectedObjects) {
+							gameInstance.getObjectInstanceById(i).state.isActive = false;
+						}
 						selectedObjects.clear();
 						selectedObjects.add(nearestObject.id);
 					} else {

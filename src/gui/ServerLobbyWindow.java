@@ -54,21 +54,26 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private static final Logger logger = LoggerFactory.getLogger(ServerLobbyWindow.class);
 	private static final long serialVersionUID = 6569919447688866509L;
 	public final SynchronousGameClientLobbyConnection client;
+
+	String Id = String.valueOf(Options.getInteger("last_connection.id"));
+	String Address = Options.getString("last_connection.address");
+	String Port = String.valueOf(Options.getInteger("last_connection.port"));
+	String Name = Options.getString("last_connection.name");
+
+
 	private final JTextField textFieldName = new JTextField(Options.getString("last_connection.name"));
 	//private final JTextField textFieldChat = new JTextField();
 	//private final JTextArea textAreaChat = new JTextArea();
 	/*TODOS here:
 	show a list of lokally installed games
 	*/
-	
-
-	
 	private final DefaultTableModel tableModelOpenGames = new TableModel(GameInstance.TYPES);
 	private final JTable tableOpenGames = new JTable(tableModelOpenGames);
 	private final JScrollPane scrollPaneOpenGames = new JScrollPane(tableOpenGames);
     private final JButton buttonPoll = new JButton();
     private final JButton buttonCreateGame = new JButton();
     private final JButton buttonStartServer = new JButton();
+
     private final JTextField textFieldId = new JTextField(String.valueOf(Options.getInteger("last_connection.id")));
     private final JLabel labelAddress = new JLabel();
     private final JLabel labelPort = new JLabel();
@@ -265,8 +270,10 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		this.client = client;
 		buttonCreateGame.addActionListener(this);
 		buttonStartServer.addActionListener(this);
-		textFieldAddress.setText(client.getAddress());
-		textFieldPort.setText(Integer.toString(client.getPort()));
+		String Port = Integer.toString(client.getPort());
+		String Address = client.getAddress();
+		//textFieldAddress.setText(client.getAddress());
+		//textFieldPort.setText(Integer.toString(client.getPort()));
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		setMinimumSize(getPreferredSize());
 	}

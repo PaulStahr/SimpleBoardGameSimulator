@@ -27,21 +27,67 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 	 * 
 	 */
 	private static final long serialVersionUID = -1686844504581572726L;
+	private static final FuncControl[] boardControls = {
+			new FuncControl(Words.move_board, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 0,  -1,0), new ControlCombination(0, -1,  -1,16)),
+			new FuncControl(Words.rotate, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2,  -1, 0), new ControlCombination(0, -1,  KeyEvent.VK_UP, 0), new ControlCombination(0, -1,  KeyEvent.VK_DOWN, 0)),
+			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
+			new FuncControl(Words.sit_down, new ControlCombination(0, 3,  0, 0)),
+			new FuncControl(Words.center_board, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  KeyEvent.VK_ENTER, 0)),
+			new FuncControl(Words.hide_show_table, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  KeyEvent.VK_T, 0)),
+			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(0, -1, KeyEvent.VK_H,0)),
+
+	};
+
+	private static final FuncControl[] objectControls= {
+			new FuncControl(Words.select_objects, 	new ControlCombination(0, 0,  -1,0)),
+			new FuncControl(Words.select_multiple_objects, 	new ControlCombination(InputEvent.CTRL_DOWN_MASK, 0,  -1,0)),
+			new FuncControl(Words.move_object, 		new ControlCombination(0, 0, -1, 1)),
+			new FuncControl(Words.move_stack,	 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 0, -1, 1),new ControlCombination(0, 1, -1, 1)),
+			new FuncControl(Words.get_top_n_card, 	new ControlCombination(0, 1, -1, 5)),
+			new FuncControl(Words.get_bottom_card, 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 2,  -1, 1)),
+			new FuncControl(Words.rotate_object, 	new ControlCombination(0, -1,  KeyEvent.VK_R, 0)),
+			new FuncControl(Words.shuffle_stack, 	new ControlCombination(0, -1, KeyEvent.VK_S, 0)),
+			new FuncControl(Words.merge_objects, 	new ControlCombination(0, -1, KeyEvent.VK_M, 0)),
+			new FuncControl(Words.collect_all_objects_of_a_group, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2,  KeyEvent.VK_M, 0)),
+			new FuncControl(Words.flip_objects_roll_dice, new ControlCombination(0, -1,  KeyEvent.VK_F, 0)),
+			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
+			new FuncControl(Words.fix_object, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  KeyEvent.VK_F, 0)),
+
+	};
+
+	private static final FuncControl[] privateAreaControls= {
+			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(0, -1, KeyEvent.VK_H,0)),
+			new FuncControl(Words.take_object_to_hand, new ControlCombination(0, -1,  KeyEvent.VK_T, 0), new ControlCombination(0, 0,  -1, 1)),
+			new FuncControl(Words.take_object_to_hand_face_down, new ControlCombination(0, 2,  -1,1)),
+			new FuncControl(Words.play_card_face_up, new ControlCombination(0, 1,  -1, 8)),
+			new FuncControl(Words.play_card_face_down, new ControlCombination(0, 2,  -1, 8)),
+			new FuncControl(Words.play_active_hand_card, new ControlCombination(0, -1, KeyEvent.VK_P, 0)),
+			new FuncControl(Words.drop_all_hand_cards, new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, KeyEvent.VK_D, 0)),
+			new FuncControl(Words.drop_active_hand_card, new ControlCombination(0, -1, KeyEvent.VK_D, 0)),
+			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
+	};
+
+	private static final FuncControl[] countControls = {
+			new FuncControl(Words.count_card_number, new ControlCombination(0, -1,  KeyEvent.VK_C, 0)),
+			new FuncControl(Words.count_card_value, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1, KeyEvent.VK_C, 0)),
+	};
+
+
 	JLabel boardControlsLabel = new JLabel("Board Controls");
-    JTable boardControlsTable = new JTable(7, 2);
+    JTable boardControlsTable = new JTable(boardControls.length, 2);
     JScrollPane boardControlPane = new JScrollPane(boardControlsTable);
 
     JLabel objectControlsLabel = new JLabel("Object Controls");
-    JTable objectControlsTable = new JTable(12, 2);
+    JTable objectControlsTable = new JTable(objectControls.length, 2);
     JScrollPane objectControlsPane = new JScrollPane(objectControlsTable);
 
     JLabel privateAreaControlsLabel = new JLabel("Hand Card Area");
-    JTable privateAreaControlsTable = new JTable(9, 2);
+    JTable privateAreaControlsTable = new JTable(privateAreaControls.length, 2);
     JScrollPane privateAreaControlsPane = new JScrollPane(privateAreaControlsTable);
 
 
     JLabel countControlsLabel = new JLabel("Control Hand Cards");
-    JTable countControlsTable = new JTable(2, 2);
+    JTable countControlsTable = new JTable(countControls.length, 2);
     JScrollPane countControlsPane = new JScrollPane(countControlsTable);
     //keyAssignmentTable.setFillsViewportHeight(true);
 
@@ -90,50 +136,7 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 		}
 	}
 
-	private static final FuncControl[] boardControls = {
-			new FuncControl(Words.move_board, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 0,  -1,0), new ControlCombination(0, -1,  -1,16)),
-			new FuncControl(Words.rotate, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2,  -1, 0), new ControlCombination(0, -1,  KeyEvent.VK_UP, 0), new ControlCombination(0, -1,  KeyEvent.VK_DOWN, 0)),
-			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
-			new FuncControl(Words.sit_down, new ControlCombination(0, 3,  0, 0)),
-			new FuncControl(Words.center_board, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  KeyEvent.VK_ENTER, 0)),
-			new FuncControl(Words.hide_show_table, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  KeyEvent.VK_T, 0)),
-			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(0, -1, KeyEvent.VK_H,0)),
 
-	};
-
-	private static final FuncControl[] objectControls= {
-			new FuncControl(Words.move_object, 		new ControlCombination(0, 0, -1, 1)),
-			new FuncControl(Words.move_stack,	 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 0, -1, 1),new ControlCombination(0, 1, -1, 1)),
-			new FuncControl(Words.get_top_n_card, 	new ControlCombination(0, 1, -1, 5)),
-			new FuncControl(Words.get_bottom_card, 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 2,  -1, 1)),
-			new FuncControl(Words.rotate_object, 	new ControlCombination(0, -1,  KeyEvent.VK_R, 0)),
-			new FuncControl(Words.select_objects, 	new ControlCombination(0, 0,  -1,1)),
-			new FuncControl(Words.shuffle_stack, 	new ControlCombination(0, -1, KeyEvent.VK_S, 0)),
-			new FuncControl(Words.merge_objects, 	new ControlCombination(0, -1, KeyEvent.VK_M, 0)),
-			new FuncControl(Words.collect_all_objects_of_a_group, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2,  KeyEvent.VK_M, 0)),
-			new FuncControl(Words.flip_objects_roll_dice, new ControlCombination(0, -1,  KeyEvent.VK_F, 0)),
-			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
-			new FuncControl(Words.fix_object, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  KeyEvent.VK_F, 0)),
-
-	};
-	
-	private static final FuncControl[] privateAreaControls= {
-			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(0, -1, KeyEvent.VK_H,0)),
-			new FuncControl(Words.take_object_to_hand, new ControlCombination(0, -1,  KeyEvent.VK_T, 0), new ControlCombination(0, 0,  -1, 1)),
-			new FuncControl(Words.take_object_to_hand_face_down, new ControlCombination(0, 2,  -1,1)),
-			new FuncControl(Words.play_card_face_up, new ControlCombination(0, 1,  -1, 8)),
-			new FuncControl(Words.play_card_face_down, new ControlCombination(0, 2,  -1, 8)),
-			new FuncControl(Words.play_active_hand_card, new ControlCombination(0, -1, KeyEvent.VK_P, 0)),
-			new FuncControl(Words.drop_all_hand_cards, new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, KeyEvent.VK_D, 0)),
-			new FuncControl(Words.drop_active_hand_card, new ControlCombination(0, -1, KeyEvent.VK_D, 0)),
-			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
-	};
-	
-	private static final FuncControl[] countControls = {
-			new FuncControl(Words.count_card_number, new ControlCombination(0, -1,  KeyEvent.VK_C, 0)),
-			new FuncControl(Words.count_card_value, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1, KeyEvent.VK_C, 0)),
-	};
-	
     @Override
     public void languageChanged(Language lang) {
 		String[] columnNames = {lang.getString(Words.description), lang.getString(Words.key)};

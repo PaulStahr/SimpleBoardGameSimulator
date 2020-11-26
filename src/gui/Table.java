@@ -27,7 +27,7 @@ public class Table {
 
     public Table(GameInstance gameInstance, int diameter, Point2D tableOrigin){
         this.diameter = diameter;
-        this.playerDiameter = diameter/10;
+        this.playerDiameter = diameter/5;
         this.stackerWidth = diameter/5;
         this.tableOrigin.setLocation(tableOrigin.getX(), tableOrigin.getY());
         this.tableScreenOrigin.setLocation(tableOrigin.getX(), tableOrigin.getY());
@@ -63,7 +63,7 @@ public class Table {
         Graphics2D graphics2D = (Graphics2D) g;
         AffineTransform tmp = graphics2D.getTransform();
         Point2D rotatedPoint = new Point2D.Double();
-        Rectangle rectangle = new Rectangle(  -100, 0, 200, 200);
+        Rectangle rectangle = new Rectangle(  -diameter/10, diameter/20, diameter/5, diameter/5);
 
         for (int i = 0; i< playerShapes.size(); ++i){
             double angle = 360./playerShapes.size()*i;

@@ -97,6 +97,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	
 	public GameWindow(GameInstance gi, Player player, LanguageHandler lh)
 	{
+		this.setTitle(gi.name);
 		this.gi = gi;
 		this.lh = lh;
 		JMenuBar menuBar = new JMenuBar();
