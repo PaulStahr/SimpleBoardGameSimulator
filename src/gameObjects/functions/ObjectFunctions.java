@@ -990,7 +990,6 @@ public class ObjectFunctions {
     public static void deactivateObject(GamePanel gamePanel, GameInstance gameInstance, int objectId){
         ObjectInstance oi = gameInstance.getObjectInstanceById(objectId);
         if(oi != null) {
-            oi.state.isActive = false;
             if (gamePanel.activeObject.equals(oi))
             {
                 gamePanel.activeObject = null;
@@ -1167,11 +1166,11 @@ public class ObjectFunctions {
             if (objectBelow != null) {
                 ObjectState stateBelow = objectBelow.state.copy();
                 ObjectState state = objectInstance.state.copy();
-                ObjectState stateAbove = objectAbove.state.copy();
                 stateBelow.aboveInstanceId = objectInstance.id;
                 state.belowInstanceId = objectBelow.id;
                 moveObjectTo(gamePanel.id, gameInstance, player, objectInstance, objectBelow.state.posX - cardMargin, objectBelow.state.posY);
                 if (objectAbove != null) {
+                    ObjectState stateAbove = objectAbove.state.copy();
                     stateAbove.belowInstanceId = objectInstance.id;
                     state.aboveInstanceId = objectAbove.id;
                     gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectAbove, stateAbove));
