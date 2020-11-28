@@ -2,7 +2,10 @@
 
 <xml>
 <name>Doppelkopf</name>
-<settings name="Doppelkopf" private_area="true" table="true" table_radius="500"/>
+<settings>
+<name>Doppelkopf</name>
+<table table_radius="500" put_down_area="true" color="#d2a56d">true</table>
+</settings>
 <object unique_name="caro10" id="0" x="100" y="100" r="0"/>
 <object unique_name="carobube" id="1" x="100" y="100" r="0"/>
 

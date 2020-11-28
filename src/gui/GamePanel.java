@@ -357,7 +357,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		zoomFactor = (int)(-10*Math.log(zooming));
 		rotation = 0;
 		updateGameTransform();
-		rotation = Math.toRadians(- 360/this.table.playerShapes.size() * pos);
+		rotation = Math.toRadians(- 360/Math.max(1,this.table.playerShapes.size()) * pos);
 		updateGameTransform();
 	}
 
@@ -433,14 +433,21 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 			//Select objects on click
 			else if (!mouseInPrivateArea) {
-				if(!selectedObjects.contains(nearestObject.id)) {
+				//Select unselected objects on click and deselect selected objects on Control+click
+				if(!selectedObjects.contains(nearestObject.id) || arg0.isControlDown()) {
 					if (!arg0.isControlDown()) {
 						for (int i : selectedObjects) {
 							gameInstance.getObjectInstanceById(i).state.isActive = false;
 						}
 						selectedObjects.clear();
 						selectedObjects.add(nearestObject.id);
-					} else {
+					}
+					else if (selectedObjects.contains(nearestObject.id)) {
+
+						selectedObjects.remove(Integer.valueOf(nearestObject.id));
+						gameInstance.getObjectInstanceById(nearestObject.id).state.isActive = false;
+					}
+					else {
 						selectedObjects.add(nearestObject.id);
 					}
 				}

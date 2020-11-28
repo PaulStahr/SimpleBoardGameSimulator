@@ -71,8 +71,8 @@ public enum GameObjectColumnType implements TableColumnType{
 		switch (this)
 		{
 			case DELETE:	return "Delete";
-			case ID:		return gi.uniqueName;
-			case NAME:		return gi.uniqueName;
+			case ID:		return gi.uniqueObjectName;
+			case NAME:		return gi.uniqueObjectName;
 			default:throw new IllegalArgumentException(getName());
 		}
 	}

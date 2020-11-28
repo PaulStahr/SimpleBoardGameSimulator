@@ -11,8 +11,8 @@ public class GameObjectFigure extends GameObject{
 	private transient BufferedImage lyingLook;
 	private String standingLookStr;
 	private String lyingLookStr;
-	public GameObjectFigure(String uniqueName, String objectType, int widthInMM, int heightInMM, BufferedImage standingLook, int value, int rotationStep, int isFixed) {
-		super(uniqueName, objectType, widthInMM, heightInMM, value, rotationStep,isFixed);
+	public GameObjectFigure(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, BufferedImage standingLook, int value, int rotationStep, int isFixed) {
+		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, rotationStep,isFixed);
 		this.standingLook = standingLook;
 		// calc a rotated figure from standing figure
 		int width = standingLook.getWidth();

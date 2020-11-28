@@ -976,6 +976,37 @@ public class ObjectFunctions {
         getOwnedStack(gameInstance,player,idList,true);
     }
 
+    public static void deselectObject(GamePanel gamePanel, int objectId){
+        if (gamePanel.selectedObjects.contains(objectId))
+        {
+            gamePanel.selectedObjects.remove(Integer.valueOf(objectId));
+        }
+    }
+    public static void deselectObjects(GamePanel gamePanel, IntegerArrayList idList){
+        for (int id: idList){
+            deselectObject(gamePanel, id);
+        }
+    }
+    public static void deactivateObject(GamePanel gamePanel, GameInstance gameInstance, int objectId){
+        ObjectInstance oi = gameInstance.getObjectInstanceById(objectId);
+        if(oi != null) {
+            oi.state.isActive = false;
+            if (gamePanel.activeObject.equals(oi))
+            {
+                gamePanel.activeObject = null;
+            }
+            if (gamePanel.activeObjects.contains(objectId))
+            {
+                gamePanel.activeObjects.remove(Integer.valueOf(objectId));
+            }
+        }
+    }
+    public static void deactivateObjects(GamePanel gamePanel, GameInstance gameInstance, IntegerArrayList idList){
+        for (int id: idList){
+            deactivateObject(gamePanel, gameInstance, id);
+        }
+    }
+
     public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
         if (activeObject != null) {
             if (activeObject.go instanceof GameObjectToken) {
@@ -1194,11 +1225,14 @@ public class ObjectFunctions {
         state.owner_id = player.id;
         state.inPrivateArea = true;
         state.isActive = false;
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance, state));
+        gamePanel.privateArea.updatePrivateObjects(gameInstance, player);
+        deselectObject(gamePanel, objectInstance.id);
+        deactivateObject(gamePanel, gameInstance, objectInstance.id);
         insertIntoStack(gamePanel, gameInstance, player, objectInstance, idList, insertId, cardMargin);
         idList.clear();
         moveOwnStackToBoardPosition(gamePanel, gameInstance, player, idList);
-        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance, state));
-        gamePanel.privateArea.updatePrivateObjects(gameInstance, player);
+
     }
 
     public static void removeFromOwnStack(GamePanel gamePanel, GameInstance gameInstance, Player player, int id) {

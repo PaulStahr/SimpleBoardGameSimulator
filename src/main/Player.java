@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import gameObjects.PlayerColumnType;
+import gameObjects.instance.GameInstance;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 
@@ -56,7 +57,7 @@ public class Player implements Comparable {
 		this.color = color;
 		this.mouseXPos = mouseX;
 		this.mouseYPos = mouseY;
-		setPlayerColor();	
+		setPlayerColor();
 	}
 
 	@Override
@@ -64,13 +65,35 @@ public class Player implements Comparable {
 		return "(" + name + " " + id + ")";
 	}
 
-	public void setPlayerColor(){
-		Random rand = new Random();
-		float r = rand.nextFloat();
-		float g = rand.nextFloat();
-		float b = rand.nextFloat();
 
-		this.color = new Color(r, g, b);
+
+	public void setPlayerColor(GameInstance gameInstance){
+		int posPlayer = -1;
+		if (gameInstance != null) {
+			posPlayer = gameInstance.getPlayerList().indexOf(this);
+		}
+		if (posPlayer != -1 && posPlayer < gameInstance.seatColors.size())
+		{
+			this.color = Color.decode(gameInstance.seatColors.get(posPlayer));
+		}
+		else {
+			Random rand = new Random();
+			float r = rand.nextFloat();
+			float g = rand.nextFloat();
+			float b = rand.nextFloat();
+
+			this.color = new Color(r, g, b);
+		}
+	}
+
+	public void setPlayerColor(){
+		if (this.color == null) {
+			Random rand = new Random();
+			float r = rand.nextFloat();
+			float g = rand.nextFloat();
+			float b = rand.nextFloat();
+			this.color = new Color(r, g, b);
+		}
 	}
 
 	public void setMousePos(int posX, int posY){

@@ -33,8 +33,8 @@ public class GameObjectToken extends GameObject{
 		this.downsideLook = null;
 	}
 
-	public GameObjectToken(String uniqueName, String objectType, int widthInMM, int heightInMM, BufferedImage front, BufferedImage back, int value, int rotationStep, int isFixed) {
-		super(uniqueName, objectType, widthInMM, heightInMM, value, rotationStep, isFixed);
+	public GameObjectToken(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, BufferedImage front, BufferedImage back, int value, int rotationStep, int isFixed) {
+		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, rotationStep, isFixed);
 		this.upsideLook = front;
 		this.downsideLook = back;
 	}

@@ -134,7 +134,7 @@ public class DrawFunctions {
                 g2.translate(-img.getWidth()/2, 0);
                 g2.drawImage(img, null, 0, -10);
                 g2.scale(5, 5);
-                g2.drawString(p.getName(), 0, -25);
+                g2.drawString(p.getName(), 5, -10);
 			}
             g2.setTransform(tmp);
 
@@ -163,9 +163,13 @@ public class DrawFunctions {
     public static void drawSelection(GamePanel gamePanel, Graphics g, Player player){
         Graphics2D g2 = (Graphics2D)g;
         g2.setTransform(new AffineTransform());
-        if (gamePanel.selectWidth > 0 && gamePanel.selectHeight >0 && gamePanel.activeObject == null  && !gamePanel.mouseInPrivateArea){
-            g.setColor(player.color);
-            g.drawRect(min(gamePanel.beginSelectPosScreenX, gamePanel.beginSelectPosScreenX+gamePanel.selectWidth),min(gamePanel.beginSelectPosScreenY, gamePanel.beginSelectPosScreenY+gamePanel.selectHeight), abs(gamePanel.selectWidth), abs(gamePanel.selectHeight));
+        if (gamePanel.activeObject == null  && !gamePanel.mouseInPrivateArea){
+            g2.setColor(player.color);
+            if(min(abs(gamePanel.selectWidth), abs(gamePanel.selectHeight)) > 0) {
+                Stroke stroke = new BasicStroke(5.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 10.0f, new float[]{20.0f, 20.0f}, 0.0f);
+                g2.setStroke(stroke);
+                g2.drawRect(min(gamePanel.beginSelectPosScreenX, gamePanel.beginSelectPosScreenX + gamePanel.selectWidth), min(gamePanel.beginSelectPosScreenY, gamePanel.beginSelectPosScreenY + gamePanel.selectHeight), abs(gamePanel.selectWidth), abs(gamePanel.selectHeight));
+            }
         }
     }
 
@@ -297,14 +301,26 @@ public class DrawFunctions {
             }
 
             //Draw Border around objects
-            Stroke stroke = new BasicStroke(borderWidth);
-            g2.setStroke(stroke);
+            Stroke stroke = new BasicStroke(borderWidth,BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+            float strokePresentLength = Math.min((float)(objectInstance.scale * img.getHeight())/2.0f, (float)(objectInstance.scale * img.getWidth())/2.0f);
+            float strokeAbsentLengthHeight = (float)(objectInstance.scale * img.getHeight() - strokePresentLength);
+            float strokeAbsentLengthWidth = (float)(objectInstance.scale * img.getWidth() - strokePresentLength);
+            float [] dash = new float[]{ strokePresentLength,  strokeAbsentLengthWidth, strokePresentLength, strokeAbsentLengthHeight, strokePresentLength, strokeAbsentLengthWidth, strokePresentLength, strokeAbsentLengthHeight };
+            float dashPhase = strokePresentLength/4.0f;
+            Stroke activeStroke = new BasicStroke(borderWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, img.getHeight()/4.0f, dash, dashPhase);
             if (objectInstance.state.owner_id != -1) {
+                    g2.setStroke(stroke);
                     Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
                     g2.setColor(playerOwner.color);
                     g2.drawString(playerOwner.getName() + " Hand Cards", -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - 20);
             }
-            else if(objectInstance.state.isActive || gamePanel.selectedObjects.contains(objectInstance.id)){
+            else if(gamePanel.selectedObjects.contains(objectInstance.id))
+            {
+                g2.setStroke(stroke);
+                g2.setColor(player.color);
+            }
+            else if(objectInstance.state.isActive){
+                g2.setStroke(activeStroke);
                 g2.setColor(player.color);
             }
             else if(ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance)){

@@ -13,7 +13,7 @@ import util.jframe.table.TableColumnType;
 public abstract class GameObject {
 	public int widthInMM;
 	public int heightInMM;
-	public String uniqueName;
+	public String uniqueObjectName;
 	public String objectType;
 	public int value;
 	public int rotationStep;
@@ -22,9 +22,9 @@ public abstract class GameObject {
 
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectColumnType.ID, GameObjectColumnType.NAME, GameObjectColumnType.DELETE});
 
-	public GameObject(String uniqueName, String objectType, int widthInMM, int heightInMM, int value, int rotationStep, int isFixed)
+	public GameObject(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, int value, int rotationStep, int isFixed)
 	{
-		this.uniqueName = uniqueName;
+		this.uniqueObjectName = uniqueObjectName;
 		this.objectType = objectType;
 		this.widthInMM = widthInMM;
 		this.heightInMM = heightInMM;
@@ -51,7 +51,7 @@ public abstract class GameObject {
 	@Override
 	public int hashCode()
 	{
-		return widthInMM ^ heightInMM ^ uniqueName.hashCode();
+		return widthInMM ^ heightInMM ^ uniqueObjectName.hashCode();
 	}
 
 	public abstract void updateImages(GameInstance gi);

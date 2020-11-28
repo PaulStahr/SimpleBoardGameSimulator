@@ -38,7 +38,9 @@ public class GameInstance {
 	public boolean table = true;
     public boolean put_down_area = true;
     public int seats = -1;
-    private long maxDrawValue = 0;
+	public List<String> seatColors = new ArrayList<>();
+	public String tableColor = "";
+	private long maxDrawValue = 0;
 	public int tableRadius = 1200;
 	
 	public static interface GameChangeListener
@@ -76,10 +78,12 @@ public class GameInstance {
 		if (pl != null)
 		{
 			pl.set(player);
+			player.setPlayerColor(this);
 			update(new GamePlayerEditAction(action == null ? 0 : action.source, pl, pl));
 			return pl;
 		}else {
 			players.add(player);
+			player.setPlayerColor(this);
 			update(action == null ? new AddPlayerAction(0, player) : action);
 			return player;
 		}
@@ -267,7 +271,7 @@ public class GameInstance {
 
 	public void remove(int source, GameObject object) {
 		game.objects.remove(object);
-		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_OBJECT, object.uniqueName.hashCode()));
+		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_OBJECT, object.uniqueObjectName.hashCode()));
 	}
 	
 	public void getOwnedPrivateObjects(int player_id, boolean inPrivateArea, ArrayList<ObjectInstance> result)

@@ -76,7 +76,7 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
 		{
 			case DELETE:	return "Delete";
 			case ID:		return gi.id;
-			case NAME:		return gi.go.uniqueName;
+			case NAME:		return gi.go.uniqueObjectName;
 			case ABOVE:		return gi.state.aboveInstanceId;
 			case BELOW:		return gi.state.belowInstanceId;
 			case OWNER:		return gi.owner_id();

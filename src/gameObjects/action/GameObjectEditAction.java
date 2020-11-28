@@ -20,7 +20,7 @@ public class GameObjectEditAction extends GameAction{
 	public GameObjectEditAction(int source, GameObject go) {
 		super(source);
 		this.go = go;
-		this.objectId = go.uniqueName;
+		this.objectId = go.uniqueObjectName;
 	}
 
 	public GameObject getObject(GameInstance gi) {

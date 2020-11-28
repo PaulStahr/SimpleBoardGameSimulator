@@ -412,7 +412,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			//setLayout(layout);YES_NO_OPTION
 			setLayout(JFrameUtils.DOUBLE_COLUMN_LAUYOUT);
 			this.go = go;
-			textFieldName.setText(go.uniqueName);
+			textFieldName.setText(go.uniqueObjectName);
 			textFieldWidth.setText(Integer.toString(go.widthInMM));
 			textFieldHeight.setText(Integer.toString(go.heightInMM));
 			textFieldWidth.getDocument().addDocumentListener(this);
@@ -476,7 +476,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				go.heightInMM = Integer.parseInt(textFieldHeight.getText());
 			}
 			isUpdating = true;
-			gi.update(new GameObjectEditAction(id, go.uniqueName));
+			gi.update(new GameObjectEditAction(id, go.uniqueObjectName));
 			isUpdating = false;
 		}
 		@Override
@@ -503,7 +503,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 					got.setDownsideLook((String)comboBoxBackImage.getSelectedItem());
 				}
 				isUpdating = true;
-				gi.update(new GameObjectEditAction(id, got.uniqueName));
+				gi.update(new GameObjectEditAction(id, got.uniqueObjectName));
 				isUpdating = false;
 			}
 		}
@@ -607,7 +607,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 					ObjectInstance instance = gi.getObjectInstanceByIndex(row);
 					if (type == GameObjectInstanceColumnType.NAME)
 					{
-						instance.go.uniqueName = tableModelGameObjectInstances.getValueAt(row, col).toString();
+						instance.go.uniqueObjectName = tableModelGameObjectInstances.getValueAt(row, col).toString();
 						gi.update(new GameObjectEditAction(-1, instance.go));
 					}
 					else
@@ -634,7 +634,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 					GameObject go = gi.getObjectByIndex(row);
 					switch (type)
 					{
-						case NAME: go.uniqueName = tableModelGameObjects.getValueAt(row, col).toString(); break;
+						case NAME: go.uniqueObjectName = tableModelGameObjects.getValueAt(row, col).toString(); break;
 						default: break;
 					}
 				}

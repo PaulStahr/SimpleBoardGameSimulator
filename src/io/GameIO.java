@@ -162,46 +162,88 @@ public class GameIO {
 	 * @param gi the GameInstance that shall the updated
 	 */
 	private static void editGameInstanceFromElement(Element root, GameInstance gi) throws JDOMException, IOException {
-
-		for (Element elem : root.getChildren())
-		{
+		//Control the xml version, downward compatible current version 2.0
+		//String xmlVersion = root.getAttributeValue(IOString.VERSION);
+		Integer uniqueId = 0;
+		for (Element elem : root.getChildren()) {
 			String name = elem.getName();
-			switch (name)
-			{
+			switch (name) {
 				case IOString.PLAYER:
 					Player player = createPlayerFromElement(elem);
 					gi.addPlayer(null, player);
 					break;
-				case IOString.NAME:gi.name = elem.getValue();break;
+				case IOString.NAME:
+					gi.name = elem.getValue();
+					break;
 				case IOString.SETTINGS:
-					gi.name = elem.getAttributeValue(IOString.NAME);
-					if (elem.getAttribute(IOString.PRIVATE_AREA) != null) {
-						gi.private_area = Boolean.parseBoolean(elem.getAttributeValue(IOString.PRIVATE_AREA));
-					}
-					if (elem.getAttribute(IOString.PUT_DOWN_AREA) != null) {
-						gi.put_down_area = Boolean.parseBoolean(elem.getAttributeValue(IOString.PUT_DOWN_AREA));
-					}
-					if (elem.getAttribute(IOString.TABLE) != null) {
-						gi.table = Boolean.parseBoolean(elem.getAttributeValue(IOString.TABLE));
-					}
-					if (elem.getAttribute(IOString.TABLE_RADIUS) != null) {
-						gi.tableRadius = Integer.parseInt(elem.getAttributeValue(IOString.TABLE_RADIUS));
-					}
-					if (elem.getAttribute(IOString.SEATS) != null) {
-						gi.seats = Integer.parseInt(elem.getAttributeValue(IOString.SEATS));
-						gi.seats = max(-1, gi.seats);
+					for (Element elemSettings : elem.getChildren()) {
+						String settingsName = elemSettings.getName();
+						switch (settingsName) {
+							case IOString.NAME:
+								gi.name = elemSettings.getValue();
+								break;
+							case IOString.PRIVATE_AREA:
+								gi.private_area = Boolean.parseBoolean(elemSettings.getValue());
+								break;
+							case IOString.TABLE:
+								gi.table = Boolean.parseBoolean(elemSettings.getValue());
+								if (elemSettings.getAttribute(IOString.PUT_DOWN_AREA) != null) {
+									gi.put_down_area = Boolean.parseBoolean(elemSettings.getAttributeValue(IOString.PUT_DOWN_AREA));
+								}
+								if (elemSettings.getAttribute(IOString.TABLE_RADIUS) != null) {
+									gi.tableRadius = Integer.parseInt(elemSettings.getAttributeValue(IOString.TABLE_RADIUS));
+								}
+								if (elemSettings.getAttribute(IOString.COLOR) != null) {
+									gi.tableColor = elemSettings.getAttributeValue(IOString.COLOR);
+								}
+								break;
+							case IOString.SEATS:
+								for (Element seatElement : elemSettings.getChildren()) {
+									String seatElementName = seatElement.getName();
+									if (seatElementName.equals(IOString.SEAT)) {
+										++gi.seats;
+										if (seatElement.getAttribute(IOString.COLOR) != null) {
+											gi.seatColors.add(seatElement.getAttributeValue(IOString.COLOR));
+										}
+									}
+								}
+								gi.seats = max(-1, gi.seats + 1);
+								break;
+						}
 					}
 					break;
 				case IOString.OBJECT:
-					String uniqueName = elem.getAttributeValue(IOString.UNIQUE_NAME);
-					ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), Integer.parseInt(elem.getAttributeValue(IOString.ID)));
-					editStateFromElement(oi.state, elem);
-					gi.addObjectInstance(oi);
+					String uniqueName = "";
+					if (elem.getAttributeValue(IOString.UNIQUE_NAME) != null) {
+						uniqueName = elem.getAttributeValue(IOString.UNIQUE_NAME);
+					}
+					else
+					{
+						throw new IOException("Object must have a unique name");
+					}
+					if (elem.getAttributeValue(IOString.NUMBER) != null) {
+						for (int i = 0; i < Integer.parseInt(elem.getAttributeValue(IOString.NUMBER)); ++i) {
+							ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), uniqueId);
+							editStateFromElement(oi.state, elem);
+							gi.addObjectInstance(oi);
+							++uniqueId;
+						}
+					} else {
+						ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), uniqueId);
+						editStateFromElement(oi.state, elem);
+						gi.addObjectInstance(oi);
+						++uniqueId;
+					}
 					break;
-				case IOString.PASSWORD:gi.password = elem.getValue();break;
-				case IOString.HIDDEN:gi.hidden = Boolean.parseBoolean(elem.getValue());break;
+				case IOString.PASSWORD:
+					gi.password = elem.getValue();
+					break;
+				case IOString.HIDDEN:
+					gi.hidden = Boolean.parseBoolean(elem.getValue());
+					break;
 			}
 		}
+
 	}
 
 	/**
@@ -211,9 +253,10 @@ public class GameIO {
 	 * @param images a HashMap of all images saved in the game
 	 * @return the created GameInstance
 	 */
-	private static GameObject createGameObjectFromElement(Element elem, HashMap<String, BufferedImage> images)
+	private static GameObject createGameObjectFromElement(Element elem, HashMap<String, BufferedImage> images, Integer uniqueId)
 	{
-		String uniqueName = elem.getAttributeValue(IOString.UNIQUE_NAME);
+
+		String objectName = elem.getAttributeValue(IOString.UNIQUE_NAME);
 		String type = elem.getAttributeValue(IOString.TYPE);
 		GameObject result = null;
 		int width = 66;
@@ -240,12 +283,12 @@ public class GameIO {
 		{
 			case IOString.CARD:
 			{
-				result = new GameObjectToken(uniqueName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value, rotationStep, isFixed);
+				result = new GameObjectToken(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value, rotationStep, isFixed);
 				break;
 			}
 			case IOString.FIGURE:
 			{
-				result = new GameObjectFigure(uniqueName, type, width, height, images.get(elem.getAttributeValue(IOString.STANDING)), value, rotationStep, isFixed);
+				result = new GameObjectFigure(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.STANDING)), value, rotationStep, isFixed);
 				break;
 			}
 			case IOString.DICE:
@@ -263,7 +306,7 @@ public class GameIO {
 						dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img, side.getValue()));
 					}
 				}
-				result = new GameObjectDice(uniqueName, type, width, height, dss.toArray(new DiceSide[dss.size()]), value, rotationStep);
+				result = new GameObjectDice(objectName, type, width, height, dss.toArray(new DiceSide[dss.size()]), value, rotationStep);
 				break;
 			}
 		}
@@ -322,8 +365,7 @@ public class GameIO {
 	private static Element createElementFromObjectInstance(ObjectInstance objectInstance)
 	{
 		Element elem = new Element(IOString.OBJECT);
-		elem.setAttribute(IOString.UNIQUE_NAME, objectInstance.go.uniqueName);
-		elem.setAttribute(IOString.ID, Integer.toString(objectInstance.id));
+		elem.setAttribute(IOString.UNIQUE_NAME, objectInstance.go.uniqueObjectName);
 		writeStateToElement(objectInstance.state, elem);
 		return elem;
 	}
@@ -341,7 +383,7 @@ public class GameIO {
 	{
 		Element elem = new Element(IOString.OBJECT);
 		elem.setAttribute(IOString.TYPE, gameObject.objectType);
-		elem.setAttribute(IOString.UNIQUE_NAME, gameObject.uniqueName);
+		elem.setAttribute(IOString.UNIQUE_NAME, gameObject.uniqueObjectName);
 		elem.setAttribute(IOString.WIDTH, Integer.toString(gameObject.widthInMM));
 		elem.setAttribute(IOString.HEIGHT, Integer.toString(gameObject.heightInMM));
 		for (String group : gameObject.groups)
@@ -455,12 +497,34 @@ public class GameIO {
 	        root_inst.addContent(sessionName);
 
 			Element settings = new Element(IOString.SETTINGS);
-			settings.setAttribute(IOString.NAME, gi.name);
-			settings.setAttribute(IOString.TABLE, Boolean.toString(gi.table));
-			settings.setAttribute(IOString.PRIVATE_AREA, Boolean.toString(gi.private_area));
-			settings.setAttribute(IOString.PUT_DOWN_AREA, Boolean.toString(gi.put_down_area));
-			settings.setAttribute(IOString.TABLE_RADIUS, Integer.toString(gi.tableRadius));
-			settings.setAttribute(IOString.SEATS, Integer.toString(gi.seats));
+
+			Element settingsName = new Element(IOString.NAME);
+			settingsName.setText(gi.name);
+			Element table = new Element(IOString.TABLE);
+			table.setText(Boolean.toString(gi.table));
+
+			table.setAttribute(IOString.PUT_DOWN_AREA, Boolean.toString(gi.put_down_area));
+			table.setAttribute(IOString.TABLE_RADIUS, Integer.toString(gi.tableRadius));
+			table.setAttribute(IOString.COLOR, gi.tableColor);
+
+			Element privateArea = new Element(IOString.PRIVATE_AREA);
+			privateArea.setText(Boolean.toString(gi.private_area));
+
+			Element seats = new Element(IOString.SEATS);
+			for (int i=0; i<gi.seats;++i)
+			{
+				Element seat = new Element(IOString.SEAT);
+				if (gi.seatColors.size() > i)
+				{
+					seat.setAttribute(IOString.COLOR, gi.seatColors.get(i));
+				}
+				seats.addContent(seat);
+			}
+
+			settings.addContent(settingsName);
+			settings.addContent(table);
+			settings.addContent(privateArea);
+			settings.addContent(seats);
 			settings.setAttribute(IOString.HIDDEN,Boolean.toString(gi.hidden));
 			root_inst.addContent(settings);
 
@@ -674,47 +738,28 @@ public class GameIO {
 			Document doc = new SAXBuilder().build(new ByteArrayInputStream(gameBuffer.toByteArray()));
 			Element root = doc.getRootElement();
 
-			for (Element elem : root.getChildren())
-			{
+			//Control the xml version, downward compatible current version 2.0
+			//String xmlVersion = root.getAttributeValue(IOString.VERSION);
+			Integer uniqueId = 0;
+			for (Element elem : root.getChildren()) {
 				final String name = elem.getName();
-				if (name.equals(IOString.OBJECT))
-				{
-					result.game.objects.add(createGameObjectFromElement(elem, result.game.images));
-				}
-				else if (name.equals(IOString.BACKGROUND))
-				{
+				if (name.equals(IOString.OBJECT)) {
+					if (elem.getAttribute(IOString.NUMBER) != null)
+					{
+						for (int i=0; i<Integer.parseInt(elem.getAttributeValue(IOString.NUMBER));++i) {
+							result.game.objects.add(createGameObjectFromElement(elem, result.game.images, uniqueId));
+							++uniqueId;
+						}
+					}
+					else {
+						result.game.objects.add(createGameObjectFromElement(elem, result.game.images, uniqueId));
+						++uniqueId;
+					}
+				} else if (name.equals(IOString.BACKGROUND)) {
 					result.game.background = result.game.images.get(elem.getValue());
 				}
-				else if (name.equals(IOString.NAME))
-				{
-					result.name = elem.getValue();
-				}
-				else if (name.equals(IOString.SETTINGS))
-				{
-					if (elem.getAttribute(IOString.NAME) != null)
-					{
-						result.name = elem.getAttributeValue(IOString.NAME);
-					}
-					if (elem.getAttribute(IOString.PRIVATE_AREA) != null)
-					{
-						result.private_area = Boolean.parseBoolean(elem.getAttributeValue(IOString.PRIVATE_AREA));
-					}
-					if (elem.getAttribute(IOString.PUT_DOWN_AREA) != null)
-					{
-						result.put_down_area = Boolean.parseBoolean(elem.getAttributeValue(IOString.PUT_DOWN_AREA));
-					}
-					if (elem.getAttribute(IOString.TABLE) != null)
-					{
-						result.table = Boolean.parseBoolean(elem.getAttributeValue(IOString.TABLE));
-					}
-					if (elem.getAttribute(IOString.TABLE_RADIUS) != null) {
-						result.tableRadius = Integer.parseInt(elem.getAttributeValue(IOString.TABLE_RADIUS));
-					}
-					if (elem.getAttribute(IOString.SEATS) != null) {
-						result.seats = Integer.parseInt(elem.getAttributeValue(IOString.SEATS));
-					}
-				}
 			}
+
 			if (result.name == null)
 			{
 				logger.warn("Name not set");

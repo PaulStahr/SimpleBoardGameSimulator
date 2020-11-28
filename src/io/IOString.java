@@ -54,4 +54,7 @@ public class IOString {
 	public static final String TABLE_RADIUS = "table_radius";
     public static final String PUT_DOWN_AREA = "put_down_area";
     public static final String SEATS = "seats";
+    public static final String SEAT = "seat";
+	public static final String NUMBER = "number";
+	public static final String VERSION = "version";
 }
