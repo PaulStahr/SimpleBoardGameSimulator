@@ -47,6 +47,7 @@ public abstract class ObjectState implements Serializable {
 		this.rotationStep = state.rotationStep;
 		this.isFixed = state.isFixed;
 		this.lastChange = state.lastChange;
+		this.isActive = state.isActive;
 	}
 
 	public abstract ObjectState copy();
