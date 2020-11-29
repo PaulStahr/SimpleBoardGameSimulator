@@ -211,6 +211,7 @@ public class GameIO {
 								}
 								break;
 							case IOString.SEATS:
+								gi.seatColors.clear();
 								for (Element seatElement : elemSettings.getChildren()) {
 									String seatElementName = seatElement.getName();
 									if (seatElementName.equals(IOString.SEAT)) {
