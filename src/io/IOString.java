@@ -5,6 +5,7 @@ public class IOString {
 	public static final String Y = "y";
 	public static final String Z = "z";
 	public static final String R = "r";
+	public static final String S = "s";
 	public static final String OWNER_ID = "owner_id";
 	public static final String DRAW_VALUE = "draw_value";
 	public static final String PLAYER = "player";

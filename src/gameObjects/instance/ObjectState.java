@@ -11,9 +11,10 @@ public abstract class ObjectState implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = -6447814893037551696L;
-	public int posX;
-	public int posY;
-	public int rotation;
+	public int posX = 0;
+	public int posY = 0;
+	public int rotation = 0;
+	public int scale = 1;
 	public int owner_id = -1;
 	transient public boolean isActive = false;
 	transient public long lastChange = System.nanoTime();
@@ -28,8 +29,9 @@ public abstract class ObjectState implements Serializable {
 
 	/*fix an object*/
 	public boolean isFixed = false;
-	
-	@Override
+
+
+    @Override
 	public int hashCode()
 	{
 		return posX ^ (posY << 16) ^ rotation ^ owner_id;
@@ -39,6 +41,7 @@ public abstract class ObjectState implements Serializable {
 		this.posX = state.posX;
 		this.posY = state.posY;
 		this.rotation = state.rotation;
+		this.scale = state.scale;
 		this.owner_id = state.owner_id;
 		this.inPrivateArea = state.inPrivateArea;
 		this.aboveInstanceId = state.aboveInstanceId;
@@ -62,6 +65,7 @@ public abstract class ObjectState implements Serializable {
 		posX = 0;
 		posY = 0;
 		rotation = 0;
+		scale = 1;
 		owner_id = -1;
 		isActive = false;
 		inPrivateArea = false;

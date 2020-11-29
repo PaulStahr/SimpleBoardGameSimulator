@@ -87,7 +87,8 @@
 <play_card_face_down>Play card face down</play_card_face_down>
 <rotate_wheel>Rotate wheel</rotate_wheel>
 <drop_on_board>Drop on board</drop_on_board>
-<sit_down>Sit down</sit_down>
+<sit_down>Sit to seat</sit_down>
+    <sit_to_own_seat>Sit to own seat</sit_to_own_seat>
 <arrow_keys>Arrow keys</arrow_keys>
 <invert_rotation>Invert Rotation</invert_rotation>
     <hide_and_show_hand_area>Hide or show hand cards</hide_and_show_hand_area>
@@ -97,4 +98,5 @@
     <fix_object>Fix object</fix_object>
     <left_double_click>Left double click</left_double_click>
     <select_multiple_objects>Select multiple objects</select_multiple_objects>
+    <double_click>Double click</double_click>
 </xml>

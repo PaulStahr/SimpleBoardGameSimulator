@@ -990,7 +990,7 @@ public class ObjectFunctions {
     public static void deactivateObject(GamePanel gamePanel, GameInstance gameInstance, int objectId){
         ObjectInstance oi = gameInstance.getObjectInstanceById(objectId);
         if(oi != null) {
-            if (gamePanel.activeObject.equals(oi))
+            if (gamePanel.activeObject != null && gamePanel.activeObject.equals(oi))
             {
                 gamePanel.activeObject = null;
             }

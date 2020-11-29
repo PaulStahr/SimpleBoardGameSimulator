@@ -47,12 +47,12 @@ public class ObjectInstance {
 
 	public int getWidth(int playerId)
 	{
-		return go.getWidth(state, playerId);
+		return go.getWidth(state, playerId) * this.state.scale;
 	}
 
 	public int getHeight(int playerId)
 	{
-		return go.getHeight(state, playerId);
+		return go.getHeight(state, playerId) * this.state.scale;
 	}
 
 	public void updateState(ObjectState objectState)

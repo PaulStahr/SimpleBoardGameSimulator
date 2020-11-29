@@ -295,7 +295,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			//get nearest object concerning the mouse position
 			ObjectInstance nearestObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			//do actions if mouse is in the private area or not and there is some nearest object
-			if (mouseInPrivateArea && nearestObject != null && !arg0.isControlDown() && !arg0.isShiftDown())
+			if (mouseInPrivateArea && nearestObject != null && !arg0.isControlDown() && !arg0.isShiftDown() && !arg0.isAltDown())
 			{
 				if (activeObject != null){
 					activeObject.state.isActive = false;
@@ -490,8 +490,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
-		/*Translate the board if control is down*/
-		if ((arg0.isControlDown() || (SwingUtilities.isMiddleMouseButton(arg0) && activeObjects.size() == 0)) && !mouseInPrivateArea)
+		/*Translate the board if alt is down*/
+		if (arg0.isAltDown() && (SwingUtilities.isLeftMouseButton(arg0)))
 		{
 			//updatePlayerMousePos(arg0);
 			translateBoard(arg0);
@@ -691,7 +691,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				if (activeObject.state.inPrivateArea) {
 					ObjectFunctions.playObject(this, gameInstance, player, activeObject);
 				}
-			} else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+			} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 
 				int place = 0;
 				for (int i = 0; i < gameInstance.getPlayerNumber(); ++i) {
@@ -701,7 +701,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 				sitDown(place);
 			}
-			else if (e.getKeyCode() == KeyEvent.VK_H && !shiftDown){
+			else if (e.getKeyCode() == KeyEvent.VK_H && altDown){
 				if (privateArea.zooming == 0) {
 					privateArea.zooming = 1;
 				}
@@ -727,10 +727,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						ObjectFunctions.removeStackRelations(id, gameInstance, player, oi);
 					}
 				}
-				else if (e.getKeyCode() == KeyEvent.VK_T) {
+				else if (e.getKeyCode() == KeyEvent.VK_T && !altDown) {
 					for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
 						ObjectFunctions.takeObjects(this, gameInstance, player, oi);
-						oi.state.isActive = false;
 					}
 					selectedObjects.clear();
 					activeObjects.clear();
@@ -743,7 +742,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				else if (e.getKeyCode() == KeyEvent.VK_M && !shiftDown) {
 					ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
 				}
-				else if (controlDown && !boardTranslation) {
+				else if (altDown && !boardTranslation) {
 					for (ObjectInstance oi : ObjectFunctions.getStackRepresentatives(gameInstance, activeObjects)) {
 						if (!scaledObjects.contains(oi.id)) {
 							scaledObjects.add(oi.id);
@@ -751,6 +750,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 							oi.scale *= scalingFactor;
 						}
 					}
+					repaint();
 				}
 				else if (e.getKeyCode() == KeyEvent.VK_F && altDown)
 				{
@@ -768,7 +768,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		--keyPressed;
 
 		if (!mouseInPrivateArea) {
-			if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+			if (e.getKeyCode() == KeyEvent.VK_ALT) {
 				for (int i = 0; i < scaledObjects.size(); i++) {
 					gameInstance.getObjectInstanceById(scaledObjects.get(i)).scale = savedScalingFactors.get(i);
 				}
@@ -794,7 +794,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (e.isControlDown() && !mouseInPrivateArea && activeObject != null){
+		if (e.isAltDown() && !mouseInPrivateArea && activeObject != null){
 			outText = String.valueOf(e.getPreciseWheelRotation());
 			double scale = 1.1;
 			if((int) e.getPreciseWheelRotation() < 0) {
@@ -804,7 +804,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				gameInstance.getObjectInstanceById(id).scale *= scale;
 			}
 		}
-		else if (e.isControlDown() && !mouseInPrivateArea)
+		else if (e.isAltDown() && !mouseInPrivateArea)
 		{
 			zoomFactor += (int) e.getPreciseWheelRotation();
 			if ((zooming >= 0.2 || e.getPreciseWheelRotation() < 0) && (zooming < 5 || e.getPreciseWheelRotation() > 0)) {
@@ -813,7 +813,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				zoomFactor -= (int) e.getPreciseWheelRotation();
 			}
 			updateGameTransform();
-		}else if (e.isControlDown() && mouseInPrivateArea)
+		}else if (e.isAltDown() && mouseInPrivateArea)
 		{
 			privateArea.zoomingFactor += (int) e.getPreciseWheelRotation();
 			if ((privateArea.zooming >= 0.5 || e.getPreciseWheelRotation() < 0) && (privateArea.zooming < 2 || e.getPreciseWheelRotation() > 0)) {

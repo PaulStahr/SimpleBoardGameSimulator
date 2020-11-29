@@ -81,6 +81,7 @@ public class GameIO {
 		elem.setAttribute(IOString.X, 				Integer.toString(state.posX));
 		elem.setAttribute(IOString.Y, 				Integer.toString(state.posY));
 		elem.setAttribute(IOString.R, 				Integer.toString(state.rotation));
+		elem.setAttribute(IOString.S, 				Integer.toString(state.scale));
 		elem.setAttribute(IOString.OWNER_ID, 		Integer.toString(state.owner_id));
 		elem.setAttribute(IOString.DRAW_VALUE, 		Long.toString(state.drawValue));
 		elem.setAttribute(IOString.ABOVE, 			Integer.toString(state.aboveInstanceId));
@@ -106,11 +107,23 @@ public class GameIO {
 	 */
 	private static void editStateFromElement(ObjectState state, Element elem)
 	{
-		state.posX = Integer.parseInt(elem.getAttributeValue(IOString.X));
-		state.posY = Integer.parseInt(elem.getAttributeValue(IOString.Y));
-		state.rotation = Integer.parseInt(elem.getAttributeValue(IOString.R));
-
-		String v = elem.getAttributeValue(IOString.ABOVE);
+		String v = elem.getAttributeValue(IOString.X);
+		if (v != null) {
+			state.posX = Integer.parseInt(elem.getAttributeValue(IOString.X));
+		}
+		v = elem.getAttributeValue(IOString.Y);
+		if (v != null) {
+			state.posY = Integer.parseInt(elem.getAttributeValue(IOString.Y));
+		}
+		v = elem.getAttributeValue(IOString.R);
+		if (v != null) {
+			state.rotation = Integer.parseInt(elem.getAttributeValue(IOString.R));
+		}
+		v = elem.getAttributeValue(IOString.S);
+		if (v != null) {
+			state.scale = Integer.parseInt(elem.getAttributeValue(IOString.S));
+		}
+		v = elem.getAttributeValue(IOString.ABOVE);
 		if (v != null)
 		{
 			state.aboveInstanceId = Integer.parseInt(v);
@@ -1024,6 +1037,7 @@ public class GameIO {
 		state.posX = is.readInt();
 		state.posY = is.readInt();
 		state.rotation = is.readInt();
+		state.scale = is.readInt();
 		state.value = is.readInt();
 		state.rotationStep = is.readInt();
 		state.isFixed = is.readBoolean();
@@ -1058,6 +1072,7 @@ public class GameIO {
 		out.writeInt(state.posX);
 		out.writeInt(state.posY);
 		out.writeInt(state.rotation);
+		out.writeInt(state.scale);
 		out.writeInt(state.value);
 		out.writeInt(state.rotationStep);
 		out.writeBoolean(state.isFixed);

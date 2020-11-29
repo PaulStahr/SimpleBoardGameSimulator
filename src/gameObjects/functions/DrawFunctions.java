@@ -306,7 +306,7 @@ public class DrawFunctions {
             float strokeAbsentLengthHeight = (float)(objectInstance.scale * img.getHeight() - strokePresentLength);
             float strokeAbsentLengthWidth = (float)(objectInstance.scale * img.getWidth() - strokePresentLength);
             float [] dash = new float[]{ strokePresentLength,  strokeAbsentLengthWidth, strokePresentLength, strokeAbsentLengthHeight, strokePresentLength, strokeAbsentLengthWidth, strokePresentLength, strokeAbsentLengthHeight };
-            float dashPhase = strokePresentLength/4.0f;
+            float dashPhase = strokePresentLength/2.0f;
             Stroke activeStroke = new BasicStroke(borderWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, img.getHeight()/4.0f, dash, dashPhase);
             if (objectInstance.state.owner_id != -1) {
                     g2.setStroke(stroke);
@@ -314,19 +314,22 @@ public class DrawFunctions {
                     g2.setColor(playerOwner.color);
                     g2.drawString(playerOwner.getName() + " Hand Cards", -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - 20);
             }
-            else if(gamePanel.selectedObjects.contains(objectInstance.id))
-            {
-                g2.setStroke(stroke);
-                g2.setColor(player.color);
+            else {
+                if (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance)) {
+                    g2.setStroke(stroke);
+                    g2.setColor(gamePanel.stackColor);
+                }
+                if (objectInstance.state.isActive) {
+                    g2.setStroke(activeStroke);
+                    g2.setColor(player.color);
+                }
+                if (gamePanel.selectedObjects.contains(objectInstance.id)) {
+                    g2.setStroke(stroke);
+                    g2.setColor(player.color);
+                }
             }
-            else if(objectInstance.state.isActive){
-                g2.setStroke(activeStroke);
-                g2.setColor(player.color);
-            }
-            else if(ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance)){
-                g2.setStroke(stroke);
-                g2.setColor(gamePanel.stackColor);
-            }
+
+
 
             if (objectInstance.go instanceof GameObjectToken) {
                 if (objectInstance.state.isActive || gamePanel.selectedObjects.contains(objectInstance.id) || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {

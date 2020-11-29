@@ -3,6 +3,7 @@ package gameObjects.instance;
 import static java.lang.Math.max;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class GameInstance {
 	public boolean table = true;
     public boolean put_down_area = true;
     public int seats = -1;
-	public List<String> seatColors = new ArrayList<>();
+	public List<String> seatColors = new ArrayList<>(Arrays.asList("#e81123", "#00188f", "#009e49", "#ff8c00", "#68217a", "#00bcf2", "#ec008c", "#fff100", "#00b294", "#bad80a"));
 	public String tableColor = "";
 	private long maxDrawValue = 0;
 	public int tableRadius = 1200;
@@ -129,7 +130,7 @@ public class GameInstance {
 		if (oi != null)
 		{
 			oi.updateState(objectInstance.state);
-			oi.scale = objectInstance.scale;
+			oi.scale = objectInstance.scale *= objectInstance.state.scale;
 			return oi;
 		}
 		objects.add(objectInstance);

@@ -90,5 +90,7 @@ public enum Words {
     center_board,
     fix_object,
     left_double_click,
-    select_multiple_objects;
+    select_multiple_objects,
+    sit_to_own_seat,
+    double_click;
 }
