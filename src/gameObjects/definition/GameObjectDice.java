@@ -7,11 +7,13 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 
 public class GameObjectDice extends GameObject{
+
 	public static class DiceSide
 	{
 		public final int value;
 		public BufferedImage img;
 		public final String imgStr;
+
 	
 		public DiceSide(int value, BufferedImage img, String imgStr)
 		{
@@ -57,6 +59,7 @@ public class GameObjectDice extends GameObject{
 		 */
 		private static final long serialVersionUID = 2534848632779449228L;
 		public int side = 0;
+		public boolean unfold = false;
 		
 		public DiceState() {}
 		
@@ -77,6 +80,7 @@ public class GameObjectDice extends GameObject{
 		{
 			super.set(state);
 			side = ((DiceState)state).side;
+			unfold = ((DiceState)state).unfold;
 		}
 
 
@@ -89,6 +93,7 @@ public class GameObjectDice extends GameObject{
 		public void reset() {
 			super.reset();
 			side = 0;
+			unfold = false;
 		}
 	}
 	

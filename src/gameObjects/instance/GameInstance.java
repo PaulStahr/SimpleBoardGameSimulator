@@ -207,6 +207,7 @@ public class GameInstance {
 							if (objects.get(i).state.owner_id == gsoea.objectId)
 							{
 								objects.get(i).state.owner_id = -1;
+								objects.get(i).state.isSelected = -1;
 								objects.get(i).state.inPrivateArea = false;
 							}
 						}

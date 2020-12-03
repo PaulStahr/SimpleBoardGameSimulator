@@ -83,6 +83,7 @@ public class GameIO {
 		elem.setAttribute(IOString.R, 				Integer.toString(state.rotation));
 		elem.setAttribute(IOString.S, 				Integer.toString(state.scale));
 		elem.setAttribute(IOString.OWNER_ID, 		Integer.toString(state.owner_id));
+		elem.setAttribute(IOString.IS_SELECTED, 		Integer.toString(state.isSelected));
 		elem.setAttribute(IOString.DRAW_VALUE, 		Long.toString(state.drawValue));
 		elem.setAttribute(IOString.ABOVE, 			Integer.toString(state.aboveInstanceId));
 		elem.setAttribute(IOString.BELOW,			Integer.toString(state.belowInstanceId));
@@ -137,6 +138,11 @@ public class GameIO {
 		if (ownerAttribute != null)
 		{
 	        state.owner_id = Integer.parseInt(ownerAttribute.getValue());
+		}
+		Attribute selectedAttribute = elem.getAttribute(IOString.IS_SELECTED);
+		if (selectedAttribute != null)
+		{
+			state.isSelected = Integer.parseInt(selectedAttribute.getValue());
 		}
 		Attribute drawValueAttribute = elem.getAttribute(IOString.DRAW_VALUE);
 		if (drawValueAttribute != null)
@@ -1034,6 +1040,7 @@ public class GameIO {
 		state.belowInstanceId = is.readInt();
 		state.inPrivateArea = is.readBoolean();
 		state.owner_id = is.readInt();
+		state.isSelected = is.readInt();
 		state.drawValue = is.readLong();
 		state.posX = is.readInt();
 		state.posY = is.readInt();
@@ -1069,6 +1076,7 @@ public class GameIO {
 		out.writeInt(state.belowInstanceId);
 		out.writeBoolean(state.inPrivateArea);
 		out.writeInt(state.owner_id);
+		out.writeInt(state.isSelected);
 		out.writeLong(state.drawValue);
 		out.writeInt(state.posX);
 		out.writeInt(state.posY);

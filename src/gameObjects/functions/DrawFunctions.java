@@ -13,6 +13,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,16 +52,16 @@ public class DrawFunctions {
 
     public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, IntegerArrayList ial){
         //Draw all objects not in some private area
-        ArrayList<ObjectInstance> oiList = new ArrayList<>();
-        ArrayList<ObjectInstance> fixedObjects = new ArrayList<>();
+        IntegerArrayList oiList = new IntegerArrayList();
+        IntegerArrayList fixedObjects = new IntegerArrayList();
         for (int idx : ial){
             if (!gameInstance.getObjectInstanceByIndex(idx).state.isFixed)
             {
-                oiList.add(gameInstance.getObjectInstanceByIndex(idx));
+                oiList.add(gameInstance.getObjectInstanceByIndex(idx).id);
             }
             else
             {
-                fixedObjects.add(gameInstance.getObjectInstanceByIndex(idx));
+                fixedObjects.add(gameInstance.getObjectInstanceByIndex(idx).id);
             }
         }
         //Draw the fixed objects first
@@ -70,9 +71,9 @@ public class DrawFunctions {
 
     }
 
-    public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList, IntegerArrayList ial) {
+    public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, IntegerArrayList oiList, IntegerArrayList ial) {
         for (int i = 0; i < oiList.size(); ++i){
-            ObjectInstance oi = oiList.get(i);
+            ObjectInstance oi = gameInstance.getObjectInstanceById(oiList.get(i));
             if (oi.state.owner_id != player.id || !oi.state.inPrivateArea || oi.state.isActive) {
                 try {
                     if (oi.go instanceof GameObjectToken) {
@@ -125,17 +126,15 @@ public class DrawFunctions {
 	        g2.setStroke(wideStroke);
             //g2.drawLine(40, p.screenHeight, p.screenWidth, p.screenHeight);
             int imageNumber = p.id % 10;
-            if (p.id != player.id)
-			{
-                BufferedImage img = gamePanel.playerImages[imageNumber];
-                g2.translate((p.screenWidth)/2, p.screenHeight - 20);
-                double scale = 0.5 / Math.sqrt(playerDeterminant * determinant);
-                g2.scale(scale, scale);
-                g2.translate(-img.getWidth()/2, 0);
-                g2.drawImage(img, null, 0, -10);
-                g2.scale(5, 5);
-                g2.drawString(p.getName(), 5, -10);
-			}
+
+            BufferedImage img = gamePanel.playerImages[imageNumber];
+            g2.translate((p.screenWidth)/2, p.screenHeight - 20);
+            double scale = 0.5 / Math.sqrt(playerDeterminant * determinant);
+            g2.scale(scale, scale);
+            g2.translate(-img.getWidth()/2, 0);
+            g2.drawImage(img, null, 0, -10);
+            g2.scale(5, 5);
+            g2.drawString(p.getName(), 5, -10);
             g2.setTransform(tmp);
 
             //draw mouse position of other players
@@ -163,7 +162,7 @@ public class DrawFunctions {
     public static void drawSelection(GamePanel gamePanel, Graphics g, Player player){
         Graphics2D g2 = (Graphics2D)g;
         g2.setTransform(new AffineTransform());
-        if (gamePanel.activeObject == null  && !gamePanel.mouseInPrivateArea){
+        if (gamePanel.hoveredObject == null  && !gamePanel.mouseInPrivateArea){
             g2.setColor(player.color);
             if(min(abs(gamePanel.selectWidth), abs(gamePanel.selectHeight)) > 0) {
                 Stroke stroke = new BasicStroke(5.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_BEVEL, 10.0f, new float[]{20.0f, 20.0f}, 0.0f);
@@ -189,7 +188,7 @@ public class DrawFunctions {
 
         if (gamePanel.privateArea.objects.size() != 0) {
             int extraSpace; //Private Area needs extra space if object is dragged into it
-            if (gamePanel.privateArea.currentDragPosition != -1 && gamePanel.activeObject != null && gamePanel.activeObjects.size() != 0 && !gamePanel.isSelectStarted) {
+            if (gamePanel.privateArea.currentDragPosition != -1 && gamePanel.hoveredObject != null && gamePanel.selectedObjects.size() != 0 && !gamePanel.isSelectStarted) {
                 extraSpace = 1;
             } else {
                 extraSpace = 0;
@@ -280,13 +279,28 @@ public class DrawFunctions {
         BufferedImage img = objectInstance.go.getLook(objectInstance.state, player.id);
         if (objectInstance.state == null || img == null) {
             logger.error("Object state is null");
-        } else {
+        }
+        else {
             Graphics2D g2 = (Graphics2D) g;
             AffineTransform tmp = g2.getTransform();
             g2.translate(objectInstance.state.posX, objectInstance.state.posY);
             //draw object not in private area
             if (gamePanel.privateArea == null || !gamePanel.privateArea.containsBoardCoordinates(objectInstance.state.posX, objectInstance.state.posY) || !objectInstance.state.isActive){
                 g2.rotate(Math.toRadians(objectInstance.state.rotation));
+                if (objectInstance.go instanceof GameObjectDice)
+                {
+                    GameObjectDice.DiceState diceState = (GameObjectDice.DiceState) objectInstance.state;
+                    if (diceState.unfold) {
+                        List<BufferedImage> bufferedImages = new ArrayList<>();
+                        DrawFunctions.unfoldDice(objectInstance, bufferedImages);
+                        for (int i = 0; i<bufferedImages.size();++i) {
+                            BufferedImage bufferedImage = bufferedImages.get(i);
+                            g2.translate(i*-(int) (objectInstance.scale * img.getWidth() * zooming + 5.0f), 0);
+                            g2.drawImage(bufferedImage, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+                            g2.translate(i*(int) (objectInstance.scale * img.getWidth() * zooming + 5.0f), 0);
+                        }
+                    }
+                }
                 g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
             }
             //draw object above private area
@@ -300,39 +314,48 @@ public class DrawFunctions {
                 g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth()  * 0.5), -(int) (objectInstance.scale * img.getHeight()  * 0.5), (int) (objectInstance.scale * img.getWidth() ), (int) (objectInstance.scale * img.getHeight() ), null);
             }
 
-            //Draw Border around objects
-            Stroke stroke = new BasicStroke(borderWidth,BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+            //Define border strokes
+            Stroke selectStroke = new BasicStroke(borderWidth,BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
             float strokePresentLength = Math.min((float)(objectInstance.scale * img.getHeight())/2.0f, (float)(objectInstance.scale * img.getWidth())/2.0f);
             float strokeAbsentLengthHeight = (float)(objectInstance.scale * img.getHeight() - strokePresentLength);
             float strokeAbsentLengthWidth = (float)(objectInstance.scale * img.getWidth() - strokePresentLength);
             float [] dash = new float[]{ strokePresentLength,  strokeAbsentLengthWidth, strokePresentLength, strokeAbsentLengthHeight, strokePresentLength, strokeAbsentLengthWidth, strokePresentLength, strokeAbsentLengthHeight };
             float dashPhase = strokePresentLength/2.0f;
-            Stroke activeStroke = new BasicStroke(borderWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, img.getHeight()/4.0f, dash, dashPhase);
+            Stroke hoverStroke = new BasicStroke(borderWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, dashPhase);
             if (objectInstance.state.owner_id != -1) {
-                    g2.setStroke(stroke);
+                    g2.setStroke(selectStroke);
                     Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
                     g2.setColor(playerOwner.color);
                     g2.drawString(playerOwner.getName() + " Hand Cards", -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - 20);
             }
             else {
                 if (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance)) {
-                    g2.setStroke(stroke);
+                    g2.setStroke(selectStroke);
                     g2.setColor(gamePanel.stackColor);
                 }
-                if (objectInstance.state.isActive) {
-                    g2.setStroke(activeStroke);
+                //draw selection border
+                if (ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, objectInstance.id)) {
+                    g2.setStroke(selectStroke);
                     g2.setColor(player.color);
                 }
-                if (gamePanel.selectedObjects.contains(objectInstance.id)) {
-                    g2.setStroke(stroke);
+                //draw hover border
+                else if (ObjectFunctions.isObjecthovered(gamePanel, objectInstance)) {
+                    g2.setStroke(hoverStroke);
                     g2.setColor(player.color);
                 }
+
             }
 
 
-
+            //Draw border around object
+            int objectSelector = ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id);
+            if (objectSelector != -1)
+            {
+                g2.setStroke(selectStroke);
+                g2.setColor(gameInstance.getPlayerById(objectSelector).color);
+            }
             if (objectInstance.go instanceof GameObjectToken) {
-                if (objectInstance.state.isActive || gamePanel.selectedObjects.contains(objectInstance.id) || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
+                if (ObjectFunctions.isObjecthovered(gamePanel, objectInstance) || ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id) != -1 || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
                     if (isStackCollected(gameInstance, objectInstance)) {
                         g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth / 2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth / 2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth / 2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
                     }
@@ -346,7 +369,7 @@ public class DrawFunctions {
                 }
             }
             else{
-                if (objectInstance.state.isActive || gamePanel.selectedObjects.contains(objectInstance.id)) {
+                if (ObjectFunctions.isObjecthovered(gamePanel, objectInstance) || ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id) != -1) {
                     g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth/2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth/2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth/2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
                 }
             }
@@ -377,4 +400,18 @@ public class DrawFunctions {
             g2d.setTransform(tmp);
         }
     }
+
+    public static void unfoldDice(ObjectInstance objectInstance, List<BufferedImage> bufferedImages) {
+        bufferedImages.clear();
+        if (objectInstance.go instanceof GameObjectDice)
+        {
+            GameObjectDice dice = (GameObjectDice)objectInstance.go;
+            for(int i = 0; i<dice.dss.length; ++i) {
+                GameObjectDice.DiceSide diceSide = dice.dss[i];
+                bufferedImages.add(diceSide.img);
+            }
+
+        }
+    }
+
 }

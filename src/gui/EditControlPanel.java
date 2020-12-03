@@ -33,7 +33,6 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 			new FuncControl(Words.rotate, new ControlCombination(InputEvent.ALT_DOWN_MASK, 2,  -1, 0), new ControlCombination(0, -1,  KeyEvent.VK_UP, 0), new ControlCombination(0, -1,  KeyEvent.VK_DOWN, 0)),
 			new FuncControl(Words.zoom, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
 			new FuncControl(Words.sit_down, new ControlCombination(0, 0,  -1, 32)),
-			//new FuncControl(Words.sit_down, new ControlCombination(0, 3,  0, 0)),
 			new FuncControl(Words.sit_to_own_seat, new ControlCombination(0, -1,  KeyEvent.VK_SPACE, 0)),
 			new FuncControl(Words.hide_show_table, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  KeyEvent.VK_T, 0)),
 			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1, KeyEvent.VK_H,0)),
@@ -52,6 +51,7 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 			new FuncControl(Words.merge_objects, 	new ControlCombination(0, -1, KeyEvent.VK_M, 0)),
 			new FuncControl(Words.collect_all_objects_of_a_group, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2,  KeyEvent.VK_M, 0)),
 			new FuncControl(Words.flip_objects_roll_dice, new ControlCombination(0, -1,  KeyEvent.VK_F, 0)),
+			new FuncControl(Words.unfold_dice, new ControlCombination(0, -1,  KeyEvent.VK_V, 0)),
 			new FuncControl(Words.zoom, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
 			new FuncControl(Words.fix_object, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  KeyEvent.VK_F, 0)),
 

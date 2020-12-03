@@ -58,4 +58,5 @@ public class IOString {
     public static final String SEAT = "seat";
 	public static final String NUMBER = "number";
 	public static final String VERSION = "version";
+    public static final String IS_SELECTED = "is_selected";
 }

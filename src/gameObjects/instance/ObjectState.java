@@ -16,6 +16,7 @@ public abstract class ObjectState implements Serializable {
 	public int rotation = 0;
 	public int scale = 1;
 	public int owner_id = -1;
+	public int isSelected = -1;
 	transient public boolean isActive = false;
 	transient public long lastChange = System.nanoTime();
 	public boolean inPrivateArea = false;
@@ -43,6 +44,7 @@ public abstract class ObjectState implements Serializable {
 		this.rotation = state.rotation;
 		this.scale = state.scale;
 		this.owner_id = state.owner_id;
+		this.isSelected = state.isSelected;
 		this.inPrivateArea = state.inPrivateArea;
 		this.aboveInstanceId = state.aboveInstanceId;
 		this.belowInstanceId = state.belowInstanceId;
@@ -67,6 +69,7 @@ public abstract class ObjectState implements Serializable {
 		rotation = 0;
 		scale = 1;
 		owner_id = -1;
+		isSelected = -1;
 		isActive = false;
 		inPrivateArea = false;
 		aboveInstanceId = -1;

@@ -94,6 +94,12 @@ public class Table {
             graphics2D.setTransform(gamePanel.getBoardToScreenTransform());
             graphics2D.transform(player.playerAtTableTransform);
             graphics2D.setColor(player.color);
+
+            if (gameInstance.seatColors.size() > i)
+            {
+                graphics2D.setColor(Color.decode(gameInstance.seatColors.get(i)));
+            }
+
             Stroke stroke = new BasicStroke(20.0f);
             graphics2D.setStroke(stroke);
             graphics2D.draw(rectangle);
