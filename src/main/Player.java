@@ -70,7 +70,12 @@ public class Player implements Comparable {
 	public void setPlayerColor(GameInstance gameInstance){
 		int posPlayer = -1;
 		if (gameInstance != null) {
-			posPlayer = gameInstance.getPlayerList().indexOf(this);
+			++posPlayer;
+			for (int i = 0; i < gameInstance.getPlayerNumber(); ++i) {
+				if (gameInstance.getPlayerByIndex(i).id < this.id) {
+					++posPlayer;
+				}
+			}
 		}
 		if (posPlayer != -1 && posPlayer < gameInstance.seatColors.size())
 		{

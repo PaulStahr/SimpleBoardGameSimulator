@@ -35,7 +35,7 @@ public abstract class ObjectState implements Serializable {
     @Override
 	public int hashCode()
 	{
-		return posX ^ (posY << 16) ^ rotation ^ owner_id;
+		return posX ^ (posY << 16) ^ rotation ^ scale ^ owner_id;
 	}
 
 	public void set(ObjectState state) {

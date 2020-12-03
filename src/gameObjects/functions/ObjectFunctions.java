@@ -994,6 +994,7 @@ public class ObjectFunctions {
                 }
             }
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, oi, state));
+            ObjectFunctions.updateSelectedObjects(gamePanel, gameInstance,player);
         }
     }
     public static void deselectObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList idList){
