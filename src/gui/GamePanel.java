@@ -334,7 +334,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			//Sit down on double click on seat
 			for (int i = 0; i < this.table.playerShapes.size();++i) {
 				if(this.table.playerShapes.get(i).contains(mouseScreenX, mouseScreenY)) {
-					sitDown(i);
+					sitDown(player, i);
 					break;
 				}
 			}
@@ -353,7 +353,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}*/
 	}
 
-	private void sitDown(int pos){
+	private void sitDown(Player player, int pos){
 		translateX = 0;
 		translateY = 0;
 		zooming = getHeight()/ ((float) this.table.getDiameter() + 200);
@@ -362,6 +362,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		updateGameTransform();
 		rotation = Math.toRadians(- 360/Math.max(1,this.table.playerShapes.size()) * pos);
 		updateGameTransform();
+		if (player != null && gameInstance.seatColors.size() > pos)
+		{
+			player.color = Color.decode(gameInstance.seatColors.get(pos));
+		}
 	}
 
 	private boolean checkFirstMouseClick(MouseEvent arg0) {
@@ -601,6 +605,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		e.consume();
 		++keyPressed;
 		boolean controlDown = e.isControlDown();
 		boolean shiftDown = e.isShiftDown();
@@ -707,7 +712,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						++place;
 					}
 				}
-				sitDown(place);
+				sitDown(player, place);
 			}
 			else if (e.getKeyCode() == KeyEvent.VK_H && altDown){
 				if (privateArea.zooming == 0) {
@@ -753,7 +758,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				else if (e.getKeyCode() == KeyEvent.VK_M && !shiftDown) {
 					ObjectFunctions.makeStack(id, gameInstance, player, selectedObjects);
 				}
-				else if (altDown && !boardTranslation) {
+				else if (altDown && !boardTranslation && scaledObjects.size() > 0) {
 					for (int oId : ObjectFunctions.getStackRepresentatives(gameInstance, selectedObjects)) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 						if (!scaledObjects.contains(oi.id)) {
@@ -781,7 +786,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		--keyPressed;
 
 		if (!mouseInPrivateArea) {
-			if (e.getKeyCode() == KeyEvent.VK_ALT) {
+			if (e.getKeyCode() == KeyEvent.VK_ALT && scaledObjects.size() > 0) {
 				for (int i = 0; i < scaledObjects.size(); i++) {
 					gameInstance.getObjectInstanceById(scaledObjects.get(i)).scale = savedScalingFactors.get(i);
 				}
