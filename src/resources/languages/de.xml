@@ -92,4 +92,8 @@
     <select_multiple_objects>Mehrere Objekte auswählen</select_multiple_objects>
     <double_click>Doppelklick</double_click>
     <unfold_dice>Würfelseiten anzeigen</unfold_dice>
+    <edit_game>Spiel verändern</edit_game>
+    <control_window>Spiel Steuerung</control_window>
+    <server_controls>Server Steuerung</server_controls>
+    <game_list>Server und Spiele</game_list>
 </xml>

@@ -196,6 +196,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		this.table = new Table(gameInstance, 2*tableRadius,new Point2D.Double(-tableRadius,-tableRadius));
 		this.gameInstance = gameInstance;
 		this.privateArea = new PrivateArea(this, gameInstance, boardToScreenTransformation, screenToBoardTransformation);
+		this.isDebug = gameInstance.debug_mode;
 
 		if (!this.gameInstance.private_area) {
 			this.privateArea.zooming = 0;
@@ -267,7 +268,25 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		g2.setTransform(tmp);
 		//Draw objects in private area
 		drawTokensInPrivateArea(this, g, gameInstance, player, hoveredObject);
-		g.drawString(outText, 50, 50);
+
+		//Draw debug informations
+		if (isDebug) {
+			int hoverId = (hoveredObject== null) ? -1 : hoveredObject.id;
+			String stringSelectedObjects = "";
+			for (int i = 0; i < selectedObjects.size(); ++i)
+			{
+				if (i==0) {
+					stringSelectedObjects += Integer.toString(selectedObjects.get(i));
+				}
+				else{
+					stringSelectedObjects += "; " + Integer.toString(selectedObjects.get(i));
+				}
+			}
+			g.drawString("Hovered Object: " + Integer.toString(hoverId), 50, 20);
+			g.drawString("Selected Objects: " + stringSelectedObjects, 50, 40);
+			g.drawString("Player Id: " + Integer.toString(player.id), 50, 60);
+			g.drawString("Admin Id: " + Integer.toString(gameInstance.admin), 50, 80);
+		}
 
 	}
 
@@ -428,7 +447,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			screenToBoardPos(arg0.getX(), arg0.getY(), mousePressedGamePos);
 			mouseBoardPos.set(mousePressedGamePos);
 			mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, mouseBoardPos.getXI(), mouseBoardPos.getYI());
-
+			ObjectFunctions.updateSelectedObjects(this, gameInstance, player);
 			if (!isSelectStarted && hoveredObject == null) {
 				ObjectFunctions.deselectAllSelected(this, gameInstance, player, ial);
 				beginSelectPosScreenX = arg0.getX();

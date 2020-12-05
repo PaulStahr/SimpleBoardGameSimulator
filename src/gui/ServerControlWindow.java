@@ -9,7 +9,7 @@ import javax.swing.JFrame;
 
 import net.GameServer;
 
-public class ServerControlWindow extends JFrame implements ActionListener{
+public class ServerControlWindow extends JFrame implements ActionListener, LanguageChangeListener{
 	/**
 	 * 
 	 */
@@ -17,9 +17,13 @@ public class ServerControlWindow extends JFrame implements ActionListener{
 	private final JButton buttonStart = new JButton("Start");
 	private final JButton buttonStop = new JButton("Stop");
 	private final GameServer gs;
-	public ServerControlWindow(GameServer gs)
+	private final LanguageHandler lh;
+	public ServerControlWindow(GameServer gs, LanguageHandler lh)
 	{
 		this.gs = gs;
+		this.lh = lh;
+		lh.addLanguageChangeListener(this);
+		languageChanged(lh.getCurrentLanguage());
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		
@@ -41,5 +45,10 @@ public class ServerControlWindow extends JFrame implements ActionListener{
 		{
 			gs.stop();
 		}
+	}
+
+	@Override
+	public void languageChanged(Language language) {
+
 	}
 }

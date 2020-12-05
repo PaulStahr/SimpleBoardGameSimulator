@@ -41,6 +41,8 @@ public class GameInstance {
     public int seats = -1;
 	public List<String> seatColors = new ArrayList<>(Arrays.asList("#e81123", "#00188f", "#009e49", "#ff8c00", "#68217a", "#00bcf2", "#ec008c", "#fff100", "#00b294", "#bad80a"));
 	public String tableColor = "";
+	public int admin = -1;
+	public boolean debug_mode = false;
 	private long maxDrawValue = 0;
 	public int tableRadius = 1200;
 	
@@ -84,6 +86,9 @@ public class GameInstance {
 			return pl;
 		}else {
 			players.add(player);
+			if (this.admin == -1){
+				this.admin = player.id;
+			}
 			player.setPlayerColor(this);
 			update(action == null ? new AddPlayerAction(0, player) : action);
 			return player;

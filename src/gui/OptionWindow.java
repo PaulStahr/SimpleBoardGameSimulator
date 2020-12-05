@@ -44,6 +44,8 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		buttonCancel.addActionListener(this);
 		buttonAccept.addActionListener(this);
 		this.lh = lh;
+		lh.addLanguageChangeListener(this);
+		languageChanged(lh.getCurrentLanguage());
 		panelSettings.setLayout(JFrameUtils.DOUBLE_COLUMN_LAUYOUT);
 		panelSettings.add(labelLanguage);
 		panelSettings.add(comboBoxLanguages);
@@ -53,7 +55,6 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		panelSettings.add(comboBoxLayoutManager);
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
-		lh.addLanguageChangeListener(this);
 		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(panelSettings).addGroup(layout.createSequentialGroup().addComponent(buttonOk).addComponent(buttonAccept).addComponent(buttonCancel)));
 		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(panelSettings).addGroup(layout.createParallelGroup().addComponent(buttonOk).addComponent(buttonAccept).addComponent(buttonCancel)));
 		languageChanged(lh.getCurrentLanguage());

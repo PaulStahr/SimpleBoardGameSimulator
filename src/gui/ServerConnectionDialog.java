@@ -12,7 +12,7 @@ import javax.swing.JTextField;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
 
-public class ServerConnectionDialog extends JFrame implements ActionListener{
+public class ServerConnectionDialog extends JFrame implements ActionListener, LanguageChangeListener{
 	/**
 	 * 
 	 */
@@ -33,6 +33,7 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 
 	public ServerConnectionDialog(String string, int i, LanguageHandler lh) {
 		this.lh = lh;
+		lh.addLanguageChangeListener(this);
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		
@@ -63,10 +64,14 @@ public class ServerConnectionDialog extends JFrame implements ActionListener{
 		else if (source == buttonStartServer)
 		{
 			GameServer gs = new GameServer(Integer.parseInt(textFieldPort.getText()));
-			ServerControlWindow scw = new ServerControlWindow(gs);
+			ServerControlWindow scw = new ServerControlWindow(gs, lh);
 			scw.setVisible(true);
 		}
 	}
-	
 
+
+	@Override
+	public void languageChanged(Language language) {
+
+	}
 }

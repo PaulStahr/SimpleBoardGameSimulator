@@ -97,9 +97,14 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	
 	public GameWindow(GameInstance gi, Player player, LanguageHandler lh)
 	{
-		this.setTitle(gi.name);
 		this.gi = gi;
 		this.lh = lh;
+		if (gi.admin == player.id) {
+			this.setTitle(gi.name + " (Admin Mode)");
+		}
+		else {
+			this.setTitle(gi.name);
+		}
 		JMenuBar menuBar = new JMenuBar();
 		JToolBar toolBar = new JToolBar();
 		toolBar.setOrientation(SwingConstants.VERTICAL);

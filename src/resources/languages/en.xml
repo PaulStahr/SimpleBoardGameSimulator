@@ -100,4 +100,8 @@
     <select_multiple_objects>Select multiple objects</select_multiple_objects>
     <double_click>Double click</double_click>
     <unfold_dice>Show dice sides</unfold_dice>
+    <edit_game>Edit Game</edit_game>
+    <control_window>Game Controls</control_window>
+    <server_controls>Server Controls</server_controls>
+    <game_list>Server and Games</game_list>
 </xml>

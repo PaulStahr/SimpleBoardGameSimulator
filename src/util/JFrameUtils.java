@@ -311,6 +311,11 @@ public class JFrameUtils{
 		}
 		
 	}
+
+	public static void showInfoMessage(String info, Logger logger){
+		logger.info(info);
+		JFrameUtils.runByDispatcher(new ShowMessageClass(info));
+	}
 	
 	public static void logErrorAndShow(String error, Exception ex, Logger logger) {
 		if (ex == null)

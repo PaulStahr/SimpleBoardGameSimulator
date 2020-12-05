@@ -59,4 +59,6 @@ public class IOString {
 	public static final String NUMBER = "number";
 	public static final String VERSION = "version";
     public static final String IS_SELECTED = "is_selected";
+    public static final String ADMIN = "admin";
+	public static final String DEBUG_MODE = "debug_mode";
 }

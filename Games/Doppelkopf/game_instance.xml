@@ -6,6 +6,7 @@
 <name>Doppelkopf</name>
 <table table_radius="600" put_down_area="true" color="#d2a56d">true</table>
 <private_area>true</private_area>
+<debug_mode>true</debug_mode>
 </settings>
 <object unique_name="caro10" id="0" x="100" y="100" r="0" s="2"/>
 <object unique_name="carobube" id="1" x="100" y="100" r="0"/>

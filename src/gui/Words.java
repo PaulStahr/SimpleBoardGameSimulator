@@ -93,5 +93,6 @@ public enum Words {
     select_multiple_objects,
     sit_to_own_seat,
     double_click,
-    unfold_dice;
+    unfold_dice,
+    edit_game, control_window, server_controls, game_list;
 }

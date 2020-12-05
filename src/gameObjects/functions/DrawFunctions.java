@@ -293,11 +293,13 @@ public class DrawFunctions {
                     if (diceState.unfold) {
                         List<BufferedImage> bufferedImages = new ArrayList<>();
                         DrawFunctions.unfoldDice(objectInstance, bufferedImages);
+                        int side = diceState.side;
                         for (int i = 0; i<bufferedImages.size();++i) {
                             BufferedImage bufferedImage = bufferedImages.get(i);
-                            g2.translate(i*-(int) (objectInstance.scale * img.getWidth() * zooming + 5.0f), 0);
+                            int drawPos = i - side;
+                            g2.translate(drawPos*-(int) (objectInstance.scale * img.getWidth() * zooming + 5.0f), 0);
                             g2.drawImage(bufferedImage, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
-                            g2.translate(i*(int) (objectInstance.scale * img.getWidth() * zooming + 5.0f), 0);
+                            g2.translate(drawPos*(int) (objectInstance.scale * img.getWidth() * zooming + 5.0f), 0);
                         }
                     }
                 }

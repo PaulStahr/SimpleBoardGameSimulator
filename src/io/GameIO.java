@@ -230,6 +230,16 @@ public class GameIO {
 								}
 								gi.seats = max(-1, gi.seats + 1);
 								break;
+							case IOString.ADMIN:
+								if (!elemSettings.getValue().equals("") && Integer.parseInt(elemSettings.getValue()) > -1) {
+									gi.admin = Integer.parseInt(elemSettings.getValue());
+								}
+								else {
+									gi.admin = -1;
+								}
+
+							case IOString.DEBUG_MODE:
+								gi.debug_mode = Boolean.parseBoolean(elemSettings.getValue());
 						}
 					}
 					break;
@@ -531,6 +541,12 @@ public class GameIO {
 			Element privateArea = new Element(IOString.PRIVATE_AREA);
 			privateArea.setText(Boolean.toString(gi.private_area));
 
+			Element admin = new Element(IOString.ADMIN);
+			admin.setText(Integer.toString(gi.admin));
+
+			Element debugMode = new Element(IOString.DEBUG_MODE);
+			debugMode.setText(Boolean.toString(gi.debug_mode));
+
 			Element seats = new Element(IOString.SEATS);
 			for (int i=0; i<gi.seats;++i)
 			{
@@ -546,6 +562,8 @@ public class GameIO {
 			settings.addContent(table);
 			settings.addContent(privateArea);
 			settings.addContent(seats);
+			settings.addContent(admin);
+			settings.addContent(debugMode);
 			settings.setAttribute(IOString.HIDDEN,Boolean.toString(gi.hidden));
 			root_inst.addContent(settings);
 

@@ -989,7 +989,7 @@ public class ObjectFunctions {
                 state.isSelected = -1;
                 if (gameInstance.getObjectInstanceById(objectId).go instanceof GameObjectDice)
                 {
-                    GameObjectDice.DiceState diceState = (GameObjectDice.DiceState) oi.state;
+                    GameObjectDice.DiceState diceState = (GameObjectDice.DiceState) state;
                     diceState.unfold = false;
                 }
             }

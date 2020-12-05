@@ -102,17 +102,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		Object source = e.getSource();
 		if (source == buttonPoll)
 		{
-			try {
-				client.setAdress(textFieldAddress.getText());
-				client.setPort(Integer.parseInt(textFieldPort.getText()));
-				gmi.clear();
-				client.getGameInstanceMeta(gmi);
-				JFrameUtils.updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn, deleteColumn);
-			} catch (IOException | ClassNotFoundException e1) {
-				JFrameUtils.logErrorAndShow("Can't update information", e1, logger);
-			}
-			
-			
+			updateCurrentGames();
 		}
 		else if (source == buttonCreateGame)
 		{
@@ -159,6 +149,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 					JFrameUtils.logErrorAndShow("Can't connect to Server", ex, logger);
 				}
 			}
+			updateCurrentGames();
 		}
 		else if (source == buttonStartServer)
 		{
@@ -214,8 +205,14 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				{
 					GameInstance gi;
 					try {
+						int playerId = Integer.parseInt(textFieldId.getText());
 						gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.indexOf(GameInstanceColumnType.ID)));
-						client.deleteGame(gi.name, gi.password);
+						if (playerId == gi.admin) {
+							client.deleteGame(gi.name, gi.password);
+						}
+						else{
+							JFrameUtils.showInfoMessage("Can't delete game. You have no admin rights!", logger);
+						}
 					} catch (IOException | JDOMException e2) {
 						JFrameUtils.logErrorAndShow("Can't delete game", e2, logger);
 					}
@@ -223,7 +220,19 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			}
 		}
     }
-	
+
+	private void updateCurrentGames() {
+		try {
+			client.setAdress(textFieldAddress.getText());
+			client.setPort(Integer.parseInt(textFieldPort.getText()));
+			gmi.clear();
+			client.getGameInstanceMeta(gmi);
+			JFrameUtils.updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn, deleteColumn);
+		} catch (IOException | ClassNotFoundException e1) {
+			JFrameUtils.logErrorAndShow("Can't update information", e1, logger);
+		}
+	}
+
 	public ServerLobbyWindow(SynchronousGameClientLobbyConnection client, LanguageHandler lh)
 	{
 		this.lh = lh;
@@ -321,5 +330,6 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		labelPort.setText(language.getString(Words.port));
 		labelName.setText(language.getString(Words.name));
 		labelId.setText(language.getString(Words.id));
+		this.setTitle(language.getString(Words.game_list));
 	}
 }
