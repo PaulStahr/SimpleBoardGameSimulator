@@ -58,7 +58,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	ArrayDeque<Object> queuedOutputs = new ArrayDeque<>();
 	private final int connectionId = (int)(Math.random() * Integer.MAX_VALUE);
 	private ObjectInputStream objIn;
-	private boolean stopOnError = true;
+	private boolean stopOnError = false;
 	private int outputEvents = 0;
 	private int inputEvents = 0;
 	private long otherToThisOffset = Long.MAX_VALUE / 10;
