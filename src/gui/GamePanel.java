@@ -44,6 +44,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -731,7 +733,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				int count = 0;
 				for (int oId : selectedObjects) {
 					ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
-					count += ObjectFunctions.countStack(gameInstance, oi);
+					if (oi.go instanceof GameObjectToken) {
+						count += ObjectFunctions.countStack(gameInstance, oi);
+					}
+					else if (oi.go instanceof GameObjectDice){
+						count += 1;
+					}
+					else if (oi.go instanceof GameObjectFigure){
+						count += 1;
+					}
 				}
 				player.actionString = "Object Number: " + String.valueOf(count);
 			}

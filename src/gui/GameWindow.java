@@ -144,14 +144,14 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		gamePanel.player = player;
 		chatPanel = new IngameChatPanel(gi, player);
 
-		sliderRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,gamePanel, chatPanel);
+		sliderRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,chatPanel, gamePanel);
 		sliderRight.setOneTouchExpandable(true);
-		sliderRight.setResizeWeight(1); // the chat panel will not be resized when resizing the window
+		sliderRight.setResizeWeight(0); // the chat panel will not be resized when resizing the window
 		this.add(sliderRight);
 
 		setLayout(new GridLayout(1, 1));
 		setSize((int) screenSize.getWidth(), (int) screenSize.getHeight());
-		sliderRight.setDividerLocation(0.5);
+		sliderRight.setDividerLocation(0.0d);
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		languageChanged(lh.getCurrentLanguage());
 		lh.addLanguageChangeListener(this);

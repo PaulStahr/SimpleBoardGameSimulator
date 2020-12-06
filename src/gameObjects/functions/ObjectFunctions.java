@@ -992,9 +992,9 @@ public class ObjectFunctions {
                     GameObjectDice.DiceState diceState = (GameObjectDice.DiceState) state;
                     diceState.unfold = false;
                 }
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, oi, state));
+                ObjectFunctions.updateSelectedObjects(gamePanel, gameInstance,player);
             }
-            gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, oi, state));
-            ObjectFunctions.updateSelectedObjects(gamePanel, gameInstance,player);
         }
     }
     public static void deselectObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList idList){
@@ -1036,15 +1036,16 @@ public class ObjectFunctions {
     }
 
     public static void selectObject(GamePanel gamePanel, GameInstance gameInstance, Player player, int objectId){
-        if (!objectIsSelectedByPlayer(gameInstance, player, objectId))
+        if (objectIsSelected(gameInstance, objectId) == -1)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceById(objectId);
             ObjectState state = oi.state.copy();
             state.isActive = true;
             state.isSelected = player.id;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, oi, state));
+            ObjectFunctions.updateSelectedObjects(gamePanel, gameInstance, player);
         }
-        ObjectFunctions.updateSelectedObjects(gamePanel, gameInstance, player);
+
     }
 
     public static void selectObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList objectInstances){
