@@ -1015,8 +1015,18 @@ public class ObjectFunctions {
         gamePanel.hoveredObject = objectInstance;
     }
 
-    public static void unhoverObject(GamePanel gamePanel)
+    public static void unhoverObject(GamePanel gamePanel, GameInstance gameInstance, Player player)
     {
+        if (gamePanel.hoveredObject != null)
+        {
+            if (gamePanel.hoveredObject.go instanceof GameObjectDice)
+            {
+                if (!ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, gamePanel.hoveredObject.id)) {
+                    GameObjectDice.DiceState diceState = (GameObjectDice.DiceState) gamePanel.hoveredObject.state;
+                    diceState.unfold = false;
+                }
+            }
+        }
         gamePanel.hoveredObject = null;
     }
 
@@ -1052,6 +1062,13 @@ public class ObjectFunctions {
         for (int id: objectInstances)
         {
             deactivateObject(gameInstance, id);
+        }
+    }
+
+    public static void deactivateAllObjects(GameInstance gameInstance){
+        for (int i = 0; i < gameInstance.getObjectNumber(); ++i)
+        {
+            deactivateObject(gameInstance, gameInstance.getObjectInstanceByIndex(i).id);
         }
     }
 
