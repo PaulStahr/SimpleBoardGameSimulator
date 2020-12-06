@@ -735,7 +735,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 				player.actionString = "Object Number: " + String.valueOf(count);
 			}
-			else if (e.getKeyCode() == KeyEvent.VK_F && downKeys.size() == 1) {
+			else if (e.getKeyCode() == KeyEvent.VK_F) {
 				for (int oId : selectedObjects) {
 					ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 					ObjectFunctions.flipTokenObject(id, gameInstance, player, oi);
