@@ -1044,6 +1044,17 @@ public class ObjectFunctions {
         }
     }
 
+    public static void deactivateObject(GameInstance gameInstance, int oId){
+        gameInstance.getObjectInstanceById(oId).state.isActive = false;
+    }
+
+    public static void deactivateObjects(GameInstance gameInstance, IntegerArrayList objectInstances){
+        for (int id: objectInstances)
+        {
+            deactivateObject(gameInstance, id);
+        }
+    }
+
     public static boolean objectIsSelectedByPlayer(GameInstance gameInstance, Player player, int objectId){
         return gameInstance.getObjectInstanceById(objectId).state.isSelected == player.id;
     }

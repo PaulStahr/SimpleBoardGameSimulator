@@ -248,7 +248,7 @@ public class DrawFunctions {
             transform.scale(gamePanel.privateArea.zooming, gamePanel.privateArea.zooming);
             transform.translate(-activeObject.getWidth(player.id) / 2, -activeObject.getHeight(player.id) / 2);
             transform.translate(0, -250);
-            drawPrivateAreaBorder(g, player, activeObject, 5, player.color, transform);
+            drawPrivateAreaBorder(g, gameInstance, player, activeObject, 5, player.color, transform);
             g2d.setTransform(tmp);
         }
     }
@@ -390,14 +390,27 @@ public class DrawFunctions {
         }
     }
 
-    public static void drawPrivateAreaBorder(Graphics g, Player player, ObjectInstance objectInstance, int borderWidth, Color color, AffineTransform transform){
+    public static void drawPrivateAreaBorder(Graphics g, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int borderWidth, Color color, AffineTransform transform){
         if (objectInstance != null) {
+            Graphics2D g2 = (Graphics2D) g;
+            //Define border strokes
+            BufferedImage img = objectInstance.go.getLook(objectInstance.state, player.id);
+            Stroke selectStroke = new BasicStroke(borderWidth,BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+            float strokePresentLength = Math.min((float)(objectInstance.scale * img.getHeight())/2.0f, (float)(objectInstance.scale * img.getWidth())/2.0f);
+            float strokeAbsentLengthHeight = (float)(objectInstance.scale * img.getHeight() - strokePresentLength);
+            float strokeAbsentLengthWidth = (float)(objectInstance.scale * img.getWidth() - strokePresentLength);
+            float [] dash = new float[]{ strokePresentLength,  strokeAbsentLengthWidth, strokePresentLength, strokeAbsentLengthHeight, strokePresentLength, strokeAbsentLengthWidth, strokePresentLength, strokeAbsentLengthHeight };
+            float dashPhase = strokePresentLength/2.0f;
+            Stroke hoverStroke = new BasicStroke(borderWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, dashPhase);
+
+
+
             g.setColor(color);
             Graphics2D g2d = (Graphics2D) g.create();
             AffineTransform tmp = g2d.getTransform();
             if(transform != null)
                 g2d.setTransform(transform);
-            g2d.setStroke(new BasicStroke(borderWidth));
+            g2d.setStroke(hoverStroke);
             g2d.drawRect(-borderWidth/2 ,-borderWidth/2, (objectInstance.getWidth(player.id)) + borderWidth, (objectInstance.getHeight(player.id)) + borderWidth);
             g2d.setTransform(tmp);
         }

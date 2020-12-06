@@ -273,6 +273,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (isDebug) {
 			int hoverId = (hoveredObject== null) ? -1 : hoveredObject.id;
 			String stringSelectedObjects = "";
+			String stringHandCards = "";
+			String stringActiveObjects = "";
+			String stringPrivateAreaCards = "";
+
+
 			for (int i = 0; i < selectedObjects.size(); ++i)
 			{
 				if (i==0) {
@@ -282,10 +287,62 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					stringSelectedObjects += "; " + Integer.toString(selectedObjects.get(i));
 				}
 			}
-			g.drawString("Hovered Object: " + Integer.toString(hoverId), 50, 20);
-			g.drawString("Selected Objects: " + stringSelectedObjects, 50, 40);
-			g.drawString("Player Id: " + Integer.toString(player.id), 50, 60);
-			g.drawString("Admin Id: " + Integer.toString(gameInstance.admin), 50, 80);
+			for (int i = 0; i < gameInstance.getObjectNumber(); ++i)
+			{
+				ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
+				if (oi.state.owner_id == player.id) {
+					if (stringHandCards.equals("")) {
+						stringHandCards += Integer.toString(oi.id);
+					} else {
+						stringHandCards += "; " + Integer.toString(oi.id);
+					}
+				}
+			}
+
+			for (int i = 0; i < gameInstance.getObjectNumber(); ++i)
+			{
+				ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
+				if (oi.state.isActive) {
+					if (stringActiveObjects.equals("")) {
+						stringActiveObjects += Integer.toString(oi.id);
+					} else {
+						stringActiveObjects += "; " + Integer.toString(oi.id);
+					}
+				}
+			}
+
+			for (int i = 0; i < gameInstance.getObjectNumber(); ++i)
+			{
+				ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
+				if (oi.state.inPrivateArea) {
+					if (stringPrivateAreaCards.equals("")) {
+						stringPrivateAreaCards += Integer.toString(oi.id);
+					} else {
+						stringPrivateAreaCards += "; " + Integer.toString(oi.id);
+					}
+				}
+			}
+
+			int yPos = 20;
+			int yStep = 20;
+			g2.setColor(player.color);
+			g2.drawString("Private Area: " + Boolean.toString(mouseInPrivateArea), 50, yPos);
+			yPos+=yStep;
+			g2.drawString("Own Hand Cards: " + stringHandCards, 50, yPos);
+			yPos+=yStep;
+			g2.drawString("Cards in some private Area: " + stringPrivateAreaCards, 50, yPos);
+			yPos+=yStep;
+			g2.drawString("Active Objects: " + stringActiveObjects, 50, yPos);
+			yPos+=yStep;
+			g2.drawString("Hovered Object: " + Integer.toString(hoverId), 50, yPos);
+			yPos+=yStep;
+			g2.drawString("Selected Objects: " + stringSelectedObjects, 50, yPos);
+			yPos+=yStep;
+			g2.drawString("Player Id: " + Integer.toString(player.id), 50, yPos);
+			yPos+=yStep;
+			g2.drawString("Admin Id: " + Integer.toString(gameInstance.admin), 50, yPos);
+			yPos+=yStep;
+
 		}
 
 	}
@@ -470,15 +527,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					}
 				}
 			}
-			else {
-				ObjectFunctions.deselectAllSelected(this, gameInstance, player, ial);
-			}
-			if (hoveredObject != null && this.privateArea.contains(hoveredObject.id)) {
+			else if (mouseInPrivateArea && hoveredObject != null && this.privateArea.contains(hoveredObject.id))
+			{
+				ObjectFunctions.deselectAllSelected(this,gameInstance,player,ial);
+				ObjectFunctions.selectObject(this, gameInstance, player, hoveredObject.id);
 				ObjectFunctions.setNewDrawValue(this.id, gameInstance, player, hoveredObject);
 				ObjectState state = hoveredObject.state.copy();
 				state.posX = player.mouseXPos;
 				state.posY = player.mouseYPos;
 				gameInstance.update(new GameObjectInstanceEditAction(id, player, hoveredObject, state));
+			}
+			else {
+				ObjectFunctions.deselectAllSelected(this, gameInstance, player, ial);
 			}
 			if (selectedObjects.size() > 0) {
 				objOrigPosX.clear();
