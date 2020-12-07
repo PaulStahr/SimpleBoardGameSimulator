@@ -2,8 +2,7 @@ package gameObjects.functions;
 
 import static gameObjects.functions.ObjectFunctions.*;
 import static java.lang.Integer.min;
-import static java.lang.Math.abs;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -136,10 +135,11 @@ public class DrawFunctions {
             g2.scale(5, 5);
             g2.drawString(p.getName(), 5, -10);
             g2.setTransform(tmp);
-
             //draw mouse position of other players
             g2.setStroke(basicStroke);
-            g2.translate(p.mouseXPos-5, p.mouseYPos-5);
+            g2.translate(p.mouseXPos, p.mouseYPos);
+
+
 
             AffineTransform newTmp = g2.getTransform();
             AffineTransform newTransform = new AffineTransform();
@@ -350,14 +350,14 @@ public class DrawFunctions {
 
 
             //Draw border around object
-            int objectSelector = ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id);
+            int objectSelector = ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id);
             if (objectSelector != -1)
             {
                 g2.setStroke(selectStroke);
                 g2.setColor(gameInstance.getPlayerById(objectSelector).color);
             }
             if (objectInstance.go instanceof GameObjectToken) {
-                if (ObjectFunctions.isObjecthovered(gamePanel, objectInstance) || ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id) != -1 || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
+                if (ObjectFunctions.isObjecthovered(gamePanel, objectInstance) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id) != -1 || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
                     if (isStackCollected(gameInstance, objectInstance)) {
                         g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth / 2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth / 2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth / 2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
                     }
@@ -371,7 +371,7 @@ public class DrawFunctions {
                 }
             }
             else{
-                if (ObjectFunctions.isObjecthovered(gamePanel, objectInstance) || ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id) != -1) {
+                if (ObjectFunctions.isObjecthovered(gamePanel, objectInstance) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id) != -1) {
                     g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth/2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth/2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth/2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
                 }
             }

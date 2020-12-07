@@ -1011,8 +1011,11 @@ public class ObjectFunctions {
         ObjectFunctions.updateSelectedObjects(gamePanel, gameInstance,player);
     }
 
-    public static void hoverObject(GamePanel gamePanel, ObjectInstance objectInstance){
-        gamePanel.hoveredObject = objectInstance;
+    public static void hoverObject(GamePanel gamePanel, GameInstance gameInstance, ObjectInstance objectInstance){
+        //Can only hover if not selected
+        if (objectInstance != null && !isObjectSelected(gameInstance, objectInstance.id)) {
+            gamePanel.hoveredObject = objectInstance;
+        }
     }
 
     public static void unhoverObject(GamePanel gamePanel, GameInstance gameInstance, Player player)
@@ -1036,7 +1039,7 @@ public class ObjectFunctions {
     }
 
     public static void selectObject(GamePanel gamePanel, GameInstance gameInstance, Player player, int objectId){
-        if (objectIsSelected(gameInstance, objectId) == -1)
+        if (getObjectSelector(gameInstance, objectId) == -1)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceById(objectId);
             ObjectState state = oi.state.copy();
@@ -1077,8 +1080,12 @@ public class ObjectFunctions {
         return gameInstance.getObjectInstanceById(objectId).state.isSelected == player.id;
     }
 
-    public static int objectIsSelected(GameInstance gameInstance, int objectId){
+    public static int getObjectSelector(GameInstance gameInstance, int objectId){
         return gameInstance.getObjectInstanceById(objectId).state.isSelected;
+    }
+
+    public static boolean isObjectSelected(GameInstance gameInstance, int objectId){
+        return getObjectSelector(gameInstance, objectId) != -1;
     }
 
     public static void getSelectedObjects(GameInstance gameInstance, Player player, IntegerArrayList ial)

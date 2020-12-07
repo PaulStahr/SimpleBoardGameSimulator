@@ -379,25 +379,26 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			//get nearest object concerning the mouse position
 			ObjectInstance nearestObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 			//do actions if mouse is in the private area or not and there is some nearest object
-			if (mouseInPrivateArea && nearestObject != null && !arg0.isControlDown() && !arg0.isShiftDown() && !arg0.isAltDown())
-			{
-				if (hoveredObject != null){
+			if (mouseInPrivateArea && nearestObject != null && !arg0.isControlDown() && !arg0.isShiftDown() && !arg0.isAltDown()) {
+				if (hoveredObject != null) {
 					hoveredObject.state.isActive = false;
 				}
 				nearestObject.state.isActive = false;
-				hoveredObject = nearestObject;
+				ObjectFunctions.hoverObject(this, gameInstance, nearestObject);
 				outText = String.valueOf(mouseScreenY);
-				outText = "OId: " + String.valueOf(hoveredObject.id) + " StackPos: " + String.valueOf(ObjectFunctions.getStackIdOfObject(gameInstance, hoveredObject, ial));
+				if (hoveredObject != null) {
+					outText = "OId: " + String.valueOf(hoveredObject.id) + " StackPos: " + String.valueOf(ObjectFunctions.getStackIdOfObject(gameInstance, hoveredObject, ial));
+				}
 			}
 			else if (!mouseInPrivateArea){
 				if (nearestObject != null && !nearestObject.state.inPrivateArea) {
 					if (hoveredObject == null){
-						ObjectFunctions.hoverObject(this, nearestObject);
+						ObjectFunctions.hoverObject(this, gameInstance, nearestObject);
 					}
 					else if(nearestObject.id != hoveredObject.id) {
-						ObjectFunctions.hoverObject(this, nearestObject);
+						ObjectFunctions.hoverObject(this, gameInstance, nearestObject);
 					}
-					if (isDebug) {
+					if (isDebug && hoveredObject != null) {
 						outText = "Hover Object: " + String.valueOf(hoveredObject.id);
 						outText += "\n Select: " + String.valueOf(hoveredObject.state.isSelected);
 					}
@@ -665,7 +666,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				isSelectStarted = false;
 			}
 			ObjectFunctions.deactivateAllObjects(gameInstance);
-			hoveredObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
+			ObjectInstance nearestObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
+			ObjectFunctions.hoverObject(this, gameInstance, nearestObject);
 			//gameInstance.update(new GamePlayerEditAction(id, player, player));
 			mouseColor = player.color;
 			repaint();
@@ -751,7 +753,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					ObjectFunctions.flipTokenObject(id, gameInstance, player, oi);
 					ObjectFunctions.rollTheDice(id, gameInstance, player, oi);
 				}
-				if (hoveredObject != null && ObjectFunctions.objectIsSelected(gameInstance, hoveredObject.id) != player.id){
+				if (hoveredObject != null && ObjectFunctions.getObjectSelector(gameInstance, hoveredObject.id) != player.id){
 					ObjectFunctions.flipTokenObject(id, gameInstance, player, hoveredObject);
 					ObjectFunctions.rollTheDice(id, gameInstance, player, hoveredObject);
 				}
@@ -800,7 +802,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 							state.unfold = !state.unfold;
 						}
 					}
-					if (hoveredObject != null && player.id != ObjectFunctions.objectIsSelected(gameInstance,hoveredObject.id) && hoveredObject.go instanceof  GameObjectDice)
+					if (hoveredObject != null && player.id != ObjectFunctions.getObjectSelector(gameInstance,hoveredObject.id) && hoveredObject.go instanceof  GameObjectDice)
 					{
 						GameObjectDice.DiceState state = (GameObjectDice.DiceState) hoveredObject.state;
 						state.unfold = !state.unfold;
@@ -925,14 +927,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				scaledObjects.clear();
 				savedScalingFactors.clear();
 				scalingFactor = originalScalingFactor;
-			}
-			else {
-				if (!(isLeftMouseKeyHold || isRightMouseKeyHold || isMiddleMouseKeyHold) && hoveredObject == null) {
-					if (hoveredObject != null) {
-						hoveredObject.state.isActive = false;
-					}
-					hoveredObject = null;
-				}
 			}
 			repaint();
 		}
