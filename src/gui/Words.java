@@ -94,5 +94,7 @@ public enum Words {
     sit_to_own_seat,
     double_click,
     unfold_dice,
-    edit_game, control_window, server_controls, game_list;
+    edit_game, control_window, server_controls, game_list,
+    player_name,
+    player_id;
 }

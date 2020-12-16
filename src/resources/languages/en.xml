@@ -104,4 +104,6 @@
     <control_window>Game Controls</control_window>
     <server_controls>Server Controls</server_controls>
     <game_list>Server and Games</game_list>
+    <player_name>Player Name</player_name>
+    <player_id>Player Id</player_id>
 </xml>

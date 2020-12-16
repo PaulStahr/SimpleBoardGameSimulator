@@ -13,6 +13,7 @@ public abstract class ObjectState implements Serializable {
 	private static final long serialVersionUID = -6447814893037551696L;
 	public int posX = 0;
 	public int posY = 0;
+	public int originalRotation = 0;
 	public int rotation = 0;
 	public int scale = 1;
 	public int owner_id = -1;
@@ -41,6 +42,7 @@ public abstract class ObjectState implements Serializable {
 	public void set(ObjectState state) {
 		this.posX = state.posX;
 		this.posY = state.posY;
+		this.originalRotation = state.originalRotation;
 		this.rotation = state.rotation;
 		this.scale = state.scale;
 		this.owner_id = state.owner_id;
@@ -66,7 +68,7 @@ public abstract class ObjectState implements Serializable {
 	{
 		posX = 0;
 		posY = 0;
-		rotation = 0;
+		rotation = originalRotation;
 		scale = 1;
 		owner_id = -1;
 		isSelected = -1;

@@ -61,4 +61,5 @@ public class IOString {
     public static final String IS_SELECTED = "is_selected";
     public static final String ADMIN = "admin";
 	public static final String DEBUG_MODE = "debug_mode";
+    public static final String ORIGINAL_ROTATION = "original_rotation";
 }

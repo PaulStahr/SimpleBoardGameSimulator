@@ -7,8 +7,8 @@ import util.jframe.table.TableColumnType;
 import util.jframe.table.ValueColumnTypes;
 
 public enum GameInstanceColumnType implements TableColumnType{
-	ID("id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
-	NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
+	ID("Game Id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
+	NAME("Game Name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	CONNECT("Connect", ValueColumnTypes.TYPE_BUTTON, "Connect", null),
 	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null), 
 	NUM_PLAYERS("Players", ValueColumnTypes.TYPE_TEXTFIELD, "0", null);

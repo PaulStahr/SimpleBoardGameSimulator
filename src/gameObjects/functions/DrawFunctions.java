@@ -50,7 +50,7 @@ public class DrawFunctions {
 
 
     public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, IntegerArrayList ial){
-        //Draw all objects not in some private area
+        //Draw all objects
         IntegerArrayList oiList = new IntegerArrayList();
         IntegerArrayList fixedObjects = new IntegerArrayList();
         for (int idx : ial){
@@ -138,7 +138,6 @@ public class DrawFunctions {
             //draw mouse position of other players
             g2.setStroke(basicStroke);
             g2.translate(p.mouseXPos, p.mouseYPos);
-
 
 
             AffineTransform newTmp = g2.getTransform();
@@ -255,7 +254,7 @@ public class DrawFunctions {
 
     public static void drawStack(GamePanel gamePanel, Graphics g, IntegerArrayList stackList, GameInstance gameInstance, Player player, double zooming) {
         if (stackList.size()>0) {
-            if (isStackCollected(gameInstance,gameInstance.getObjectInstanceById(stackList.get(0)))){
+            if (isStackCollected(gameInstance,gameInstance.getObjectInstanceById(stackList.get(0))) || isStackOwned(gameInstance, stackList)){
                 int oiId = gameInstance.getObjectInstanceById(stackList.getI(0)).id;
                 stackList.clear();
                 stackList.add(oiId);
@@ -285,25 +284,41 @@ public class DrawFunctions {
             AffineTransform tmp = g2.getTransform();
             g2.translate(objectInstance.state.posX, objectInstance.state.posY);
             //draw object not in private area
-            if (gamePanel.privateArea == null || !gamePanel.privateArea.containsBoardCoordinates(objectInstance.state.posX, objectInstance.state.posY) || !objectInstance.state.isActive){
+            if (gamePanel.privateArea == null || !gamePanel.privateArea.containsBoardCoordinates(objectInstance.state.posX, objectInstance.state.posY) || !objectInstance.state.isActive) {
                 g2.rotate(Math.toRadians(objectInstance.state.rotation));
-                if (objectInstance.go instanceof GameObjectDice)
-                {
+                if (objectInstance.go instanceof GameObjectDice) {
                     GameObjectDice.DiceState diceState = (GameObjectDice.DiceState) objectInstance.state;
                     if (diceState.unfold) {
                         List<BufferedImage> bufferedImages = new ArrayList<>();
                         DrawFunctions.unfoldDice(objectInstance, bufferedImages);
                         int side = diceState.side;
-                        for (int i = 0; i<bufferedImages.size();++i) {
+                        for (int i = 0; i < bufferedImages.size(); ++i) {
                             BufferedImage bufferedImage = bufferedImages.get(i);
                             int drawPos = i - side;
-                            g2.translate(drawPos*-(int) (objectInstance.scale * img.getWidth() * zooming + 5.0f), 0);
-                            g2.drawImage(bufferedImage, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
-                            g2.translate(drawPos*(int) (objectInstance.scale * img.getWidth() * zooming + 5.0f), 0);
+                            if (objectInstance.state.owner_id == -1) {
+                                g2.translate(drawPos * -(int) (objectInstance.scale * img.getWidth() * zooming + 5.0f), 0);
+                                g2.drawImage(bufferedImage, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+                                g2.translate(drawPos * (int) (objectInstance.scale * img.getWidth() * zooming + 5.0f), 0);
+                            }
                         }
                     }
                 }
-                g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+                if (objectInstance.state.owner_id == -1 || ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id)) {
+                    g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+                }
+                else if (objectInstance.state.owner_id != -1){
+                    //Draw Object in front of player
+                    //Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
+                    /*
+                    if (playerOwner != null) {
+                        tmp = g2.getTransform();
+                        g2.setTransform(new AffineTransform());
+                        g2.setTransform(playerOwner.playerAtTableTransform);
+                        g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
+                        g2.setTransform(tmp);
+                    }
+                    */
+                }
             }
             //draw object above private area
             else if (objectInstance.state.isActive){
@@ -429,4 +444,102 @@ public class DrawFunctions {
         }
     }
 
+    public static void drawDebugInfo(GamePanel gamePanel, Graphics2D g2, GameInstance gameInstance, Player player) {
+        ObjectInstance hoveredObject = gamePanel.hoveredObject;
+        IntegerArrayList selectedObjects = gamePanel.selectedObjects;
+        IntegerArrayList ial = new IntegerArrayList();
+        int hoverId = (hoveredObject== null) ? -1 : hoveredObject.id;
+        String stringSelectedObjects = "";
+        String stringHandCards = "";
+        String stringActiveObjects = "";
+        String stringHoveredStack = "";
+        String stringPrivateAreaCards = "";
+
+
+        for (int i = 0; i < selectedObjects.size(); ++i)
+        {
+            if (i==0) {
+                stringSelectedObjects += Integer.toString(selectedObjects.get(i));
+            }
+            else{
+                stringSelectedObjects += "; " + Integer.toString(selectedObjects.get(i));
+            }
+        }
+        for (int i = 0; i < gameInstance.getObjectNumber(); ++i)
+        {
+            ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
+            if (oi.state.owner_id == player.id) {
+                if (stringHandCards.equals("")) {
+                    stringHandCards += Integer.toString(oi.id);
+                } else {
+                    stringHandCards += "; " + Integer.toString(oi.id);
+                }
+            }
+        }
+
+        for (int i = 0; i < gameInstance.getObjectNumber(); ++i)
+        {
+            ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
+            if (oi.state.isActive) {
+                if (stringActiveObjects.equals("")) {
+                    stringActiveObjects += Integer.toString(oi.id);
+                } else {
+                    stringActiveObjects += "; " + Integer.toString(oi.id);
+                }
+            }
+        }
+
+        ObjectFunctions.getStack(gameInstance, hoveredObject, ial);
+        if (ial.size()>1) {
+            for (int i : ial) {
+                if (stringHoveredStack.equals("")) {
+                    stringHoveredStack += Integer.toString(i);
+                } else {
+                    stringHoveredStack += "; " + Integer.toString(i);
+                }
+            }
+        }
+
+        for (int i = 0; i < gameInstance.getObjectNumber(); ++i)
+        {
+            ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
+            if (oi.state.inPrivateArea) {
+                if (stringPrivateAreaCards.equals("")) {
+                    stringPrivateAreaCards += Integer.toString(oi.id);
+                } else {
+                    stringPrivateAreaCards += "; " + Integer.toString(oi.id);
+                }
+            }
+        }
+
+        int yPos = 20;
+        int yStep = 20;
+        g2.setColor(player.color);
+        g2.drawString("Mouse: (" + Integer.toString(gamePanel.mouseScreenX) + ", " + Integer.toString(gamePanel.mouseScreenX) + ")" + " Wheel: " + Integer.toString(gamePanel.mouseWheelValue), 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Player Pos: " + Boolean.toString(gamePanel.mouseInPrivateArea), 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Private Area: " + Boolean.toString(gamePanel.mouseInPrivateArea), 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Own Hand Cards: " + stringHandCards, 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Cards in some private Area: " + stringPrivateAreaCards, 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Active Objects: " + stringActiveObjects, 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Hovered Object: " + Integer.toString(hoverId), 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Hovered Stack: " + stringHoveredStack, 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Selected Objects: " + stringSelectedObjects, 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Player Id: " + Integer.toString(player.id), 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Admin Id: " + Integer.toString(gameInstance.admin), 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Number of Pressed Keys: " + Integer.toString(gamePanel.downKeys.size()), 50, yPos);
+        yPos+=yStep;
+
+
+    }
 }

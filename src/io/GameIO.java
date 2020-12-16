@@ -81,6 +81,7 @@ public class GameIO {
 		elem.setAttribute(IOString.X, 				Integer.toString(state.posX));
 		elem.setAttribute(IOString.Y, 				Integer.toString(state.posY));
 		elem.setAttribute(IOString.R, 				Integer.toString(state.rotation));
+		elem.setAttribute(IOString.ORIGINAL_ROTATION, 				Integer.toString(state.originalRotation));
 		elem.setAttribute(IOString.S, 				Integer.toString(state.scale));
 		elem.setAttribute(IOString.OWNER_ID, 		Integer.toString(state.owner_id));
 		elem.setAttribute(IOString.IS_SELECTED, 		Integer.toString(state.isSelected));
@@ -112,62 +113,83 @@ public class GameIO {
 		if (v != null) {
 			state.posX = Integer.parseInt(elem.getAttributeValue(IOString.X));
 		}
+
 		v = elem.getAttributeValue(IOString.Y);
 		if (v != null) {
 			state.posY = Integer.parseInt(elem.getAttributeValue(IOString.Y));
 		}
+
 		v = elem.getAttributeValue(IOString.R);
 		if (v != null) {
 			state.rotation = Integer.parseInt(elem.getAttributeValue(IOString.R));
 		}
+
+		v = elem.getAttributeValue(IOString.ORIGINAL_ROTATION);
+		if (v != null) {
+			state.originalRotation = Integer.parseInt(elem.getAttributeValue(IOString.ORIGINAL_ROTATION));
+		}
+		else if(elem.getAttributeValue(IOString.R)!= null){
+			state.originalRotation = Integer.parseInt(elem.getAttributeValue(IOString.R));
+		}
+
 		v = elem.getAttributeValue(IOString.S);
 		if (v != null) {
 			state.scale = Integer.parseInt(elem.getAttributeValue(IOString.S));
 		}
+
 		v = elem.getAttributeValue(IOString.ABOVE);
 		if (v != null)
 		{
 			state.aboveInstanceId = Integer.parseInt(v);
 		}
+
 		v = elem.getAttributeValue(IOString.BELOW);
 		if (v != null)
 		{
 			state.belowInstanceId = Integer.parseInt(v);
 		}
+
 		Attribute ownerAttribute = elem.getAttribute(IOString.OWNER_ID);
 		if (ownerAttribute != null)
 		{
 	        state.owner_id = Integer.parseInt(ownerAttribute.getValue());
 		}
+
 		Attribute selectedAttribute = elem.getAttribute(IOString.IS_SELECTED);
 		if (selectedAttribute != null)
 		{
 			state.isSelected = Integer.parseInt(selectedAttribute.getValue());
 		}
+
 		Attribute drawValueAttribute = elem.getAttribute(IOString.DRAW_VALUE);
 		if (drawValueAttribute != null)
 		{
 			state.drawValue = Long.parseLong(drawValueAttribute.getValue());
 		}
+
 		Attribute valueAttribute = elem.getAttribute(IOString.VALUE);
 		if (valueAttribute != null)
 		{
 			state.value = Integer.parseInt(valueAttribute.getValue());
 		}
+
 		Attribute rotationStep = elem.getAttribute(IOString.ROTATION_STEP);
 		if (rotationStep != null)
 		{
 			state.rotationStep = Integer.parseInt(rotationStep.getValue());
 		}
+
 		Attribute isFixed = elem.getAttribute(IOString.IS_FIXED);
 		if (rotationStep != null)
 		{
 			state.isFixed = Boolean.parseBoolean(isFixed.getValue());
 		}
+
 		if (state instanceof TokenState && elem.getAttribute(IOString.SIDE) != null)
     	{
 			((TokenState)state).side = Boolean.parseBoolean(elem.getAttributeValue(IOString.SIDE));
     	}
+
 		if (state instanceof GameObjectFigure.FigureState && elem.getAttribute(IOString.STANDING) != null)
 		{
 			((GameObjectFigure.FigureState)state).standing = Boolean.parseBoolean(elem.getAttributeValue(IOString.STANDING));
