@@ -96,4 +96,6 @@
     <control_window>Spiel Steuerung</control_window>
     <server_controls>Server Steuerung</server_controls>
     <game_list>Server und Spiele</game_list>
+    <player_name>Spielername</player_name>
+    <player_id>Spieler Id</player_id>
 </xml>

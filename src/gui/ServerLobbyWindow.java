@@ -328,8 +328,8 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		buttonStartServer.setText(language.getString(Words.start_server));
 		labelAddress.setText(language.getString(Words.server_address));
 		labelPort.setText(language.getString(Words.port));
-		labelName.setText(language.getString(Words.name));
-		labelId.setText(language.getString(Words.id));
+		labelName.setText(language.getString(Words.player_name));
+		labelId.setText(language.getString(Words.player_id));
 		this.setTitle(language.getString(Words.game_list));
 	}
 }
