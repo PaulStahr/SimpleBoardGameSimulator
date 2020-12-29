@@ -19,6 +19,7 @@ import main.Player;
 import net.AsynchronousGameConnection;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
+import util.JFrameUtils;
 
 public class SimpleNetworkServertest {
     private static final Logger logger = LoggerFactory.getLogger(SimpleNetworkServertest.class);
@@ -45,7 +46,15 @@ public class SimpleNetworkServertest {
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi, null);
     	connection.start();
     	gi.addPlayer(null, player);
-    	gw.setVisible(true);
+    	JFrameUtils.runByDispatcherAndWait(
+    			new Runnable() {
+					
+					@Override
+					public void run() {
+				    	gw.setVisible(true);
+					}
+				}
+			);
     }
     
     public static GameWindow connectAndJoinGame(String address, int port, Player player, String gameInstanceId, LanguageHandler lh) throws UnknownHostException, IOException, JDOMException
@@ -58,7 +67,13 @@ public class SimpleNetworkServertest {
     	connection.start();
     	player = gi.addPlayer(null, player);
     	GameWindow gw = new GameWindow(gi, player, lh);
-    	gw.setVisible(true);
+    	JFrameUtils.runByDispatcherAndWait(new Runnable() {
+			
+			@Override
+			public void run() {
+		    	gw.setVisible(true);
+			}
+		});
     	return gw;
     }
     
@@ -78,7 +93,7 @@ public class SimpleNetworkServertest {
     	}
     	{
     	   	Player player = new Player("Paul", 1);
-    	   	FileInputStream fis = new FileInputStream("PrivateGames/Gruppe01.zip");
+    	   	FileInputStream fis = new FileInputStream("PrivateGames/Wizard.zip");
 			GameInstance gi = new GameInstance(new Game(), null);
 			GameIO.readSnapshotFromZip(fis, gi);
 			gi.name = "Testsession";
