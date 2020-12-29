@@ -25,6 +25,7 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import data.DataHandler;
 import gameObjects.GameMetaInfo;
 import gameObjects.action.message.UsertextMessageAction;
 import gameObjects.definition.GameObject;
@@ -32,7 +33,6 @@ import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import io.GameIO;
-import main.DataHandler;
 import main.Player;
 import util.StringUtils;
 
