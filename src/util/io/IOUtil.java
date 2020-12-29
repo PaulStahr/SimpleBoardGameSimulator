@@ -4,8 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 import util.StringUtils;
@@ -100,14 +98,5 @@ public class IOUtil {
 			outBuf.newLine();
 			chBuf = StringUtils.writeAndReset(outBuf, strB, chBuf);
 		}
-	}
-
-	public static final void copy(InputStream in, OutputStream out) throws IOException{
-		byte data[] = new byte[4096];
-        int len = 0;
-        while ((len = in.read(data, 0, 4096)) > 0)
-        {
-        	out.write(data, 0, len);
-        }
 	}
 }

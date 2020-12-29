@@ -8,8 +8,11 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,6 +20,13 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.TargetDataLine;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -40,19 +50,22 @@ import javax.swing.text.html.HTML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import data.DataHandler;
 import gameObjects.action.GameAction;
 import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.message.UserCombinedMessage;
 import gameObjects.action.message.UserFileMessage;
 import gameObjects.action.message.UserMessage;
+import gameObjects.action.message.UserSoundMessageAction;
 import gameObjects.action.message.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import main.Player;
 import util.JFrameUtils;
+import util.io.StreamUtil;
 
 
-public class IngameChatPanel extends JPanel implements GameChangeListener {
+public class IngameChatPanel extends JPanel implements GameChangeListener, KeyListener {
 	/**
 	 * 
 	 */
@@ -67,9 +80,9 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	private GameInstance game;
 	protected Player player;
 
-	protected final JTabbedPane chatPanes;
-	protected final SimpleAttributeSet textStyle;
-	protected final JTextField messageInput;
+	protected final JTabbedPane chatPanes = new JTabbedPane(SwingConstants.BOTTOM);
+	protected final SimpleAttributeSet textStyle = new SimpleAttributeSet();
+	protected final JTextField messageInput = new JTextField();
 	protected String receiverPlayerName = "all";
 	private final JComboBox<String> sendTo = new JComboBox<String>();
 	private	 int playerModCount = 0;
@@ -112,9 +125,6 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 		this.add(new JLabel("Player Chat"));
 
-		textStyle = new SimpleAttributeSet();
-
-		chatPanes = new JTabbedPane(SwingConstants.BOTTOM);
 		this.add(chatPanes);
 		createChatPane("all");
 
@@ -128,7 +138,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		sendToPanel.add(Box.createHorizontalGlue());
 		this.add(sendToPanel);
 
-		messageInput = new JTextField();
+		messageInput.addKeyListener(this);
 		messageInput.addActionListener(new InputListener());
 
 		JPanel messagePanel = new JPanel();
@@ -243,7 +253,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 			updatePlayerList();
 		}
 	};
-
+	
 	@Override
 	public void changeUpdate(GameAction action) {
 		if (action instanceof GamePlayerEditAction)
@@ -291,6 +301,23 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 				else if (action instanceof UserCombinedMessage)
 				{
 					//TODO
+				}
+				else if (action instanceof UserSoundMessageAction)
+				{
+			        try {
+			        	DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, getAudioFormat());
+			       
+			        	SourceDataLine sourceLine = (SourceDataLine)AudioSystem.getLine(dataLineInfo);
+			        	sourceLine.open(getAudioFormat());
+				        sourceLine.start();
+				        sourceLine.write(((UserSoundMessageAction)action).getData(), 0, ((UserSoundMessageAction)action).getData().length);
+				        sourceLine.drain();
+				        sourceLine.close();
+			        } catch (LineUnavailableException e) {
+			        	logger.error("Can't play audio sample", e);
+			        } catch (Exception e){
+			        	logger.error("Can't play audio sample", e);
+			        }
 				}
 				else if (action instanceof UsertextMessageAction)
 				{
@@ -342,6 +369,73 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		}
 
 	}
+
+    AudioFormat getAudioFormat() {
+        float sampleRate = 44100;
+        int sampleSizeInBits = 16;
+        int channels = 2;
+        boolean signed = true;
+        boolean bigEndian = true;
+        AudioFormat format = new AudioFormat(sampleRate, sampleSizeInBits,
+                                             channels, signed, bigEndian);
+        return format;
+    }
+	
+    final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+    Thread th;
+    
+    public void keyChanged(KeyEvent arg0)
+    {
+    	if (arg0.isControlDown() == (line != null))
+			return;
+		if(arg0.isControlDown())
+		{
+			try {
+	            AudioFormat format = getAudioFormat();
+	            DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
+	 
+	            // checks if system supports the data line
+	            if (!AudioSystem.isLineSupported(info)) {logger.error("Line not supported");}
+	            line = (TargetDataLine) AudioSystem.getLine(info);
+	            line.open(format);
+	            line.start();
+	            final AudioInputStream ais = new AudioInputStream(line);
+	            DataHandler.tp.run(new Runnable() {
+	            	@Override
+					public void run()
+	            	{
+	    				try {
+							StreamUtil.copy(ais, bos);
+						} catch (IOException e) {
+							logger.error("Can't copy sound", e);
+						}
+	    				game.update(new UserSoundMessageAction(id, player.id, receiverPlayerId, bos.toByteArray()));
+	    	        	bos.reset();
+	    	        	line.close();
+	    		        line = null;
+	            	}
+	            }, "Capture sound");
+	            th.start();
+	        } catch (LineUnavailableException ex) {
+	            ex.printStackTrace();
+	        }
+		}
+		else
+		{
+			line.stop();
+			line.drain();
+		}
+    }
+    
+    TargetDataLine line = null;
+	@Override
+	public void keyPressed(KeyEvent arg0) {keyChanged(arg0);}
+
+	@Override
+	public void keyReleased(KeyEvent arg0) {keyChanged(arg0);}
+
+	@Override
+	public void keyTyped(KeyEvent arg0) {}
 }
 
 

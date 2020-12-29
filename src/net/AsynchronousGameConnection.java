@@ -201,6 +201,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	
 	static class CommandScip implements Serializable
 	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3856297382586773057L;
 		int bytes;
 		public CommandScip(int bytes) {
 			this.bytes = bytes;
@@ -569,6 +573,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						continue;
 					}
 					if (action instanceof UsertextMessageAction)
+					{
+						gi.update(action);
+						++inputEvents;
+						continue;
+					}
+					if (action instanceof UserSoundMessageAction)
 					{
 						gi.update(action);
 						++inputEvents;

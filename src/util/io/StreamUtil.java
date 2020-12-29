@@ -40,6 +40,8 @@ public class StreamUtil {
 		return strB.toString();
 	}*/
 	
+	
+	
 	public static final String readStreamToString(InputStream stream) throws IOException
 	{
 		InputStreamReader reader = new InputStreamReader(stream);
@@ -68,5 +70,14 @@ public class StreamUtil {
 
 	public static void skip(ObjectInputStream is, int i) throws IOException {
 		while ((i -= is.skip(i)) != 0);
+	}
+	
+	public static final void copy(InputStream in, OutputStream out) throws IOException{
+		byte data[] = new byte[4096];
+        int len = 0;
+        while ((len = in.read(data, 0, 4096)) > 0)
+        {
+        	out.write(data, 0, len);
+        }
 	}
 }
