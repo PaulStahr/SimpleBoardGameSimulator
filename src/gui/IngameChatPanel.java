@@ -8,7 +8,11 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,19 +20,22 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.JViewport;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import javax.swing.text.html.HTML;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +44,7 @@ import gameObjects.action.GameAction;
 import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.message.UserCombinedMessage;
 import gameObjects.action.message.UserFileMessage;
+import gameObjects.action.message.UserMessage;
 import gameObjects.action.message.UsertextMessageAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
@@ -52,15 +60,16 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	private static final Logger logger = LoggerFactory.getLogger(IngameChatPanel.class);
 	private static final Dimension chatTextMinDimension =  new Dimension(200,50);
 	private static final Dimension chatTextPrefDimension = new Dimension(500,10000);
+	private final ArrayList<UserFileMessage> fileMessages = new ArrayList<>();
 	//private static final Dimension chatTextMaxDimension =  new Dimension(10000,10000);
 
-	int id = (int)System.nanoTime();
+	final int id = (int)System.nanoTime();
 	private GameInstance game;
 	protected Player player;
 
-	protected JTabbedPane chatPanes;
+	protected final JTabbedPane chatPanes;
 	protected final SimpleAttributeSet textStyle;
-	protected JTextField messageInput;
+	protected final JTextField messageInput;
 	protected String receiverPlayerName = "all";
 	private final JComboBox<String> sendTo = new JComboBox<String>();
 	private	 int playerModCount = 0;
@@ -154,7 +163,51 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 
 	private void createChatPane(String tabName) {
 		JTextPane chatTextPane = new JTextPane();
-		appendColorMessage(chatTextPane, "Chat from "+ java.time.ZonedDateTime.now() + "\n", Color.black);
+		chatTextPane.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+		        int     pos  = chatTextPane.viewToModel( e.getPoint() );
+		        Element elem = ((StyledDocument) chatTextPane.getDocument()).getCharacterElement(pos);
+		        if (elem != null)
+		        {
+		        	AttributeSet set = elem.getAttributes();
+		        	Object attribute = set.getAttribute(HTML.Attribute.HREF);
+		        	if (attribute != null)
+		        	{
+		        		UserFileMessage action = fileMessages.get((Integer)attribute);
+		        		JFileChooser fileChooser = new JFileChooser();
+		        		fileChooser.setSelectedFile(new File(action.getFilename()));
+		    			if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
+		    			{
+		    				try {
+		    					File file = fileChooser.getSelectedFile();
+		    					FileOutputStream out = new FileOutputStream(file);
+		    					out.write(action.getData());
+		    					out.close();
+		    				} catch (IOException ex) {
+		    					JFrameUtils.logErrorAndShow("Couldn't save file", ex, logger );
+		    				}
+		    			}
+		        		logger.info("attribute " + attribute.toString());
+		        	}
+		        }
+			}
+		});
+		textStyle.addAttribute(StyleConstants.Foreground, Color.BLACK);
+		appendMessage(chatTextPane, "Chat from "+ java.time.ZonedDateTime.now() + "\n", textStyle);
 		chatTextPane.setEditable(false);
 		//chatTextPane.setMinimumSize(chatTextMinDimension);
 
@@ -168,11 +221,10 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	}
 	
 	// add a message to the chat area in the color of the sending player
-	private void appendColorMessage(JTextPane chatTextPane, String message, Color color) {
-		StyleConstants.setForeground(textStyle, color);
+	private void appendMessage(JTextPane chatTextPane, String message, SimpleAttributeSet style) {
 		try {
 			StyledDocument chatText = chatTextPane.getStyledDocument();
-			chatText.insertString(chatText.getLength(), message, textStyle);
+			chatText.insertString(chatText.getLength(), message, style);
 			chatTextPane.setCaretPosition(chatText.getLength());
 		} catch (BadLocationException e) {
 			logger.error("Failed to append text in chat area.");
@@ -198,56 +250,57 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 		{
 			JFrameUtils.runByDispatcher(updatePlayerListRunnable);
 		}
-		else if (action instanceof UserFileMessage)
+		else if (action instanceof UserMessage)
 		{
-			//TODO
-		}
-		else if (action instanceof UserCombinedMessage)
-		{
-			//TODO
-		}
-		else if (action instanceof UsertextMessageAction)
-		{
-			UsertextMessageAction textAction = (UsertextMessageAction) action;
-			Player pl = game.getPlayerById(textAction.sourcePlayer);
-			String rawMessage = textAction.message;
-			Color color = pl == null ? Color.BLACK : pl.color;
-			String recipient = rawMessage.substring(0, rawMessage.indexOf(":"));
-			// chop off the recipient part from the message
-			rawMessage = rawMessage.substring(rawMessage.indexOf(":")+1);
-			String sender = rawMessage.substring(0, rawMessage.indexOf(":"));
-			// chop off the sender part from the message:			
-			String message = rawMessage.substring(rawMessage.indexOf(":")+1);
-			String tabName;
-			if ( sender.equals(player.getName()) || recipient.equals(player.getName())  || recipient.equals("all")) {
+			UserMessage userMessage = (UserMessage)action;
+			Player pl = game.getPlayerById(userMessage.sourcePlayer);
+			int destinationId = userMessage.destinationPlayer;
+			if ( pl == player || destinationId == player.id || destinationId == -1) {
+				textStyle.addAttribute(StyleConstants.Foreground, pl == null ? Color.BLACK : pl.color);
+				String tabName;
 				// The message was sent by me or it was sent to me or it was sent to all (which means also to me)
-
 				// Find the tab to add the message to
 				int chatIndex = -1;
-				if (recipient.matches("all")) {
+				if (destinationId == -1) {
 					tabName = "all";
-				} else if (sender.equals(player.getName())) {
+				} else if (pl == player) {
 					// I sent the message. Look for a tab named with the reciver
-					tabName = recipient;
+					tabName = player.getName();
 				} else {
 					// it is a private message sent to me
 					// look for a tab with the sender name
-					tabName = sender;
+					tabName = pl.getName();
 				}
 				chatIndex = chatPanes.indexOfTab(tabName);
 				if (chatIndex == -1) {
 					// The one-on-one chat does not exist yet.
 					// Create a new tab.
+					chatIndex = chatPanes.getTabCount();
 					createChatPane(tabName);
-					chatIndex = chatPanes.getTabCount() -1;
 					chatPanes.setSelectedIndex(chatIndex);
 				}
-
 				JScrollPane scrollPane =(JScrollPane) chatPanes.getComponentAt(chatIndex);
-				JViewport viewPort = scrollPane.getViewport();
-				JTextPane chatPane = (JTextPane) viewPort.getView();
-			
-				appendColorMessage(chatPane, sender + ": "+ message, color);
+				JTextPane chatPane = (JTextPane)scrollPane.getViewport().getView();
+				if (action instanceof UserFileMessage)
+				{
+					textStyle.addAttribute(HTML.Attribute.HREF, fileMessages.size());
+					fileMessages.add((UserFileMessage)action);
+					appendMessage(chatPane, ((UserFileMessage)action).getFilename(), textStyle);
+					textStyle.removeAttribute(HTML.Attribute.HREF);
+				}
+				else if (action instanceof UserCombinedMessage)
+				{
+					//TODO
+				}
+				else if (action instanceof UsertextMessageAction)
+				{
+					UsertextMessageAction textAction = (UsertextMessageAction) action;
+					// chop off the recipient part from the message
+					String rawMessage = textAction.message.substring(textAction.message.indexOf(":")+1);
+					// chop off the sender part from the message:			
+					String message = rawMessage.substring(rawMessage.indexOf(":")+1);		
+					appendMessage(chatPane, pl.getName() + ": "+ message, textStyle);
+				}
 			}
 		}
 	}
@@ -278,7 +331,6 @@ public class IngameChatPanel extends JPanel implements GameChangeListener {
 	}
 
 	class InputListener implements ActionListener {
-		InputListener() {}
 		@Override
 		public void actionPerformed(java.awt.event.ActionEvent evt) {
 			String inputText = messageInput.getText();

@@ -403,6 +403,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    		objOut.writeUnshared(action);
 				    		++outputEvents;
 					   	}
+				    	else if (action instanceof UserFileMessage)
+				    	{
+				    		objOut.writeUnshared(action);
+				    		++outputEvents;
+				    	}
 				    	else if (action instanceof GameObjectEditAction)
 				    	{
 				    		objOut.writeUnshared(action);
@@ -456,6 +461,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					    {
 					    	objOut.writeUnshared(action);
 					    	++outputEvents;
+					    }
+					    else
+					    {
+					    	logger.warn("Unknown actiontype " + action.getClass());
 					    }
 					}
 				    catch ( Exception e ) {
@@ -577,6 +586,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						++inputEvents;
 						continue;
 					}
+					logger.warn("Unknown actiontype class " + action.getClass());
 				}
 				
 				if (inputObject instanceof GameStructureEditAction)
