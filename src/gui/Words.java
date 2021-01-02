@@ -96,5 +96,8 @@ public enum Words {
     unfold_dice,
     edit_game, control_window, server_controls, game_list,
     player_name,
-    player_id;
+    player_id,
+    game_name,
+    game,
+    server,
 }

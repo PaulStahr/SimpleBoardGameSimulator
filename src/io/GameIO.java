@@ -91,13 +91,16 @@ public class GameIO {
 		elem.setAttribute(IOString.VALUE, 			Integer.toString(state.value));
 		elem.setAttribute(IOString.ROTATION_STEP, 	Integer.toString(state.rotationStep));
 		elem.setAttribute(IOString.IS_FIXED, 		Boolean.toString(state.isFixed));
-		if (state instanceof TokenState)
-    	{
-			elem.setAttribute(IOString.SIDE, Boolean.toString(((TokenState)state).side));
-    	}
+		if (state instanceof TokenState) {
+			elem.setAttribute(IOString.SIDE, Boolean.toString(((TokenState) state).side));
+		}
 		if (state instanceof GameObjectFigure.FigureState)
 		{
 			elem.setAttribute(IOString.STANDING, Boolean.toString(((GameObjectFigure.FigureState) state).standing));
+		}
+		if (state instanceof GameObjectDice.DiceState)
+		{
+			elem.setAttribute(IOString.SIDE, Integer.toString(((GameObjectDice.DiceState)state).side));
 		}
 	}
 
@@ -193,6 +196,11 @@ public class GameIO {
 		if (state instanceof GameObjectFigure.FigureState && elem.getAttribute(IOString.STANDING) != null)
 		{
 			((GameObjectFigure.FigureState)state).standing = Boolean.parseBoolean(elem.getAttributeValue(IOString.STANDING));
+		}
+
+		if (state instanceof GameObjectDice.DiceState && elem.getAttributeValue(IOString.SIDE) != null)
+		{
+			((DiceState)state).side = Integer.parseInt(elem.getAttributeValue(IOString.SIDE));
 		}
 	}
 

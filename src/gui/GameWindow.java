@@ -22,6 +22,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
+import data.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,6 +50,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	public GamePanel gamePanel;
 	public IngameChatPanel chatPanel;
 	public JToolBar toolBar;
+
 	private final JMenuItem menuItemExit = new JMenuItem();
 	private final JMenuItem menuItemEditGame = new JMenuItem();
 	private final JMenuItem menuItemSaveGame = new JMenuItem();
@@ -62,10 +64,9 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	private final JMenu menuFile = new JMenu();
 	private final JMenu menuExtras = new JMenu();
 	private final JMenu menuControls = new JMenu();
-
 	private final LanguageHandler lh;
-	
 	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+
 	private class GameWindowUpdater implements TimedUpdateHandler
 	{
 		
@@ -99,12 +100,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	{
 		this.gi = gi;
 		this.lh = lh;
-		if (gi.admin == player.id) {
-			this.setTitle(gi.name + " (Admin Mode)");
-		}
-		else {
-			this.setTitle(gi.name);
-		}
+		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		JMenuBar menuBar = new JMenuBar();
 		JToolBar toolBar = new JToolBar();
 		toolBar.setOrientation(SwingConstants.VERTICAL);
@@ -146,17 +142,22 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 
 		sliderRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,chatPanel, gamePanel);
 		sliderRight.setOneTouchExpandable(true);
+
 		sliderRight.setResizeWeight(0); // the chat panel will not be resized when resizing the window
+		sliderRight.getLeftComponent().setMinimumSize(new Dimension());
+		sliderRight.setDividerLocation(0.0d);
 		this.add(sliderRight);
 
 		setLayout(new GridLayout(1, 1));
 		setSize((int) screenSize.getWidth(), (int) screenSize.getHeight());
-		sliderRight.setDividerLocation(0.0d);
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		languageChanged(lh.getCurrentLanguage());
 		lh.addLanguageChangeListener(this);
 		DataHandler.timedUpdater.add(gww);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+
+
 	}
 
 	@Override
@@ -242,6 +243,13 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuFile.setText(			language.getString(Words.files));
 		menuExtras.setText(			language.getString(Words.extras));
 		menuControls.setText(		language.getString(Words.controls));
+		//Set Title of the window
+		if (gi.admin == gamePanel.player.id) {
+			this.setTitle(language.getString(Words.game) + ": " + gi.name + " (Admin Mode)" + ", " + gamePanel.player.getName() + " (Id: " + gamePanel.player.id +  ")" + ", " + lh.getCurrentLanguage().getString(Words.server) + ": " + Options.getString("last_connection.address"));
+		}
+		else {
+			this.setTitle(language.getString(Words.game) + ": " + gi.name + ", " + gamePanel.player.getName() + " (Id: " + gamePanel.player.id +  ")" + ", " + lh.getCurrentLanguage().getString(Words.server) + ": " + Options.getString("last_connection.address"));
+		}
 	}
 	
 }

@@ -98,4 +98,7 @@
     <game_list>Server und Spiele</game_list>
     <player_name>Spielername</player_name>
     <player_id>Spieler Id</player_id>
+    <game_name>Spielname</game_name>
+    <game>Spiel</game>
+    <server>Server</server>
 </xml>

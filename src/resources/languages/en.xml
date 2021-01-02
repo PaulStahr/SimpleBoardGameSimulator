@@ -106,4 +106,7 @@
     <game_list>Server and Games</game_list>
     <player_name>Player Name</player_name>
     <player_id>Player Id</player_id>
+    <game_name>Game Name</game_name>
+    <game>Spiel</game>
+    <server>Server</server>
 </xml>
