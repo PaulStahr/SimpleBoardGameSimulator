@@ -10,5 +10,8 @@ public class UserSoundMessageAction extends UserMessage{
 		super(source, sourcePlayer, destinationPlayer);
 		this.message = message;
 	}
+	public byte[] getData() {
+		return message;
+	}
 
 }

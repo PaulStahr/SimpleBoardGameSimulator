@@ -34,9 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import util.StringUtils;
+import util.ThreadPool;
 import util.TimedUpdater;
 import util.data.UniqueObjects;
-import util.io.IOUtil;
 import util.io.StreamUtil;
 
 /**
@@ -51,6 +51,7 @@ public abstract class DataHandler
     private static final String resourceFolder = "/resources/";
     public static final TimedUpdater timedUpdater = new TimedUpdater(10);
     public static volatile int openWindows = 0;
+	public static final ThreadPool tp = new ThreadPool();
 
 	
 	
@@ -61,7 +62,7 @@ public abstract class DataHandler
         File fileOut = new File(System.getProperty("java.io.tmpdir") + 	'/' + name);
         logger.info("Writing dll to: " + fileOut.getAbsolutePath());
         OutputStream out = new FileOutputStream(fileOut);
-        IOUtil.copy(in, out);
+        StreamUtil.copy(in, out);
         in.close();
         out.close();
         System.load(fileOut.toString());

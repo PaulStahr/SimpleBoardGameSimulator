@@ -201,6 +201,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	
 	static class CommandScip implements Serializable
 	{
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 3856297382586773057L;
 		int bytes;
 		public CommandScip(int bytes) {
 			this.bytes = bytes;
@@ -403,6 +407,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    		objOut.writeUnshared(action);
 				    		++outputEvents;
 					   	}
+				    	else if (action instanceof UserFileMessage)
+				    	{
+				    		objOut.writeUnshared(action);
+				    		++outputEvents;
+				    	}
 				    	else if (action instanceof GameObjectEditAction)
 				    	{
 				    		objOut.writeUnshared(action);
@@ -456,6 +465,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					    {
 					    	objOut.writeUnshared(action);
 					    	++outputEvents;
+					    }
+					    else
+					    {
+					    	logger.warn("Unknown actiontype " + action.getClass());
 					    }
 					}
 				    catch ( Exception e ) {
@@ -565,6 +578,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						++inputEvents;
 						continue;
 					}
+					if (action instanceof UserSoundMessageAction)
+					{
+						gi.update(action);
+						++inputEvents;
+						continue;
+					}
 					if (action instanceof UserFileMessage)
 					{
 						gi.update(action);
@@ -577,6 +596,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						++inputEvents;
 						continue;
 					}
+					logger.warn("Unknown actiontype class " + action.getClass());
 				}
 				
 				if (inputObject instanceof GameStructureEditAction)

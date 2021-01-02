@@ -115,11 +115,13 @@ public class ThreadPool {
 		@SuppressWarnings("unchecked")
 		private E obj[] = (E[]) new Object[maxThreads];
 		
+		@Override
 		public int size()
 		{
 			return obj.length;
 		}
 		
+		@Override
 		public E get(int i)
 		{
 			return obj[i];
@@ -196,6 +198,7 @@ public class ThreadPool {
 			this.prr = prr;
 		}
 		
+		@Override
 		public void run()
 		{
 			try
