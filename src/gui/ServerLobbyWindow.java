@@ -95,6 +95,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
  	    }
     };
  	private final ButtonColumn connectColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.CONNECT));
+	private final ButtonColumn visitColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.VISIT));
  	private final ButtonColumn deleteColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.DELETE));
  	
 	@Override
@@ -186,7 +187,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						Options.set("last_connection.port", Integer.valueOf(textFieldPort.getText()));
 						Options.set("last_connection.name", textFieldName.getText());
 						Options.set("last_connection.id", playerId);
-						Player player = new Player(textFieldName.getText(), playerId);
+						Player player = new Player(textFieldName.getText(), playerId, false);
 						String password = null;
 						if (gmi.get(row).passwordRequired)
 						{
@@ -214,6 +215,44 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						JFrameUtils.logErrorAndShow("Can't connect to server", e1, logger);
 					}
 		 	    }
+				else if (GameInstance.TYPES.get(col) == GameInstanceColumnType.VISIT)
+				{
+					try
+					{
+						int playerId = Integer.parseInt(textFieldId.getText());
+						Options.set("last_connection.address", textFieldAddress.getText());
+						Options.set("last_connection.port", Integer.valueOf(textFieldPort.getText()));
+						Options.set("last_connection.name", textFieldName.getText());
+						Options.set("last_connection.id", playerId);
+						Player player = new Player(textFieldName.getText(), playerId, true);
+						String password = null;
+						if (gmi.get(row).passwordRequired)
+						{
+							JPasswordField pf = new JPasswordField(10);
+							int option = PasswordDialog.showOptionDialog("Passwort eingeben", "Ok", "Cancel", pf);
+							if (option == JOptionPane.OK_OPTION)
+							{
+								password = new String(pf.getPassword());
+							}
+						}
+						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.indexOf(GameInstanceColumnType.ID)));
+						if (password != null)
+						{
+							gi.password = password;
+						}
+
+						//client.addPlayerToGameSession(player, gi.name, gi.password);
+						AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
+						//player = gi.addPlayer(null, player);
+						connection.syncPull();
+						connection.start();
+						GameWindow gw = new GameWindow(gi, player, lh);
+						gw.setVisible(true);
+					} catch (IOException | JDOMException e1) {
+						JFrameUtils.logErrorAndShow("Can't connect to server", e1, logger);
+					}
+				}
+
 				else if (GameInstance.TYPES.get(col) == GameInstanceColumnType.DELETE)
 				{
 					GameInstance gi;
@@ -240,7 +279,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			client.setPort(Integer.parseInt(textFieldPort.getText()));
 			gmi.clear();
 			client.getGameInstanceMeta(gmi);
-			JFrameUtils.updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn, deleteColumn);
+			JFrameUtils.updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn, visitColumn, deleteColumn);
 		} catch (IOException | ClassNotFoundException e1) {
 			JFrameUtils.logErrorAndShow("Can't update information", e1, logger);
 		}

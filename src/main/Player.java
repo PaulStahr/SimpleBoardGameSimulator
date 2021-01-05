@@ -24,6 +24,8 @@ public class Player implements Comparable {
 
 	public String actionString = "";
 	private transient int nameModCount = 0;
+
+	private boolean visitor = false;
 	
 	public String getName()
 	{
@@ -48,6 +50,13 @@ public class Player implements Comparable {
 	{
 		this.name = name;
 		this.id = id;
+		setPlayerColor();
+	}
+	public Player(String name, int id, boolean visitor)
+	{
+		this.name = name;
+		this.id = id;
+		this.visitor = visitor;
 		setPlayerColor();
 	}
 	

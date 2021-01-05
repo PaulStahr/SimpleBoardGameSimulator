@@ -10,9 +10,10 @@ public enum GameInstanceColumnType implements TableColumnType{
 	ID("Game Id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	NAME("Game Name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	CONNECT("Connect", ValueColumnTypes.TYPE_BUTTON, "Connect", null),
+	VISIT("Visit", ValueColumnTypes.TYPE_BUTTON, "Visit", null),
 	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null), 
 	NUM_PLAYERS("Players", ValueColumnTypes.TYPE_TEXTFIELD, "0", null);
-	
+
     private static final GameInstanceColumnType ct[] = GameInstanceColumnType.values();
     
     public static final int size()
@@ -72,8 +73,9 @@ public enum GameInstanceColumnType implements TableColumnType{
 		{
 			case CONNECT: 		return "Connect";
 			case DELETE:		return "Delete";
-			case ID:			return gi.id;
-			case NAME:			return gi.name;
+			case VISIT:			return "Visit";
+			case ID:			return gi.name;
+			case NAME:			return gi.id;
 			case NUM_PLAYERS:	return gi.connectedPlayerCount;
 			default:throw new IllegalArgumentException(getName());
 		}
