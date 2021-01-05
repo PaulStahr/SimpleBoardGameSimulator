@@ -25,7 +25,7 @@ import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 
 public class GameInstance {
-	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME, GameInstanceColumnType.NUM_PLAYERS, GameInstanceColumnType.CONNECT, GameInstanceColumnType.VISIT, GameInstanceColumnType.DELETE});
+	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME,   GameInstanceColumnType.NUM_PLAYERS, GameInstanceColumnType.NUM_VISITORS, GameInstanceColumnType.CONNECT, GameInstanceColumnType.VISIT, GameInstanceColumnType.DELETE});
 	public static final Logger logger = LoggerFactory.getLogger(GameInstance.class);
 	public final Game game;
 	public String password;
@@ -114,7 +114,24 @@ public class GameInstance {
 
 	public int getPlayerNumber()
 	{
-		return players.size();
+		return getPlayerNumber(false);
+	}
+	public int getPlayerNumber(boolean with_visitors)
+	{
+		if (with_visitors)
+		{
+			return players.size();
+
+		}
+		else{
+			int non_visitors = 0;
+			for (Player player : players){
+				if (!player.visitor){
+					++non_visitors;
+				}
+			}
+			return non_visitors;
+		}
 	}
 	
 	public Player getPlayerByName(String name)
@@ -212,8 +229,12 @@ public class GameInstance {
 							if (objects.get(i).state.owner_id == gsoea.objectId)
 							{
 								objects.get(i).state.owner_id = -1;
-								objects.get(i).state.isSelected = -1;
 								objects.get(i).state.inPrivateArea = false;
+							}
+							if (objects.get(i).state.isSelected == gsoea.objectId)
+							{
+								objects.get(i).state.isSelected = -1;
+								objects.get(i).state.isActive = false;
 							}
 						}
 						players.remove(getPlayerById(gsoea.objectId));
@@ -272,7 +293,22 @@ public class GameInstance {
 	}
 
 	public List<Player> getPlayerList() {
-		return Collections.unmodifiableList(players);
+		List<Player> playerList = new ArrayList<>();
+		for (Player player : players){
+			if (!player.visitor){
+				playerList.add(player);
+			}
+		}
+		return Collections.unmodifiableList(playerList);
+	}
+
+	public List<Player> getPlayerList(boolean with_visitors){
+		if (with_visitors){
+			return Collections.unmodifiableList(players);
+		}
+		else{
+			return getPlayerList();
+		}
 	}
 
 

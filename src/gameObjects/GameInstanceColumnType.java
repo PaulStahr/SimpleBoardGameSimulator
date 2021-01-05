@@ -9,12 +9,14 @@ import util.jframe.table.ValueColumnTypes;
 public enum GameInstanceColumnType implements TableColumnType{
 	ID("Game Id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	NAME("Game Name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
+	NUM_PLAYERS("Players", ValueColumnTypes.TYPE_TEXTFIELD, "0", null),
+	NUM_VISITORS("Visitors", ValueColumnTypes.TYPE_TEXTFIELD, "0", null),
 	CONNECT("Connect", ValueColumnTypes.TYPE_BUTTON, "Connect", null),
 	VISIT("Visit", ValueColumnTypes.TYPE_BUTTON, "Visit", null),
-	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null), 
-	NUM_PLAYERS("Players", ValueColumnTypes.TYPE_TEXTFIELD, "0", null);
+	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
 
-    private static final GameInstanceColumnType ct[] = GameInstanceColumnType.values();
+
+	private static final GameInstanceColumnType ct[] = GameInstanceColumnType.values();
     
     public static final int size()
     {
@@ -71,12 +73,13 @@ public enum GameInstanceColumnType implements TableColumnType{
 		GameMetaInfo gi = (GameMetaInfo)obj;
 		switch (this)
 		{
-			case CONNECT: 		return "Connect";
-			case DELETE:		return "Delete";
-			case VISIT:			return "Visit";
 			case ID:			return gi.name;
 			case NAME:			return gi.id;
+			case NUM_VISITORS:  return gi.visitorPlayerCount;
 			case NUM_PLAYERS:	return gi.connectedPlayerCount;
+			case CONNECT: 		return "Connect";
+			case VISIT:			return "Visit";
+			case DELETE:		return "Delete";
 			default:throw new IllegalArgumentException(getName());
 		}
 	}

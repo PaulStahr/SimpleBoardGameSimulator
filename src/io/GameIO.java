@@ -21,6 +21,7 @@ import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -401,6 +402,7 @@ public class GameIO {
 				Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y)));
 		result.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
 		result.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
+		result.visitor = Boolean.parseBoolean(elem.getAttributeValue(IOString.VISITOR));
 		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), result.screenToBoardTransformation);
 		return result;
 	}
@@ -413,6 +415,7 @@ public class GameIO {
 		player.mouseYPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y));
 		player.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
 		player.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
+		player.visitor = Boolean.parseBoolean(elem.getAttributeValue(IOString.VISITOR));
 		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), player.screenToBoardTransformation);
 		return player;
 	}
@@ -516,6 +519,7 @@ public class GameIO {
 		elem.setAttribute(IOString.MOUSE_Y, Integer.toString(player.mouseYPos));
 		elem.setAttribute(IOString.SCREEN_W, Integer.toString(player.screenWidth));
 		elem.setAttribute(IOString.SCREEN_H, Integer.toString(player.screenHeight));
+		elem.setAttribute(IOString.VISITOR, Boolean.toString(player.visitor));
 		elem.addContent(createElementFromAffineTransform(player.screenToBoardTransformation));
 		return elem;
 	}
@@ -1045,6 +1049,7 @@ public class GameIO {
 		player.screenToBoardTransformation.setTransform(is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble());
 		player.screenWidth = is.readInt();
 		player.screenHeight = is.readInt();
+		player.visitor = is.readBoolean();
 	}
 	
 	public static void writePlayerToStreamObject(ObjectOutputStream out, Player player) throws IOException
@@ -1064,6 +1069,7 @@ public class GameIO {
 		out.writeDouble(player.screenToBoardTransformation.getTranslateY());
 		out.writeInt(player.screenWidth);
 		out.writeInt(player.screenHeight);
+		out.writeBoolean(player.visitor);
 	}
 	
 	public static void simulateStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException

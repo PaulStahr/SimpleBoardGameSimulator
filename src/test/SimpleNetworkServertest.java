@@ -107,7 +107,7 @@ public class SimpleNetworkServertest {
     	
 
 
-	   	Player player = new Player("Florian", 2);
+	   	Player player = new Player("Florian", 2, true);
 	    GameWindow gw = connectAndJoinGame(address, port, player, "Testsession", lh);
     	try {
     		Thread.sleep(500);

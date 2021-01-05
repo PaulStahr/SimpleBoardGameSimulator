@@ -134,19 +134,19 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 					{
 						gi.name = "Unnamed";
 					}
-					Player player = new Player(textFieldName.getText(), Integer.parseInt(textFieldId.getText()));
+					//Player player = new Player(textFieldName.getText(), Integer.parseInt(textFieldId.getText()));
 					client.pushGameSession(gi);
 			    	try {
 						Thread.sleep(5000);
 					} catch (InterruptedException e1) {
 						logger.error("Unnexpected interrupt", e1);
 					}
-			    	client.addPlayerToGameSession(player, gi.name, gi.password);
+			    	//client.addPlayerToGameSession(player, gi.name, gi.password);
 			    	AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
 			    	connection.start();
-			    	gi.addPlayer(null, player);
-			    	GameWindow gw = new GameWindow(gi, player, lh);
-			    	gw.setVisible(true);
+			    	//gi.addPlayer(null, player);
+			    	//GameWindow gw = new GameWindow(gi, player, lh);
+			    	//gw.setVisible(true);
 				}catch(IOException | JDOMException ex)
 				{
 					JFrameUtils.logErrorAndShow("Can't connect to Server", ex, logger);
@@ -214,6 +214,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 					} catch (IOException | JDOMException e1) {
 						JFrameUtils.logErrorAndShow("Can't connect to server", e1, logger);
 					}
+					updateCurrentGames();
 		 	    }
 				else if (GameInstance.TYPES.get(col) == GameInstanceColumnType.VISIT)
 				{
@@ -243,7 +244,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 
 						//client.addPlayerToGameSession(player, gi.name, gi.password);
 						AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
-						//player = gi.addPlayer(null, player);
+						player = gi.addPlayer(null, player);
 						connection.syncPull();
 						connection.start();
 						GameWindow gw = new GameWindow(gi, player, lh);
@@ -251,6 +252,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 					} catch (IOException | JDOMException e1) {
 						JFrameUtils.logErrorAndShow("Can't connect to server", e1, logger);
 					}
+					updateCurrentGames();
 				}
 
 				else if (GameInstance.TYPES.get(col) == GameInstanceColumnType.DELETE)

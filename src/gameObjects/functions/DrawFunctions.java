@@ -116,7 +116,7 @@ public class DrawFunctions {
         BasicStroke wideStroke = new BasicStroke(4);
         BasicStroke basicStroke = new BasicStroke();
         double determinant = tmp.getDeterminant();
-        for(int pIdx = 0;pIdx < gameInstance.getPlayerNumber();++pIdx) {
+        for(int pIdx = 0;pIdx < gameInstance.getPlayerNumber(true);++pIdx) {
             Player p = gameInstance.getPlayerByIndex(pIdx);
             g.setColor(p.color);
             g2.setTransform(tmp);

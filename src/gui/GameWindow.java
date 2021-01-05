@@ -244,11 +244,12 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuExtras.setText(			language.getString(Words.extras));
 		menuControls.setText(		language.getString(Words.controls));
 		//Set Title of the window
+		String visitor = gamePanel.player.visitor ? " (Visitor Mode), " : "";
 		if (gi.admin == gamePanel.player.id) {
-			this.setTitle(language.getString(Words.game) + ": " + gi.name + " (Admin Mode)" + ", " + gamePanel.player.getName() + " (Id: " + gamePanel.player.id +  ")" + ", " + lh.getCurrentLanguage().getString(Words.server) + ": " + Options.getString("last_connection.address"));
+			this.setTitle(language.getString(Words.game) + ": " + gi.name + " (Admin Mode)" + ", "  + visitor  + gamePanel.player.getName() + " (Id: " + gamePanel.player.id +  ")" + ", " + lh.getCurrentLanguage().getString(Words.server) + ": " + Options.getString("last_connection.address"));
 		}
 		else {
-			this.setTitle(language.getString(Words.game) + ": " + gi.name + ", " + gamePanel.player.getName() + " (Id: " + gamePanel.player.id +  ")" + ", " + lh.getCurrentLanguage().getString(Words.server) + ": " + Options.getString("last_connection.address"));
+			this.setTitle(language.getString(Words.game) + ": " + gi.name + visitor + gamePanel.player.getName() + " (Id: " + gamePanel.player.id +  ")" + ", " + lh.getCurrentLanguage().getString(Words.server) + ": " + Options.getString("last_connection.address"));
 		}
 	}
 	

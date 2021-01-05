@@ -25,7 +25,7 @@ public class Player implements Comparable {
 	public String actionString = "";
 	private transient int nameModCount = 0;
 
-	private boolean visitor = false;
+	public boolean visitor = false;
 	
 	public String getName()
 	{

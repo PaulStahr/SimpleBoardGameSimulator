@@ -13,12 +13,14 @@ public class GameMetaInfo implements Serializable
 	public final String id;
 	public final String name;
 	public final int connectedPlayerCount;
+	public final int visitorPlayerCount;
 	public final boolean passwordRequired;
 	
 	public GameMetaInfo(GameInstance gameInstance) {
 		this.id = gameInstance.name;
 		this.name = gameInstance.name;
 		this.connectedPlayerCount = gameInstance.getPlayerNumber();
+		this.visitorPlayerCount = gameInstance.getPlayerNumber(true) - gameInstance.getPlayerNumber();
 		this.passwordRequired = !"".equals(gameInstance.password);
 	}
 	
