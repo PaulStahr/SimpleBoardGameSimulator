@@ -101,4 +101,7 @@
     <game_name>Spielname</game_name>
     <game>Spiel</game>
     <server>Server</server>
+    <stop_server>Server stoppen</stop_server>
+    <server_start_info>Der Server wurde gestartet.</server_start_info>
+    <server_stop_info>Der Server wurde gestoppt.</server_stop_info>
 </xml>

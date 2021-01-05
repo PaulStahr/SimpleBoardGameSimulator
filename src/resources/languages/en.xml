@@ -109,4 +109,7 @@
     <game_name>Game Name</game_name>
     <game>Spiel</game>
     <server>Server</server>
+    <stop_server>Stop server</stop_server>
+    <server_start_info>The server was started.</server_start_info>
+    <server_stop_info>The server was stopped.</server_stop_info>
 </xml>

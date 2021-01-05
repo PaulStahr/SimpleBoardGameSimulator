@@ -62,6 +62,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 
 
 	private final JTextField textFieldName = new JTextField(Options.getString("last_connection.name"));
+	private boolean bStartStopServer = true;
 	//private final JTextField textFieldChat = new JTextField();
 	//private final JTextArea textAreaChat = new JTextArea();
 	/*TODOS here:
@@ -99,6 +100,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	@Override
 	public void actionPerformed(ActionEvent e)
     {
+		updateCurrentGames();
 		Object source = e.getSource();
 		if (source == buttonPoll)
 		{
@@ -153,8 +155,19 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		}
 		else if (source == buttonStartServer)
 		{
-			GameServer gs = new GameServer(Integer.parseUnsignedInt(textFieldPort.getText()));
-			gs.start();
+			if (bStartStopServer == true) {
+				bStartStopServer = false;
+				GameServer gs = new GameServer(Integer.parseUnsignedInt(textFieldPort.getText()));
+				JFrameUtils.showInfoMessage(lh.getCurrentLanguage().getString(Words.server_start_info), logger);
+				buttonStartServer.setText(lh.getCurrentLanguage().getString(Words.stop_server));
+				gs.start();
+			}
+			else if(bStartStopServer == false){
+				GameServer gs = new GameServer(Integer.parseUnsignedInt(textFieldPort.getText()));
+				buttonStartServer.setText(lh.getCurrentLanguage().getString(Words.start_server));
+				JFrameUtils.showInfoMessage(lh.getCurrentLanguage().getString(Words.server_stop_info), logger);
+				gs.stop();
+			}
 		}
 		else if (e instanceof ButtonColumn.TableButtonActionEvent)
 		{
@@ -285,13 +298,15 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		//textFieldPort.setText(Integer.toString(client.getPort()));
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		setMinimumSize(getPreferredSize());
+		updateCurrentGames();
 	}
 	
     @Override
 	public void tableChanged(TableModelEvent e) {
     	if (!EventQueue.isDispatchThread())
     	{
-    		throw new RuntimeException("Table Changes only allowed by dispatchment thread");
+    		//TODO do we need this line
+    		//throw new RuntimeException("Table Changes only allowed by dispatchment thread");
     	}
        	if (!isUpdating )
 		{
@@ -330,6 +345,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		labelPort.setText(language.getString(Words.port));
 		labelName.setText(language.getString(Words.player_name));
 		labelId.setText(language.getString(Words.player_id));
+
 		this.setTitle(language.getString(Words.game_list));
 	}
 }
