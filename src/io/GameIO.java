@@ -812,7 +812,6 @@ public class GameIO {
 			Element root = doc.getRootElement();
 
 			//Control the xml version, downward compatible current version 2.0
-			//String xmlVersion = root.getAttributeValue(IOString.VERSION);
 			Integer uniqueId = 0;
 			for (Element elem : root.getChildren()) {
 				final String name = elem.getName();

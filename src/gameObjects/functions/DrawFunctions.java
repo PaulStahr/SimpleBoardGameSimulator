@@ -42,8 +42,8 @@ public class DrawFunctions {
     }
 
     public static void drawPrivateArea(GamePanel gamePanel, Graphics g){
-        int privateAreaHeight = 700;
-        int privateAreaWidth = 700;
+        int privateAreaHeight = 750;
+        int privateAreaWidth = 750;
         gamePanel.privateArea.setArea(gamePanel.getWidth()/2 - privateAreaWidth/2, gamePanel.getHeight()-privateAreaHeight/2, privateAreaWidth, privateAreaHeight, gamePanel.translateX, gamePanel.translateY, gamePanel.rotation, gamePanel.zooming);
         gamePanel.privateArea.draw(g, gamePanel.getWidth()/2, gamePanel.getHeight());
     }
@@ -284,7 +284,7 @@ public class DrawFunctions {
             AffineTransform tmp = g2.getTransform();
             g2.translate(objectInstance.state.posX, objectInstance.state.posY);
             //draw object not in private area
-            if (gamePanel.privateArea == null || !gamePanel.privateArea.containsBoardCoordinates(objectInstance.state.posX, objectInstance.state.posY) || !objectInstance.state.isActive) {
+            if (gamePanel.privateArea == null || !gamePanel.mouseInPrivateArea || !objectInstance.state.isActive) {
                 g2.rotate(Math.toRadians(objectInstance.state.rotation));
                 if (objectInstance.go instanceof GameObjectDice) {
                     GameObjectDice.DiceState diceState = (GameObjectDice.DiceState) objectInstance.state;
@@ -307,6 +307,7 @@ public class DrawFunctions {
                     g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
                 }
                 else if (objectInstance.state.owner_id != -1){
+                    boolean x = ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id);
                     //Draw Object in front of player
                     //Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
                     /*
@@ -321,14 +322,19 @@ public class DrawFunctions {
                 }
             }
             //draw object above private area
-            else if (objectInstance.state.isActive){
+            else if (gamePanel.mouseInPrivateArea && objectInstance.state.isActive){
                 int insertPosition = gamePanel.privateArea.getInsertPosition(gamePanel.mouseScreenX, gamePanel.mouseScreenY, gamePanel.getWidth()/2, gamePanel.getHeight());
                 //g2.rotate(player.screenToBoardTransformation.getDeterminant());
+                //g2.rotate(Math.toRadians(objectInstance.state.originalRotation));
                 g2.rotate(-Math.PI * 0.5 + Math.PI / ((gamePanel.privateArea.objects.size() + 1) * 2));
                 g2.rotate(insertPosition * Math.PI / (gamePanel.privateArea.objects.size() + 1));
+                g2.rotate(Math.toRadians(objectInstance.state.originalRotation));
                 g2.rotate(-gamePanel.rotation);
                 g2.scale(gamePanel.privateArea.zooming/(sqrt(g2.getTransform().getDeterminant())), gamePanel.privateArea.zooming/(sqrt(g2.getTransform().getDeterminant())));
                 g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth()  * 0.5), -(int) (objectInstance.scale * img.getHeight()  * 0.5), (int) (objectInstance.scale * img.getWidth() ), (int) (objectInstance.scale * img.getHeight() ), null);
+            }
+            else{
+                boolean x = true;
             }
 
             //Define border strokes
@@ -417,15 +423,13 @@ public class DrawFunctions {
             float [] dash = new float[]{ strokePresentLength,  strokeAbsentLengthWidth, strokePresentLength, strokeAbsentLengthHeight, strokePresentLength, strokeAbsentLengthWidth, strokePresentLength, strokeAbsentLengthHeight };
             float dashPhase = strokePresentLength/2.0f;
             Stroke hoverStroke = new BasicStroke(borderWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, dashPhase);
-
-
-
             g.setColor(color);
             Graphics2D g2d = (Graphics2D) g.create();
             AffineTransform tmp = g2d.getTransform();
             if(transform != null)
                 g2d.setTransform(transform);
             g2d.setStroke(hoverStroke);
+            //g2d.rotate(Math.toRadians(objectInstance.state.originalRotation));
             g2d.drawRect(-borderWidth/2 ,-borderWidth/2, (objectInstance.getWidth(player.id)) + borderWidth, (objectInstance.getHeight(player.id)) + borderWidth);
             g2d.setTransform(tmp);
         }
@@ -515,7 +519,7 @@ public class DrawFunctions {
         int yPos = 20;
         int yStep = 20;
         g2.setColor(player.color);
-        g2.drawString("Mouse: (" + Integer.toString(gamePanel.mouseScreenX) + ", " + Integer.toString(gamePanel.mouseScreenX) + ")" + " Wheel: " + Integer.toString(gamePanel.mouseWheelValue), 50, yPos);
+        g2.drawString("Mouse: (" + Integer.toString(gamePanel.mouseScreenX) + ", " + Integer.toString(gamePanel.mouseScreenY) + ")" + " Wheel: " + Integer.toString(gamePanel.mouseWheelValue), 50, yPos);
         yPos+=yStep;
         g2.drawString("Player Pos: " + Boolean.toString(gamePanel.mouseInPrivateArea), 50, yPos);
         yPos+=yStep;

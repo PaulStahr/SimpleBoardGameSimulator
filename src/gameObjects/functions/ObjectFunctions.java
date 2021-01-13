@@ -14,11 +14,9 @@ import java.util.Random;
 import javax.swing.SwingUtilities;
 
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.GamePlayerEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectToken;
-import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
@@ -447,20 +445,19 @@ public class ObjectFunctions {
 
     /**
      * Shuffles the given stack
-     *
-     * @param gamePanelId    id of game panel
+     *  @param gamePanel    id of game panel
      * @param gameInstance   Instance of Game
      * @param player         Current player
      * @param objectInstance Instance of Object
      * @param include        if object should be included in shuffling operation, default is true
      */
-    public static void shuffleStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean include) {
+    public static void shuffleStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean include) {
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
             IntegerArrayList objectStack = new IntegerArrayList();
-            getStack(gameInstance, objectInstance, objectStack);
+            getStackFromBottom(gameInstance, objectInstance, objectStack);
+            removeStackRelations(gamePanel, gameInstance, player, objectInstance);
             if (objectStack.size() > 1) {
                 player.actionString = "Objects Shuffled";
-                gameInstance.update(new GamePlayerEditAction(gamePanelId, player, player));
                 IntegerArrayList oldX = new IntegerArrayList();
                 IntegerArrayList oldY = new IntegerArrayList();
                 for (int id : objectStack) {
@@ -483,14 +480,14 @@ public class ObjectFunctions {
                     }
                     state.posX = oldX.get(i);
                     state.posY = oldY.get(i);
-                    gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject, state));
+                    gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentObject, state));
                 }
             }
         }
     }
 
-    public static void shuffleStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
-        shuffleStack(gamePanelId, gameInstance, player, objectInstance, true);
+    public static void shuffleStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
+        shuffleStack(gamePanel, gameInstance, player, objectInstance, true);
     }
 
     /**
@@ -878,7 +875,7 @@ public class ObjectFunctions {
                 ObjectState state = gameInstance.getObjectInstanceById(x).state.copy();
                 state.aboveInstanceId = -1;
                 state.belowInstanceId = -1;
-                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance, state));
+                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, gameInstance.getObjectInstanceById(x), state));
             }
         }
     }
@@ -926,8 +923,11 @@ public class ObjectFunctions {
             removeFromOwnStack(gamePanel, gameInstance, player, objectInstance.id);
             ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, objectInstance);
         }
-        objectInstance.state.rotation = 0;
-        moveObjectTo(gamePanel.id, gameInstance,player, objectInstance, (int) gamePanel.table.getTableCenter().getX(), (int) gamePanel.table.getTableCenter().getY());
+        objectInstance.state.rotation = objectInstance.state.originalRotation;
+        Random rand = new Random();
+        int randX = 20 - rand.nextInt(40);
+        int randY = 20 - rand.nextInt(40);
+        moveObjectTo(gamePanel.id, gameInstance,player, objectInstance, (int) gamePanel.table.getTableCenter().getX() + randX, (int) gamePanel.table.getTableCenter().getY() + randY);
         flipTokenObject(gamePanel.id, gameInstance, player, objectInstance);
     }
 
@@ -967,7 +967,7 @@ public class ObjectFunctions {
         for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
             if (oi.state.owner_id == player.id && (!ignoreActiveObject || !oi.state.isActive)) {
-                getStack(gameInstance, oi, idList);
+                getStackFromBottom(gameInstance, oi, idList);
                 return;
             }
         }
@@ -1130,6 +1130,7 @@ public class ObjectFunctions {
     public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
         if (activeObject != null) {
             if (activeObject.go instanceof GameObjectToken) {
+                // Release Object over private Area
                 if (gamePanel.privateArea != null && activeObject.state.owner_id != player.id && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                     IntegerArrayList stackIds = new IntegerArrayList();
                     ObjectFunctions.getStack(gameInstance, activeObject, stackIds);
@@ -1193,7 +1194,7 @@ public class ObjectFunctions {
                 if (oi.state.owner_id == player.id) {
                     Point2D targetPoint = new Point2D.Double(0, 0);
                     player.playerAtTableTransform.transform(targetPoint,targetPoint);
-                    ObjectFunctions.rotateStack(gameInstance, ial, player.playerAtTableRotation);
+                    ObjectFunctions.rotateStack(gameInstance, ial, oi.state.originalRotation);
                     ObjectFunctions.moveStackTo(gamePanel.id, gameInstance, player, ial, (int) targetPoint.getX(), (int) targetPoint.getY());
                 }
             }
@@ -1383,7 +1384,7 @@ public class ObjectFunctions {
             if (oi.go.groups.length > 0) {
                 oiGroup = oi.go.groups[0];
             }
-            if (oiGroup.equals(objectGroup) && oi.id != objectInstance.id && oi.state.owner_id==-1) {
+            if (oiGroup.equals(objectGroup) && oi.id != objectInstance.id && oi.state.owner_id==-1 && (oi.state.isSelected == player.id || oi.state.isSelected == -1)) {
                 objectTypeList.add(oi.id);
             }
         }

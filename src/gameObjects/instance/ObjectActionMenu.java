@@ -68,7 +68,7 @@ public class ObjectActionMenu {
             @Override
 			public void actionPerformed(ActionEvent e) {
                 /*Shuffle objects on a stack*/
-                ObjectFunctions.shuffleStack(gamePanel.id, gameInstance, player, objectInstance);
+                ObjectFunctions.shuffleStack(gamePanel, gameInstance, player, objectInstance);
             }
         });
 

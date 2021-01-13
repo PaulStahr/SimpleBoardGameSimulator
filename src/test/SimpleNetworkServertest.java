@@ -93,7 +93,7 @@ public class SimpleNetworkServertest {
     	}
     	{
     	   	Player player = new Player("Paul", 1);
-    	   	FileInputStream fis = new FileInputStream("PrivateGames/Fabrik.zip");
+    	   	FileInputStream fis = new FileInputStream("PrivateGames/Crew.zip");
 			GameInstance gi = new GameInstance(new Game(), null);
 			GameIO.readSnapshotFromZip(fis, gi);
 			gi.name = "Testsession";
@@ -102,15 +102,15 @@ public class SimpleNetworkServertest {
 	    	connectAndStartGame(address, port, player, gi, lh);
     	}
     	try {
-    		Thread.sleep(300);
+    		Thread.sleep(800);
     	}catch(InterruptedException e) {}
     	
 
 
-	   	Player player = new Player("Florian", 2, true);
+	   	Player player = new Player("Florian", 2);
 	    GameWindow gw = connectAndJoinGame(address, port, player, "Testsession", lh);
     	try {
-    		Thread.sleep(500);
+    		Thread.sleep(1000);
     	}catch(InterruptedException e) {
 			logger.error("Unecpected interrupt", e);
     	}
@@ -120,7 +120,7 @@ public class SimpleNetworkServertest {
 			PlayerList.add(new Player("TestPlayer" + (i+1), 3+i));
 			GameWindowList.add(connectAndJoinGame(address, port, PlayerList.get(PlayerList.size()-1), "Testsession", lh));
 			try {
-				Thread.sleep(500);
+				Thread.sleep(1000);
 			}catch(InterruptedException e) {
 				logger.error("Unecpected interrupt", e);
 			}

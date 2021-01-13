@@ -650,7 +650,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (!(isLeftMouseKeyHold || isRightMouseKeyHold || isMiddleMouseKeyHold)) {
 				if (e.getKeyCode() == KeyEvent.VK_C && !shiftDown) {
 					int count = 0;
-					for (int oId : selectedObjects) {
+					ial.clear();
+					for( int i : selectedObjects) {
+						ial.add(i);
+					}
+					for (int oId : ial) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 						if (oi.go instanceof GameObjectToken) {
 							count += ObjectFunctions.countStack(gameInstance, oi);
@@ -662,7 +666,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					}
 					player.actionString = "Object Number: " + String.valueOf(count);
 				} else if (e.getKeyCode() == KeyEvent.VK_F && !shiftDown && !altDown) {
-					for (int oId : selectedObjects) {
+					ial.clear();
+					for( int i : selectedObjects) {
+						ial.add(i);
+					}
+					for (int oId : ial) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 						ObjectFunctions.flipTokenObject(id, gameInstance, player, oi);
 						ObjectFunctions.rollTheDice(id, gameInstance, player, oi);
@@ -672,14 +680,24 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						ObjectFunctions.rollTheDice(id, gameInstance, player, hoveredObject);
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_F && shiftDown) {
-					for (int oId : ObjectFunctions.getStackRepresentatives(gameInstance, selectedObjects)) {
+					ial.clear();
+					for( int i : selectedObjects) {
+						ial.add(i);
+					}
+					for (int oId : ObjectFunctions.getStackRepresentatives(gameInstance, ial)) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 						ObjectFunctions.flipTokenStack(this, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, oi));
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_S) {
-					for (int oId : ObjectFunctions.getStackRepresentatives(gameInstance, selectedObjects)) {
+					ial.clear();
+					for( int i : selectedObjects) {
+						ial.add(i);
+					}
+					for (int oId : ObjectFunctions.getStackRepresentatives(gameInstance, ial)) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
-						ObjectFunctions.shuffleStack(id, gameInstance, player, oi);
+						ObjectFunctions.shuffleStack(this, gameInstance, player, oi);
+						ObjectFunctions.deselectObject(this, gameInstance, player, oi.id);
+						ObjectFunctions.selectObject(this, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, oi).id);
 					}
 
 				} else if (shiftDown && e.getKeyCode() == KeyEvent.VK_C) {
@@ -734,7 +752,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_D && shiftDown) {
-					for (int oId : selectedObjects) {
+					ial.clear();
+					for( int i : selectedObjects) {
+						ial.add(i);
+					}
+					for (int oId : ial) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 						ObjectFunctions.dropObjects(this, gameInstance, player, oi);
 					}
@@ -773,7 +795,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 						repaint();
 					} else if (e.getKeyCode() == KeyEvent.VK_R && shiftDown) {
-						for (int oId : selectedObjects) {
+						ial.clear();
+						for( int i : selectedObjects) {
+							ial.add(i);
+						}
+						for (int oId : ial) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.removeStackRelations(this, gameInstance, player, oi);
 						}
@@ -784,7 +810,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 						ObjectFunctions.deselectAllSelected(this, gameInstance, player, ial);
 					} else if (e.getKeyCode() == KeyEvent.VK_M && shiftDown) {
-						for (int oId : selectedObjects) {
+						ial.clear();
+						for( int i : selectedObjects) {
+							ial.add(i);
+						}
+						for (int oId : ial) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.getAllObjectsOfGroup(this, gameInstance, player, oi);
 						}
@@ -805,7 +835,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 						repaint();
 					} else if (e.getKeyCode() == KeyEvent.VK_F && altDown) {
-						for (int oId : selectedObjects) {
+						ial.clear();
+						for( int i : selectedObjects) {
+							ial.add(i);
+						}
+						for (int oId : ial) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.fixObject(id, gameInstance, player, oi);
 						}
