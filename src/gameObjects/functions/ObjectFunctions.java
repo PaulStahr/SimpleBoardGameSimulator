@@ -1159,21 +1159,22 @@ public class ObjectFunctions {
                     IntegerArrayList activeOIds = new IntegerArrayList();
                     getStack(gameInstance, activeObject, activeOIds);
                     ObjectInstance objectInstance = getNearestObjectByPosition(gamePanel, gameInstance, player, activeObject.state.posX, activeObject.state.posY, zooming, activeOIds);
-                    if (isStackCollected(gameInstance, objectInstance)) {
-                        IntegerArrayList oiIds = new IntegerArrayList();
-                        getStack(gameInstance,objectInstance,oiIds);
-                        if (objectInstance != activeObject && (activeOIds.size() > 1 || oiIds.size() > 1)) {
-                            ObjectFunctions.mergeStacks(gamePanel.id, gameInstance, player, activeObject, objectInstance);
-                            activeOIds.clear();
-                            getStack(gameInstance, objectInstance, activeOIds);
-                        }
 
-                    }
-                    else if (objectInstance != null) {
-                        activeOIds.clear();
-                        getStack(gameInstance, activeObject, activeOIds);
-                        Pair<ObjectInstance, ObjectInstance> insertObjects = getInsertObjects(gamePanel, gameInstance, player, activeObject.state.posX, activeObject.state.posY, zooming, activeOIds);
-                        insertIntoStack(gamePanel, gameInstance, player, activeObject, insertObjects.getKey(), insertObjects.getValue(), (int) (activeObject.getWidth(player.id) * gamePanel.cardOverlap));
+                    if (objectInstance != null && objectInstance.state.owner_id == -1) {
+                        if (isStackCollected(gameInstance, objectInstance)) {
+                            IntegerArrayList oiIds = new IntegerArrayList();
+                            getStack(gameInstance, objectInstance, oiIds);
+                            if (objectInstance != activeObject && (activeOIds.size() > 1 || oiIds.size() > 1)) {
+                                ObjectFunctions.mergeStacks(gamePanel.id, gameInstance, player, activeObject, objectInstance);
+                                activeOIds.clear();
+                                getStack(gameInstance, objectInstance, activeOIds);
+                            }
+                        } else{
+                            activeOIds.clear();
+                            getStack(gameInstance, activeObject, activeOIds);
+                            Pair<ObjectInstance, ObjectInstance> insertObjects = getInsertObjects(gamePanel, gameInstance, player, activeObject.state.posX, activeObject.state.posY, zooming, activeOIds);
+                            insertIntoStack(gamePanel, gameInstance, player, activeObject, insertObjects.getKey(), insertObjects.getValue(), (int) (activeObject.getWidth(player.id) * gamePanel.cardOverlap));
+                        }
                     }
                 }
 

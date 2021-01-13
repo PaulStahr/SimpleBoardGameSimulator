@@ -507,7 +507,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void mouseDragged(MouseEvent arg0) {
 
 			/*Translate the board if alt is down*/
-			if (arg0.isAltDown() && (SwingUtilities.isLeftMouseButton(arg0))) {
+			if ((arg0.isAltDown() && SwingUtilities.isLeftMouseButton(arg0)) || (arg0.isAltDown() && SwingUtilities.isRightMouseButton(arg0)) ) {
 				//updatePlayerMousePos(arg0);
 				translateBoard(arg0);
 				boardTranslation = true;
