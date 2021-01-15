@@ -23,6 +23,9 @@ import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
 import data.Options;
+import net.AsynchronousGameConnection;
+import net.SynchronousGameClientLobbyConnection;
+import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +48,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	 * 
 	 */
 	private static final long serialVersionUID = -1441104795154034811L;
+	public SynchronousGameClientLobbyConnection client;
 	private final GameInstance gi;
 	private final JSplitPane sliderRight;
 	public GamePanel gamePanel;
@@ -61,6 +65,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	private final JMenu menuStatus = new JMenu("Status");
 	private final JMenuItem menuItemStatusPlayerConsistency = new JMenuItem("Correct Card-Consistency");
 	private final JMenuItem menuItemStatusGaiaConsistency = new JMenuItem("Correct Free-Object-Consistency");
+	private final JMenuItem menuItemReconnect = new JMenuItem("Reconnect");
 	private final JMenu menuFile = new JMenu();
 	private final JMenu menuExtras = new JMenu();
 	private final JMenu menuControls = new JMenu();
@@ -134,8 +139,10 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuControls.add(menuItemControls);
 		menuStatus.add(menuItemStatusPlayerConsistency);
 		menuStatus.add(menuItemStatusGaiaConsistency);
+		menuStatus.add(menuItemReconnect);
 		menuItemStatusPlayerConsistency.addActionListener(this);
 		menuItemStatusGaiaConsistency.addActionListener(this);
+		menuItemReconnect.addActionListener(this);
 		gamePanel = new GamePanel(gi, lh);
 		gamePanel.player = player;
 		chatPanel = new IngameChatPanel(gi, player);
@@ -228,6 +235,22 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		{
 			gi.repairPlayerConsistency(-1, gamePanel.player, new ArrayList<>());
 			gww.update();
+		}
+		else if (source == menuItemReconnect)
+		{
+			try {
+				client.connectToGameSession(gi, gi.password);
+				AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
+				connection.syncPull();
+				connection.start();
+				GameWindow gw = new GameWindow(gi, gamePanel.player, lh);
+				this.setVisible(false);
+				gw.setVisible(true);
+				this.dispose();
+			} catch (IOException e1) {
+				JFrameUtils.logErrorAndShow("Can't connect to server", e1, logger);
+			}
+
 		}
 	}
 
