@@ -91,19 +91,34 @@ public class GameIO {
 		elem.setAttribute(IOString.VALUE, 			Integer.toString(state.value));
 		elem.setAttribute(IOString.ROTATION_STEP, 	Integer.toString(state.rotationStep));
 		elem.setAttribute(IOString.IS_FIXED, 		Boolean.toString(state.isFixed));
-		if (state instanceof TokenState) {
-			elem.setAttribute(IOString.SIDE, Boolean.toString(((TokenState) state).side));
-		}
-		if (state instanceof GameObjectFigure.FigureState)
-		{
-			elem.setAttribute(IOString.STANDING, Boolean.toString(((GameObjectFigure.FigureState) state).standing));
-		}
-		if (state instanceof GameObjectDice.DiceState)
-		{
-			elem.setAttribute(IOString.SIDE, Integer.toString(((GameObjectDice.DiceState)state).side));
-		}
+		if (state instanceof TokenState) 					{elem.setAttribute(IOString.SIDE, Boolean.toString(((TokenState) state).side));}
+		if (state instanceof GameObjectFigure.FigureState)	{elem.setAttribute(IOString.STANDING, Boolean.toString(((GameObjectFigure.FigureState) state).standing));}
+		if (state instanceof GameObjectDice.DiceState)		{elem.setAttribute(IOString.SIDE, Integer.toString(((GameObjectDice.DiceState)state).side));}
 	}
 
+	private static final int readAttribute(Element elem, String key, int def)
+	{
+		Attribute attribute = elem.getAttribute(key);
+		return attribute != null ? Integer.parseInt(attribute.getValue()) : def;
+	}
+	
+	private static final long readAttribute(Element elem, String key, long def)
+	{
+		Attribute attribute = elem.getAttribute(key);
+		return attribute != null ? Long.parseLong(attribute.getValue()) : def;
+	}
+	
+	private static final boolean readAttribute(Element elem, String key, boolean def)
+	{
+		Attribute attribute = elem.getAttribute(key);
+		return attribute != null ? Boolean.parseBoolean(attribute.getValue()) : def;
+	}
+
+	private static String readAttribute(Element elem, String key, String def) {
+		Attribute attribute = elem.getAttribute(key);
+		return attribute != null ? attribute.getValue() : def;
+	}
+	
 	/**
 	 * Edit a ObjectState from an XML Element. The Attributes "x", "y"
 	 * and "r" are needed in @param elem. All others are optional.
@@ -112,22 +127,11 @@ public class GameIO {
 	 */
 	private static void editStateFromElement(ObjectState state, Element elem)
 	{
-		String v = elem.getAttributeValue(IOString.X);
-		if (v != null) {
-			state.posX = Integer.parseInt(elem.getAttributeValue(IOString.X));
-		}
+		state.posX = readAttribute(elem, IOString.X, state.posX);
+		state.posY = readAttribute(elem, IOString.Y, state.posY);
+		state.rotation = readAttribute(elem, IOString.R, state.rotation);
 
-		v = elem.getAttributeValue(IOString.Y);
-		if (v != null) {
-			state.posY = Integer.parseInt(elem.getAttributeValue(IOString.Y));
-		}
-
-		v = elem.getAttributeValue(IOString.R);
-		if (v != null) {
-			state.rotation = Integer.parseInt(elem.getAttributeValue(IOString.R));
-		}
-
-		v = elem.getAttributeValue(IOString.ORIGINAL_ROTATION);
+		String v = elem.getAttributeValue(IOString.ORIGINAL_ROTATION);
 		if (v != null) {
 			state.originalRotation = Integer.parseInt(elem.getAttributeValue(IOString.ORIGINAL_ROTATION));
 		}
@@ -135,59 +139,15 @@ public class GameIO {
 			state.originalRotation = Integer.parseInt(elem.getAttributeValue(IOString.R));
 		}
 
-		v = elem.getAttributeValue(IOString.S);
-		if (v != null) {
-			state.scale = Integer.parseInt(elem.getAttributeValue(IOString.S));
-		}
-
-		v = elem.getAttributeValue(IOString.ABOVE);
-		if (v != null)
-		{
-			state.aboveInstanceId = Integer.parseInt(v);
-		}
-
-		v = elem.getAttributeValue(IOString.BELOW);
-		if (v != null)
-		{
-			state.belowInstanceId = Integer.parseInt(v);
-		}
-
-		Attribute ownerAttribute = elem.getAttribute(IOString.OWNER_ID);
-		if (ownerAttribute != null)
-		{
-	        state.owner_id = Integer.parseInt(ownerAttribute.getValue());
-		}
-
-		Attribute selectedAttribute = elem.getAttribute(IOString.IS_SELECTED);
-		if (selectedAttribute != null)
-		{
-			state.isSelected = Integer.parseInt(selectedAttribute.getValue());
-		}
-
-		Attribute drawValueAttribute = elem.getAttribute(IOString.DRAW_VALUE);
-		if (drawValueAttribute != null)
-		{
-			state.drawValue = Long.parseLong(drawValueAttribute.getValue());
-		}
-
-		Attribute valueAttribute = elem.getAttribute(IOString.VALUE);
-		if (valueAttribute != null)
-		{
-			state.value = Integer.parseInt(valueAttribute.getValue());
-		}
-
-		Attribute rotationStep = elem.getAttribute(IOString.ROTATION_STEP);
-		if (rotationStep != null)
-		{
-			state.rotationStep = Integer.parseInt(rotationStep.getValue());
-		}
-
-		Attribute isFixed = elem.getAttribute(IOString.IS_FIXED);
-		if (rotationStep != null)
-		{
-			state.isFixed = Boolean.parseBoolean(isFixed.getValue());
-		}
-
+		state.scale 			= readAttribute(elem, IOString.S, state.scale);
+		state.aboveInstanceId 	= readAttribute(elem, IOString.ABOVE, state.aboveInstanceId);
+		state.belowInstanceId 	= readAttribute(elem, IOString.BELOW, state.belowInstanceId);
+		state.owner_id 			= readAttribute(elem, IOString.OWNER_ID, state.owner_id);
+		state.isSelected 		= readAttribute(elem, IOString.IS_SELECTED, state.isSelected);
+		state.drawValue			= readAttribute(elem, IOString.DRAW_VALUE, state.drawValue);
+		state.value				= readAttribute(elem, IOString.VALUE, state.value);
+		state.rotationStep		= readAttribute(elem, IOString.ROTATION_STEP, state.rotationStep);
+		state.isFixed			= readAttribute(elem, IOString.IS_FIXED, state.isFixed);
 		if (state instanceof TokenState && elem.getAttribute(IOString.SIDE) != null)
     	{
 			((TokenState)state).side = Boolean.parseBoolean(elem.getAttributeValue(IOString.SIDE));
@@ -236,15 +196,10 @@ public class GameIO {
 								break;
 							case IOString.TABLE:
 								gi.table = Boolean.parseBoolean(elemSettings.getValue());
-								if (elemSettings.getAttribute(IOString.PUT_DOWN_AREA) != null) {
-									gi.put_down_area = Boolean.parseBoolean(elemSettings.getAttributeValue(IOString.PUT_DOWN_AREA));
-								}
-								if (elemSettings.getAttribute(IOString.TABLE_RADIUS) != null) {
-									gi.tableRadius = Integer.parseInt(elemSettings.getAttributeValue(IOString.TABLE_RADIUS));
-								}
-								if (elemSettings.getAttribute(IOString.COLOR) != null) {
-									gi.tableColor = elemSettings.getAttributeValue(IOString.COLOR);
-								}
+								gi.put_down_area = readAttribute(elemSettings, IOString.PUT_DOWN_AREA, gi.put_down_area);
+								gi.tableRadius = readAttribute(elemSettings, IOString.TABLE_RADIUS, gi.tableRadius);
+								gi.tableColor = readAttribute(elemSettings, IOString.COLOR, gi.tableColor);
+								
 								break;
 							case IOString.SEATS:
 								gi.seatColors.clear();
@@ -275,13 +230,10 @@ public class GameIO {
 					break;
 				case IOString.OBJECT:
 					String uniqueName = "";
-					if (elem.getAttributeValue(IOString.UNIQUE_NAME) != null) {
-						uniqueName = elem.getAttributeValue(IOString.UNIQUE_NAME);
-					}
-					else
-					{
+					if (elem.getAttributeValue(IOString.UNIQUE_NAME) == null) {
 						throw new IOException("Object must have a unique name");
 					}
+					uniqueName = elem.getAttributeValue(IOString.UNIQUE_NAME);
 					if (elem.getAttributeValue(IOString.NUMBER) != null) {
 						for (int i = 0; i < Integer.parseInt(elem.getAttributeValue(IOString.NUMBER)); ++i) {
 							ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), uniqueId);
@@ -320,26 +272,11 @@ public class GameIO {
 		String objectName = elem.getAttributeValue(IOString.UNIQUE_NAME);
 		String type = elem.getAttributeValue(IOString.TYPE);
 		GameObject result = null;
-		int width = 66;
-		int height = 88;
-		int value = 0;
-		int rotationStep = 90;
-		int isFixed = 0;
-		if(elem.getAttributeValue(IOString.WIDTH) != null) {
-			width = Integer.parseInt(elem.getAttributeValue(IOString.WIDTH));
-		}
-		if(elem.getAttributeValue(IOString.HEIGHT) != null) {
-			height = Integer.parseInt(elem.getAttributeValue(IOString.HEIGHT));
-		}
-		if(elem.getAttributeValue(IOString.VALUE) != null) {
-			value = Integer.parseInt(elem.getAttributeValue(IOString.VALUE));
-		}
-		if(elem.getAttributeValue(IOString.ROTATION_STEP) != null) {
-			rotationStep = Integer.parseInt(elem.getAttributeValue(IOString.ROTATION_STEP));
-		}
-		if(elem.getAttributeValue(IOString.IS_FIXED) != null) {
-			isFixed = Integer.parseInt(elem.getAttributeValue(IOString.IS_FIXED));
-		}
+		int width = readAttribute(elem, IOString.WIDTH, 66);
+		int height = readAttribute(elem, IOString.HEIGHT, 88);
+		int value = readAttribute(elem, IOString.VALUE, 0);
+		int rotationStep = readAttribute(elem, IOString.ROTATION_STEP, 90);
+		int isFixed = readAttribute(elem, IOString.IS_FIXED, 0);
 		switch(type)
 		{
 			case IOString.CARD:
