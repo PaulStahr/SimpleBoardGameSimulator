@@ -1,5 +1,7 @@
 package io;
 
+import static java.lang.Integer.max;
+
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
@@ -21,7 +23,6 @@ import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -49,8 +50,6 @@ import main.Player;
 import net.AsynchronousGameConnection;
 import util.ArrayUtil;
 import util.io.StreamUtil;
-
-import static java.lang.Integer.max;
 
 public class GameIO {
 
