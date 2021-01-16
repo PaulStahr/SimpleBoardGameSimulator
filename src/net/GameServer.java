@@ -368,12 +368,12 @@ public class GameServer implements Runnable {
 			    		
 			    		if (input instanceof ObjectInputStream)
 			    		{
-			    			asc = new AsynchronousGameConnection(gi, (ObjectInputStream)input, output);
+			    			asc = new AsynchronousGameConnection(gi, (ObjectInputStream)input, output, client);
 			    		}
 			    		else
 			    		{
 			    			logger.debug("Connect to Stream Input");
-			    			asc = new AsynchronousGameConnection(gi, input, output);
+			    			asc = new AsynchronousGameConnection(gi, input, output, client);
 				    	}
 			    		asc.blocksize = bs;
 			    		input = null;

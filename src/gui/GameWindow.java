@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.swing.JComboBox;
@@ -30,6 +31,7 @@ import data.JFrameLookAndFeelUtil;
 import data.Options;
 import gameObjects.functions.CheckingFunctions;
 import gameObjects.instance.GameInstance;
+import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
 import gui.minigames.TetrisGameInstance;
 import gui.minigames.TetrisGameInstance.TetrisGameEvent;
@@ -37,6 +39,8 @@ import gui.minigames.TetrisGameInstance.TetrisGameListener;
 import gui.minigames.TetrisWindow;
 import io.GameIO;
 import main.Player;
+import net.AsynchronousGameConnection;
+import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
 import util.TimedUpdateHandler;
 
@@ -61,6 +65,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	private final JMenu menuStatus = new JMenu("Status");
 	private final JMenuItem menuItemStatusPlayerConsistency = new JMenuItem("Correct Card-Consistency");
 	private final JMenuItem menuItemStatusGaiaConsistency = new JMenuItem("Correct Free-Object-Consistency");
+	private final JMenuItem menuItemReconnect = new JMenuItem("Reconnect");
 	private final JMenu menuFile = new JMenu();
 	private final JMenu menuExtras = new JMenu();
 	private final JMenu menuControls = new JMenu();
@@ -134,8 +139,10 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuControls.add(menuItemControls);
 		menuStatus.add(menuItemStatusPlayerConsistency);
 		menuStatus.add(menuItemStatusGaiaConsistency);
+		menuStatus.add(menuItemReconnect);
 		menuItemStatusPlayerConsistency.addActionListener(this);
 		menuItemStatusGaiaConsistency.addActionListener(this);
+		menuItemReconnect.addActionListener(this);
 		gamePanel = new GamePanel(gi, lh);
 		gamePanel.setPlayer(player);
 		chatPanel = new IngameChatPanel(gi, player);
@@ -225,6 +232,35 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		{
 			gi.repairPlayerConsistency(-1, gamePanel.getPlayer(), new ArrayList<>());
 			gww.update();
+		}
+		else if (source == menuItemReconnect)
+		{
+			try {
+				SynchronousGameClientLobbyConnection client = null;
+				for (int i = 0; i < gi.getChangeListenerCount(); ++i)
+				{
+					GameChangeListener gcl = gi.getChangeListener(i);
+					if (gcl instanceof AsynchronousGameConnection)
+					{
+						Socket socket = ((AsynchronousGameConnection)gcl).getSocket();
+						client = new SynchronousGameClientLobbyConnection(socket.getInetAddress().getCanonicalHostName(), socket.getPort());
+						break;
+					}
+				}
+				Player player = this.gamePanel.getPlayer();
+				GameInstance gi = client.getGameInstance(this.gi.name);
+				gi.password = this.gi.password;
+				AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
+				player = gi.addPlayer(null, player);
+				connection.syncPull();
+				connection.start();
+				GameWindow gw = new GameWindow(gi, player, lh);
+				gw.setVisible(true);
+				setVisible(false);
+				dispose();
+			}catch(Exception e){
+				JFrameUtils.logErrorAndShow("Reconnect failed", e, logger);
+			}
 		}
 	}
 

@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.io.OptionalDataException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -67,16 +68,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	public int blocksize = 0;
 	private final Random random = new Random();
 	private byte[] randBytes = UniqueObjects.EMPTY_BYTE_ARRAY;
+	private Socket socket;//TODO close on exit
 	
-	public int getInEvents()
-	{
-		return inputEvents;
-	}
-	
-	public int getOutEvents()
-	{
-		return outputEvents;
-	}
+	public int getInEvents(){return inputEvents;}
+	public int getOutEvents(){return outputEvents;}
+	public Socket getSocket(){return socket;}
 	
 	@Override
 	public void changeUpdate(GameAction action) {
@@ -97,10 +93,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		}
 	}
 	
-	public GameInstance getGameInstance()
-	{
-		return gi;
-	}
+	public GameInstance getGameInstance(){return gi;}
 	
 	/**
 	 * Constructs an connection with the GameInstance and the two streams.
@@ -108,7 +101,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	 * @param input
 	 * @param output
 	 */
-	public AsynchronousGameConnection(GameInstance gi, ObjectInputStream input, OutputStream output)
+	public AsynchronousGameConnection(GameInstance gi, ObjectInputStream input, OutputStream output, Socket socket)
 	{
 		this.gi = gi;
 		gi.addChangeListener(this);
@@ -121,17 +114,15 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	 * @param gi
 	 * @param input
 	 * @param output
+	 * @param server 
 	 */
-	public AsynchronousGameConnection(GameInstance gi, InputStream input, OutputStream output)
+	public AsynchronousGameConnection(GameInstance gi, InputStream input, OutputStream output, Socket socket)
 	{
 		this.gi = gi;
 		gi.addChangeListener(this);
-		/*if (!(input instanceof ObjectInputStream))
-		{
-			throw new RuntimeException();
-		}*/
 		this.input = input;
 		this.output = output;
+		this.socket = socket;
 	}
 	
 	public void syncPull()

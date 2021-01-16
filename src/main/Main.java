@@ -189,7 +189,7 @@ public class Main {
 				do {
 					socket2 = server.accept();
 				}while(socket2 == null);	
-		    	AsynchronousGameConnection sgc1 = new AsynchronousGameConnection(game1, socket2.getInputStream(), socket2.getOutputStream());
+		    	AsynchronousGameConnection sgc1 = new AsynchronousGameConnection(game1, socket2.getInputStream(), socket2.getOutputStream(), socket2);
 		    	sgc1.start();
 		    	GameWindow gw2 = new GameWindow(game1, lh);
 		       	player = game1.addPlayer(null, player);    	
@@ -198,7 +198,7 @@ public class Main {
 		    }
 			
 			while (socket[0] == null);
-	        AsynchronousGameConnection sgc = new AsynchronousGameConnection(game0, socket[0].getInputStream(), socket[0].getOutputStream());
+	        AsynchronousGameConnection sgc = new AsynchronousGameConnection(game0, socket[0].getInputStream(), socket[0].getOutputStream(), socket[0]);
 	    	sgc.start();
 	    	GameWindow gw0 = new GameWindow(game0, lh);
 	    	player = game0.addPlayer(null, player);
