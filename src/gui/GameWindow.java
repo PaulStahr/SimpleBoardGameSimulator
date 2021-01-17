@@ -9,6 +9,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.swing.JComboBox;
@@ -33,6 +34,7 @@ import data.JFrameLookAndFeelUtil;
 import data.Options;
 import gameObjects.functions.CheckingFunctions;
 import gameObjects.instance.GameInstance;
+import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
 import gui.minigames.TetrisGameInstance;
 import gui.minigames.TetrisGameInstance.TetrisGameEvent;
@@ -40,6 +42,8 @@ import gui.minigames.TetrisGameInstance.TetrisGameListener;
 import gui.minigames.TetrisWindow;
 import io.GameIO;
 import main.Player;
+import net.AsynchronousGameConnection;
+import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
 import util.TimedUpdateHandler;
 
@@ -236,18 +240,31 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		else if (source == menuItemReconnect)
 		{
 			try {
-				client.connectToGameSession(gi, gi.password);
+				SynchronousGameClientLobbyConnection client = null;
+				for (int i = 0; i < gi.getChangeListenerCount(); ++i)
+				{
+					GameChangeListener gcl = gi.getChangeListener(i);
+					if (gcl instanceof AsynchronousGameConnection)
+					{
+						Socket socket = ((AsynchronousGameConnection)gcl).getSocket();
+						client = new SynchronousGameClientLobbyConnection(socket.getInetAddress().getCanonicalHostName(), socket.getPort());
+						break;
+					}
+				}
+				Player player = this.gamePanel.getPlayer();
+				GameInstance gi = client.getGameInstance(this.gi.name);
+				gi.password = this.gi.password;
 				AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
+				player = gi.addPlayer(null, player);
 				connection.syncPull();
 				connection.start();
-				GameWindow gw = new GameWindow(gi, gamePanel.getPlayer(), lh);
-				this.setVisible(false);
+				GameWindow gw = new GameWindow(gi, player, lh);
 				gw.setVisible(true);
-				this.dispose();
-			} catch (IOException e1) {
-				JFrameUtils.logErrorAndShow("Can't connect to server", e1, logger);
+				setVisible(false);
+				dispose();
+			}catch(Exception e){
+				JFrameUtils.logErrorAndShow("Reconnect failed", e, logger);
 			}
-
 		}
 	}
 

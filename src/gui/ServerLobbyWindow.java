@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import data.JFrameLookAndFeelUtil;
 import data.Options;
+import data.Options.OptionTreeNode;
 import gameObjects.GameInstanceColumnType;
 import gameObjects.GameMetaInfo;
 import gameObjects.instance.Game;
@@ -183,10 +184,11 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 					try
 					{
 						int playerId = Integer.parseInt(textFieldId.getText());
-						Options.set("last_connection.address", textFieldAddress.getText());
-						Options.set("last_connection.port", Integer.valueOf(textFieldPort.getText()));
-						Options.set("last_connection.name", textFieldName.getText());
-						Options.set("last_connection.id", playerId);
+						OptionTreeNode lc = Options.getNode("last_connection");
+						Options.set(lc, "address", textFieldAddress.getText());
+						Options.set(lc, "port", Integer.valueOf(textFieldPort.getText()));
+						Options.set(lc, "name", textFieldName.getText());
+						Options.set(lc, "id", playerId);
 						Player player = new Player(textFieldName.getText(), playerId, false);
 						String password = null;
 						if (gmi.get(row).passwordRequired)

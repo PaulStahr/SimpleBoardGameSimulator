@@ -35,7 +35,7 @@ public class SynchronousGameClientLobbyConnection {
 	String address;
 	int port;
 	CommandEncoding ce = CommandEncoding.SERIALIZE;
-	Logger logger = LoggerFactory.getLogger(SynchronousGameClientLobbyConnection.class);
+	private static final Logger logger = LoggerFactory.getLogger(SynchronousGameClientLobbyConnection.class);
 
 	public void setAdress(String address)
 	{
@@ -79,7 +79,7 @@ public class SynchronousGameClientLobbyConnection {
 	    return result;
 	}
 	
-	OutputStream writeCommand(StringBuilder strB, OutputStream oStream) throws IOException
+	private final OutputStream writeCommand(StringBuilder strB, OutputStream oStream) throws IOException
 	{
 		logger.debug("Write command " + strB.toString());
 		switch (ce)
@@ -204,12 +204,12 @@ public class SynchronousGameClientLobbyConnection {
 	            final Cipher c = Cipher.getInstance("AES");
 	            c.init(Cipher.ENCRYPT_MODE, key);
 	            CipherInputStream input = new CipherInputStream(server.getInputStream(), c);
-	    	    return new AsynchronousGameConnection(gi, input, output);
+	    	    return new AsynchronousGameConnection(gi, input, output, server);
 			} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
 				logger.error("Can't create encrypted stream",e);
 			}
 	    }
-	    return new AsynchronousGameConnection(gi, server.getInputStream(), output);	    	
+	    return new AsynchronousGameConnection(gi, server.getInputStream(), output, server);
 	}
 
 	public GameInstance getGameInstance(String gameInstanceId) throws UnknownHostException, IOException, JDOMException

@@ -284,13 +284,7 @@ public class GameInstance {
 		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_OBJECT_INSTANCE, objectInstance.id));
 	}
 
-	public void addChangeListener(GameChangeListener listener) {
-		changeListener.add(listener);
-	}
-
-	public List<ObjectInstance> getObjectInstanceList() {
-		return Collections.unmodifiableList(objects);
-	}
+	public List<ObjectInstance> getObjectInstanceList() {return Collections.unmodifiableList(objects);}
 
 	public List<Player> getPlayerList() {
 		List<Player> playerList = new ArrayList<>();
@@ -402,4 +396,8 @@ public class GameInstance {
 		players.remove(player);
 		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_PLAYER, player.id));
 	}
+
+	public void addChangeListener(GameChangeListener listener) {changeListener.add(listener);}
+	public GameChangeListener getChangeListener(int index){return changeListener.get(index);}
+	public int getChangeListenerCount() {return changeListener.size();}
 }
