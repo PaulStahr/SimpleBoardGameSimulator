@@ -36,7 +36,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -44,9 +46,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
-import gameObjects.functions.DrawFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +60,9 @@ import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
+import gameObjects.functions.DrawFunctions;
 import gameObjects.functions.MoveFunctions;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
@@ -96,7 +98,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public ObjectInstance hoveredObject = null;
 	IntegerArrayList objOrigPosX = new IntegerArrayList();
 	IntegerArrayList objOrigPosY = new IntegerArrayList();
-	public Player player;
+	private Player player;
 	public final int id = (int)System.nanoTime();
 	private final IntegerArrayList ial = new IntegerArrayList();
 
@@ -236,6 +238,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		DataHandler.timedUpdater.add(autosave);
 	}
+    
+    public void setPlayer(Player pl)
+    {
+    	this.player = pl;
+		privateArea.updatePrivateObjects(gameInstance, player);    	
+    }
 
 	/** Drawing of all the game objects, draws the board, object instances and the players
 	 * @param g game graphic object
@@ -1090,5 +1098,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			revalidate();
 		}
 	}
-	
+
+	public int getPlayerId() {
+		Player pl = player;
+		return pl == null ? -1 : pl.id;
+	}
+
+	public Player getPlayer() {return player;}
 }

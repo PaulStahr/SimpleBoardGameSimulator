@@ -94,8 +94,8 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		else
 		{
 			System.arraycopy(list.data, 0, this.data, 0, list.length);
-			this.length = list.length;
 		}
+		this.length = list.length;
 	}
 	
 	public int set(int index, int value){

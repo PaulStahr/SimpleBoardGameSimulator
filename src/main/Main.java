@@ -193,7 +193,7 @@ public class Main {
 		    	sgc1.start();
 		    	GameWindow gw2 = new GameWindow(game1, lh);
 		       	player = game1.addPlayer(null, player);    	
-		       	gw2.gamePanel.player = player;
+		       	gw2.gamePanel.setPlayer(player);
 		       	gw2.setVisible(true);
 		    }
 			
@@ -202,7 +202,7 @@ public class Main {
 	    	sgc.start();
 	    	GameWindow gw0 = new GameWindow(game0, lh);
 	    	player = game0.addPlayer(null, player);
-	    	gw0.gamePanel.player = player;
+	    	gw0.gamePanel.setPlayer(player);
 	    		//GameWindow gw1 = new GameWindow(game0);
 	    	
 	    	gw0.setVisible(true);

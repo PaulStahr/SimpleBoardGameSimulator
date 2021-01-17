@@ -22,15 +22,15 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
-import data.Options;
+
 import net.AsynchronousGameConnection;
 import net.SynchronousGameClientLobbyConnection;
-import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
+import data.Options;
 import gameObjects.functions.CheckingFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -84,7 +84,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 
 		@Override
 		public synchronized void update() {
-			boolean playerConsistent = CheckingFunctions.checkPlayerConsistency(gamePanel.player.id, tmp, gi); 
+			boolean playerConsistent = CheckingFunctions.checkPlayerConsistency(gamePanel.getPlayerId(), tmp, gi); 
 			menuItemStatusPlayerConsistency.setEnabled(!playerConsistent);
 			boolean gaiaConsistent = CheckingFunctions.checkPlayerConsistency(-1, tmp, gi);
 			menuItemStatusGaiaConsistency.setEnabled(!gaiaConsistent);
@@ -144,7 +144,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuItemStatusGaiaConsistency.addActionListener(this);
 		menuItemReconnect.addActionListener(this);
 		gamePanel = new GamePanel(gi, lh);
-		gamePanel.player = player;
+		gamePanel.setPlayer(player);
 		chatPanel = new IngameChatPanel(gi, player);
 
 		sliderRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,chatPanel, gamePanel);
@@ -162,9 +162,6 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		lh.addLanguageChangeListener(this);
 		DataHandler.timedUpdater.add(gww);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-
-
 	}
 
 	@Override
@@ -176,7 +173,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		}
 		else if (source == menuItemEditGame )
 		{
-			new EditGameWindow(gi, lh, gamePanel.player).setVisible(true);
+			new EditGameWindow(gi, lh, gamePanel.getPlayer()).setVisible(true);
 		}
 		else if (source == menuItemSaveGame)
 		{
@@ -228,12 +225,12 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		}
 		else if (source == menuItemStatusPlayerConsistency)
 		{
-			gi.repairPlayerConsistency(gamePanel.player.id, gamePanel.player, new ArrayList<>());
+			gi.repairPlayerConsistency(gamePanel.getPlayerId(), gamePanel.getPlayer(), new ArrayList<>());
 			gww.update();
 		}
 		else if (source == menuItemStatusGaiaConsistency)
 		{
-			gi.repairPlayerConsistency(-1, gamePanel.player, new ArrayList<>());
+			gi.repairPlayerConsistency(-1, gamePanel.getPlayer(), new ArrayList<>());
 			gww.update();
 		}
 		else if (source == menuItemReconnect)
@@ -243,7 +240,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 				AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
 				connection.syncPull();
 				connection.start();
-				GameWindow gw = new GameWindow(gi, gamePanel.player, lh);
+				GameWindow gw = new GameWindow(gi, gamePanel.getPlayer(), lh);
 				this.setVisible(false);
 				gw.setVisible(true);
 				this.dispose();
@@ -267,12 +264,13 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuExtras.setText(			language.getString(Words.extras));
 		menuControls.setText(		language.getString(Words.controls));
 		//Set Title of the window
-		String visitor = gamePanel.player.visitor ? " (Visitor Mode), " : "";
-		if (gi.admin == gamePanel.player.id) {
-			this.setTitle(language.getString(Words.game) + ": " + gi.name + " (Admin Mode)" + ", "  + visitor  + gamePanel.player.getName() + " (Id: " + gamePanel.player.id +  ")" + ", " + lh.getCurrentLanguage().getString(Words.server) + ": " + Options.getString("last_connection.address"));
+		String visitor = gamePanel.getPlayer().visitor ? " (Visitor Mode), " : "";
+		if (gi.admin == gamePanel.getPlayerId()) {
+			Player pl = gamePanel.getPlayer();
+			this.setTitle(language.getString(Words.game) + ": " + gi.name + " (Admin Mode)" + ", "  + visitor  + pl.getName() + " (Id: " + pl.id +  ")" + ", " + lh.getCurrentLanguage().getString(Words.server) + ": " + Options.getString("last_connection.address"));
 		}
 		else {
-			this.setTitle(language.getString(Words.game) + ": " + gi.name + visitor + gamePanel.player.getName() + " (Id: " + gamePanel.player.id +  ")" + ", " + lh.getCurrentLanguage().getString(Words.server) + ": " + Options.getString("last_connection.address"));
+			this.setTitle(language.getString(Words.game) + ": " + gi.name + visitor + gamePanel.getPlayer().getName() + " (Id: " + gamePanel.getPlayerId() +  ")" + ", " + lh.getCurrentLanguage().getString(Words.server) + ": " + Options.getString("last_connection.address"));
 		}
 	}
 	

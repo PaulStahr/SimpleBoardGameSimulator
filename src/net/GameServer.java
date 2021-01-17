@@ -53,10 +53,7 @@ public class GameServer implements Runnable {
 	private boolean isRunning;
 	private boolean run;
 	
-	public boolean isReady()
-	{
-		return isReady;
-	}
+	public boolean isReady(){return isReady;}
 	
 	private GameInstance getGameInstance(String name)
 	{
@@ -114,8 +111,7 @@ public class GameServer implements Runnable {
 					StringBuilder strB = new StringBuilder();
 					line = readLine(input, strB);
 				}
-				ArrayList<String> split = new ArrayList<>();
-				StringUtils.split(line, ' ', split);
+				ArrayList<String> split = StringUtils.split(line, ' ', new ArrayList<>());
 				if (logger.isDebugEnabled()) {logger.debug(line);}
 			    switch (split.get(0))
 			    {
@@ -389,9 +385,7 @@ public class GameServer implements Runnable {
 			    	default:
 			    		logger.error("Unknown command");
 			    }
-			} catch (IOException e) {
-				logger.error("Networking error", e);
-			}
+			} catch (IOException e) {logger.error("Networking error", e);}
 			try { if (client != null) {client.close();} } catch ( IOException e ) { }
 			client = null;
 		}	
@@ -412,27 +406,16 @@ public class GameServer implements Runnable {
 		    		client = server.accept();
 		    		DataHandler.tp.run(new ConnectionHandle(client), "Server Connection");
 		    	}
-		    	catch ( IOException e ) {
-		    		e.printStackTrace();
-		    		
-		    	}
+		    	catch ( IOException e ) {logger.error("Can't create connection", e);}
 		    	
 		    }
-		} catch (IOException e1) {
-			logger.error("Error in running Server connection", e1);
-		}
+		} catch (IOException e1) {logger.error("Error in running Server connection", e1);}
 		isRunning = false;
 	}
 	
-	public void stop()
-	{
-		run = false;
-	}
+	public void stop(){run = false;}
 	
-	public boolean isRunning()
-	{
-		return isRunning;
-	}
+	public boolean isRunning(){return isRunning;}
 
 	public void start()
     {

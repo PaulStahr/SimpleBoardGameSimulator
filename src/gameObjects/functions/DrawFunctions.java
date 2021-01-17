@@ -1,8 +1,12 @@
 package gameObjects.functions;
 
-import static gameObjects.functions.ObjectFunctions.*;
+import static gameObjects.functions.ObjectFunctions.isStackBottom;
+import static gameObjects.functions.ObjectFunctions.isStackCollected;
+import static gameObjects.functions.ObjectFunctions.isStackOwned;
+import static gameObjects.functions.ObjectFunctions.isStackTop;
 import static java.lang.Integer.min;
-import static java.lang.Math.*;
+import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -182,7 +186,7 @@ public class DrawFunctions {
         Graphics2D g2 = (Graphics2D)g;
         AffineTransform tmp = g2.getTransform();
         g2.setTransform(new AffineTransform());
-        int playerId = gamePanel.player == null ? -1 : gamePanel.player.id;
+        int playerId = gamePanel.getPlayerId();
         g2.translate(gamePanel.getWidth() / 2, gamePanel.getHeight()-10);
 
         if (gamePanel.privateArea.objects.size() != 0) {
