@@ -90,13 +90,13 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		@Override
 		public synchronized void update() {
 			GameInconsistency gic = CheckingFunctions.checkPlayerConsistency(gamePanel.getPlayerId(), tmp, gi);
-			boolean playerConsistent = gic != null; 
+			boolean playerConsistent = gic == null; 
 			menuItemStatusPlayerConsistency.setEnabled(!playerConsistent);
-			menuItemStatusPlayerConsistency.setText("Correct Card-Consistency" + gic == null ? "" : (" (" + gic.toString() + ")"));
+			menuItemStatusPlayerConsistency.setText("Correct Card-Consistency" + (gic == null ? "" : (" (" + gic.toString() + ")")));
 			gic = CheckingFunctions.checkPlayerConsistency(-1, tmp, gi);
-			boolean gaiaConsistent = gic != null;
+			boolean gaiaConsistent = gic == null;
 			menuItemStatusGaiaConsistency.setEnabled(!gaiaConsistent);
-			menuItemStatusGaiaConsistency.setText("Correct Free-Object-Consistency" + gic == null ? "" : (" (" + gic.toString() + ")"));
+			menuItemStatusGaiaConsistency.setText("Correct Free-Object-Consistency" + (gic == null ? "" : (" (" + gic.toString() + ")")));
 			menuStatus.setForeground(playerConsistent && gaiaConsistent ? Color.BLACK : Color.RED);
 		}
 	}
