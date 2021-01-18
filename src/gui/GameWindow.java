@@ -33,6 +33,7 @@ import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
 import data.Options;
 import gameObjects.functions.CheckingFunctions;
+import gameObjects.functions.CheckingFunctions.GameInconsistency;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
@@ -88,10 +89,14 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 
 		@Override
 		public synchronized void update() {
-			boolean playerConsistent = CheckingFunctions.checkPlayerConsistency(gamePanel.getPlayerId(), tmp, gi); 
+			GameInconsistency gic = CheckingFunctions.checkPlayerConsistency(gamePanel.getPlayerId(), tmp, gi);
+			boolean playerConsistent = gic != null; 
 			menuItemStatusPlayerConsistency.setEnabled(!playerConsistent);
-			boolean gaiaConsistent = CheckingFunctions.checkPlayerConsistency(-1, tmp, gi);
+			menuItemStatusPlayerConsistency.setText("Correct Card-Consistency" + gic == null ? "" : (" (" + gic.toString() + ")"));
+			gic = CheckingFunctions.checkPlayerConsistency(-1, tmp, gi);
+			boolean gaiaConsistent = gic != null;
 			menuItemStatusGaiaConsistency.setEnabled(!gaiaConsistent);
+			menuItemStatusGaiaConsistency.setText("Correct Free-Object-Consistency" + gic == null ? "" : (" (" + gic.toString() + ")"));
 			menuStatus.setForeground(playerConsistent && gaiaConsistent ? Color.BLACK : Color.RED);
 		}
 	}
@@ -99,12 +104,8 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	
 	private static final Logger logger = LoggerFactory.getLogger(GameWindow.class);
 	
-	public GameWindow(GameInstance gi, LanguageHandler lh)
-	{
-		this(gi, null, lh);
-	}
-	
-	
+	public GameWindow(GameInstance gi, LanguageHandler lh){this(gi, null, lh);}
+
 	public GameWindow(GameInstance gi, Player player, LanguageHandler lh)
 	{
 		this.gi = gi;
