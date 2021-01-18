@@ -483,6 +483,8 @@ public class ObjectFunctions {
                     gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentObject, state));
                 }
             }
+            gamePanel.AudioClips.get("shuffle").setFramePosition(0);
+            gamePanel.AudioClips.get("shuffle").start();
         }
     }
 
@@ -929,6 +931,8 @@ public class ObjectFunctions {
         int randY = 20 - rand.nextInt(40);
         moveObjectTo(gamePanel.id, gameInstance,player, objectInstance, (int) gamePanel.table.getTableCenter().getX() + randX, (int) gamePanel.table.getTableCenter().getY() + randY);
         flipTokenObject(gamePanel.id, gameInstance, player, objectInstance);
+        gamePanel.AudioClips.get("drop").setFramePosition(0);
+        gamePanel.AudioClips.get("drop").start();
     }
 
 
@@ -1050,6 +1054,8 @@ public class ObjectFunctions {
             state.isSelected = player.id;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, oi, state));
             ObjectFunctions.updateSelectedObjects(gamePanel, gameInstance, player);
+            gamePanel.AudioClips.get("select").setFramePosition(0);
+            gamePanel.AudioClips.get("select").start();
         }
 
     }

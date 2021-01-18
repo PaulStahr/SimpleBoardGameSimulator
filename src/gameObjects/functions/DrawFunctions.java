@@ -350,7 +350,7 @@ public class DrawFunctions {
             float dashPhase = strokePresentLength/2.0f;
             Stroke hoverStroke = new BasicStroke(borderWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, dashPhase);
             if (objectInstance.state.owner_id != -1) {
-                    g2.setStroke(selectStroke);
+                    g2.setStroke(new BasicStroke(0));
                     Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
                     g2.setColor(playerOwner.color);
                     g2.drawString(playerOwner.getName() + " Hand Cards", -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - 20);

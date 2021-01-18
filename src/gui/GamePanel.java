@@ -7,6 +7,8 @@ import static gameObjects.functions.DrawFunctions.drawPrivateArea;
 import static gameObjects.functions.DrawFunctions.drawSelection;
 import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
 
+import java.applet.Applet;
+import java.applet.AudioClip;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -34,13 +36,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.*;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -169,6 +171,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public BufferedImage[] playerImages = new BufferedImage[10];
 
+	public Map<String, Clip> AudioClips = new HashMap<String, Clip>();
+
 	public Set<Integer> downKeys = new HashSet<>();
 	
 	TimedUpdateHandler autosave = new TimedUpdateHandler() {
@@ -236,6 +240,30 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				e.printStackTrace();
 			}
 		}
+		//Read the audio clips
+		AudioFormat format;
+		AudioInputStream stream;
+		DataLine.Info info;
+		Clip clip;
+		List<String> clipList = Arrays.asList("drop", "open", "select", "click", "shuffle");
+		for(String clipString : clipList) {
+			try {
+				stream = AudioSystem.getAudioInputStream(DataHandler.getResourceAsStream("audio/kenney-audio/" + clipString + ".wav"));
+				format = stream.getFormat();
+				info = new DataLine.Info(Clip.class, format);
+				clip = (Clip) AudioSystem.getLine(info);
+				clip.open(stream);
+				AudioClips.put(clipString, clip);
+
+			} catch (UnsupportedAudioFileException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (LineUnavailableException e) {
+				e.printStackTrace();
+			}
+		}
+		AudioClips.get("open").start();
 		DataHandler.timedUpdater.add(autosave);
 	}
     
@@ -282,7 +310,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		drawPlayerPositions(this, g, gameInstance, player, infoText);
 		g2.setTransform(tmp);
 		//Draw objects in private area
-		if (!player.visitor) {
+		if (!player.visitor && privateArea.zooming != 0) {
 			drawTokensInPrivateArea(this, g, gameInstance, player, hoveredObject);
 		}
 
@@ -352,7 +380,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-
+		this.AudioClips.get("click").setFramePosition(0);
+		this.AudioClips.get("click").start();
 		if (!player.visitor) {
 			if (arg0.getClickCount() == 2) {
 				//Sit down on double click on seat
@@ -761,9 +790,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_D && shiftDown) {
 					ial.clear();
-					for( int i : selectedObjects) {
-						ial.add(i);
-					}
+					ObjectFunctions.getStack(gameInstance, hoveredObject, ial);
 					for (int oId : ial) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 						ObjectFunctions.dropObjects(this, gameInstance, player, oi);
@@ -785,8 +812,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					sitDown(player, place);
 				} else if (e.getKeyCode() == KeyEvent.VK_H && altDown) {
 					if (privateArea.zooming == 0) {
-						privateArea.zooming = 1;
+						privateArea.zooming = privateArea.savedZooming;
 					} else {
+						privateArea.savedZooming = privateArea.zooming;
 						privateArea.zooming = 0;
 						updateGameTransform();
 					}

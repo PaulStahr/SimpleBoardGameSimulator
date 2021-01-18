@@ -32,6 +32,7 @@ public class PrivateArea {
     public Point2D.Double origin = new Point2D.Double();
 
     public int currentDragPosition = -1;
+    public double savedZooming;
 
     public PrivateArea(GamePanel gamePanel, GameInstance gameInstance, AffineTransform boardToScreenTransformation, AffineTransform screenToBoardTransformation) {
         this.boardToScreenTransformation = boardToScreenTransformation;
