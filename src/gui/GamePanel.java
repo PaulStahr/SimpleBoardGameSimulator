@@ -7,8 +7,6 @@ import static gameObjects.functions.DrawFunctions.drawPrivateArea;
 import static gameObjects.functions.DrawFunctions.drawSelection;
 import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
 
-import java.applet.Applet;
-import java.applet.AudioClip;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -33,16 +31,28 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -76,6 +86,7 @@ import io.GameIO;
 import main.Player;
 import util.TimedUpdateHandler;
 import util.data.IntegerArrayList;
+import util.io.StreamUtil;
 
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener, KeyListener, KeyEventDispatcher, MouseWheelListener, ActionListener, ComponentListener{
@@ -171,7 +182,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public BufferedImage[] playerImages = new BufferedImage[10];
 
-	public Map<String, Clip> AudioClips = new HashMap<String, Clip>();
+	public Map<String, Clip> audioClips = new HashMap<String, Clip>();
 
 	public Set<Integer> downKeys = new HashSet<>();
 	
@@ -241,29 +252,26 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 		//Read the audio clips
-		AudioFormat format;
-		AudioInputStream stream;
-		DataLine.Info info;
-		Clip clip;
 		List<String> clipList = Arrays.asList("drop", "open", "select", "click", "shuffle");
 		for(String clipString : clipList) {
+			Clip clip;
 			try {
-				stream = AudioSystem.getAudioInputStream(DataHandler.getResourceAsStream("audio/kenney-audio/" + clipString + ".wav"));
-				format = stream.getFormat();
-				info = new DataLine.Info(Clip.class, format);
+				ByteArrayInputStream bis = new ByteArrayInputStream(StreamUtil.toByteArray(DataHandler.getResourceAsStream("audio/kenney-audio/" + clipString + ".wav")));
+				AudioInputStream stream = AudioSystem.getAudioInputStream(bis);
+				AudioFormat format = stream.getFormat();
+				DataLine.Info info = new DataLine.Info(Clip.class, format);
 				clip = (Clip) AudioSystem.getLine(info);
 				clip.open(stream);
-				AudioClips.put(clipString, clip);
-
+				audioClips.put(clipString, clip);
 			} catch (UnsupportedAudioFileException e) {
-				e.printStackTrace();
+				logger.error("Unsupported Audio File", e);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("IO Error loading sounds", e);
 			} catch (LineUnavailableException e) {
-				e.printStackTrace();
+				logger.error("No sound availible", e);
 			}
 		}
-		AudioClips.get("open").start();
+		audioClips.get("open").start();
 		DataHandler.timedUpdater.add(autosave);
 	}
     
@@ -380,8 +388,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-		this.AudioClips.get("click").setFramePosition(0);
-		this.AudioClips.get("click").start();
+		this.audioClips.get("click").setFramePosition(0);
+		this.audioClips.get("click").start();
 		if (!player.visitor) {
 			if (arg0.getClickCount() == 2) {
 				//Sit down on double click on seat

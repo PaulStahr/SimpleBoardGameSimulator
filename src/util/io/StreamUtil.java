@@ -80,4 +80,19 @@ public class StreamUtil {
         	out.write(data, 0, len);
         }
 	}
+
+	public static byte[] toByteArray(InputStream stream) throws IOException{
+		byte ch[] = new byte[Math.max(1, stream.available())];
+		int len = 0;
+		int read = 0;
+		while ((read = stream.read(ch, len, ch.length - len))!=-1)
+		{
+			len += read;
+			if (ch.length - len - stream.available() < 0)
+			{
+				ch = Arrays.copyOf(ch, Math.max(ch.length * 2, ch.length + stream.available()));
+			}
+		}
+		return len == ch.length ? ch : Arrays.copyOf(ch, len);
+	}
 }
