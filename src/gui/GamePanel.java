@@ -248,7 +248,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		List<String> clipList = Arrays.asList("drop", "open", "select", "click", "shuffle");
 		for(String clipString : clipList) {
 			try {
-				stream = AudioSystem.getAudioInputStream(DataHandler.getResourceAsStream("audio/kenney-audio/" + clipString + ".wav"));
+				stream = AudioSystem.getAudioInputStream(DataHandler.getResource("audio/kenney-audio/" + clipString + ".wav"));
 				format = stream.getFormat();
 				info = new DataLine.Info(Clip.class, format);
 				clip = (Clip) AudioSystem.getLine(info);
@@ -264,13 +264,22 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 		AudioClips.get("open").start();
+		if (this.gameInstance != null && this.player != null) {
+			int place = 0;
+			for (int i = 0; i < gameInstance.getPlayerNumber(); ++i) {
+				if (gameInstance.getPlayerByIndex(i).id < player.id) {
+					++place;
+				}
+			}
+			sitDown(player, place);
+		}
 		DataHandler.timedUpdater.add(autosave);
 	}
     
     public void setPlayer(Player pl)
     {
     	this.player = pl;
-		privateArea.updatePrivateObjects(gameInstance, player);    	
+		privateArea.updatePrivateObjects(gameInstance, player);
     }
 
 	/** Drawing of all the game objects, draws the board, object instances and the players
@@ -684,25 +693,47 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		translateBoard(e);
 
 		if (!player.visitor) {
+
+			//Mouse move independent keys
+			if (e.getKeyCode() == KeyEvent.VK_H && altDown) {
+				if (privateArea.zooming == 0) {
+					privateArea.zooming = privateArea.savedZooming;
+				} else {
+					privateArea.savedZooming = privateArea.zooming;
+					privateArea.zooming = 0;
+					updateGameTransform();
+				}
+			} else if (e.getKeyCode() == KeyEvent.VK_T && altDown) {
+				isTableVisible = !isTableVisible;
+			}else if (shiftDown && e.getKeyCode() == KeyEvent.VK_C) {
+				int count = 0;
+				for (int oId : selectedObjects) {
+					ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
+					count += ObjectFunctions.countStackValues(gameInstance, oi);
+				}
+				player.actionString = "Value: " + String.valueOf(count);
+			}
+			else if (e.getKeyCode() == KeyEvent.VK_C && !shiftDown) {
+				int count = 0;
+				ial.clear();
+				for( int i : selectedObjects) {
+					ial.add(i);
+				}
+				for (int oId : ial) {
+					ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
+					if (oi.go instanceof GameObjectToken) {
+						count += ObjectFunctions.countStack(gameInstance, oi);
+					} else if (oi.go instanceof GameObjectDice) {
+						count += 1;
+					} else if (oi.go instanceof GameObjectFigure) {
+						count += 1;
+					}
+				}
+				player.actionString = "Object Number: " + String.valueOf(count);
+			}
+
 			if (!(isLeftMouseKeyHold || isRightMouseKeyHold || isMiddleMouseKeyHold)) {
-				if (e.getKeyCode() == KeyEvent.VK_C && !shiftDown) {
-					int count = 0;
-					ial.clear();
-					for( int i : selectedObjects) {
-						ial.add(i);
-					}
-					for (int oId : ial) {
-						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
-						if (oi.go instanceof GameObjectToken) {
-							count += ObjectFunctions.countStack(gameInstance, oi);
-						} else if (oi.go instanceof GameObjectDice) {
-							count += 1;
-						} else if (oi.go instanceof GameObjectFigure) {
-							count += 1;
-						}
-					}
-					player.actionString = "Object Number: " + String.valueOf(count);
-				} else if (e.getKeyCode() == KeyEvent.VK_F && !shiftDown && !altDown) {
+				if (e.getKeyCode() == KeyEvent.VK_F && !shiftDown && !altDown) {
 					ial.clear();
 					for( int i : selectedObjects) {
 						ial.add(i);
@@ -737,14 +768,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						ObjectFunctions.selectObject(this, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, oi).id);
 					}
 
-				} else if (shiftDown && e.getKeyCode() == KeyEvent.VK_C) {
-					int count = 0;
-					for (int oId : selectedObjects) {
-						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
-						count += ObjectFunctions.countStackValues(gameInstance, oi);
-					}
-					player.actionString = "Value: " + String.valueOf(count);
-				} else if (e.getKeyCode() == KeyEvent.VK_V) {
+				}
+				else if (e.getKeyCode() == KeyEvent.VK_V) {
 					if (!mouseInPrivateArea) {
 						for (int oId : ObjectFunctions.getStackRepresentatives(gameInstance, selectedObjects)) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
@@ -810,16 +835,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 					}
 					sitDown(player, place);
-				} else if (e.getKeyCode() == KeyEvent.VK_H && altDown) {
-					if (privateArea.zooming == 0) {
-						privateArea.zooming = privateArea.savedZooming;
-					} else {
-						privateArea.savedZooming = privateArea.zooming;
-						privateArea.zooming = 0;
-						updateGameTransform();
-					}
-				} else if (e.getKeyCode() == KeyEvent.VK_T && altDown) {
-					isTableVisible = !isTableVisible;
 				}
 
 

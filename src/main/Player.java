@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Random;
 
 import gameObjects.PlayerColumnType;
+import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;

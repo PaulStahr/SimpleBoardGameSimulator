@@ -218,4 +218,5 @@ public class Table {
     public int getDiameter(){
         return diameter;
     }
+    public int getStackerWidth(){return this.stackerWidth;}
 }

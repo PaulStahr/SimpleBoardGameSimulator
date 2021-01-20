@@ -1,8 +1,5 @@
 package gameObjects.functions;
 
-import static java.lang.Math.PI;
-import static java.lang.Math.max;
-
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -25,6 +22,8 @@ import gui.GamePanel;
 import main.Player;
 import util.Pair;
 import util.data.IntegerArrayList;
+
+import static java.lang.Math.*;
 
 public class ObjectFunctions {
     //private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -457,7 +456,6 @@ public class ObjectFunctions {
             getStackFromBottom(gameInstance, objectInstance, objectStack);
             removeStackRelations(gamePanel, gameInstance, player, objectInstance);
             if (objectStack.size() > 1) {
-                player.actionString = "Objects Shuffled";
                 IntegerArrayList oldX = new IntegerArrayList();
                 IntegerArrayList oldY = new IntegerArrayList();
                 for (int id : objectStack) {
@@ -465,6 +463,7 @@ public class ObjectFunctions {
                     oldY.add(gameInstance.getObjectInstanceById(id).state.posY);
                 }
                 Collections.shuffle(objectStack);
+                player.actionString = objectStack.size() + " Objects Shuffled";
                 for (int i = 0; i < objectStack.size(); i++) {
                     ObjectInstance currentObject = gameInstance.getObjectInstanceById(objectStack.get(i));
                 	ObjectState state = currentObject.state.copy();
@@ -929,7 +928,9 @@ public class ObjectFunctions {
         Random rand = new Random();
         int randX = 20 - rand.nextInt(40);
         int randY = 20 - rand.nextInt(40);
-        moveObjectTo(gamePanel.id, gameInstance,player, objectInstance, (int) gamePanel.table.getTableCenter().getX() + randX, (int) gamePanel.table.getTableCenter().getY() + randY);
+        int x = player.playerAtTableRotation;
+        Point2D PlayerShift = new Point2D.Double(-sin(Math.toRadians(x))*gamePanel.table.getStackerWidth()/3, cos(Math.toRadians(x))*gamePanel.table.getStackerWidth()/3);
+        moveObjectTo(gamePanel.id, gameInstance,player, objectInstance, (int) (gamePanel.table.getTableCenter().getX() + PlayerShift.getX()), (int) (gamePanel.table.getTableCenter().getY() + PlayerShift.getY()));
         flipTokenObject(gamePanel.id, gameInstance, player, objectInstance);
         gamePanel.AudioClips.get("drop").setFramePosition(0);
         gamePanel.AudioClips.get("drop").start();
