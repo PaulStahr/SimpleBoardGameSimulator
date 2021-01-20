@@ -88,7 +88,7 @@ public class StreamUtil {
 		while ((read = stream.read(ch, len, ch.length - len))!=-1)
 		{
 			len += read;
-			if (ch.length - len - stream.available() < 0)
+			if (ch.length - len - stream.available() < 0 || stream.available() == 0)
 			{
 				ch = Arrays.copyOf(ch, Math.max(ch.length * 2, ch.length + stream.available()));
 			}
