@@ -35,8 +35,7 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 			new FuncControl(Words.sit_down, new ControlCombination(0, 0,  -1, 32)),
 			new FuncControl(Words.sit_to_own_seat, new ControlCombination(0, -1,  KeyEvent.VK_SPACE, 0)),
 			new FuncControl(Words.hide_show_table, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  KeyEvent.VK_T, 0)),
-			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1, KeyEvent.VK_H,0)),
-
+			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(0, -1, KeyEvent.VK_H,0)),
 	};
 
 	private static final FuncControl[] objectControls= {

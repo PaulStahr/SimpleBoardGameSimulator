@@ -482,8 +482,8 @@ public class ObjectFunctions {
                     gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentObject, state));
                 }
             }
-            gamePanel.AudioClips.get("shuffle").setFramePosition(0);
-            gamePanel.AudioClips.get("shuffle").start();
+            gamePanel.audioClips.get("shuffle").setFramePosition(0);
+            gamePanel.audioClips.get("shuffle").start();
         }
     }
 
@@ -932,8 +932,8 @@ public class ObjectFunctions {
         Point2D PlayerShift = new Point2D.Double(-sin(Math.toRadians(x))*gamePanel.table.getStackerWidth()/3, cos(Math.toRadians(x))*gamePanel.table.getStackerWidth()/3);
         moveObjectTo(gamePanel.id, gameInstance,player, objectInstance, (int) (gamePanel.table.getTableCenter().getX() + PlayerShift.getX()), (int) (gamePanel.table.getTableCenter().getY() + PlayerShift.getY()));
         flipTokenObject(gamePanel.id, gameInstance, player, objectInstance);
-        gamePanel.AudioClips.get("drop").setFramePosition(0);
-        gamePanel.AudioClips.get("drop").start();
+        gamePanel.audioClips.get("drop").setFramePosition(0);
+        gamePanel.audioClips.get("drop").start();
     }
 
 
@@ -1055,8 +1055,8 @@ public class ObjectFunctions {
             state.isSelected = player.id;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, oi, state));
             ObjectFunctions.updateSelectedObjects(gamePanel, gameInstance, player);
-            gamePanel.AudioClips.get("select").setFramePosition(0);
-            gamePanel.AudioClips.get("select").start();
+            gamePanel.audioClips.get("select").setFramePosition(0);
+            gamePanel.audioClips.get("select").start();
         }
 
     }
@@ -1376,6 +1376,7 @@ public class ObjectFunctions {
         objectInstance.state.owner_id = -1;
         objectInstance.state.inPrivateArea = false;
         gamePanel.privateArea.updatePrivateObjects(gameInstance, player);
+        //TODO no update?
     }
 
 

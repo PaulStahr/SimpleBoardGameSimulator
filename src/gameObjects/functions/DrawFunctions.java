@@ -187,7 +187,7 @@ public class DrawFunctions {
         AffineTransform tmp = g2.getTransform();
         g2.setTransform(new AffineTransform());
         int playerId = gamePanel.getPlayerId();
-        g2.translate(gamePanel.getWidth() / 2, gamePanel.getHeight()-10);
+        g2.translate(gamePanel.getWidth() / 2, gamePanel.getHeight()-2*gamePanel.privateArea.objects.size());
 
         if (gamePanel.privateArea.objects.size() != 0) {
             int extraSpace; //Private Area needs extra space if object is dragged into it
@@ -211,6 +211,7 @@ public class DrawFunctions {
                         g2.rotate(Math.PI / (gamePanel.privateArea.objects.size() + extraSpace));
                     }
                 } else {
+                    //TODO out ouf bound errors
                     if (i == gamePanel.privateArea.currentDragPosition) {
                         g2.translate(0, -250);
                         g2.translate(0, 250);
@@ -245,7 +246,7 @@ public class DrawFunctions {
             tmp = g2d.getTransform();
             AffineTransform transform = new AffineTransform();
 
-            transform.translate(gamePanel.getWidth()/2, gamePanel.getHeight()-10);
+            transform.translate(gamePanel.getWidth()/2, gamePanel.getHeight()-2*gamePanel.privateArea.objects.size());
             transform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));
             transform.rotate(gamePanel.privateArea.objects.indexOf(activeObject.id) * Math.PI / (gamePanel.privateArea.objects.size()));
             transform.scale(gamePanel.privateArea.zooming, gamePanel.privateArea.zooming);
