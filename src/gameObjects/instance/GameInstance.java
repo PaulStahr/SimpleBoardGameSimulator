@@ -64,10 +64,10 @@ public class GameInstance {
 		game.clear();
 	}
 	
-	public long getMaxDrawValue()
+	public int getMaxDrawValue()
 	{
 		//return maxDrawValue;
-        long maxDrawValue = 0;
+        int maxDrawValue = 0;
         for (int idx = 0; idx<getObjectNumber(); ++idx){
             maxDrawValue = max(maxDrawValue, getObjectInstanceByIndex(idx).state.drawValue);
         }

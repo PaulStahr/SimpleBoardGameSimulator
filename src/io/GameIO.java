@@ -85,7 +85,7 @@ public class GameIO {
 		elem.setAttribute(IOString.S, 				Integer.toString(state.scale));
 		elem.setAttribute(IOString.OWNER_ID, 		Integer.toString(state.owner_id));
 		elem.setAttribute(IOString.IS_SELECTED, 		Integer.toString(state.isSelected));
-		elem.setAttribute(IOString.DRAW_VALUE, 		Long.toString(state.drawValue));
+		elem.setAttribute(IOString.DRAW_VALUE, 		Integer.toString(state.drawValue));
 		elem.setAttribute(IOString.ABOVE, 			Integer.toString(state.aboveInstanceId));
 		elem.setAttribute(IOString.BELOW,			Integer.toString(state.belowInstanceId));
 		elem.setAttribute(IOString.VALUE, 			Integer.toString(state.value));
@@ -127,8 +127,7 @@ public class GameIO {
 	 */
 	private static void editStateFromElement(ObjectState state, Element elem)
 	{
-		state.posX = readAttribute(elem, IOString.X, state.posX);
-		state.posY = readAttribute(elem, IOString.Y, state.posY);
+
 		state.rotation = readAttribute(elem, IOString.R, state.rotation);
 
 		String v = elem.getAttributeValue(IOString.ORIGINAL_ROTATION);
@@ -145,6 +144,8 @@ public class GameIO {
 		state.owner_id 			= readAttribute(elem, IOString.OWNER_ID, state.owner_id);
 		state.isSelected 		= readAttribute(elem, IOString.IS_SELECTED, state.isSelected);
 		state.drawValue			= readAttribute(elem, IOString.DRAW_VALUE, state.drawValue);
+		state.posX 				= readAttribute(elem, IOString.X, state.posX);
+		state.posY 				= readAttribute(elem, IOString.Y, state.posY);
 		state.value				= readAttribute(elem, IOString.VALUE, state.value);
 		state.rotationStep		= readAttribute(elem, IOString.ROTATION_STEP, state.rotationStep);
 		state.isFixed			= readAttribute(elem, IOString.IS_FIXED, state.isFixed);
@@ -1031,7 +1032,7 @@ public class GameIO {
 		state.inPrivateArea = is.readBoolean();
 		state.owner_id = is.readInt();
 		state.isSelected = is.readInt();
-		state.drawValue = is.readLong();
+		state.drawValue = is.readInt();
 		state.posX = is.readInt();
 		state.posY = is.readInt();
 		state.rotation = is.readInt();
@@ -1067,7 +1068,7 @@ public class GameIO {
 		out.writeBoolean(state.inPrivateArea);
 		out.writeInt(state.owner_id);
 		out.writeInt(state.isSelected);
-		out.writeLong(state.drawValue);
+		out.writeInt(state.drawValue);
 		out.writeInt(state.posX);
 		out.writeInt(state.posY);
 		out.writeInt(state.rotation);

@@ -266,6 +266,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.indexOf(GameInstanceColumnType.ID)));
 						if (playerId == gi.admin) {
 							client.deleteGame(gi.name, gi.password);
+							updateCurrentGames();
 						}
 						else{
 							JFrameUtils.showInfoMessage("Can't delete game. You have no admin rights!", logger);

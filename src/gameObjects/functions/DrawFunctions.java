@@ -458,6 +458,7 @@ public class DrawFunctions {
         IntegerArrayList selectedObjects = gamePanel.selectedObjects;
         IntegerArrayList ial = new IntegerArrayList();
         int hoverId = (hoveredObject== null) ? -1 : hoveredObject.id;
+        int drawValue = (hoveredObject== null) ? -1 : hoveredObject.state.drawValue;
         String stringSelectedObjects = "";
         String stringHandCards = "";
         String stringActiveObjects = "";
@@ -501,11 +502,8 @@ public class DrawFunctions {
         ObjectFunctions.getStack(gameInstance, hoveredObject, ial);
         if (ial.size()>1) {
             for (int i : ial) {
-                if (stringHoveredStack.equals("")) {
-                    stringHoveredStack += Integer.toString(i);
-                } else {
-                    stringHoveredStack += "; " + Integer.toString(i);
-                }
+                ObjectInstance oi = gameInstance.getObjectInstanceById(i);
+                stringHoveredStack += "|" + oi.state.aboveInstanceId + " " + oi.id + " " + oi.state.belowInstanceId + "|";
             }
         }
 
@@ -537,6 +535,8 @@ public class DrawFunctions {
         g2.drawString("Active Objects: " + stringActiveObjects, 50, yPos);
         yPos+=yStep;
         g2.drawString("Hovered Object: " + Integer.toString(hoverId), 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Hovered Draw Value: " + Long.toString(drawValue), 50, yPos);
         yPos+=yStep;
         g2.drawString("Hovered Stack: " + stringHoveredStack, 50, yPos);
         yPos+=yStep;

@@ -1,5 +1,6 @@
 package gameObjects.functions;
 
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -14,6 +15,7 @@ import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectToken;
+import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
@@ -776,7 +778,7 @@ public class ObjectFunctions {
                 ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
                 if (!oi.state.isFixed && (ignoredObjects == null || !ignoredObjects.contains(oi.id)) && !oi.state.inPrivateArea && (oi.state.owner_id == -1 || oi.state.owner_id == player.id)) {
                     int dist = objectDist(xPos, yPos, oi);
-                    if (dist < distance && isOnObject(xPos, yPos, oi, player.id, maxInaccuracy)) {
+                    if ((dist < distance || (dist == distance && activeObject!= null && oi.state.drawValue > activeObject.state.drawValue)) && isOnObject(xPos, yPos, oi, player.id, maxInaccuracy)) {
                         activeObject = oi;
                         distance = dist;
                     }
@@ -936,6 +938,33 @@ public class ObjectFunctions {
         gamePanel.audioClips.get("drop").start();
     }
 
+    public static void getObjectsInTableMiddle(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial){
+        ial.clear();
+        IntegerArrayList possibleObjects = new IntegerArrayList();
+        getAllObjectsOfGroup(gamePanel, gameInstance, player, objectInstance, possibleObjects);
+        Shape shape = gamePanel.table.stackerShape;
+        for(int id : possibleObjects){
+            ObjectInstance oi = gameInstance.getObjectInstanceById(id);
+            Point2D transformedPoint = gamePanel.getBoardToScreenTransform().transform(new Point2D.Double(oi.state.posX, oi.state.posY), null);
+            if(shape != null){
+                if(transformedPoint != null && shape.contains(transformedPoint)){
+                    ial.add(oi.id);
+                }
+            }
+        }
+    }
+
+    public static void stackObjectsInTableMiddle(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial){
+        getObjectsInTableMiddle(gamePanel, gameInstance, player, objectInstance, ial);
+        makeStack(gamePanel, gameInstance, player, ial);
+        moveStackTo(gamePanel.id, gameInstance, player, ial, (int) gamePanel.table.getTableCenter().getX(), (int) gamePanel.table.getTableCenter().getY());
+    }
+    public static void stackAndFlipObjectsInTableMiddle(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial){
+        getObjectsInTableMiddle(gamePanel, gameInstance, player, objectInstance, ial);
+        makeStack(gamePanel, gameInstance, player, ial);
+        moveStackTo(gamePanel.id, gameInstance, player, ial, (int) gamePanel.table.getTableCenter().getX(), (int) gamePanel.table.getTableCenter().getY());
+        flipTokenStack(gamePanel, gameInstance, player, objectInstance);
+    }
 
     public static ObjectInstance setActiveObjectByMouseAndKey(GamePanel gamePanel, GameInstance gameInstance, Player player, MouseEvent arg0, Vector2 mouse, int maxInaccuracy) {
         ObjectInstance activeObject = null;
@@ -1380,9 +1409,9 @@ public class ObjectFunctions {
     }
 
 
-    public static void getAllObjectsOfGroup(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
-        IntegerArrayList objectTypeList = new IntegerArrayList();
-        objectTypeList.add(objectInstance.id);
+    public static void getAllObjectsOfGroup(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial) {
+        ial.clear();
+        ial.add(objectInstance.id);
         String objectGroup = objectInstance.go.objectType;
         if (objectInstance.go.groups.length > 0) {
             objectGroup = objectInstance.go.groups[0];
@@ -1394,10 +1423,16 @@ public class ObjectFunctions {
                 oiGroup = oi.go.groups[0];
             }
             if (oiGroup.equals(objectGroup) && oi.id != objectInstance.id && oi.state.owner_id==-1 && (oi.state.isSelected == player.id || oi.state.isSelected == -1)) {
-                objectTypeList.add(oi.id);
+                ial.add(oi.id);
             }
         }
-        makeStack(gamePanel, gameInstance, player, objectTypeList);
+
+    }
+
+    public static void stackAllObjectsOfGroup(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
+        IntegerArrayList ial = new IntegerArrayList();
+        getAllObjectsOfGroup(gamePanel, gameInstance, player, objectInstance, ial);
+        makeStack(gamePanel, gameInstance, player, ial);
     }
 
     public static IntegerArrayList getTopNObjects(GameInstance gameInstance, ObjectInstance objectInstance, int number) {
@@ -1614,4 +1649,39 @@ public class ObjectFunctions {
     }
 
 
+    public static void giveObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList ial) {
+        Collections.shuffle(ial);
+        int playerNum = gameInstance.getPlayerNumber();
+        int numElements = ial.size()/playerNum;
+        int modElements = ial.size() & playerNum;
+
+        int counter = 0;
+        int playerCounter = 0;
+        for(Player player1 : gameInstance.getPlayerList())
+        {
+            int currentElementIndex = 0;
+            while(currentElementIndex < numElements){
+                int Pos = numElements*playerCounter + currentElementIndex;
+                takeObjects(gamePanel,gameInstance,player1, gameInstance.getObjectInstanceById(ial.getI(Pos)));
+                currentElementIndex+=1;
+            }
+            if(counter < modElements){
+                int Pos = numElements*playerNum + counter;
+                takeObjects(gamePanel,gameInstance,player1, gameInstance.getObjectInstanceById(ial.getI(Pos)));
+                counter+= 1;
+            }
+            ++playerCounter;
+        }
+    }
+
+    public static boolean isInTableMiddle(GamePanel gamePanel, int xi, int yi) {
+        Shape shape = gamePanel.table.stackerShape;
+            Point2D transformedPoint = gamePanel.getBoardToScreenTransform().transform(new Point2D.Double(xi, yi), null);
+            if(shape != null){
+                if(transformedPoint != null && shape.contains(transformedPoint)){
+                    return true;
+                }
+            }
+            return false;
+        }
 }

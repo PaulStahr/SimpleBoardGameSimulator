@@ -26,7 +26,7 @@ public abstract class ObjectState implements Serializable {
 	public int aboveInstanceId = -1;
 	public int belowInstanceId = -1;
 	public int value;
-	public long drawValue = 0;
+	public int drawValue = 0;
 	public int rotationStep = 90;
 
 	/*fix an object*/
@@ -55,6 +55,7 @@ public abstract class ObjectState implements Serializable {
 		this.isFixed = state.isFixed;
 		this.lastChange = state.lastChange;
 		this.isActive = state.isActive;
+		this.drawValue = state.drawValue;
 	}
 
 	public abstract ObjectState copy();
