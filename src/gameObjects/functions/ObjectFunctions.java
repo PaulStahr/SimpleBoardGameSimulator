@@ -1,6 +1,6 @@
 package gameObjects.functions;
 
-import java.awt.*;
+import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -15,7 +15,6 @@ import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectToken;
-import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
@@ -24,8 +23,6 @@ import gui.GamePanel;
 import main.Player;
 import util.Pair;
 import util.data.IntegerArrayList;
-
-import static java.lang.Math.*;
 
 public class ObjectFunctions {
     //private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -469,7 +466,7 @@ public class ObjectFunctions {
                 for (int i = 0; i < objectStack.size(); i++) {
                     ObjectInstance currentObject = gameInstance.getObjectInstanceById(objectStack.get(i));
                 	ObjectState state = currentObject.state.copy();
-                    if (i == 0 && i < objectStack.size() - 1) {
+                    if (i == 0) {
                         state.belowInstanceId = -1;
                         state.aboveInstanceId = gameInstance.getObjectInstanceById(objectStack.get(i + 1)).id;
                     } else if (i == objectStack.size() - 1) {
@@ -479,8 +476,8 @@ public class ObjectFunctions {
                         state.belowInstanceId = gameInstance.getObjectInstanceById(objectStack.get(i - 1)).id;
                         state.aboveInstanceId = gameInstance.getObjectInstanceById(objectStack.get(i + 1)).id;
                     }
-                    state.posX = oldX.get(i);
-                    state.posY = oldY.get(i);
+                    state.posX = oldX.getI(i);
+                    state.posY = oldY.getI(i);
                     gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentObject, state));
                 }
             }
@@ -754,7 +751,7 @@ public class ObjectFunctions {
         int yCenter = oi.state.posY;
         int xDiff = xPos - xCenter, yDiff = yPos - yCenter;
 
-        double radians = oi.state.rotation*2*PI/360;
+        double radians = oi.state.rotation*2*Math.PI/360;
         double sin = Math.sin(radians), cos = Math.cos(radians);
         double transformedX = -xDiff * cos + yDiff * sin + xCenter;
         double transformedY = -xDiff * sin - yDiff * cos + yCenter;
@@ -931,7 +928,7 @@ public class ObjectFunctions {
         int randX = 20 - rand.nextInt(40);
         int randY = 20 - rand.nextInt(40);
         int x = player.playerAtTableRotation;
-        Point2D PlayerShift = new Point2D.Double(-sin(Math.toRadians(x))*gamePanel.table.getStackerWidth()/3, cos(Math.toRadians(x))*gamePanel.table.getStackerWidth()/3);
+        Point2D PlayerShift = new Point2D.Double(-Math.sin(Math.toRadians(x))*gamePanel.table.getStackerWidth()/3, Math.cos(Math.toRadians(x))*gamePanel.table.getStackerWidth()/3);
         moveObjectTo(gamePanel.id, gameInstance,player, objectInstance, (int) (gamePanel.table.getTableCenter().getX() + PlayerShift.getX()), (int) (gamePanel.table.getTableCenter().getY() + PlayerShift.getY()));
         flipTokenObject(gamePanel.id, gameInstance, player, objectInstance);
         gamePanel.audioClips.get("drop").setFramePosition(0);
@@ -1533,8 +1530,8 @@ public class ObjectFunctions {
         Point2D point = new Point2D.Double();
         int lowX = Math.min(posX, posX + width);
         int lowY = Math.min(posY, posY + height);
-        int highX = max(posX, posX + width);
-        int highY = max(posY, posY + height);
+        int highX = Math.max(posX, posX + width);
+        int highY = Math.max(posY, posY + height);
         for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
             ObjectInstance objectInstance = gameInstance.getObjectInstanceByIndex(idx);
             point.setLocation(objectInstance.state.posX, objectInstance.state.posY);

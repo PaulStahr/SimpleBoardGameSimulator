@@ -358,19 +358,17 @@ public class GameInstance {
 	{
 		tmp.clear();
 		getOwnedPrivateObjects(player_id, true, tmp);
+		ArrayList<ObjectInstance> output = new ArrayList<>();
 		tmp.sort(ObjectInstance.ID_COMPARATOR);
 		int incoming[] = new int[tmp.size()];
 		CheckingFunctions.countIncoming(tmp, incoming);
-		for (int read = 0, write = 0; read < incoming.length;)
+		for (int read = 0; read < incoming.length;)
 		{
-			if (incoming[read] == 0)
-			{
-				write = CheckingFunctions.packBelongingObjects(incoming, write, read, tmp);
-			}
-			read = Math.max(write, read + 1);
+			if (incoming[read] == 0){CheckingFunctions.packBelongingObjects(incoming, read, tmp, output);}
 		}
-		makeStack(tmp, 0, tmp.size());
-		update(tmp, 0, tmp.size(), player);
+		makeStack(output, 0, output.size());
+		update(output, 0, output.size(), player);
+		output.clear();
 		tmp.clear();
 		getOwnedPrivateObjects(player_id, false, tmp);
 		tmp.sort(ObjectInstance.ID_COMPARATOR);
@@ -382,9 +380,10 @@ public class GameInstance {
 			int oldWrite = write;
 			if (incoming[read] == 0)
 			{
-				write = CheckingFunctions.packBelongingObjects(incoming, write, read, tmp);
+				CheckingFunctions.packBelongingObjects(incoming, read, tmp, output);
 				makeStack(tmp, oldWrite, write);
-				update(tmp, oldWrite, write, player);
+				update(output, 0, output.size(), player);
+				output.clear();
 			}
 			read = Math.max(write, read + 1);
 		}

@@ -44,34 +44,52 @@ public class CheckingFunctions {
 		return null;
 	}
 	
-	public static int packBelongingObjects(int incoming[], int write, int curIdx, ArrayList<ObjectInstance> tmp)
+	public static void packBelongingObjects(int incoming[], int startIdx, ArrayList<ObjectInstance> sorted, ArrayList<ObjectInstance> output)
 	{
-		ObjectInstance current = tmp.get(curIdx);
+		ObjectInstance current = sorted.get(startIdx);
 		while(true){
-			incoming[curIdx] = incoming[write];
-			incoming[write] = 0;
-			tmp.set(curIdx, tmp.get(write));
-			tmp.set(write, current);
-			++write;
-			curIdx = ArrayTools.binarySearch(tmp, current.state.aboveInstanceId, ObjectInstance.OBJECT_TO_ID);
-			if (curIdx < 0){return write;}
-			current = tmp.get(curIdx);
-			--incoming[curIdx];
-			if (incoming[curIdx] != 0){return write;}
+			output.add(current);
+			int aboveId = current.state.aboveInstanceId;
+			if (aboveId == -1){return;}
+			int nextIdx = ArrayTools.binarySearch(sorted, current.state.aboveInstanceId, ObjectInstance.OBJECT_TO_ID);
+			if (nextIdx < 0 || --incoming[nextIdx] > 0) {return;}
+			current = sorted.get(nextIdx);
 		}
 	}
 	
-	public static GameInconsistency checkPlayerConsistency(int player_id, ArrayList<ObjectInstance> tmp, GameInstance gi)
+	public static GameInconsistency checkChainingCorrectness(ArrayList<ObjectInstance> objects)
 	{
-		tmp.clear();
-		gi.getOwnedPrivateObjects(player_id, true, tmp);
-		if (tmp.size() != 0)
+		for (int i = 0; i < objects.size(); ++i)
+		{
+			ObjectInstance current = objects.get(i);
+			if (current.state.aboveInstanceId != -1)
+			{
+				int index = ArrayTools.binarySearch(objects, current.state.aboveInstanceId, ObjectInstance.OBJECT_TO_ID);
+				if (index < 0){return new GameInconsistency();}
+				if (objects.get(index).state.belowInstanceId != current.id) {return new InconsistencyNotLinkedViceVersa(objects.get(index).id, current.id);}
+			}
+			if (current.state.belowInstanceId != -1)
+			{
+				int index = ArrayTools.binarySearch(objects, current.state.belowInstanceId, ObjectInstance.OBJECT_TO_ID);
+				if (index < 0){return new GameInconsistency();}
+				if (objects.get(index).state.aboveInstanceId != current.id) {return new InconsistencyNotLinkedViceVersa(objects.get(index).id, current.id);}
+
+			}
+		}
+		return null;
+	}
+	
+	public static GameInconsistency checkPlayerConsistency(int player_id, ArrayList<ObjectInstance> sorted, ArrayList<ObjectInstance> output, GameInstance gi)
+	{
+		sorted.clear();
+		gi.getOwnedPrivateObjects(player_id, true, sorted);
+		if (sorted.size() != 0)
 		{
 			ObjectInstance bottom = null;
 			ObjectInstance top = null;
-			for (int i = 0; i < tmp.size(); ++i)
+			for (int i = 0; i < sorted.size(); ++i)
 			{
-				ObjectInstance oi = tmp.get(i);
+				ObjectInstance oi = sorted.get(i);
 				if (oi.state.belowInstanceId == -1)
 				{
 					if (bottom != null){return new InconsistencyMultistackend(bottom.id, oi.id);}
@@ -86,7 +104,7 @@ public class CheckingFunctions {
 			if (bottom == null || top == null){return new InconsistencyNostackend();}
 			ObjectInstance current = bottom;
 			if (current.owner_id() != player_id || !current.state.inPrivateArea){return new InconsistencyNotInPrivateArea(current.id);}
-			for (int i = 1; i < tmp.size(); ++i)
+			for (int i = 1; i < sorted.size(); ++i)
 			{
 				ObjectInstance next = gi.getObjectInstanceById(current.state.aboveInstanceId);
 				if (next == null){return new StackEndReached(current.id);}
@@ -96,24 +114,12 @@ public class CheckingFunctions {
 				current = next;
 			}
 			if (current != top){return new InconsistencyMultistackend(current.id, top.id);}
-			tmp.clear();
+			sorted.clear();
 		}
-		gi.getOwnedPrivateObjects(player_id, false, tmp);
-		tmp.sort(ObjectInstance.ID_COMPARATOR);
-		int incoming[] = new int[tmp.size()];
-		countIncoming(tmp, incoming);
-		int write = 0;
-		for (int read = 0; read < incoming.length;)
-		{
-			int oldWrite = write;
-			if (incoming[read] == 0)
-			{
-				write = packBelongingObjects(incoming, write, read, tmp);
-				GameInconsistency inc = checkStack(tmp, oldWrite, write);
-				if (inc != null){return inc;}
-			}
-			read = Math.max(write, read + 1);
-		}
-		return write == incoming.length ? null : new GameInconsistency();
+		gi.getOwnedPrivateObjects(player_id, false, sorted);
+		sorted.sort(ObjectInstance.ID_COMPARATOR);
+		GameInconsistency inconsistency = checkChainingCorrectness(sorted);
+		if (inconsistency != null) {return inconsistency;}
+		return null;
 	}
 }

@@ -23,9 +23,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
-
-import net.AsynchronousGameConnection;
-import net.SynchronousGameClientLobbyConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,10 +74,11 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	private final LanguageHandler lh;
 	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-	private class GameWindowUpdater implements TimedUpdateHandler
+	private class GameWindowUpdater implements TimedUpdateHandler, Runnable
 	{
 		
 		private final ArrayList<ObjectInstance> tmp = new ArrayList<>();
+		private final ArrayList<ObjectInstance> tmp2 = new ArrayList<>();
 
 		@Override
 		public int getUpdateInterval() {
@@ -89,16 +87,19 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 
 		@Override
 		public synchronized void update() {
-			GameInconsistency gic = CheckingFunctions.checkPlayerConsistency(gamePanel.getPlayerId(), tmp, gi);
+			GameInconsistency gic = CheckingFunctions.checkPlayerConsistency(gamePanel.getPlayerId(), tmp, tmp2, gi);
 			boolean playerConsistent = gic == null; 
 			menuItemStatusPlayerConsistency.setEnabled(!playerConsistent);
 			menuItemStatusPlayerConsistency.setText("Correct Card-Consistency" + (gic == null ? "" : (" (" + gic.toString() + ")")));
-			gic = CheckingFunctions.checkPlayerConsistency(-1, tmp, gi);
+			gic = CheckingFunctions.checkPlayerConsistency(-1, tmp, tmp2, gi);
 			boolean gaiaConsistent = gic == null;
 			menuItemStatusGaiaConsistency.setEnabled(!gaiaConsistent);
 			menuItemStatusGaiaConsistency.setText("Correct Free-Object-Consistency" + (gic == null ? "" : (" (" + gic.toString() + ")")));
 			menuStatus.setForeground(playerConsistent && gaiaConsistent ? Color.BLACK : Color.RED);
 		}
+
+		@Override
+		public void run() {update();}
 	}
 	private final GameWindowUpdater gww = new GameWindowUpdater();
 	
@@ -231,12 +232,12 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		else if (source == menuItemStatusPlayerConsistency)
 		{
 			gi.repairPlayerConsistency(gamePanel.getPlayerId(), gamePanel.getPlayer(), new ArrayList<>());
-			gww.update();
+			DataHandler.tp.run(gww, "UpdateConsistency");
 		}
 		else if (source == menuItemStatusGaiaConsistency)
 		{
 			gi.repairPlayerConsistency(-1, gamePanel.getPlayer(), new ArrayList<>());
-			gww.update();
+			DataHandler.tp.run(gww, "UpdateConsistency");
 		}
 		else if (source == menuItemReconnect)
 		{
