@@ -1,9 +1,10 @@
-package gameObjects.action;
+package gameObjects.action.player;
 
+import gameObjects.action.GameAction;
 import gameObjects.instance.GameInstance;
 import main.Player;
 
-public class GamePlayerEditAction extends GameAction{
+public class PlayerEditAction extends GameAction{
 	/**
 	 * 
 	 */
@@ -12,13 +13,13 @@ public class GamePlayerEditAction extends GameAction{
 	public final int sourcePlayer;
 	private transient Player sourcePlayerObject;
 	private transient Player editedPlayerObject;
-	public GamePlayerEditAction(int source, int sourcePlayer, int editedPlayer) {
+	public PlayerEditAction(int source, int sourcePlayer, int editedPlayer) {
 		super(source);
 		this.sourcePlayer = sourcePlayer;
 		this.editedPlayer = editedPlayer;
 	}
 
-	public GamePlayerEditAction(int source, Player sourcePlayer, Player editedPlayer) {
+	public PlayerEditAction(int source, Player sourcePlayer, Player editedPlayer) {
 		super(source);
 		this.sourcePlayer = (sourcePlayerObject = sourcePlayer).id;
 		this.editedPlayer = (editedPlayerObject = editedPlayer).id;

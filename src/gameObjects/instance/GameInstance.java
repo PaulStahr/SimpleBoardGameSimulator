@@ -11,13 +11,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.GameInstanceColumnType;
-import gameObjects.action.AddPlayerAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.GameStructureObjectEditAction;
+import gameObjects.action.player.PlayerAddAction;
+import gameObjects.action.player.PlayerEditAction;
+import gameObjects.action.player.PlayerRemoveAction;
 import gameObjects.definition.GameObject;
 import gameObjects.functions.CheckingFunctions;
 import main.Player;
@@ -77,14 +78,14 @@ public class GameInstance {
 	}
 	
 	
-	public Player addPlayer(AddPlayerAction action, Player player)
+	public Player addPlayer(PlayerAddAction action, Player player)
 	{
 		Player pl = action == null ? getPlayerById(player.id) : action.getPlayer(this);
 		if (pl != null)
 		{
 			pl.set(player);
 			player.setPlayerColor(this);
-			update(new GamePlayerEditAction(action == null ? 0 : action.source, pl, pl));
+			update(new PlayerEditAction(action == null ? 0 : action.source, pl, pl));
 			return pl;
 		}else {
 			players.add(player);
@@ -92,7 +93,7 @@ public class GameInstance {
 				this.admin = player.id;
 			}
 			player.setPlayerColor(this);
-			update(action == null ? new AddPlayerAction(0, player) : action);
+			update(action == null ? new PlayerAddAction(0, player) : action);
 			return player;
 		}
 	}
@@ -203,6 +204,24 @@ public class GameInstance {
 			maxDrawValue = max(maxDrawValue , oi.state.drawValue);
 			oi.state.set(editAction.state);
 		}
+		else if (action instanceof PlayerRemoveAction)
+		{
+			PlayerRemoveAction rpa = (PlayerRemoveAction)action;
+			for (int i = 0; i < objects.size(); ++i)
+			{
+				if (objects.get(i).state.owner_id == rpa.editedPlayer)
+				{
+					objects.get(i).state.owner_id = -1;
+					objects.get(i).state.inPrivateArea = false;
+				}
+				if (objects.get(i).state.isSelected == rpa.editedPlayer)
+				{
+					objects.get(i).state.isSelected = -1;
+					objects.get(i).state.isActive = false;
+				}
+			}
+			players.remove(rpa.getEditedPlayer(this));
+		}
 		else if (action instanceof GameStructureEditAction)
 		{
 			GameStructureEditAction structureAction = (GameStructureEditAction)action;
@@ -210,24 +229,6 @@ public class GameInstance {
 			{
 				GameStructureObjectEditAction gsoea = (GameStructureObjectEditAction)structureAction;
 				switch (gsoea.type) {
-					case GameStructureEditAction.REMOVE_PLAYER:
-					{
-						for (int i = 0; i < objects.size(); ++i)
-						{
-							if (objects.get(i).state.owner_id == gsoea.objectId)
-							{
-								objects.get(i).state.owner_id = -1;
-								objects.get(i).state.inPrivateArea = false;
-							}
-							if (objects.get(i).state.isSelected == gsoea.objectId)
-							{
-								objects.get(i).state.isSelected = -1;
-								objects.get(i).state.isActive = false;
-							}
-						}
-						players.remove(getPlayerById(gsoea.objectId));
-						break;
-					}
 					case GameStructureEditAction.REMOVE_OBJECT_INSTANCE:
 					{
 						ObjectInstance oi = getObjectInstanceById(gsoea.objectId);
@@ -364,11 +365,6 @@ public class GameInstance {
 				output.clear();
 			}
 		}
-	}
-
-	public void remove(int source, Player player) {
-		players.remove(player);
-		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_PLAYER, player.id));
 	}
 
 	public void addChangeListener(GameChangeListener listener) {changeListener.add(listener);}

@@ -37,7 +37,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -65,12 +64,13 @@ import data.ControlCombination;
 import data.DataHandler;
 import data.Options;
 import data.SystemFileUtil;
-import gameObjects.action.AddPlayerAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.GameStructureEditAction;
+import gameObjects.action.player.PlayerAddAction;
+import gameObjects.action.player.PlayerEditAction;
+import gameObjects.action.player.PlayerRemoveAction;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
@@ -85,6 +85,7 @@ import geometry.Vector2d;
 import io.GameIO;
 import main.Player;
 import util.TimedUpdateHandler;
+import util.data.DoubleArrayList;
 import util.data.IntegerArrayList;
 import util.io.StreamUtil;
 
@@ -162,7 +163,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public boolean isSelectStarted = false;
 
 	public final IntegerArrayList scaledObjects = new IntegerArrayList();
-	public final ArrayList<Double> savedScalingFactors = new ArrayList<>();
+	public final DoubleArrayList savedScalingFactors = new DoubleArrayList();
 	private double originalScalingFactor = 3;
 	private double scalingFactor = originalScalingFactor;
 	public int beginSelectPosScreenX = 0;
@@ -355,7 +356,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				if (downKeys.size() == 0) {
 					player.actionString = "";
 				}
-				gameInstance.update(new GamePlayerEditAction(id, player, player));
+				gameInstance.update(new PlayerEditAction(id, player, player));
 				//get nearest object concerning the mouse position
 				ObjectInstance nearestObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 				//do actions if mouse is in the private area or not and there is some nearest object
@@ -670,14 +671,21 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			//If direct repaint causes problems use this:
 			//JFrameUtils.runByDispatcher(repaintRunnable);
 		}
-		else if (action instanceof GamePlayerEditAction || action instanceof GameStructureEditAction || action instanceof GameObjectEditAction)
+		else if (action instanceof PlayerEditAction || action instanceof GameStructureEditAction || action instanceof GameObjectEditAction)
 		{
 			repaint();
 		}
 
-		if (action instanceof AddPlayerAction){
+		if (action instanceof PlayerAddAction){
 			if (table != null) {
-				this.table.updatePlayers(gameInstance);
+				table.updatePlayers(gameInstance);
+			}
+		}
+		else if (action instanceof PlayerRemoveAction)
+		{
+			if (table !=null)
+			{
+				table.updatePlayers(gameInstance);
 			}
 		}
 	}
@@ -934,7 +942,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (!mouseInPrivateArea) {
 			if (e.getKeyCode() == KeyEvent.VK_ALT && scaledObjects.size() > 0) {
 				for (int i = 0; i < scaledObjects.size(); i++) {
-					gameInstance.getObjectInstanceById(scaledObjects.get(i)).scale = savedScalingFactors.get(i);
+					gameInstance.getObjectInstanceById(scaledObjects.get(i)).scale = savedScalingFactors.getD(i);
 				}
 				scaledObjects.clear();
 				savedScalingFactors.clear();
@@ -1000,7 +1008,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		player.setMousePos(mousePressedGamePos.getXI(), mousePressedGamePos.getYI());
 		player.setMousePos(mouseBoardPos.getXI(), mouseBoardPos.getYI());
 		mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, mouseBoardPos.getXI(), mouseBoardPos.getYI());
-		gameInstance.update(new GamePlayerEditAction(id, player, player));
+		gameInstance.update(new PlayerEditAction(id, player, player));
 	}
 
 	@Override
@@ -1045,7 +1053,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			player.screenToBoardTransformation.setTransform(screenToBoardTransformation);
 			player.screenWidth = getWidth();
 			player.screenHeight = getHeight();
-			gameInstance.update(new GamePlayerEditAction(id, player, player));
+			gameInstance.update(new PlayerEditAction(id, player, player));
 		}
 	}
 
@@ -1109,7 +1117,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (isTranslation) {
 			updateGameTransform();
 			player.setMousePos(mouseBoardPos.getXI(), mouseBoardPos.getYI());
-			gameInstance.update(new GamePlayerEditAction(id, player, player));
+			gameInstance.update(new PlayerEditAction(id, player, player));
 		}
 	}
 
@@ -1132,7 +1140,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		updateGameTransform();
 		screenToBoardPos(mouseScreenX = arg0.getX(), mouseScreenY = arg0.getY(), mouseBoardPos);
 		player.setMousePos(mouseBoardPos.getXI(), mouseBoardPos.getYI());
-		gameInstance.update(new GamePlayerEditAction(id, player, player));
+		gameInstance.update(new PlayerEditAction(id, player, player));
 	}
 
 	class SheetPanel extends JPanel implements LanguageChangeListener{

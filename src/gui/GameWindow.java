@@ -29,6 +29,8 @@ import org.slf4j.LoggerFactory;
 import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
 import data.Options;
+import gameObjects.action.GameAction;
+import gameObjects.action.player.PlayerRemoveAction;
 import gameObjects.functions.CheckingFunctions;
 import gameObjects.functions.CheckingFunctions.GameInconsistency;
 import gameObjects.instance.GameInstance;
@@ -168,6 +170,21 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		lh.addLanguageChangeListener(this);
 		DataHandler.timedUpdater.add(gww);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		
+		gi.addChangeListener(new GameChangeListener() {
+			
+			@Override
+			public void changeUpdate(GameAction action) {
+				if (action instanceof PlayerRemoveAction)
+				{	
+					if (((PlayerRemoveAction)action).editedPlayer == player.id)
+					{
+						JFrameUtils.logErrorAndShow("You were removed from the game", null, logger);
+						dispose();
+					}
+				}
+			}
+		});
 	}
 
 	@Override

@@ -1,14 +1,15 @@
-package gameObjects.action;
+package gameObjects.action.player;
 
+import gameObjects.action.AddObjectAction;
 import gameObjects.instance.GameInstance;
 import main.Player;
 
-public class AddPlayerAction extends AddObjectAction{
-	public AddPlayerAction(int source, int objectId) {
+public class PlayerAddAction extends AddObjectAction{
+	public PlayerAddAction(int source, int objectId) {
 		super(source, ADD_PLAYER, objectId);
 	}
 
-	public AddPlayerAction(int source, Player pl) {
+	public PlayerAddAction(int source, Player pl) {
 		super(source, ADD_PLAYER, pl.id);
 		this.player = pl;
 	}
