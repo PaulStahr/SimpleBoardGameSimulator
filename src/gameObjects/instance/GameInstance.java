@@ -32,7 +32,9 @@ public class GameInstance {
 	public String name;
 	public boolean hidden = false;
 	private final ArrayList<ObjectInstance> objects = new ArrayList<>();
+	private final List<ObjectInstance> unmodifiableObjectInstanceList = Collections.unmodifiableList(objects);
 	private final ArrayList<Player> players = new ArrayList<>();
+	private final List<Player> unmodifiablePlayer = Collections.unmodifiableList(players);
 	private final ArrayList<GameAction> actions = new ArrayList<>();
 	private final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
     public boolean private_area = true;
@@ -107,21 +109,15 @@ public class GameInstance {
 		return null;
 	}
 
-	public Player getPlayerByIndex(int idx)
-	{
-		return players.get(idx);
-	}
+	public Player getPlayerByIndex(int idx){return players.get(idx);}
 
-	public int getPlayerNumber()
-	{
-		return getPlayerNumber(false);
-	}
+	public int getPlayerNumber(){return getPlayerNumber(false);}
+
 	public int getPlayerNumber(boolean with_visitors)
 	{
 		if (with_visitors)
 		{
 			return players.size();
-
 		}
 		else{
 			int non_visitors = 0;
@@ -171,19 +167,11 @@ public class GameInstance {
 		return null;
 	}
 
-	public ObjectInstance getObjectInstanceByIndex(int index)
-	{
-		return this.objects.get(index);
-	}
+	public ObjectInstance getObjectInstanceByIndex(int index){return this.objects.get(index);}
 
-	public int getObjectNumber(){
-		return this.objects.size();
-	}
+	public int getObjectNumber(){return this.objects.size();}
 	
-	public GameObject getObjectByIndex(int index)
-	{
-		return this.game.objects.get(index);
-	}
+	public GameObject getObjectByIndex(int index){return this.game.objects.get(index);}
 	
 	public int getHash()
 	{
@@ -284,7 +272,7 @@ public class GameInstance {
 		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_OBJECT_INSTANCE, objectInstance.id));
 	}
 
-	public List<ObjectInstance> getObjectInstanceList() {return Collections.unmodifiableList(objects);}
+	public List<ObjectInstance> getObjectInstanceList() {return unmodifiableObjectInstanceList;}
 
 	public List<Player> getPlayerList() {
 		List<Player> playerList = new ArrayList<>();
@@ -296,15 +284,7 @@ public class GameInstance {
 		return Collections.unmodifiableList(playerList);
 	}
 
-	public List<Player> getPlayerList(boolean with_visitors){
-		if (with_visitors){
-			return Collections.unmodifiableList(players);
-		}
-		else{
-			return getPlayerList();
-		}
-	}
-
+	public List<Player> getPlayerList(boolean with_visitors){return with_visitors ? unmodifiablePlayer : getPlayerList();}
 
 	public void remove(int source, GameObject object) {
 		game.objects.remove(object);
@@ -344,7 +324,7 @@ public class GameInstance {
 	{
 		for (int i = begin; i < end; ++i)
 		{
-			update(new GameObjectInstanceEditAction(-1, player, list.get(i), list.get(i).state)); //TODO remove states by copy
+			update(new GameObjectInstanceEditAction(-1, player, list.get(i), list.get(i).state.copy()));
 		}
 	}
 	
@@ -374,21 +354,16 @@ public class GameInstance {
 		tmp.sort(ObjectInstance.ID_COMPARATOR);
 		incoming = new int[tmp.size()];
 		CheckingFunctions.countIncoming(tmp, incoming);
-		int write = 0;
 		for (int read = 0; read < incoming.length;)
 		{
-			int oldWrite = write;
 			if (incoming[read] == 0)
 			{
 				CheckingFunctions.packBelongingObjects(incoming, read, tmp, output);
-				makeStack(tmp, oldWrite, write);
+				makeStack(output, 0, output.size());
 				update(output, 0, output.size(), player);
 				output.clear();
 			}
-			read = Math.max(write, read + 1);
 		}
-		makeStack(tmp, write, tmp.size());
-		update(tmp, write, tmp.size(), player);
 	}
 
 	public void remove(int source, Player player) {
