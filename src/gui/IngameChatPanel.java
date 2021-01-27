@@ -52,12 +52,12 @@ import org.slf4j.LoggerFactory;
 
 import data.DataHandler;
 import gameObjects.action.GameAction;
-import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.message.UserCombinedMessage;
 import gameObjects.action.message.UserFileMessage;
 import gameObjects.action.message.UserMessage;
 import gameObjects.action.message.UserSoundMessageAction;
 import gameObjects.action.message.UsertextMessageAction;
+import gameObjects.action.player.PlayerEditAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import main.Player;
@@ -256,7 +256,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 	
 	@Override
 	public void changeUpdate(GameAction action) {
-		if (action instanceof GamePlayerEditAction)
+		if (action instanceof PlayerEditAction)
 		{
 			JFrameUtils.runByDispatcher(updatePlayerListRunnable);
 		}

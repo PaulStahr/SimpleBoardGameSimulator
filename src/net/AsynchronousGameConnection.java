@@ -24,15 +24,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.action.AddObjectAction;
-import gameObjects.action.AddPlayerAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.message.UserFileMessage;
 import gameObjects.action.message.UserSoundMessageAction;
 import gameObjects.action.message.UsertextMessageAction;
+import gameObjects.action.player.PlayerAddAction;
+import gameObjects.action.player.PlayerEditAction;
+import gameObjects.action.player.PlayerRemoveAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
@@ -387,10 +388,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    		GameIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).state);
 				    		++outputEvents;
 				 		}
-				    	else if (action instanceof GamePlayerEditAction)
+				    	else if (action instanceof PlayerEditAction)
 				 		{
 				    		objOut.writeUnshared(action);
-				    		GameIO.writePlayerToStreamObject(objOut, ((GamePlayerEditAction)action).getEditedPlayer(gi));
+				    		GameIO.writePlayerToStreamObject(objOut, ((PlayerEditAction)action).getEditedPlayer(gi));
 				    		++outputEvents;
 				 		}
 				    	else if (action instanceof UsertextMessageAction)
@@ -413,10 +414,14 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				    	{ 
 				    		GameStructureEditAction gs = (GameStructureEditAction)action;
 				    		objOut.writeUnshared(gs);
-				    		if (action instanceof AddPlayerAction)
+				    		if (action instanceof PlayerAddAction)
 			    			{
-				    			GameIO.writePlayerToStreamObject(objOut, ((AddPlayerAction)action).getPlayer(gi));
+				    			GameIO.writePlayerToStreamObject(objOut, ((PlayerAddAction)action).getPlayer(gi));
 			    			}
+				    		else if (action instanceof PlayerRemoveAction)
+				    		{
+				    			
+				    		}
 				    		else
 				    		{
 					    		switch(gs.type)
@@ -438,8 +443,6 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 									}
 									case GameStructureEditAction.REMOVE_OBJECT:
 									case GameStructureEditAction.REMOVE_OBJECT_INSTANCE:
-									case GameStructureEditAction.REMOVE_PLAYER:
-										break;
 									default:
 										logger.warn("Structure edit action " + gs.type + " is unknown");
 										break;
@@ -554,9 +557,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						++inputEvents;
 						continue;
 					}
-					if (action instanceof GamePlayerEditAction)
+					if (action instanceof PlayerEditAction)
 					{
-						GamePlayerEditAction actionEdit = (GamePlayerEditAction)inputObject;
+						PlayerEditAction actionEdit = (PlayerEditAction)inputObject;
 						Player editedPlayer = actionEdit.getEditedPlayer(gi);
 						GameIO.editPlayerFromStreamObject(objIn, editedPlayer);
 						gi.update(action);
@@ -589,7 +592,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 					}
 					logger.warn("Unknown actiontype class " + action.getClass());
 				}
-				
+				if (inputObject instanceof PlayerRemoveAction)
+				{
+					PlayerRemoveAction removeAction = (PlayerRemoveAction)inputObject;
+					gi.update(removeAction);
+					continue;
+				}
 				if (inputObject instanceof GameStructureEditAction)
 				{
 					GameStructureEditAction action = (GameStructureEditAction)inputObject;
@@ -610,13 +618,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 							}
 							case AddObjectAction.ADD_PLAYER:
 							{
-								Player player =((AddPlayerAction)action).getPlayer(gi);
+								Player player =((PlayerAddAction)action).getPlayer(gi);
 								if (player == null)
 								{
 									player = new Player("", addAction.objectId);
 								}
 								GameIO.editPlayerFromStreamObject(objIn, player);
-								gi.addPlayer((AddPlayerAction)action, player);
+								gi.addPlayer((PlayerAddAction)action, player);
 								break;
 							}
 							case AddObjectAction.ADD_GAME_OBJECT:
@@ -650,14 +658,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}
 				if (!(inputObject instanceof String))
 				{
-					if (inputObject instanceof String[])
-					{
-						logger.error("Input object has wrong type " + Arrays.toString((String[])inputObject));		
-					}
-					else
-					{
-						logger.error("Input object has wrong type " + inputObject.toString());
-					}
+					if (inputObject instanceof String[])	{logger.error("Input object has wrong type " + Arrays.toString((String[])inputObject));		}
+					else									{logger.error("Input object has wrong type " + inputObject.toString());}
 				}
 				else
 				{
@@ -771,7 +773,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								}
 								else
 								{
-									gi.update(new GamePlayerEditAction(sourceConnectionId, sourcePlayer, object));
+									gi.update(new PlayerEditAction(sourceConnectionId, sourcePlayer, object));
 								}
 							}
 						}
@@ -809,13 +811,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	@Override
 	public void run()
 	{
-		if (Thread.currentThread() == outputThread)
-		{
-			outputLoop();
-		}
-		else if (Thread.currentThread() == inputThread)
-		{
-			inputLoop();
-		}
+		if (Thread.currentThread() == outputThread)		{outputLoop();}
+		else if (Thread.currentThread() == inputThread)	{inputLoop();}
+		else											{throw new IllegalStateException();}
 	}
 }

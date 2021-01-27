@@ -45,8 +45,9 @@ import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.GamePlayerEditAction;
 import gameObjects.action.GameStructureEditAction;
+import gameObjects.action.player.PlayerEditAction;
+import gameObjects.action.player.PlayerRemoveAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
@@ -166,6 +167,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  		private final JTextField textFieldTableRadius = new JTextField();
  		private final JLabel labelPassword = new JLabel("Password");
  		private final JTextField textFieldPassword = new JTextField();
+ 		private final JLabel labelSeats = new JLabel();
+ 		private final JTextField textFieldSeats = new JTextField();
 		//private final JButton buttonResetAll = new JButton("Reset All");
 
  		public GeneralPanel()
@@ -175,15 +178,15 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  			
  			layout.setHorizontalGroup(
  					layout.createSequentialGroup()
- 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelBackground).addComponent(labelTableRadius).addComponent(labelPassword))
- 					.addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(comboBoxBackground).addComponent(textFieldTableRadius).addComponent(textFieldPassword)));
+ 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelBackground).addComponent(labelTableRadius).addComponent(labelPassword).addComponent(labelSeats))
+ 					.addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(comboBoxBackground).addComponent(textFieldTableRadius).addComponent(textFieldPassword).addComponent(textFieldSeats)));
  			layout.setVerticalGroup(
  					layout.createSequentialGroup()
  					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName))
  					.addGroup(layout.createParallelGroup().addComponent(labelBackground).addComponent(comboBoxBackground))
  					.addGroup(layout.createParallelGroup().addComponent(labelTableRadius).addComponent(textFieldTableRadius))
- 					.addGroup(layout.createParallelGroup().addComponent(labelPassword).addComponent(textFieldPassword)));
- 			
+ 					.addGroup(layout.createParallelGroup().addComponent(labelPassword).addComponent(textFieldPassword))
+ 					.addGroup(layout.createParallelGroup().addComponent(labelSeats).addComponent(textFieldSeats)));
  			textFieldName.getDocument().addDocumentListener(this);
 			comboBoxBackground.addItemListener(this);
 			textFieldPassword.getDocument().addDocumentListener(this);
@@ -209,6 +212,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
 			comboBoxBackground.setSelectedItem(gi.game.getImageKey(gi.game.background));
 			textFieldPassword.setText(gi.password);
+			textFieldSeats.setText(Integer.toString(gi.seats));
 			isUpdating = false;
 		}
 
@@ -275,10 +279,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		public void removeUpdate(DocumentEvent arg0) {update(arg0);}
 
 		@Override
-		public void languageChanged(Language language) {
-			
-		}
-		
+		public void languageChanged(Language language) {}
  	}
  	
 	/**
@@ -300,7 +301,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, deleteObjectColumn);
 		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, resetObjectInstanceColumn, deleteObjectInstanceColumn);
 		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.entrySet().toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, deleteImageColumn);
-		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(), Player.TYPES, tableModelPlayer, deletePlayerColumn, repairPlayerColumn);
+		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(true), Player.TYPES, tableModelPlayer, deletePlayerColumn, repairPlayerColumn);
 		panelGeneral.update();
 		isUpdating = false;
 	}
@@ -351,7 +352,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			{
 				if (button == deletePlayerColumn)
 				{
-					gi.remove(id, gi.getPlayerByIndex(row));
+					gi.update(new PlayerRemoveAction(id, player, gi.getPlayerByIndex(row)));
 				}
 				else if (button == repairPlayerColumn)
 				{
@@ -577,7 +578,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 					{
 						Player pl = gi.getPlayerByIndex(row);
 						pl.setName((String)tableModelPlayer.getValueAt(row, col));
-						gi.update(new GamePlayerEditAction(id, pl, pl));
+						gi.update(new PlayerEditAction(id, pl, pl));
 					}
 				}
 			}

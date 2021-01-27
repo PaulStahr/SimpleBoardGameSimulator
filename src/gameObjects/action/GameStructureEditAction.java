@@ -8,7 +8,6 @@ public class GameStructureEditAction extends GameAction {
 	public static final byte EDIT_SESSION_NAME = 3;
 	public static final byte EDIT_TABLE_RADIUS = 12;
 	public static final byte REMOVE_IMAGE = 8;
-	public static final byte REMOVE_PLAYER = 9;
 	public static final byte REMOVE_OBJECT = 10;
 	public static final byte REMOVE_OBJECT_INSTANCE = 11;
 	
