@@ -44,16 +44,20 @@ public class CheckingFunctions {
 		return null;
 	}
 	
-	public static void packBelongingObjects(int incoming[], int startIdx, ArrayList<ObjectInstance> sorted, ArrayList<ObjectInstance> output)
+	public static void packBelongingObjects(int incoming[], int nextIdx, ArrayList<ObjectInstance> sorted, ArrayList<ObjectInstance> output)
 	{
-		ObjectInstance current = sorted.get(startIdx);
-		while(true){
+		while(incoming[nextIdx] == 0){
+			ObjectInstance current = sorted.get(nextIdx);
+			incoming[nextIdx] = -1;
 			output.add(current);
 			int aboveId = current.state.aboveInstanceId;
 			if (aboveId == -1){return;}
-			int nextIdx = ArrayTools.binarySearch(sorted, current.state.aboveInstanceId, ObjectInstance.OBJECT_TO_ID);
-			if (nextIdx < 0 || --incoming[nextIdx] > 0) {return;}
-			current = sorted.get(nextIdx);
+			nextIdx = ArrayTools.binarySearch(sorted, current.state.aboveInstanceId, ObjectInstance.OBJECT_TO_ID);
+			if (nextIdx < 0)
+			{
+				return;
+			}
+			--incoming[nextIdx];
 		}
 	}
 	

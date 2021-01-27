@@ -343,7 +343,7 @@ public class GameInstance {
 		tmp.sort(ObjectInstance.ID_COMPARATOR);
 		int incoming[] = new int[tmp.size()];
 		CheckingFunctions.countIncoming(tmp, incoming);
-		for (int read = 0; read < incoming.length;)
+		for (int read = 0; read < incoming.length;++read)
 		{
 			if (incoming[read] == 0){CheckingFunctions.packBelongingObjects(incoming, read, tmp, output);}
 		}
@@ -355,7 +355,7 @@ public class GameInstance {
 		tmp.sort(ObjectInstance.ID_COMPARATOR);
 		incoming = new int[tmp.size()];
 		CheckingFunctions.countIncoming(tmp, incoming);
-		for (int read = 0; read < incoming.length;)
+		for (int read = 0; read < incoming.length;++read)
 		{
 			if (incoming[read] == 0)
 			{

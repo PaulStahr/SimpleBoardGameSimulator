@@ -535,4 +535,8 @@ public class ArrayUtil {
 			tmp.set(i, current_min);
 		}
 	}
+
+	public static void iota(Integer[] data) {
+		for (int i = 0; i < data.length; ++i){data[i] = i;}
+	}
 }
