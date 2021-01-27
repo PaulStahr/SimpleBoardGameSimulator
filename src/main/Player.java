@@ -22,6 +22,7 @@ public class Player implements Comparable {
 	public final AffineTransform screenToBoardTransformation = new AffineTransform();
 	public final AffineTransform playerAtTableTransform = new AffineTransform();
 	public int playerAtTableRotation = 0;
+	public int playerAtTablePosition = -1;
 
 	public String actionString = "";
 	private transient int nameModCount = 0;

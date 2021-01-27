@@ -923,12 +923,13 @@ public class ObjectFunctions {
             removeFromOwnStack(gamePanel, gameInstance, player, objectInstance.id);
             ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, objectInstance);
         }
-        objectInstance.state.rotation = objectInstance.state.originalRotation;
+
         Random rand = new Random();
         int randX = 20 - rand.nextInt(40);
         int randY = 20 - rand.nextInt(40);
-        int x = player.playerAtTableRotation;
-        Point2D PlayerShift = new Point2D.Double(-Math.sin(Math.toRadians(x))*gamePanel.table.getStackerWidth()/3, Math.cos(Math.toRadians(x))*gamePanel.table.getStackerWidth()/3);
+        double angle = PlayerFunctions.GetCurrentPlayerRotation(gamePanel, gameInstance, player);
+        objectInstance.state.rotation = (int) angle;
+        Point2D PlayerShift = new Point2D.Double(-Math.sin(Math.toRadians(angle))*gamePanel.table.getStackerWidth()/3, Math.cos(Math.toRadians(angle))*gamePanel.table.getStackerWidth()/3);
         moveObjectTo(gamePanel.id, gameInstance,player, objectInstance, (int) (gamePanel.table.getTableCenter().getX() + PlayerShift.getX()), (int) (gamePanel.table.getTableCenter().getY() + PlayerShift.getY()));
         flipTokenObject(gamePanel.id, gameInstance, player, objectInstance);
         gamePanel.audioClips.get("drop").setFramePosition(0);
@@ -1056,6 +1057,8 @@ public class ObjectFunctions {
     {
         if (gamePanel.hoveredObject != null)
         {
+            gamePanel.hoveredObject.scale *= gamePanel.hoveredObject.tmpScale;
+            gamePanel.hoveredObject.tmpScale = 1;
             if (gamePanel.hoveredObject.go instanceof GameObjectDice)
             {
                 if (!ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, gamePanel.hoveredObject.id)) {

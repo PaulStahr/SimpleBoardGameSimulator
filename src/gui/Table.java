@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.geom.*;
 import java.util.ArrayList;
 
+import gameObjects.functions.PlayerFunctions;
 import gameObjects.instance.GameInstance;
 import main.Player;
 import org.w3c.dom.css.Rect;
@@ -22,7 +23,7 @@ public class Table {
     public Table(GameInstance gameInstance, int diameter, Point2D tableOrigin){
         this.diameter = diameter;
         this.playerDiameter = diameter/5;
-        this.stackerWidth = diameter/5;
+        this.stackerWidth = diameter/4;
         this.tableOrigin.setLocation(tableOrigin.getX(), tableOrigin.getY());
         this.tableScreenOrigin.setLocation(tableOrigin.getX(), tableOrigin.getY());
         setTableParameters((int) tableScreenOrigin.getX(), (int) tableScreenOrigin.getY(), this.diameter);
@@ -70,18 +71,8 @@ public class Table {
             AffineTransform rotateAroundCenterTransform = AffineTransform.getRotateInstance(Math.toRadians(angle), tableCenter.getX(), tableCenter.getY());
             rotateAroundCenterTransform.transform(originPlayerCenter, rotatedPoint);
             setPlayerParameter(i, (int) rotatedPoint.getX() - playerDiameter/2, (int) rotatedPoint.getY() - playerDiameter/2, playerDiameter, (int) angle);
-      
-            int place = 0;
-            for (int j = 0; j < gameInstance.getPlayerNumber(); ++j)
-            {
-                if (i < gameInstance.getPlayerNumber()) {
-                    if (gameInstance.getPlayerByIndex(j).id < gameInstance.getPlayerByIndex(i).id) {
-                        ++place;
-                    }
-                }
-            }
 
-            Player player = gameInstance.getPlayerByIndex(place);
+            Player player = PlayerFunctions.GetPlayerFromTablePlace(gameInstance, i);
 
             player.playerAtTableTransform.setToIdentity();
             player.playerAtTableTransform.rotate(Math.toRadians(angle));
@@ -97,7 +88,7 @@ public class Table {
 
             if (gameInstance.seatColors.size() > i)
             {
-                graphics2D.setColor(Color.decode(gameInstance.seatColors.get(i)));
+                graphics2D.setColor(Color.decode(gameInstance.seatColors.get(i % 10)));
             }
 
             Stroke stroke = new BasicStroke(20.0f);
@@ -167,12 +158,12 @@ public class Table {
         if (this.tableShape instanceof Ellipse2D)
         {
             ((Ellipse2D)this.tableShape).setFrame(posX, posY, diameter, diameter);
-            ((Rectangle2D)this.stackerShape).setFrame(posX + diameter/2-stackerWidth/2, posY + diameter/2-stackerWidth/2, stackerWidth, stackerWidth);
+            ((Ellipse2D)this.stackerShape).setFrame(posX + diameter/2-stackerWidth/2, posY + diameter/2-stackerWidth/2, stackerWidth, stackerWidth);
         }
         else
         {
             Shape tableArea = new Ellipse2D.Double(posX, posY, diameter, diameter);
-            Shape stackerShape = new Rectangle2D.Double(posX + diameter/2-stackerWidth/2, posY+diameter/2-stackerWidth/2, stackerWidth, stackerWidth);
+            Shape stackerShape = new Ellipse2D.Double(posX + diameter/2-stackerWidth/2, posY+diameter/2-stackerWidth/2, stackerWidth, stackerWidth);
             this.stackerShape = stackerShape;
             this.tableShape = tableArea;
         }

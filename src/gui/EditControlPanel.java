@@ -28,7 +28,6 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 	 */
 	private static final long serialVersionUID = -1686844504581572726L;
 	private static final FuncControl[] boardControls = {
-			new FuncControl(Words.center_board, new ControlCombination(0, -1,  KeyEvent.VK_SPACE, 0)),
 			new FuncControl(Words.move_board, new ControlCombination(InputEvent.ALT_DOWN_MASK, 0,  -1,0), new ControlCombination(0, -1,  -1,16)),
 			new FuncControl(Words.rotate, new ControlCombination(InputEvent.ALT_DOWN_MASK, 2,  -1, 0), new ControlCombination(0, -1,  KeyEvent.VK_UP, 0), new ControlCombination(0, -1,  KeyEvent.VK_DOWN, 0)),
 			new FuncControl(Words.zoom, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
@@ -57,7 +56,8 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 	};
 
 	private static final FuncControl[] privateAreaControls= {
-			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1, KeyEvent.VK_H,0)),
+			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(0, -1, KeyEvent.VK_H,0)),
+			new FuncControl(Words.distribute_cards_to_players, new ControlCombination(0, -1,  KeyEvent.VK_G, 0)),
 			new FuncControl(Words.take_object_to_hand, new ControlCombination(0, -1,  KeyEvent.VK_T, 0), new ControlCombination(0, 0,  -1, 1)),
 			new FuncControl(Words.take_object_to_hand_face_down, new ControlCombination(0, 2,  -1,1)),
 			new FuncControl(Words.play_card_face_up, new ControlCombination(0, 1,  -1, 8)),
@@ -65,7 +65,7 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 			new FuncControl(Words.play_active_hand_card, new ControlCombination(0, -1, KeyEvent.VK_P, 0)),
 			new FuncControl(Words.drop_all_hand_cards, new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, KeyEvent.VK_D, 0)),
 			new FuncControl(Words.drop_active_hand_card, new ControlCombination(0, -1, KeyEvent.VK_D, 0)),
-			new FuncControl(Words.zoom, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
+			new FuncControl(Words.zoom, new ControlCombination(0, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
 	};
 
 	private static final FuncControl[] countControls = {

@@ -128,7 +128,7 @@ public class DrawFunctions {
 			double playerDeterminant = p.screenToBoardTransformation.getDeterminant();
 	        g2.setStroke(wideStroke);
             //g2.drawLine(40, p.screenHeight, p.screenWidth, p.screenHeight);
-            int imageNumber = p.id % 10;
+            int imageNumber = pIdx % 10;
 
             BufferedImage img = gamePanel.playerImages[imageNumber];
             g2.translate((p.screenWidth)/2, p.screenHeight - 20);
@@ -156,9 +156,6 @@ public class DrawFunctions {
                 g2.drawString(infoText, -20, 10);
             }
         }
-
-
-
         g2.setTransform(tmp);
     }
 

@@ -104,4 +104,5 @@
     <stop_server>Server stoppen</stop_server>
     <server_start_info>Der Server wurde gestartet.</server_start_info>
     <server_stop_info>Der Server wurde gestoppt.</server_stop_info>
+    <distribute_cards_to_players>Karten geben</distribute_cards_to_players>
 </xml>

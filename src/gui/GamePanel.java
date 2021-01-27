@@ -58,6 +58,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import gameObjects.functions.PlayerFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -431,6 +432,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (player != null && gameInstance.seatColors.size() > pos)
 		{
 			player.color = Color.decode(gameInstance.seatColors.get(pos));
+			player.playerAtTableRotation = (int) PlayerFunctions.GetCurrentPlayerRotation(this, gameInstance,player);
+			player.playerAtTablePosition = pos;
 		}
 	}
 
@@ -698,12 +701,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (!player.visitor) {
 			//Mouse move independent keys
 			if (e.getKeyCode() == KeyEvent.VK_H) {
-				if (privateArea.zooming == 0) {
+				if (privateArea.zooming == 0.1) {
 					privateArea.zooming = privateArea.savedZooming;
 					mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, mouseBoardPos.getXI(), mouseBoardPos.getYI());
 				} else {
 					privateArea.savedZooming = privateArea.zooming;
-					privateArea.zooming = 0;
+					privateArea.zooming = 0.1;
 					mouseInPrivateArea = false;
 				}
 				updateGameTransform();
@@ -740,9 +743,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 			//Only allowed if mouse is in stacker in the middle of the table
 			if (mouseInStacker){
-				if(selectedObjects.size() > 0 && e.getKeyCode() == KeyEvent.VK_M && !shiftDown)
+				if(hoveredObject != null && e.getKeyCode() == KeyEvent.VK_M && !shiftDown)
 				{
-					ObjectFunctions.stackAndFlipObjectsInTableMiddle(this, gameInstance, player, gameInstance.getObjectInstanceById(selectedObjects.getI(0)), ial);
+					ObjectFunctions.stackAndFlipObjectsInTableMiddle(this, gameInstance, player, gameInstance.getObjectInstanceById(hoveredObject.id), ial);
 				}
 			}
 
@@ -911,7 +914,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 							ObjectFunctions.fixObject(id, gameInstance, player, oi);
 						}
 					}
-					else if (e.getKeyCode() == KeyEvent.VK_G && shiftDown){
+					else if (e.getKeyCode() == KeyEvent.VK_G){
 						ial.clear();
 						for (int oId : ObjectFunctions.getStackRepresentatives(gameInstance, selectedObjects)) {
 							IntegerArrayList stackList = new IntegerArrayList();
@@ -922,6 +925,47 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 						ObjectFunctions.giveObjects(this, gameInstance, player, ial);
 					}
+					else if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD) {
+						//Scale hovered Object
+						double scale = 1.1;
+						if (hoveredObject != null && (hoveredObject.scale > 0.1 || scale > 1) && (hoveredObject.scale < 2 || scale < 1)) {
+							hoveredObject.tmpScale /= scale;
+							hoveredObject.scale *= scale;
+						}
+					}
+					else if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT) {
+						//Scale hovered Object
+						double scale = 0.9;
+						if (hoveredObject != null &&(hoveredObject.scale > 0.1 || scale > 1) && (hoveredObject.scale < 2 || scale < 1)) {
+							hoveredObject.tmpScale /= scale;
+							hoveredObject.scale *= scale;
+						}
+					}
+				}
+
+				//Only allowed if mouse in private area
+				if (mouseInPrivateArea){
+					if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD) {
+						int value = 1;
+						privateArea.zoomingFactor += value;
+						if ((privateArea.zooming >= 0.2) && (privateArea.zooming < 2 || value>0)) {
+							privateArea.zooming = Math.exp(-privateArea.zoomingFactor * 0.1);
+						} else {
+							privateArea.zoomingFactor -= value;
+						}
+						updateGameTransform();
+					}
+					else if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT) {
+						int value = -1;
+						privateArea.zoomingFactor += value;
+						if ((privateArea.zooming >= 0.2 || value < 0) && (privateArea.zooming < 2)) {
+							privateArea.zooming = Math.exp(-privateArea.zoomingFactor * 0.1);
+						} else {
+							privateArea.zoomingFactor -= value;
+						}
+						updateGameTransform();
+					}
+
 				}
 			}
 		}
@@ -951,14 +995,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		if (e.isAltDown() && !mouseInPrivateArea && hoveredObject != null){
+		//Scale hovered Object
+		if (!mouseInPrivateArea && hoveredObject != null){
 			outText = String.valueOf(e.getPreciseWheelRotation());
-			double scale = 1.1;
+			double scale = 1.05;
 			if((int) e.getPreciseWheelRotation() < 0) {
-				scale = 0.9;
+				scale = 0.95;
 			}
-			for (int id : scaledObjects){
-				gameInstance.getObjectInstanceById(id).scale *= scale;
+
+			if ((hoveredObject.scale>0.1 || scale>1) && (hoveredObject.scale<2 || scale<1)) {
+				hoveredObject.tmpScale /= scale;
+				hoveredObject.scale *= scale;
 			}
 		}
 		else if (e.isAltDown() && !mouseInPrivateArea)
@@ -973,7 +1020,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}else if (mouseInPrivateArea)
 		{
 			privateArea.zoomingFactor += (int) e.getPreciseWheelRotation();
-			if ((privateArea.zooming >= 0.5 || e.getPreciseWheelRotation() < 0) && (privateArea.zooming < 2 || e.getPreciseWheelRotation() > 0)) {
+			if ((privateArea.zooming >= 0.2 || e.getPreciseWheelRotation() < 0) && (privateArea.zooming < 2 || e.getPreciseWheelRotation() > 0)) {
 				privateArea.zooming = Math.exp(-privateArea.zoomingFactor * 0.1);
 			}else{
 				privateArea.zoomingFactor -= (int) e.getPreciseWheelRotation();
@@ -1081,11 +1128,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			isTranslation = true;
 		}
 
-		if (!mouseInPrivateArea && (keyEvent.getKeyCode() == KeyEvent.VK_PLUS || keyEvent.getKeyCode() == KeyEvent.VK_ADD)){
+		if (!mouseInPrivateArea && hoveredObject==null && (keyEvent.getKeyCode() == KeyEvent.VK_PLUS || keyEvent.getKeyCode() == KeyEvent.VK_ADD)){
 			zoomFactor -= 1;
 			zooming = Math.exp(-zoomFactor * 0.1);
 			updateGameTransform();
-		}else if (!mouseInPrivateArea && (keyEvent.getKeyCode() == KeyEvent.VK_MINUS || keyEvent.getKeyCode() == KeyEvent.VK_SUBTRACT)) {
+		}else if (!mouseInPrivateArea && hoveredObject==null && (keyEvent.getKeyCode() == KeyEvent.VK_MINUS || keyEvent.getKeyCode() == KeyEvent.VK_SUBTRACT)) {
 			zoomFactor += 1;
 			zooming = Math.exp(-zoomFactor * 0.1);
 			updateGameTransform();

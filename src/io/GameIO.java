@@ -524,7 +524,7 @@ public class GameIO {
 				Element seat = new Element(IOString.SEAT);
 				if (gi.seatColors.size() > i)
 				{
-					seat.setAttribute(IOString.COLOR, gi.seatColors.get(i));
+					seat.setAttribute(IOString.COLOR, gi.seatColors.get(i % 10));
 				}
 				seats.addContent(seat);
 			}
@@ -532,7 +532,9 @@ public class GameIO {
 			settings.addContent(settingsName);
 			settings.addContent(table);
 			settings.addContent(privateArea);
-			settings.addContent(seats);
+			if (gi.seats > 0) {
+				settings.addContent(seats);
+			}
 			settings.addContent(admin);
 			settings.addContent(debugMode);
 			settings.setAttribute(IOString.HIDDEN,Boolean.toString(gi.hidden));
