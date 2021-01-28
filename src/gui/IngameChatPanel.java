@@ -91,28 +91,22 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 	void updatePlayerList()
 	{
 		int modCount = game.getPlayerNumber();
-		for (int i = 0; i < game.getPlayerNumber(); ++i)
-		{
-			modCount += game.getPlayerByIndex(i).getNameModCount();
-		}
-		if (modCount == playerModCount)
-		{
-			return;
-		}
+		for (int i = 0; i < game.getPlayerNumber(); ++i){modCount += game.getPlayerByIndex(i).getNameModCount();}
+		if (modCount == playerModCount){return;}
 		playerModCount = modCount;
-		ArrayList<String> sendToNames = new ArrayList<>();
+		String[] sendToNames = new String[game.getPlayerNumber()];
 		// The first option in the sendTo combobox is to send the message to everybody "all"
-		sendToNames.add("all");
+		sendToNames[0] = "all";
 
-		for(int playerIndex=0; playerIndex<game.getPlayerNumber(); playerIndex++) {
+		for(int playerIndex=0, writeIndex = 0; playerIndex<game.getPlayerNumber(); playerIndex++) {
 			Player current = game.getPlayerByIndex(playerIndex);
 			// copy all player names to the combobox. 
 			// Omit the own name, since you don't want to send messages to yourself.
-			if (current.id != player.id) {
-				sendToNames.add(current.getName());
+			if (current != player) {
+				sendToNames[++writeIndex] = current.getName();
 			}
 		}
-		JFrameUtils.updateComboBox(sendTo, sendToNames.toArray(new String[sendToNames.size()]));
+		JFrameUtils.updateComboBox(sendTo, sendToNames);
 		sendTo.setSelectedIndex(0);
 	}
 
@@ -130,7 +124,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 
 		updatePlayerList();
 		chatPanes.addChangeListener(new TabListener(chatPanes,sendTo));
-		sendTo.addActionListener(new SendToListener(this));
+		sendTo.addActionListener(new SendToListener());
 		JPanel sendToPanel = new JPanel();
 		sendToPanel.setLayout(new BoxLayout(sendToPanel, BoxLayout.X_AXIS));
 		sendToPanel.add(new JLabel("Send to: "));
@@ -240,13 +234,8 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 			logger.error("Failed to append text in chat area.");
 		}
 	}
-
-	protected void send(String message, int toPlayer)
-	{
-		game.update(new UsertextMessageAction(id, player.id, toPlayer, message));
-	}
 	
-	private Runnable updatePlayerListRunnable = new Runnable() {
+	private final Runnable updatePlayerListRunnable = new Runnable() {
 		
 		@Override
 		public void run() {
@@ -263,25 +252,25 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 		else if (action instanceof UserMessage)
 		{
 			UserMessage userMessage = (UserMessage)action;
-			Player pl = game.getPlayerById(userMessage.sourcePlayer);
+			int sourceId = userMessage.sourcePlayer;
 			int destinationId = userMessage.destinationPlayer;
-			if ( pl == player || destinationId == player.id || destinationId == -1) {
-				textStyle.addAttribute(StyleConstants.Foreground, pl == null ? Color.BLACK : pl.color);
+			if ( sourceId == player.id || destinationId == player.id || destinationId == -1) {
+				Player sourcePlayer = userMessage.getSourcePlayer(game);
+				textStyle.addAttribute(StyleConstants.Foreground, sourcePlayer == null ? Color.BLACK : sourcePlayer.color);
 				String tabName;
 				// The message was sent by me or it was sent to me or it was sent to all (which means also to me)
 				// Find the tab to add the message to
-				int chatIndex = -1;
 				if (destinationId == -1) {
 					tabName = "all";
-				} else if (pl == player) {
+				} else if (sourcePlayer == player) {
 					// I sent the message. Look for a tab named with the reciver
-					tabName = player.getName();
+					tabName = userMessage.getDestinationPlayer(game).getName();
 				} else {
 					// it is a private message sent to me
 					// look for a tab with the sender name
-					tabName = pl.getName();
+					tabName = sourcePlayer.getName();
 				}
-				chatIndex = chatPanes.indexOfTab(tabName);
+				int chatIndex = chatPanes.indexOfTab(tabName);
 				if (chatIndex == -1) {
 					// The one-on-one chat does not exist yet.
 					// Create a new tab.
@@ -306,7 +295,6 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 				{
 			        try {
 			        	DataLine.Info dataLineInfo = new DataLine.Info(SourceDataLine.class, getAudioFormat());
-			       
 			        	SourceDataLine sourceLine = (SourceDataLine)AudioSystem.getLine(dataLineInfo);
 			        	sourceLine.open(getAudioFormat());
 				        sourceLine.start();
@@ -322,11 +310,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 				else if (action instanceof UsertextMessageAction)
 				{
 					UsertextMessageAction textAction = (UsertextMessageAction) action;
-					// chop off the recipient part from the message
-					String rawMessage = textAction.message.substring(textAction.message.indexOf(":")+1);
-					// chop off the sender part from the message:			
-					String message = rawMessage.substring(rawMessage.indexOf(":")+1);		
-					appendMessage(chatPane, pl.getName() + ": "+ message, textStyle);
+					appendMessage(chatPane, sourcePlayer.getName() + ": "+ textAction.message + "\n", textStyle);
 				}
 			}
 		}
@@ -337,12 +321,10 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 	* switch to the corresponding dialog in the tabbed pane.
 	*/
 	class SendToListener implements ActionListener {
-			SendToListener(IngameChatPanel panel) {
-		}
+			SendToListener() {}
 
 		@Override
 		public void actionPerformed(java.awt.event.ActionEvent evt) {
-			JComboBox<?> sendTo = (JComboBox<?>) evt.getSource();
 			receiverPlayerName = (String) sendTo.getSelectedItem();
 			Player pl = game.getPlayerByName(receiverPlayerName);
 			receiverPlayerId = pl == null ? -1 : pl.id;
@@ -353,8 +335,6 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 				chatPanes.setSelectedIndex(receiverIndex);
 			}
 		}
-
-
 	}
 
 	class InputListener implements ActionListener {
@@ -362,12 +342,10 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 		public void actionPerformed(java.awt.event.ActionEvent evt) {
 			String inputText = messageInput.getText();
 			if(inputText.length() > 0) {
-				String message = receiverPlayerName +":"+ player.getName() + ":"+ inputText +"\n";
 				messageInput.setText("");
-				send(message, receiverPlayerId);
+				game.update(new UsertextMessageAction(id, player.id, receiverPlayerId, inputText));
 			}
 		}
-
 	}
 
     AudioFormat getAudioFormat() {
