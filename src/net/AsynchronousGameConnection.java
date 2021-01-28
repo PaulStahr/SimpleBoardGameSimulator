@@ -53,11 +53,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 
 	private static final Logger logger = LoggerFactory.getLogger(AsynchronousGameConnection.class);
 	private final GameInstance gi;
-	Thread outputThread;
-	Thread inputThread;
-	InputStream input;
-	OutputStream output;
-	ArrayDeque<Object> queuedOutputs = new ArrayDeque<>();
+	private Thread outputThread;
+	private Thread inputThread;
+	private InputStream input;
+	private final OutputStream output;
+	private final ArrayDeque<Object> queuedOutputs = new ArrayDeque<>();
 	private final int connectionId = (int)(Math.random() * Integer.MAX_VALUE);
 	private ObjectInputStream objIn;
 	private boolean stopOnError = true;
@@ -77,7 +77,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	
 	@Override
 	public void changeUpdate(GameAction action) {
-		if (Thread.currentThread() != inputThread)
+		if (Thread.currentThread() != inputThread && !stop)
 		{
 			if (logger.isDebugEnabled()){logger.debug("Queue Action != " + inputThread.getName());}
 			queueOutput(action);
@@ -151,15 +151,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		}
 	}
 	
-	static class CommandObject
-	{
-	}
+	static class CommandObject{}
 	
 	static class StopConnection{}
 	
 	static class CommandRead
 	{
-		String type;
+		final String type;
 		public CommandRead(String type) {
 			this.type = type;
 		}
@@ -167,7 +165,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	
 	static class CommandWrite
 	{
-		String type;
+		final String type;
 		public int id;
 		public CommandWrite(String type, int id) {
 			this.type = type;
@@ -177,7 +175,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	
 	static class CommandList
 	{
-		String type;
+		final String type;
 		public CommandList(String type) {
 			this.type = type;
 		}
@@ -185,7 +183,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	
 	static class CommandHash
 	{
-		String type;
+		final String type;
 		public CommandHash(String type) {
 			this.type = type;
 		}
@@ -197,7 +195,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		 * 
 		 */
 		private static final long serialVersionUID = 3856297382586773057L;
-		int bytes;
+		final int bytes;
 		public CommandScip(int bytes) {
 			this.bytes = bytes;
 		}
