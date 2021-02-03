@@ -12,6 +12,7 @@ import java.util.Random;
 import javax.swing.SwingUtilities;
 
 import gameObjects.action.GameObjectInstanceEditAction;
+import gameObjects.action.player.PlayerEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectToken;
@@ -507,6 +508,15 @@ public class ObjectFunctions {
         }
     }
 
+    public static void flipTokenToSide(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean front) {
+        if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
+            player.actionString = "Object Flipped to Side";
+            GameObjectToken.TokenState state = ((GameObjectToken.TokenState) objectInstance.state.copy());
+            state.side = !front;
+            gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, objectInstance, state));
+        }
+    }
+
     public static void rollTheDice(int id, GameInstance gameInstance, Player player, ObjectInstance activeObject) {
         if (activeObject != null && activeObject.go instanceof GameObjectDice) {
             GameObjectDice diceObject = (GameObjectDice) activeObject.go;
@@ -919,27 +929,41 @@ public class ObjectFunctions {
     }
 
     public static void playObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
+        playObject(gamePanel, gameInstance, player, objectInstance, true);
+    }
+
+    public static void playObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean front){
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
             removeFromOwnStack(gamePanel, gameInstance, player, objectInstance.id);
             ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, objectInstance);
         }
-
-        Random rand = new Random();
-        int randX = 20 - rand.nextInt(40);
-        int randY = 20 - rand.nextInt(40);
         double angle = PlayerFunctions.GetCurrentPlayerRotation(gamePanel, gameInstance, player);
-        objectInstance.state.rotation = (int) angle;
+        ObjectState objectState = objectInstance.state.copy();
+        objectState.rotation = (int) angle;
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance, objectState));
         Point2D PlayerShift = new Point2D.Double(-Math.sin(Math.toRadians(angle))*gamePanel.table.getStackerWidth()/3, Math.cos(Math.toRadians(angle))*gamePanel.table.getStackerWidth()/3);
         moveObjectTo(gamePanel.id, gameInstance,player, objectInstance, (int) (gamePanel.table.getTableCenter().getX() + PlayerShift.getX()), (int) (gamePanel.table.getTableCenter().getY() + PlayerShift.getY()));
-        flipTokenObject(gamePanel.id, gameInstance, player, objectInstance);
+        flipTokenToSide(gamePanel.id, gameInstance, player, objectInstance, front);
+        deselectObject(gamePanel, gameInstance, player, objectInstance.id);
         gamePanel.audioClips.get("drop").setFramePosition(0);
         gamePanel.audioClips.get("drop").start();
+    }
+
+    public static boolean IsObjectInTableMiddle(GamePanel gamePanel, ObjectInstance objectInstance){
+        Point2D transformedPoint = gamePanel.getBoardToScreenTransform().transform(new Point2D.Double(objectInstance.state.posX, objectInstance.state.posY), null);
+        Shape shape = gamePanel.table.stackerShape;
+        if(shape != null){
+            if(transformedPoint != null && shape.contains(transformedPoint)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void getObjectsInTableMiddle(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial){
         ial.clear();
         IntegerArrayList possibleObjects = new IntegerArrayList();
-        getAllObjectsOfGroup(gamePanel, gameInstance, player, objectInstance, possibleObjects);
+        getAllObjectsOfGroup(gamePanel, gameInstance, player, objectInstance, possibleObjects, true);
         Shape shape = gamePanel.table.stackerShape;
         for(int id : possibleObjects){
             ObjectInstance oi = gameInstance.getObjectInstanceById(id);
@@ -957,11 +981,10 @@ public class ObjectFunctions {
         makeStack(gamePanel, gameInstance, player, ial);
         moveStackTo(gamePanel.id, gameInstance, player, ial, (int) gamePanel.table.getTableCenter().getX(), (int) gamePanel.table.getTableCenter().getY());
     }
-    public static void stackAndFlipObjectsInTableMiddle(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial){
+    public static void stackObjectsInTableMiddleToOneSide(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial, boolean front){
         getObjectsInTableMiddle(gamePanel, gameInstance, player, objectInstance, ial);
-        makeStack(gamePanel, gameInstance, player, ial);
+        makeStackWithOneSide(gamePanel, gameInstance, player, ial, front);
         moveStackTo(gamePanel.id, gameInstance, player, ial, (int) gamePanel.table.getTableCenter().getX(), (int) gamePanel.table.getTableCenter().getY());
-        flipTokenStack(gamePanel, gameInstance, player, objectInstance);
     }
 
     public static ObjectInstance setActiveObjectByMouseAndKey(GamePanel gamePanel, GameInstance gameInstance, Player player, MouseEvent arg0, Vector2 mouse, int maxInaccuracy) {
@@ -1142,6 +1165,10 @@ public class ObjectFunctions {
         return gameInstance.getObjectInstanceById(objectId).state.isSelected;
     }
 
+    public static void getObjectSelector(GameInstance gameInstance, int objectId, Player player){
+        player = gameInstance.getPlayerById(getObjectSelector(gameInstance, objectId));
+    }
+
     public static boolean objectIsSelected(GameInstance gameInstance, int objectId){
         return getObjectSelector(gameInstance, objectId) != -1;
     }
@@ -1180,15 +1207,20 @@ public class ObjectFunctions {
                         insertIntoOwnStack(gamePanel, gameInstance, player, currentObject, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
                     }
                 }
+                //Release Object over private Area which was owned before
                 else if (gamePanel.privateArea != null && activeObject.state.owner_id == player.id && activeObject.state.isActive && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                     removeFromOwnStack(gamePanel, gameInstance, player, activeObject.id);
                     int index = gamePanel.privateArea.getInsertPosition(posX, posY, gamePanel.getWidth()/2, gamePanel.getHeight());
                     insertIntoOwnStack(gamePanel, gameInstance, player, activeObject, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
                }
+                //Release previously owned card
                 else if (activeObject.state.owner_id == player.id && !gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                     removeFromOwnStack(gamePanel, gameInstance, player, activeObject.id);
                     if (SwingUtilities.isLeftMouseButton(arg0)) {
                         ObjectFunctions.flipTokenObject(gamePanel.id, gameInstance, player, activeObject);
+                        if(gamePanel.table.stackerShape.contains(posX, posY)){
+                            playObject(gamePanel, gameInstance, player, activeObject);
+                        }
                     }
                 }
                 else {
@@ -1295,6 +1327,39 @@ public class ObjectFunctions {
             }
         }
     }
+
+    public static void makeStackWithOneSide(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList stackElements, boolean front) {
+        if (stackElements.size() > 1) {
+            for (int i = 0; i < stackElements.size(); ++i) {
+                ObjectInstance currentObject = gameInstance.getObjectInstanceById(stackElements.getI(i));
+                if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1 && !ObjectFunctions.objectIsSelectedByOtherPlayer(gameInstance, player, currentObject.id)) {
+                    flipTokenToSide(gamePanel.id, gameInstance, player, currentObject, front);
+                    ObjectState state = currentObject.state.copy();
+                    state.rotation = currentObject.state.originalRotation;
+                    if (i == 0 && stackElements.size() > 1) {
+                        state.belowInstanceId = -1;
+                        state.aboveInstanceId = gameInstance.getObjectInstanceById(stackElements.getI(i + 1)).id;
+                        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentObject, state));
+                        deselectObject(gamePanel, gameInstance, player, currentObject.id);
+                    } else if (i == stackElements.size() - 1) {
+                        state.aboveInstanceId = -1;
+                        state.belowInstanceId = gameInstance.getObjectInstanceById(stackElements.getI(i - 1)).id;
+                        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentObject, state));
+                        moveObjectTo(gamePanel.id, gameInstance, player, currentObject, gameInstance.getObjectInstanceById(stackElements.getI(i - 1)));
+                    } else {
+                        state.aboveInstanceId = gameInstance.getObjectInstanceById(stackElements.getI(i + 1)).id;
+                        state.belowInstanceId = gameInstance.getObjectInstanceById(stackElements.getI(i - 1)).id;
+                        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, currentObject, state));
+                        moveObjectTo(gamePanel.id, gameInstance, player, currentObject, gameInstance.getObjectInstanceById(stackElements.getI(i - 1)));
+                        deselectObject(gamePanel, gameInstance, player, currentObject.id);
+                    }
+                }
+            }
+        }
+    }
+
+
+
 
 
 
@@ -1408,8 +1473,11 @@ public class ObjectFunctions {
         //TODO no update?
     }
 
+    public static void getObjectOwner(GameInstance gameInstance, ObjectInstance objectInstance, Player player){
+        player = gameInstance.getPlayerById(objectInstance.state.owner_id);
+    }
 
-    public static void getAllObjectsOfGroup(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial) {
+    public static void getAllObjectsOfGroup(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial, boolean allCards) {
         ial.clear();
         ial.add(objectInstance.id);
         String objectGroup = objectInstance.go.objectType;
@@ -1422,17 +1490,33 @@ public class ObjectFunctions {
             if (oi.go.groups.length > 0) {
                 oiGroup = oi.go.groups[0];
             }
-            if (oiGroup.equals(objectGroup) && oi.id != objectInstance.id && oi.state.owner_id==-1 && (oi.state.isSelected == player.id || oi.state.isSelected == -1)) {
-                ial.add(oi.id);
+            if (oiGroup.equals(objectGroup) && oi.id != objectInstance.id) {
+//                if (allCards) {
+//                    //TODO deselect and remove all cards from other players
+//                    Player player1 = null;
+//                    getObjectSelector(gameInstance, oi.id, player1);
+//                    if (player1 != null){
+//                        deselectObject(gamePanel, gameInstance, player1, oi.id);
+//                    }
+//                    getObjectOwner(gameInstance, oi, player1);
+//                    if (player1 != null){
+//                        removeFromOwnStack(gamePanel, gameInstance, player1, oi.id);
+//                    }
+//                    ial.add(oi.id);
+//                }
+//                else
+                    if (oi.state.owner_id == -1 && (oi.state.isSelected == player.id || oi.state.isSelected == -1)) {
+                        ial.add(oi.id);
+                    }
             }
         }
 
     }
 
-    public static void stackAllObjectsOfGroup(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
+    public static void stackAllObjectsOfGroup(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, boolean withHandCards) {
         IntegerArrayList ial = new IntegerArrayList();
-        getAllObjectsOfGroup(gamePanel, gameInstance, player, objectInstance, ial);
-        makeStack(gamePanel, gameInstance, player, ial);
+        getAllObjectsOfGroup(gamePanel, gameInstance, player, objectInstance, ial, withHandCards);
+        makeStackWithOneSide(gamePanel, gameInstance, player, ial, false);
     }
 
     public static IntegerArrayList getTopNObjects(GameInstance gameInstance, ObjectInstance objectInstance, int number) {
@@ -1499,6 +1583,7 @@ public class ObjectFunctions {
         }
         return false;
     }
+
 
 
     public static boolean isStackInHand(GameInstance gameInstance, Player player, IntegerArrayList stackIds) {
@@ -1659,6 +1744,9 @@ public class ObjectFunctions {
         int playerCounter = 0;
         for(Player player1 : gameInstance.getPlayerList())
         {
+            //Set trick num to zero
+            player1.trickNum = 0;
+            gameInstance.update(new PlayerEditAction(gamePanel.id, player1, player1));
             int currentElementIndex = 0;
             while(currentElementIndex < numElements){
                 int Pos = numElements*playerCounter + currentElementIndex;
@@ -1684,4 +1772,24 @@ public class ObjectFunctions {
             }
             return false;
         }
+
+    public static void takeTrick(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial) {
+        stackObjectsInTableMiddleToOneSide(gamePanel, gameInstance, player, objectInstance, ial, false);
+        double angle = PlayerFunctions.GetCurrentPlayerRotation(gamePanel, gameInstance, player);
+
+        //TODO change the trick angle according to the number of tricks
+        //double trickAngle = angle - 2*(player.trickNum + 5);
+        double trickAngle = angle;
+        ObjectState objectState = objectInstance.state.copy();
+        objectState.rotation = (int) trickAngle;
+        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance, objectState));
+        double offset = 0;
+        if (gamePanel.table != null){
+            offset = gamePanel.table.getDiameter()/2 + objectInstance.getHeight(player.id)/2;
+        }
+        Point2D PlayerShift = new Point2D.Double(-Math.sin(Math.toRadians(trickAngle))*offset, Math.cos(Math.toRadians(trickAngle))*offset);
+        moveStackTo(gamePanel.id, gameInstance, player, ial, (int) (gamePanel.table.getTableCenter().getX() + PlayerShift.getX()), (int) (gamePanel.table.getTableCenter().getY() + PlayerShift.getY()));
+        rotateStack(gameInstance, ial, (int) angle);
+        ++player.trickNum;
+    }
 }

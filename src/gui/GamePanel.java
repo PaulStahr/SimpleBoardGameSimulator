@@ -398,11 +398,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		this.audioClips.get("click").start();
 		if (!player.visitor) {
 			if (arg0.getClickCount() == 2) {
-				//Sit down on double click on seat
-				for (int i = 0; i < this.table.playerShapes.size(); ++i) {
-					if (this.table.playerShapes.get(i).contains(mouseScreenX, mouseScreenY)) {
-						sitDown(player, i);
-						break;
+				//Play object with double click
+				if (hoveredObject != null && !ObjectFunctions.IsObjectInTableMiddle(this,hoveredObject)){
+					ObjectFunctions.playObject(this,gameInstance,player,hoveredObject);
+				}
+				else if(hoveredObject != null && ObjectFunctions.IsObjectInTableMiddle(this,hoveredObject)){
+					ObjectFunctions.takeTrick(this, gameInstance, player, hoveredObject, ial);
+				}
+				else{
+					//Sit down on double click on seat
+					for (int i = 0; i < this.table.playerShapes.size(); ++i) {
+						if (this.table.playerShapes.get(i).contains(mouseScreenX, mouseScreenY)) {
+							sitDown(player, i);
+							break;
+						}
 					}
 				}
 			}
@@ -753,7 +762,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (mouseInStacker){
 				if(hoveredObject != null && e.getKeyCode() == KeyEvent.VK_M && !shiftDown)
 				{
-					ObjectFunctions.stackAndFlipObjectsInTableMiddle(this, gameInstance, player, gameInstance.getObjectInstanceById(hoveredObject.id), ial);
+					ObjectFunctions.stackObjectsInTableMiddleToOneSide(this, gameInstance, player, gameInstance.getObjectInstanceById(hoveredObject.id), ial, false);
 				}
 			}
 
@@ -849,7 +858,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				} else if (e.getKeyCode() == KeyEvent.VK_D && !shiftDown) {
 					ObjectFunctions.dropObject(this, gameInstance, player, hoveredObject);
 				} else if (e.getKeyCode() == KeyEvent.VK_P && !shiftDown) {
-					if (hoveredObject != null && hoveredObject.state.inPrivateArea) {
+					if (hoveredObject != null) {
 						ObjectFunctions.playObject(this, gameInstance, player, hoveredObject);
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
@@ -887,16 +896,26 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 							ObjectFunctions.takeObjects(this, gameInstance, player, oi);
 						}
 						ObjectFunctions.deselectAllSelected(this, gameInstance, player, ial);
-					} else if (e.getKeyCode() == KeyEvent.VK_M && shiftDown) {
+					} else if (e.getKeyCode() == KeyEvent.VK_M && shiftDown && !altDown) {
 						ial.clear();
 						for( int i : selectedObjects) {
 							ial.add(i);
 						}
 						for (int oId : ial) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
-							ObjectFunctions.stackAllObjectsOfGroup(this, gameInstance, player, oi);
+							ObjectFunctions.stackAllObjectsOfGroup(this, gameInstance, player, oi, false);
 						}
-					} else if (e.getKeyCode() == KeyEvent.VK_M && !shiftDown) {
+
+					} else if (e.getKeyCode() == KeyEvent.VK_M && shiftDown && altDown) {
+						ial.clear();
+						for( int i : selectedObjects) {
+							ial.add(i);
+						}
+						for (int oId : ial) {
+							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
+							ObjectFunctions.stackAllObjectsOfGroup(this, gameInstance, player, oi, true);
+						}
+					}else if (e.getKeyCode() == KeyEvent.VK_M && !shiftDown) {
 						ial.clear();
 						for (int i : selectedObjects) {
 							ial.add(i);
