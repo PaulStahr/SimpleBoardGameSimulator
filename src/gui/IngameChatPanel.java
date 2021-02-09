@@ -326,9 +326,23 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 		@Override
 		public void actionPerformed(java.awt.event.ActionEvent evt) {
 			receiverPlayerName = (String) sendTo.getSelectedItem();
-			Player pl = game.getPlayerByName(receiverPlayerName);
-			receiverPlayerId = pl == null ? -1 : pl.id;
-
+			if (receiverPlayerName == "all")
+			{
+				receiverPlayerId = -1;
+			}
+			else
+			{
+				Player pl = game.getPlayerByName(receiverPlayerName);
+				if (pl == null)
+				{
+					logger.error("Player " + receiverPlayerName + " not found");
+					receiverPlayerId = -1;
+				}
+				else
+				{
+					receiverPlayerId = pl.id;
+				}
+			}
 			int receiverIndex = chatPanes.indexOfTab(receiverPlayerName);
 			if (receiverIndex >= 0) {
 				// When a player sends a private message for the first time, the chat tab does not yet exist.
