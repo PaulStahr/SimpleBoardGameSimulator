@@ -41,6 +41,7 @@ import gameObjects.instance.ObjectState;
 import gui.minigames.TetrisGameInstance.TetrisGameEvent;
 import io.GameIO;
 import main.Player;
+import util.ArrayUtil;
 import util.StringUtils;
 import util.data.UniqueObjects;
 import util.io.StreamUtil;
@@ -70,6 +71,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	private final Random random = new Random();
 	private byte[] randBytes = UniqueObjects.EMPTY_BYTE_ARRAY;
 	private Socket socket;//TODO close on exit
+	private boolean destroyed = false;
 	
 	public int getInEvents(){return inputEvents;}
 	public int getOutEvents(){return outputEvents;}
@@ -77,7 +79,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	
 	@Override
 	public void changeUpdate(GameAction action) {
-		if (Thread.currentThread() != inputThread && !stop)
+		if (Thread.currentThread() != inputThread && !stop) //TODO this is only a workaround
 		{
 			if (logger.isDebugEnabled()){logger.debug("Queue Action != " + inputThread.getName());}
 			queueOutput(action);
@@ -126,15 +128,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		this.socket = socket;
 	}
 	
-	public void syncPull()
-	{
-		queueOutput(new CommandRead(NetworkString.GAME_INSTANCE));
-	}
-	
-	public void syncPush()
-	{
-		queueOutput(new CommandWrite(NetworkString.GAME_INSTANCE, -1));
-	}
+	public void syncPull()	{queueOutput(new CommandRead(NetworkString.GAME_INSTANCE));}
+	public void syncPush()	{queueOutput(new CommandWrite(NetworkString.GAME_INSTANCE, -1));}
 	
 	public void start()
 	{
@@ -152,15 +147,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	}
 	
 	static class CommandObject{}
-	
 	static class StopConnection{}
 	
 	static class CommandRead
 	{
 		final String type;
-		public CommandRead(String type) {
-			this.type = type;
-		}
+		public CommandRead(String type) {this.type = type;}
 	}
 	
 	static class CommandWrite
@@ -176,17 +168,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 	static class CommandList
 	{
 		final String type;
-		public CommandList(String type) {
-			this.type = type;
-		}
+		public CommandList(String type) {this.type = type;}
 	}
 	
 	static class CommandHash
 	{
 		final String type;
-		public CommandHash(String type) {
-			this.type = type;
-		}
+		public CommandHash(String type) {this.type = type;}
 	}
 	
 	static class CommandScip implements Serializable
@@ -196,9 +184,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		 */
 		private static final long serialVersionUID = 3856297382586773057L;
 		final int bytes;
-		public CommandScip(int bytes) {
-			this.bytes = bytes;
-		}
+		public CommandScip(int bytes) {this.bytes = bytes;}
 	}
 	
 	static class TimingOffsetChanged implements Serializable{
@@ -208,11 +194,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 		 */
 		private static final long serialVersionUID = -8508545232652768659L;
 		public final long offset;
-		
-		public TimingOffsetChanged(long offset)
-		{
-			this.offset = offset;
-		}
+		public TimingOffsetChanged(long offset){this.offset = offset;}
 	}
 	
 	private void outputLoop()
@@ -245,12 +227,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						}
 						else
 						{
-							if (randBytes.length < blocksize)
-							{
-								randBytes = new byte[blocksize];
-							}
+							randBytes = ArrayUtil.ensureLength(randBytes, blocksize);
 							random.nextBytes(randBytes);
-							for (int i = 0; i < blocksize; ++i){objOut.writeByte(randBytes[i]);}							
+							objOut.write(randBytes, 0, blocksize);//TODO test
 						}
 					}
 					objOut.flush();
@@ -368,9 +347,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
     				objOut.write(gi.hashCode());
     				strB.setLength(0);
 				}
-				else if (outputObject instanceof String)
-				{
-				}
+				else if (outputObject instanceof String){}
 				else if (outputObject instanceof TimingOffsetChanged)
 				{
 					objOut.writeUnshared(outputObject);
@@ -485,10 +462,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				logger.error("Can't open Object-Input-Stream", e1);
 			}
 
-			if (objIn == null)
-			{
-				return;
-			}
+			if (objIn == null){return;}
 		}
 		CappedInputStreamWrapper cappedIn = new CappedInputStreamWrapper(objIn, 0);
 		while (!stop)
@@ -501,10 +475,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}catch(OptionalDataException e)
 				{
 					logger.error("Can't extract object", e);
-					if (stopOnError)
-					{
-						return;
-					}
+					if (stopOnError){return;}
 				}
 				if (inputObject instanceof TimingOffsetChanged)
 				{
@@ -513,10 +484,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}
 				if (inputObject instanceof CommandScip)
 				{
-					for (int i = ((CommandScip)inputObject).bytes; i != 0; --i)
-					{
-						objIn.readByte();
-					}
+					StreamUtil.skip(objIn,((CommandScip)inputObject).bytes);
+					continue;
 				}
 				if (inputObject instanceof GameAction)
 				{
@@ -564,37 +533,17 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 						++inputEvents;
 						continue;
 					}
-					if (action instanceof UsertextMessageAction)
-					{
-						gi.update(action);
-						++inputEvents;
-						continue;
-					}
-					if (action instanceof UserSoundMessageAction)
-					{
-						gi.update(action);
-						++inputEvents;
-						continue;
-					}
-					if (action instanceof UserFileMessage)
-					{
-						gi.update(action);
-						++inputEvents;
-						continue;
-					}
-					if (action instanceof TetrisGameEvent)
+					if (action instanceof UsertextMessageAction 
+						|| action instanceof UserSoundMessageAction
+						|| action instanceof UserFileMessage
+						|| action instanceof TetrisGameEvent
+						|| action instanceof PlayerRemoveAction)
 					{
 						gi.update(action);
 						++inputEvents;
 						continue;
 					}
 					logger.warn("Unknown actiontype class " + action.getClass());
-				}
-				if (inputObject instanceof PlayerRemoveAction)
-				{
-					PlayerRemoveAction removeAction = (PlayerRemoveAction)inputObject;
-					gi.update(removeAction);
-					continue;
 				}
 				if (inputObject instanceof GameStructureEditAction)
 				{
@@ -617,10 +566,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 							case AddObjectAction.ADD_PLAYER:
 							{
 								Player player =((PlayerAddAction)action).getPlayer(gi);
-								if (player == null)
-								{
-									player = new Player("", addAction.objectId);
-								}
+								if (player == null){player = new Player("", addAction.objectId);}
 								GameIO.editPlayerFromStreamObject(objIn, player);
 								gi.addPlayer((PlayerAddAction)action, player);
 								break;
@@ -665,25 +611,19 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 				}
 				String line = (String)inputObject;
 				StringUtils.split(line, ' ', split);
-				
+
 				switch(split.get(0))
 				{
 					case NetworkString.READ:
 					{
 						int id = -1;
-						if (split.size() > 2)
-						{
-							id = Integer.parseInt(split.get(2));
-						}
+						if (split.size() > 2){id = Integer.parseInt(split.get(2));}
 						queueOutput(new CommandWrite(split.get(1), id));
 						break;
 					}
 					case NetworkString.WRITEBACK:
 					{
-						if (split.get(1).equals(NetworkString.PLAYER))
-						{
-							String players[] = (String[])objIn.readObject();
-						}
+						if (split.get(1).equals(NetworkString.PLAYER)){String players[] = (String[])objIn.readObject();}
 						break;
 					}
 					case NetworkString.WRITE:
@@ -732,14 +672,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 								ObjectState state = inst.state.copy();
 								GameIO.editStateFromStreamObject(objIn, state);
 								Player pl = gi.getPlayerById(playerId);
-								if (pl == null)
-								{
-									logger.error("Can't find player: " + playerId);
-								}
-								else
-								{
-									gi.update(new GameObjectInstanceEditAction(sourceId, pl, inst, state));
-								}
+								if (pl == null)	{logger.error("Can't find player: " + playerId);}
+								else			{gi.update(new GameObjectInstanceEditAction(sourceId, pl, inst, state));}
 								++inputEvents;
 							}
 						}
@@ -765,14 +699,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 									//gi.addPlayer(GameIO.readPlayerFromStream(new ByteArrayInputStream(data, 0, size)));
 								}
 								Player sourcePlayer = gi.getPlayerById(sourcePlayerId);
-								if (sourcePlayer == null)
-								{
-									logger.error("Can't find player: " + sourcePlayerId);
-								}
-								else
-								{
-									gi.update(new PlayerEditAction(sourceConnectionId, sourcePlayer, object));
-								}
+								if (sourcePlayer == null)	{logger.error("Can't find player: " + sourcePlayerId);}
+								else						{gi.update(new PlayerEditAction(sourceConnectionId, sourcePlayer, object));}
 							}
 						}
 						else if (split.get(1).equals(NetworkString.TEXTMESSAGE))
@@ -798,6 +726,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 			}
 			split.clear();
 		}
+	}
+	
+	public void destroy()
+	{
+		stop();
+		if (gi != null){gi.removeChangeListener(this);}
+		destroyed  = true;
 	}
 	
 	public void stop()
