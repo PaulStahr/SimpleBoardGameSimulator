@@ -43,6 +43,7 @@ import gui.minigames.TetrisWindow;
 import io.GameIO;
 import main.Player;
 import net.AsynchronousGameConnection;
+import net.AsynchronousGameConnection.PingCallback;
 import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
 import util.TimedUpdateHandler;
@@ -98,15 +99,33 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 			menuItemStatusGaiaConsistency.setEnabled(!gaiaConsistent);
 			menuItemStatusGaiaConsistency.setText("Correct Free-Object-Consistency" + (gic == null ? "" : (" (" + gic.toString() + ")")));
 			menuStatus.setForeground(playerConsistent && gaiaConsistent ? Color.BLACK : Color.RED);
+			for (int i = 0; i < gi.getChangeListenerCount(); ++i)
+			{
+			    GameChangeListener gcl = gi.getChangeListener(i);
+			    if (gcl instanceof AsynchronousGameConnection)
+			    {
+			        AsynchronousGameConnection agc = (AsynchronousGameConnection)gcl;
+			        agc.ping(pingCallback, System.nanoTime() + 1000000000);
+			    }
+			}
 		}
 
 		@Override
 		public void run() {update();}
 	}
+	
+    private PingCallback pingCallback = new PingCallback() {
+        @Override
+        public void run(AsynchronousGameConnection.PingInformation pi) {
+            Color col = pi.isTimeouted() ? Color.RED : Color.BLACK;
+            if (menuItemReconnect.getForeground() != col) {menuItemReconnect.setForeground(col);}
+        }
+    };
+
 	private final GameWindowUpdater gww = new GameWindowUpdater();
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(GameWindow.class);
-	
+
 	public GameWindow(GameInstance gi, LanguageHandler lh){this(gi, null, lh);}
 
 	public GameWindow(GameInstance gi, Player player, LanguageHandler lh)
@@ -190,14 +209,8 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		Object source = arg0.getSource();
-		if(source == menuItemExit)
-		{
-			this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
-		}
-		else if (source == menuItemEditGame )
-		{
-			new EditGameWindow(gi, lh, gamePanel.getPlayer()).setVisible(true);
-		}
+		if(source == menuItemExit)			{this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));}
+		else if (source == menuItemEditGame){new EditGameWindow(gi, lh, gamePanel.getPlayer()).setVisible(true);}
 		else if (source == menuItemSaveGame)
 		{
 			JFileChooser fileChooser = new JFileChooser();

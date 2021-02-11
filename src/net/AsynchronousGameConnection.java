@@ -190,36 +190,46 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
          */
         private static final long serialVersionUID = 8248889380911809147L;}
 
-    private static class PingCallback
+    public static interface PingCallback{
+        public void run(PingInformation pi);
+    }
+
+    public static class PingInformation implements Runnable
     {
         public final int id;
         public final long timeout;
-        public final Runnable callback;
-        
-        public PingCallback(int id, long timeout, Runnable callback)
+        public final PingCallback callback;
+        boolean timeouted;
+
+        @Override
+        public void run()           {callback.run(this);}
+        public boolean isTimeouted(){return timeouted;}
+
+        public PingInformation(int id, long timeout, PingCallback callback, boolean timeouted)
         {
             this.id = id;
             this.timeout = timeout;
             this.callback = callback;
+            this.timeouted = timeouted;
         }
     }
 
-    private final ArrayList<PingCallback> pings = new ArrayList<>();
+    private final ArrayList<PingInformation> pings = new ArrayList<>();
 
     public final void triggerTimeoutPings()
     {
         final long time = System.nanoTime();
         for (int read = 0, write = 0; read < pings.size(); ++read)
         {
-            PingCallback current = pings.get(read);
-            if (time > current.timeout){DataHandler.tp.run(current.callback, "Ping Callback");
+            PingInformation current = pings.get(read);
+            if (time > current.timeout){current.timeouted=true; DataHandler.tp.run(current, "Ping Callback");
             }else{pings.set(write++, current);}
         }
     }
-    
-    public final PingCallback ping(Runnable callback, long timeout) {
+
+    public final PingInformation ping(PingCallback callback, long timeout) {
         CommandPingForward cpf = new CommandPingForward();
-        PingCallback pc = new PingCallback(cpf.id, timeout, callback);
+        PingInformation pc = new PingInformation(cpf.id, timeout, callback, false);
         pings.add(pc);
         queueOutput(cpf);
         return pc;
@@ -546,9 +556,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                     final long time = System.nanoTime();
                     for (int read = 0, write = 0; read < pings.size(); ++read)
                     {
-                        PingCallback current = pings.get(read);
-                        if (current.id == cpb.id || time > current.timeout){DataHandler.tp.run(current.callback, "Ping Callback");
-                        }else{pings.set(write++, current);}
+                        PingInformation current = pings.get(read);
+                        if (current.id == cpb.id){DataHandler.tp.run(current, "Ping Callback");}
+                        else if (time > current.timeout) {current.timeouted = true; DataHandler.tp.run(current, "Ping Callback");}
+                        else{pings.set(write++, current);}
                     }
                     continue;
                 }
