@@ -370,4 +370,5 @@ public class GameInstance {
 	public void addChangeListener(GameChangeListener listener) {changeListener.add(listener);}
 	public GameChangeListener getChangeListener(int index){return changeListener.get(index);}
 	public int getChangeListenerCount() {return changeListener.size();}
+	public void removeChangeListener(GameChangeListener listener) {changeListener.remove(listener);}
 }
