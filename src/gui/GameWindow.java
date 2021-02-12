@@ -67,11 +67,11 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	private final JMenuItem menuItemAbout = new JMenuItem();
 	private final JMenuItem menuItemControls = new JMenuItem();
 	private final JMenuItem menuItemTetris = new JMenuItem();
-	private final JMenu menuStatus = new JMenu("Status");
+	private final JMenu menuStatus = new JMenu();
 	private final JMenuItem menuItemStatusPlayerConsistency = new JMenuItem("Correct Card-Consistency");
 	private final JMenuItem menuItemStatusGaiaConsistency = new JMenuItem("Correct Free-Object-Consistency");
-	private final JMenuItem menuItemSyncPull = new JMenuItem("Pull");
-	private final JMenuItem menuItemReconnect = new JMenuItem("Reconnect");
+	private final JMenuItem menuItemSyncPull = new JMenuItem();
+	private final JMenuItem menuItemReconnect = new JMenuItem();
 	private final JMenu menuFile = new JMenu();
 	private final JMenu menuExtras = new JMenu();
 	private final JMenu menuControls = new JMenu();
@@ -252,10 +252,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 				
 				@Override
 				public void actionPerformed(TetrisGameEvent event) {
-					if (event.source == tgi.source)
-					{
-						gamePanel.gameInstance.update(event);
-					}
+					if (event.source == tgi.source){gamePanel.gameInstance.update(event);}
 				}
 			});
 			gamePanel.gameInstance.addChangeListener(tgi);
@@ -316,25 +313,28 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 
 	@Override
 	public void languageChanged(Language language) {
-		menuItemExit.setText(		language.getString(Words.exit));
-		menuItemEditGame.setText(	language.getString(Words.edit));
-		menuItemSaveGame.setText(	language.getString(Words.save));
-		menuItemSettings.setText(	language.getString(Words.settings));
-		menuItemAbout.setText(		language.getString(Words.about));
-		menuItemControls.setText(	language.getString(Words.controls));
-		menuItemTetris.setText(		language.getString(Words.tetris));
-		menuFile.setText(			language.getString(Words.files));
-		menuExtras.setText(			language.getString(Words.extras));
-		menuControls.setText(		language.getString(Words.controls));
+		menuItemExit.setText(         language.getString(Words.exit));
+		menuItemEditGame.setText(     language.getString(Words.edit));
+		menuItemSaveGame.setText(     language.getString(Words.save));
+		menuItemSettings.setText(     language.getString(Words.settings));
+		menuItemAbout.setText(        language.getString(Words.about));
+		menuItemControls.setText(     language.getString(Words.controls));
+		menuItemTetris.setText(       language.getString(Words.tetris));
+		menuFile.setText(             language.getString(Words.files));
+		menuExtras.setText(           language.getString(Words.extras));
+		menuControls.setText(         language.getString(Words.controls));
+		menuItemReconnect.setText(    language.getString(Words.reconnect));
+		menuItemSyncPull.setText(     language.getString(Words.sync_pull));
+		menuStatus.setText(           language.getString(Words.status));
 		//Set Title of the window
-		String visitor = gamePanel.getPlayer().visitor ? " (Visitor Mode), " : "";
-		if (gi.admin == gamePanel.getPlayerId()) {
-			Player pl = gamePanel.getPlayer();
-			this.setTitle(language.getString(Words.game) + ": " + gi.name + " (Admin Mode)" + ", "  + visitor  + pl.getName() + " (Id: " + pl.id +  ")" + ", " + lh.getCurrentLanguage().getString(Words.server) + ": " + Options.getString("last_connection.address"));
-		}
-		else {
-			this.setTitle(language.getString(Words.game) + ": " + gi.name + visitor + gamePanel.getPlayer().getName() + " (Id: " + gamePanel.getPlayerId() +  ")" + ", " + lh.getCurrentLanguage().getString(Words.server) + ": " + Options.getString("last_connection.address"));
-		}
+		StringBuilder strB = new StringBuilder();
+		strB.append(language.getString(Words.game) + ": " + gi.name);
+		
+        Player pl = gamePanel.getPlayer();
+		if (gi.admin == gamePanel.getPlayerId()) {strB.append(" (Admin Mode)");}
+		strB.append(", ");
+		if (pl.visitor){strB.append(" (Visitor Mode), ");}
+		strB.append(pl.getName()).append(" (Id: ").append(gamePanel.getPlayerId()).append("), ").append(lh.getCurrentLanguage().getString(Words.server)).append(": ").append(Options.getString("last_connection.address"));;
+		this.setTitle(strB.toString());
 	}
-	
 }

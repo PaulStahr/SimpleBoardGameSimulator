@@ -100,5 +100,8 @@ public enum Words {
     game_name,
     game,
     server,
-    stop_server, server_start_info, server_stop_info, distribute_cards_to_players;
+    stop_server, server_start_info, server_stop_info, distribute_cards_to_players,
+    reconnect,
+    sync_pull,
+    status;
 }
