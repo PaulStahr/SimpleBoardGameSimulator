@@ -70,6 +70,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	private final JMenu menuStatus = new JMenu("Status");
 	private final JMenuItem menuItemStatusPlayerConsistency = new JMenuItem("Correct Card-Consistency");
 	private final JMenuItem menuItemStatusGaiaConsistency = new JMenuItem("Correct Free-Object-Consistency");
+	private final JMenuItem menuItemSyncPull = new JMenuItem("Pull");
 	private final JMenuItem menuItemReconnect = new JMenuItem("Reconnect");
 	private final JMenu menuFile = new JMenu();
 	private final JMenu menuExtras = new JMenu();
@@ -166,9 +167,11 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuControls.add(menuItemControls);
 		menuStatus.add(menuItemStatusPlayerConsistency);
 		menuStatus.add(menuItemStatusGaiaConsistency);
+		menuStatus.add(menuItemSyncPull);
 		menuStatus.add(menuItemReconnect);
 		menuItemStatusPlayerConsistency.addActionListener(this);
 		menuItemStatusGaiaConsistency.addActionListener(this);
+		menuItemSyncPull.addActionListener(this);
 		menuItemReconnect.addActionListener(this);
 		gamePanel = new GamePanel(gi, lh);
 		gamePanel.setPlayer(player);
@@ -268,6 +271,17 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		{
 			gi.repairPlayerConsistency(-1, gamePanel.getPlayer(), new ArrayList<>());
 			DataHandler.tp.run(gww, "UpdateConsistency");
+		}
+		else if (source == menuItemSyncPull)
+		{
+		    for (int i = 0; i < gi.getChangeListenerCount(); ++i)
+		    {
+                GameChangeListener gcl = gi.getChangeListener(i);
+                if (gcl instanceof AsynchronousGameConnection)
+                {
+                    ((AsynchronousGameConnection) gcl).syncPull();
+                }
+		    }
 		}
 		else if (source == menuItemReconnect)
 		{
