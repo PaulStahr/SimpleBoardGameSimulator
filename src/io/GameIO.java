@@ -91,6 +91,7 @@ public class GameIO {
 		elem.setAttribute(IOString.VALUE, 			Integer.toString(state.value));
 		elem.setAttribute(IOString.ROTATION_STEP, 	Integer.toString(state.rotationStep));
 		elem.setAttribute(IOString.IS_FIXED, 		Boolean.toString(state.isFixed));
+		elem.setAttribute(IOString.IN_PRIVATE_AREA, Boolean.toString(state.inPrivateArea));
 		if (state instanceof TokenState) 					{elem.setAttribute(IOString.SIDE, Boolean.toString(((TokenState) state).side));}
 		if (state instanceof GameObjectFigure.FigureState)	{elem.setAttribute(IOString.STANDING, Boolean.toString(((GameObjectFigure.FigureState) state).standing));}
 		if (state instanceof GameObjectDice.DiceState)		{elem.setAttribute(IOString.SIDE, Integer.toString(((GameObjectDice.DiceState)state).side));}
@@ -127,17 +128,9 @@ public class GameIO {
 	 */
 	private static void editStateFromElement(ObjectState state, Element elem)
 	{
-
-		state.rotation = readAttribute(elem, IOString.R, state.rotation);
-
-		String v = elem.getAttributeValue(IOString.ORIGINAL_ROTATION);
-		if (v != null) {
-			state.originalRotation = Integer.parseInt(elem.getAttributeValue(IOString.ORIGINAL_ROTATION));
-		}
-		else if(elem.getAttributeValue(IOString.R)!= null){
-			state.originalRotation = Integer.parseInt(elem.getAttributeValue(IOString.R));
-		}
-
+		state.rotation        = readAttribute(elem, IOString.R, state.rotation);
+        state.originalRotation = readAttribute(elem, IOString.R, state.originalRotation);
+        state.originalRotation = readAttribute(elem, IOString.ORIGINAL_ROTATION, state.originalRotation);
 		state.scale 			= readAttribute(elem, IOString.S, state.scale);
 		state.aboveInstanceId 	= readAttribute(elem, IOString.ABOVE, state.aboveInstanceId);
 		state.belowInstanceId 	= readAttribute(elem, IOString.BELOW, state.belowInstanceId);
@@ -149,21 +142,87 @@ public class GameIO {
 		state.value				= readAttribute(elem, IOString.VALUE, state.value);
 		state.rotationStep		= readAttribute(elem, IOString.ROTATION_STEP, state.rotationStep);
 		state.isFixed			= readAttribute(elem, IOString.IS_FIXED, state.isFixed);
-		if (state instanceof TokenState && elem.getAttribute(IOString.SIDE) != null)
-    	{
-			((TokenState)state).side = Boolean.parseBoolean(elem.getAttributeValue(IOString.SIDE));
+		state.inPrivateArea       = readAttribute(elem, IOString.IN_PRIVATE_AREA, state.inPrivateArea);
+		if (state instanceof TokenState)
+		{
+		    ((TokenState)state).side = readAttribute(elem, IOString.SIDE, ((TokenState)state).side);
     	}
-
 		if (state instanceof GameObjectFigure.FigureState && elem.getAttribute(IOString.STANDING) != null)
 		{
 			((GameObjectFigure.FigureState)state).standing = Boolean.parseBoolean(elem.getAttributeValue(IOString.STANDING));
 		}
-
 		if (state instanceof GameObjectDice.DiceState && elem.getAttributeValue(IOString.SIDE) != null)
 		{
 			((DiceState)state).side = Integer.parseInt(elem.getAttributeValue(IOString.SIDE));
 		}
 	}
+
+    public static void simulateStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
+    {
+        int skip = 41;
+        if (state instanceof TokenState)      {skip += 1;}
+        else if (state instanceof DiceState)  {skip += 4;}
+        else if (state instanceof FigureState){skip += 1;}
+        StreamUtil.skip(is, skip);
+    }
+
+    public static void editStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
+    {
+        state.aboveInstanceId = is.readInt();
+        state.belowInstanceId = is.readInt();
+        state.inPrivateArea = is.readBoolean();
+        state.owner_id = is.readInt();
+        state.isSelected = is.readInt();
+        state.drawValue = is.readInt();
+        state.posX = is.readInt();
+        state.posY = is.readInt();
+        state.rotation = is.readInt();
+        state.scale = is.readInt();
+        state.value = is.readInt();
+        state.rotationStep = is.readInt();
+        state.isFixed = is.readBoolean();
+        if (state instanceof TokenState)
+        {
+            ((TokenState)state).side = is.readBoolean();
+        }
+        else if (state instanceof DiceState)
+        {
+            ((DiceState)state).side = is.readInt();
+        }
+        else if (state instanceof FigureState)
+        {
+            ((FigureState) state).standing = is.readBoolean();
+        }
+    }
+
+    public static void writeStateToStreamObject(ObjectOutputStream out, ObjectState state) throws IOException
+    {
+        out.writeInt(state.aboveInstanceId);
+        out.writeInt(state.belowInstanceId);
+        out.writeBoolean(state.inPrivateArea);
+        out.writeInt(state.owner_id);
+        out.writeInt(state.isSelected);
+        out.writeInt(state.drawValue);
+        out.writeInt(state.posX);
+        out.writeInt(state.posY);
+        out.writeInt(state.rotation);
+        out.writeInt(state.scale);
+        out.writeInt(state.value);
+        out.writeInt(state.rotationStep);
+        out.writeBoolean(state.isFixed);
+        if (state instanceof TokenState)
+        {
+            out.writeBoolean(((TokenState)state).side);
+        }
+        else if (state instanceof DiceState)
+        {
+            out.writeInt(((DiceState)state).side);
+        }
+        else if (state instanceof FigureState)
+        {
+            out.writeBoolean(((FigureState) state).standing);
+        }
+    }
 
 	/**
 	 * Edit a GameInstance from an XML Element.
@@ -269,7 +328,6 @@ public class GameIO {
 	 */
 	private static GameObject createGameObjectFromElement(Element elem, HashMap<String, BufferedImage> images, Integer uniqueId)
 	{
-
 		String objectName = elem.getAttributeValue(IOString.UNIQUE_NAME);
 		String type = elem.getAttributeValue(IOString.TYPE);
 		GameObject result = null;
@@ -693,21 +751,6 @@ public class GameIO {
 		in.close();
 		return result;
 	}
-
-	public static long copy(InputStream from, OutputStream to)
-		      throws IOException {
-		byte[] buf = new byte[0x1000];
-	    long total = 0;
-	    while (true) {
-	      int r = from.read(buf);
-	      if (r == -1) {
-	        break;
-	      }
-	      to.write(buf, 0, r);
-	      total += r;
-	    }
-	    return total;
-	}	
 	
 	private static class GameSnapshotreader
 	{
@@ -724,11 +767,11 @@ public class GameIO {
 		{
 			if (name.equals(IOString.GAME_XML))
 			{
-				copy(content, gameBuffer);
+				StreamUtil.copy(content, gameBuffer);
 			}
 			else if (name.equals(IOString.GAME_INSTANCE_XML))
 			{
-				copy(content, gameInstanceBuffer);
+			    StreamUtil.copy(content, gameInstanceBuffer);
 			}
 			else
 			{
@@ -908,7 +951,7 @@ public class GameIO {
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 		while ((entry = stream.getNextEntry()) != null)
 		{
-			copy(stream, byteStream);
+		    StreamUtil.copy(stream, byteStream);
 			if (entry.getName().equals(IOString.GAME_INSTANCE_XML))
 			{
 				editGameInstanceFromStream(new ByteArrayInputStream(byteStream.toByteArray()), gi);
@@ -1010,86 +1053,11 @@ public class GameIO {
 		out.writeBoolean(player.visitor);
 	}
 	
-	public static void simulateStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
-	{
-		StreamUtil.skip(is, 41);
-		if (state instanceof TokenState)
-		{
-			StreamUtil.skip(is, 1);
-		}
-		else if (state instanceof DiceState)
-		{
-			StreamUtil.skip(is, 4);
-		}
-		else if (state instanceof FigureState)
-		{
-			StreamUtil.skip(is, 1);
-		}
-	}
-	
-	public static void editStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
-	{
-		state.aboveInstanceId = is.readInt();
-		state.belowInstanceId = is.readInt();
-		state.inPrivateArea = is.readBoolean();
-		state.owner_id = is.readInt();
-		state.isSelected = is.readInt();
-		state.drawValue = is.readInt();
-		state.posX = is.readInt();
-		state.posY = is.readInt();
-		state.rotation = is.readInt();
-		state.scale = is.readInt();
-		state.value = is.readInt();
-		state.rotationStep = is.readInt();
-		state.isFixed = is.readBoolean();
-		if (state instanceof TokenState)
-		{
-			((TokenState)state).side = is.readBoolean();
-		}
-		else if (state instanceof DiceState)
-		{
-			((DiceState)state).side = is.readInt();			
-		}
-		else if (state instanceof FigureState)
-		{
-			((FigureState) state).standing = is.readBoolean();
-		}
-	}
-	
 	public static void writeGameObjectInstanceEditActionToStreamObject(ObjectOutputStream out, GameObjectInstanceEditAction action) throws IOException
 	{
 		out.writeInt(action.source);
 		out.writeInt(action.player);
 		out.writeInt(action.object);
-	}
-	
-	public static void writeStateToStreamObject(ObjectOutputStream out, ObjectState state) throws IOException
-	{
-		out.writeInt(state.aboveInstanceId);
-		out.writeInt(state.belowInstanceId);
-		out.writeBoolean(state.inPrivateArea);
-		out.writeInt(state.owner_id);
-		out.writeInt(state.isSelected);
-		out.writeInt(state.drawValue);
-		out.writeInt(state.posX);
-		out.writeInt(state.posY);
-		out.writeInt(state.rotation);
-		out.writeInt(state.scale);
-		out.writeInt(state.value);
-		out.writeInt(state.rotationStep);
-		out.writeBoolean(state.isFixed);
-		if (state instanceof TokenState)
-		{
-			out.writeBoolean(((TokenState)state).side);
-		}
-		else if (state instanceof DiceState)
-		{
-			out.writeInt(((DiceState)state).side);			
-		}
-		else if (state instanceof FigureState)
-		{
-			out.writeBoolean(((FigureState) state).standing);
-		}
 	}
 
 	public static Player readPlayerFromStream(InputStream is) throws JDOMException, IOException
@@ -1107,7 +1075,7 @@ public class GameIO {
 		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
 		while ((entry = stream.getNextEntry()) != null)
 		{
-			copy(stream, byteStream);
+		    StreamUtil.copy(stream, byteStream);
 			if (entry.getName().equals(IOString.PLAYER_XML))
 			{
 				editPlayerFromStreamZip(new ByteArrayInputStream(byteStream.toByteArray()), player);
@@ -1124,7 +1092,7 @@ public class GameIO {
 		Player pl = null;
 		while ((entry = stream.getNextEntry()) != null)
 		{
-			copy(stream, byteStream);
+		    StreamUtil.copy(stream, byteStream);
 			if (entry.getName().equals(IOString.PLAYER_XML))
 			{
 				pl = readPlayerFromStream(new ByteArrayInputStream(byteStream.toByteArray()));
