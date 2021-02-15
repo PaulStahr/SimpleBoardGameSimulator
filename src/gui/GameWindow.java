@@ -91,28 +91,30 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 
 		@Override
 		public synchronized void update() {
-			GameInconsistency gic = CheckingFunctions.checkPlayerConsistency(gamePanel.getPlayerId(), tmp, tmp2, gi);
-			boolean playerConsistent = gic == null; 
-			menuItemStatusPlayerConsistency.setEnabled(!playerConsistent);
-			menuItemStatusPlayerConsistency.setText("Correct Card-Consistency" + (gic == null ? "" : (" (" + gic.toString() + ")")));
-			gic = CheckingFunctions.checkPlayerConsistency(-1, tmp, tmp2, gi);
-			boolean gaiaConsistent = gic == null;
-			menuItemStatusGaiaConsistency.setEnabled(!gaiaConsistent);
-			menuItemStatusGaiaConsistency.setText("Correct Free-Object-Consistency" + (gic == null ? "" : (" (" + gic.toString() + ")")));
-			menuStatus.setForeground(playerConsistent && gaiaConsistent ? Color.BLACK : Color.RED);
-			for (int i = 0; i < gi.getChangeListenerCount(); ++i)
-			{
-			    GameChangeListener gcl = gi.getChangeListener(i);
-			    if (gcl instanceof AsynchronousGameConnection)
-			    {
-			        AsynchronousGameConnection agc = (AsynchronousGameConnection)gcl;
-			        agc.ping(pingCallback, System.nanoTime() + 1000000000);
-			    }
-			}
+			JFrameUtils.runByDispatcher(this);
 		}
 
 		@Override
-		public void run() {update();}
+		public void run() {
+		    GameInconsistency gic = CheckingFunctions.checkPlayerConsistency(gamePanel.getPlayerId(), tmp, tmp2, gi);
+            boolean playerConsistent = gic == null;
+            menuItemStatusPlayerConsistency.setEnabled(!playerConsistent);
+            menuItemStatusPlayerConsistency.setText("Correct Card-Consistency" + (gic == null ? "" : (" (" + gic.toString() + ")")));
+            gic = CheckingFunctions.checkPlayerConsistency(-1, tmp, tmp2, gi);
+            boolean gaiaConsistent = gic == null;
+            menuItemStatusGaiaConsistency.setEnabled(!gaiaConsistent);
+            menuItemStatusGaiaConsistency.setText("Correct Free-Object-Consistency" + (gic == null ? "" : (" (" + gic.toString() + ")")));
+            menuStatus.setForeground(playerConsistent && gaiaConsistent ? Color.BLACK : Color.RED);
+            for (int i = 0; i < gi.getChangeListenerCount(); ++i)
+            {
+                GameChangeListener gcl = gi.getChangeListener(i);
+                if (gcl instanceof AsynchronousGameConnection)
+                {
+                    AsynchronousGameConnection agc = (AsynchronousGameConnection)gcl;
+                    agc.ping(pingCallback, System.nanoTime() + 1000000000);
+                }
+            }
+        }
 	}
 	
     private PingCallback pingCallback = new PingCallback() {
@@ -262,12 +264,12 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		else if (source == menuItemStatusPlayerConsistency)
 		{
 			gi.repairPlayerConsistency(gamePanel.getPlayerId(), gamePanel.getPlayer(), new ArrayList<>());
-			DataHandler.tp.run(gww, "UpdateConsistency");
+			JFrameUtils.runByDispatcher(gww);
 		}
 		else if (source == menuItemStatusGaiaConsistency)
 		{
 			gi.repairPlayerConsistency(-1, gamePanel.getPlayer(), new ArrayList<>());
-			DataHandler.tp.run(gww, "UpdateConsistency");
+			JFrameUtils.runByDispatcher(gww);
 		}
 		else if (source == menuItemSyncPull)
 		{
@@ -334,7 +336,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		if (gi.admin == gamePanel.getPlayerId()) {strB.append(" (Admin Mode)");}
 		strB.append(", ");
 		if (pl.visitor){strB.append(" (Visitor Mode), ");}
-		strB.append(pl.getName()).append(" (Id: ").append(gamePanel.getPlayerId()).append("), ").append(lh.getCurrentLanguage().getString(Words.server)).append(": ").append(Options.getString("last_connection.address"));;
+		strB.append(pl.getName()).append(" (Id: ").append(gamePanel.getPlayerId()).append("), ").append(lh.getCurrentLanguage().getString(Words.server)).append(": ").append(Options.getString("last_connection.address"));
 		this.setTitle(strB.toString());
 	}
 }
