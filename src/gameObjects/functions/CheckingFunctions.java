@@ -8,9 +8,11 @@ import util.ArrayTools;
 
 public class CheckingFunctions {
 	public static class GameInconsistency{}
-	public static class InconsistencyMultistackend 		extends GameInconsistency{public final int first; public final int second; 	public InconsistencyMultistackend(int first,int second) 	{this.first = first; this.second = second;}}
+    public static class InconsistencyMultistackBottom   extends GameInconsistency{public final int first; public final int second;  public InconsistencyMultistackBottom(int first,int second)     {this.first = first; this.second = second;}}
+    public static class InconsistencyMultistackTop      extends GameInconsistency{public final int first; public final int second;  public InconsistencyMultistackTop(int first,int second)     {this.first = first; this.second = second;}}
 	public static class InconsistencyNotLinkedViceVersa extends GameInconsistency{public final int first; public final int second; 	public InconsistencyNotLinkedViceVersa(int first,int second){this.first = first; this.second = second;}}
-	public static class InconsistencyNostackend 		extends GameInconsistency{													public InconsistencyNostackend() 							{}}
+    public static class InconsistencyNostackBottom      extends GameInconsistency{                                                  public InconsistencyNostackBottom()                      {}}
+    public static class InconsistencyNostackTop         extends GameInconsistency{                                                  public InconsistencyNostackTop()                         {}}
 	public static class InconsistencyNotInPrivateArea 	extends GameInconsistency{public final int id; 								public InconsistencyNotInPrivateArea(int id) 				{this.id = id;}}
 	public static class InconsistencyNotOwnedArea 		extends GameInconsistency{public final int id; 								public InconsistencyNotOwnedArea(int id) 					{this.id = id;}}
 	public static class StackEndReached 				extends GameInconsistency{public final int id; 								public StackEndReached(int id) 								{this.id = id;}}
@@ -32,14 +34,14 @@ public class CheckingFunctions {
 		if (begin != end)
 		{
 			ObjectInstance last = tmp.get(begin);
-			if (last.state.belowInstanceId != -1){return new InconsistencyMultistackend(last.id, last.state.belowInstanceId);}
+			if (last.state.belowInstanceId != -1){return new InconsistencyMultistackBottom(last.id, last.state.belowInstanceId);}
 			for (int i = begin + 1; i < end; ++i)
 			{
 				ObjectInstance current = tmp.get(i);
 				if (last.state.aboveInstanceId != current.id || current.state.belowInstanceId != last.id){return new InconsistencyNotLinkedViceVersa(current.id, last.id);}
 				last = current;
 			}
-			return last.state.aboveInstanceId == -1 ? null : new InconsistencyMultistackend(last.id, last.state.aboveInstanceId);
+			return last.state.aboveInstanceId == -1 ? null : new InconsistencyMultistackTop(last.id, last.state.aboveInstanceId);
 		}
 		return null;
 	}
@@ -96,16 +98,17 @@ public class CheckingFunctions {
 				ObjectInstance oi = sorted.get(i);
 				if (oi.state.belowInstanceId == -1)
 				{
-					if (bottom != null){return new InconsistencyMultistackend(bottom.id, oi.id);}
+					if (bottom != null){return new InconsistencyMultistackBottom(bottom.id, oi.id);}
 					bottom = oi;
 				}
 				if (oi.state.aboveInstanceId == -1)
 				{
-					if (top != null){return new InconsistencyMultistackend(bottom.id, oi.id);}
+					if (top != null){return new InconsistencyMultistackTop(bottom.id, oi.id);}
 					top = oi;
 				}
 			}
-			if (bottom == null || top == null){return new InconsistencyNostackend();}
+			if (bottom == null)  {return new InconsistencyNostackBottom();}
+			if (top == null)     {return new InconsistencyNostackTop();}
 			ObjectInstance current = bottom;
 			if (current.owner_id() != player_id || !current.state.inPrivateArea){return new InconsistencyNotInPrivateArea(current.id);}
 			for (int i = 1; i < sorted.size(); ++i)
@@ -117,7 +120,7 @@ public class CheckingFunctions {
 				if (!next.state.inPrivateArea) {return new InconsistencyNotInPrivateArea(next.id);}
 				current = next;
 			}
-			if (current != top){return new InconsistencyMultistackend(current.id, top.id);}
+			if (current != top){return new InconsistencyMultistackTop(current.id, top.id);}
 			sorted.clear();
 		}
 		gi.getOwnedPrivateObjects(player_id, false, sorted);
