@@ -13,6 +13,7 @@ import java.awt.geom.Point2D;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import main.Player;
+import util.Calculate;
 import util.data.IntegerArrayList;
 import util.data.IntegerArrayList.ReadOnlyIntegerArrayList;
 
@@ -80,6 +81,7 @@ public class PrivateArea {
         }
         return false;
     }
+
     public boolean containsScreenCoordinates(int posX, int posY) {
         return shape.contains(posX, posY);
     }
@@ -109,13 +111,8 @@ public class PrivateArea {
     public int getObjectIdByPosition(int posX, int posY, int originX, int originY) {
         if (privateObjects.size() > 0) {
             int section = getSectionByPosition(posX, posY, originX, originY);
-            if (section>privateObjects.size()-1){
-                section = privateObjects.size()-1;
-            }
-            else if(section<0){
-                section = 0;
-            }
-            return privateObjects.getI(section);
+            System.out.println(section);
+            return privateObjects.getI(Calculate.clip(section, 0, privateObjects.size() - 1));
         } else {
             return -1;
         }
@@ -135,8 +132,9 @@ public class PrivateArea {
     }
 
     public Point2D transformPoint(int posX, int posY) {
-        Point2D transformedPoint = boardToScreenTransformation.transform(new Point2D.Double(posX, posY), null);
-        return transformedPoint;
+        Point2D res = new Point2D.Double(posX, posY);
+        boardToScreenTransformation.transform(res, res);
+        return res;
     }
 
 	public boolean contains(int id) {
