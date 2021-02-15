@@ -13,6 +13,7 @@ public class IOString {
 	public static final String BELOW = "below";
 	public static final String VALUE = "value";
 	public static final String IS_FIXED = "is_fixed";
+	public static final String IN_PRIVATE_AREA = "in_private_area";
 	public static final String ROTATION_STEP = "rotation_step";
 	public static final String SIDE = "side";
 	public static final String NAME = "name";
