@@ -1284,10 +1284,17 @@ public class ObjectFunctions {
             if (ial.size() >0) {
                 ObjectInstance oi = gameInstance.getObjectInstanceById(ial.getI(0));
                 if (oi.state.owner_id == player.id) {
-                    Point2D targetPoint = new Point2D.Double(0, 0);
-                    player.playerAtTableTransform.transform(targetPoint,targetPoint);
-                    ObjectFunctions.rotateStack(gameInstance, ial, oi.state.originalRotation);
-                    ObjectFunctions.moveStackTo(gamePanel, gameInstance, player, ial, (int) targetPoint.getX(), (int) targetPoint.getY());
+                    double angle = PlayerFunctions.GetCurrentPlayerRotation(gamePanel, gameInstance, player);
+                    ObjectState objectState = oi.state.copy();
+                    objectState.rotation = (int) angle;
+                    gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, oi, objectState));
+                    double offset = 0;
+                    if (gamePanel.table != null){
+                        offset = gamePanel.table.getDiameter()/2 - oi.getHeight(player.id)/2;
+                    }
+                    Point2D PlayerShift = new Point2D.Double(-Math.sin(Math.toRadians(angle))*offset, Math.cos(Math.toRadians(angle))*offset);
+                    moveStackTo(gamePanel, gameInstance, player, ial, (int) (gamePanel.table.getTableCenter().getX() + PlayerShift.getX()), (int) (gamePanel.table.getTableCenter().getY() + PlayerShift.getY()));
+                    rotateStack(gameInstance, ial, (int) angle);
                 }
             }
         }
