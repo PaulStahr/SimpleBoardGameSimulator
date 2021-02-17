@@ -25,7 +25,7 @@ public class SimpleNetworkServertest {
     private static final Logger logger = LoggerFactory.getLogger(SimpleNetworkServertest.class);
     public static List<Player> PlayerList = new ArrayList<>();
     public static List<GameWindow> GameWindowList = new ArrayList<>();
-    public static int AdditionalPlayers = 1;
+    public static int AdditionalPlayers = 2;
     public static GameServer startNewServer(int port)
     {
     	GameServer gs = new GameServer(port);
@@ -93,7 +93,7 @@ public class SimpleNetworkServertest {
     	}
     	{
     	   	Player player = new Player("Paul", 8);
-    	   	FileInputStream fis = new FileInputStream("PrivateGames/Crew.zip");
+    	   	FileInputStream fis = new FileInputStream("Games/DiceCardsFigures.zip");
 			GameInstance gi = new GameInstance(new Game(), null);
 			GameIO.readSnapshotFromZip(fis, gi);
 			gi.name = "Testsession";

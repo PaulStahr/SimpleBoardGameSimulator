@@ -64,4 +64,5 @@ public class IOString {
 	public static final String DEBUG_MODE = "debug_mode";
     public static final String ORIGINAL_ROTATION = "original_rotation";
 	public static final String VISITOR = "visitor";
+	public static final String BOOK = "book";
 }

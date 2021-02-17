@@ -4,6 +4,7 @@
 <object unique_name="sechserwuerfel" id="7" x="150" y="150" r="0"/>
 <object unique_name="sechserwuerfel" id="0" x="160" y="170" r="0"/>
 <object unique_name="sechserwuerfel" id="1" x="170" y="160" r="0"/>
+<object unique_name="booktest" x="200" y="200" r="0"/>
 <object unique_name="caro10" id="2" x="100" y="100" r="0"/>
 <object unique_name="carobube" id="3" x="100" y="100" r="0"/>
 <object unique_name="carodame" id="4" x="100" y="100" r="0"/>

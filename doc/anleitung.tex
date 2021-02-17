@@ -1,0 +1,203 @@
+\documentclass{scrbook}
+\usepackage{color}
+\usepackage{xspace}
+\usepackage{listings, tabularx}
+\newcommand{\gamefile}[1]{\textit{\textcolor{blue}{#1}}\xspace}
+\newcommand{\game}{\gamefile{game.xml}}
+\newcommand{\gameinstance}{\gamefile{game\_instance.xml}}
+
+\newcommand{\card}{\textcolor{red}{card}\xspace}
+\newcommand{\gamefigure}{\textcolor{red}{figure}\xspace}
+\newcommand{\dice}{\textcolor{red}{dice}\xspace}
+\newcommand{\xmlattribute}[1]{\textcolor{green}{#1}}
+
+
+\definecolor{maroon}{rgb}{0.5,0,0}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\lstdefinelanguage{XML}
+{
+	basicstyle=\ttfamily,
+	morestring=[s]{"}{"},
+	morecomment=[s]{?}{?},
+	morecomment=[s]{!--}{--},
+	commentstyle=\color{darkgreen},
+	moredelim=[s][\color{black}]{>}{<},
+	moredelim=[s][\color{red}]{\ }{=},
+	stringstyle=\color{blue},
+	identifierstyle=\color{maroon}
+}
+
+
+\title{Boardgame Simulator Anleitung}
+\begin{document}
+	\maketitle
+	\tableofcontents
+	\chapter{Spiel erstellen}
+	Jedes Spiel besteht aus Spielobjekten (Bildern im jpg oder png Format) und den XML-Dateien \game und \gameinstance. Spielobjekte können drei verschiedene Typen haben \card, \gamefigure und \dice.
+	\section{Die Datei \game}
+	In der \game werden die Spielobjekte definiert. Das Grundgerüst der Datei sieht wie folgt aus. 
+	
+	\lstset{language=XML}
+	\begin{lstlisting}
+	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+	<xml>
+	<background>hintergrund.jpg</background>
+	</xml>
+	\end{lstlisting}
+	
+	Das Bild mit dem Namen \textit{hintergrund.jpg} wird zum Hintergrundbild des Spiels.
+
+	Zusätzlich können beliebige Spielobjekte durch den Tag \lstset{language=XML}
+	\begin{lstlisting}
+	<object type="card"></object>
+	\end{lstlisting}  mit den unten genannten Typen definiert werden (in diesem Fall vom Typ \card). Welche Attribute die verschiedenen Spielobjekte haben können wird in den entsprechenden Abschnitten erläutert.
+
+	\section{Die Datei \gameinstance}
+	In der \gameinstance wird eine Instanz des Spiels definiert, z.B. ob es einen Tisch geben soll oder nicht und an welcher Stelle die Objekte im Spiel zu Beginn liegen.
+	
+	\lstset{language=XML}
+	\begin{lstlisting}	
+	<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+	<xml>
+	<settings>
+		<name>Brettspiel</name>
+		<table color="#d2a56d" put_down_area="true"
+		table_radius="500">true</table>
+	</settings>
+	<object unique_name="object1" x="0" y="0" r="0"/>
+	</xml>
+	\end{lstlisting}
+	
+	Das Beispiel definiert ein Spiel mit dem Namen \textit{Brettspiel}, das ein Tisch mit Radius $500$, der Farbe $\#d2a56d$, und einem Ablagebereich in der Mitte des Tisches hat. Das Spiel hat außerdem ein Objekt mit dem Namen \textit{objekt1}, welches in \game definiert wurde und an Position $0, 0$ und mit Anfangsrotation $0$ gezeichnet wird.
+	
+	Unter dem Tag \textit{settings} können alle wichtigen Spieleigenschaften definiert werden. Unter dem Tag \textit{object} werden die Objekte mit Positionen, Rotationen usw. definiert.
+	
+	\begin{table}[!h]
+		\centering
+		\renewcommand{\arraystretch}{1.5}
+		\begin{tabularx}{\textwidth}{c|X|c|X}
+			Tagname & Attribute & Werte & Erklärung\\\hline
+			
+			name & -- & String & Name des Spiels\\
+			table & \xmlattribute{color}, \xmlattribute{put\_down\_area}, \xmlattribute{table\_radius} & true/false & Anzeige des Tisches auf dem Spielfeld, falls False wird der Tisch nicht angezeigt, \xmlattribute{color} definiert die Farbe des Tisches, \xmlattribute{put\_down\_area} ist ein boolsches Attribut und gibt an, ob ein Ablagebereich in der Mitte des Tisches erscheinen soll, \xmlattribute{table\_radius} gibt den Radius des Tisches an.\\
+			private\_area & -- & true/false & gibt an, ob der Handkartenbereich zum Spielstart eingeblendet sein soll\\
+			seats & -- & <seat color="\#0000ff"/> & Feste Liste von farbigen Stühlen um den Tisch\\
+			debug\_mode & -- & true/false & Falls true, werden zusätzliche Informationen angezeigt, die hilfreich beim debuggen sind\\
+		\end{tabularx}
+	\caption{Mögliche Spiel Settings}
+	\end{table}
+	\section{Spielobjekttypen}
+	
+	Die Spielobjekte werden in der \game definiert. Einzelne Instanzen von Spielobjekten werden in der \gameinstance definiert und mit einem eindeutigen Namen mit den Objekten aus der \game verknüpft. Spielobjekte werden durch den Tag \textit{object} markiert. Alle Spielobjekte haben die folgenden Attribute.
+	
+	\begin{table}[!h]
+		\renewcommand{\arraystretch}{1.5}
+		\begin{tabularx}{\textwidth}{XX}
+			Attribute & Erklärung\\\hline
+			type & Typ des Spielobjekts\\
+			unique\_name & Eindeutiger Name des Objekts\\
+			width & Breite des Objekts\\
+			height & Höhe des Objekts\\
+		\end{tabularx}
+	\end{table}
+
+	Weitere Attribute für \card, \gamefigure, \dice Objekte können in den jeweiligen Abschnitten gefunden werden.
+
+	Instanzen von Spielobjekten können in der \gameinstance mit folgenden Attributen definiert werden:
+	
+	\begin{table}[!h]
+		\renewcommand{\arraystretch}{1.5}		\begin{tabularx}{\textwidth}{XXX}
+			Attribute & Erklärung\\\hline
+			unique\_name & eindeutiger Name aus der \game\\
+			x & x Position zu Spielbeginn\\
+			y & y Position zu Spielbeginn\\
+			r & Rotation\\
+			s & Skalierung\\
+			number & Anzahl der Objekte des Typs\\
+			is\_fixed & true/false, falls true kann Objekt im Spiel nicht bewegt werden\\
+		\end{tabularx}
+	\end{table}
+
+	Beispieldefinition von Instanzen des Objekts mit dem Namen \textit{objekt1} in der \gameinstance:
+	
+	\lstset{language=XML}
+	\begin{lstlisting}
+	<object unique_name="objekt1" x="0" y="0" r="0" s="1" 
+	number="3" is_fixed="false"/>
+	\end{lstlisting}
+	
+	In diesem Beispiel werden $3$ Instanzen vom Objekt mit dem Namen \textit{objekt1} an der Position $0,0$ mit der Rotation $0$ und ohne Skalierung erzeugt.
+
+	
+	\subsection{Der Typ \card}
+	Objekte vom Typ \card sind Spielkarten. Sie können z.B. gestapelt und gemischt werden und haben eine Vorder-und Rückseite.
+	Beispiel eines \card Objekts mit Vorderseite \textit{front.jpg}, Rückseite \textit{back.jpg}, dem Wert $10$ hat und in $45$ Grad Schritten gedreht werden kann und zur Kartengruppe \textit{Spielkarte} gehört:
+	
+	\lstset{language=XML}
+	\begin{lstlisting}
+	<object type="card" unique_name="card1" value="10"
+	 rotation_step="45" front="front.jpg" back="back.jpg">
+	 <group>Spielkarte</group>
+	</object>
+	\end{lstlisting}
+	
+	\begin{table}[!h]
+		\renewcommand{\arraystretch}{1.5}		\begin{tabularx}{\textwidth}{XXX}
+			Attribute & Optional & Erklärung\\\hline
+			front & Nein & Dateiname der Vorderseite (jpg, png)\\
+			back & Nein & Dateiname der Rückseite (jpg, png)\\
+			value & Ja & Wert der Karte\\
+			rotation\_step & Ja & Mögliche Rotationen der Karte\\
+		\end{tabularx}
+	\end{table}
+
+	Objekte vom Typ \card können als Wert eine Gruppe erhalten über die sie eindeutig identifizierbar und sammelbar sind.
+
+	\lstset{language=XML}
+	\begin{lstlisting}	
+	<group>Spielkarte</group>
+	\end{lstlisting}
+
+	\subsection{Der Typ \gamefigure}
+	Objekte vom Typ \gamefigure sind Spielfiguren. Sie können z.B. stehen oder liegen und auf Karten gestellt werden.
+
+	Beispiel eines \gamefigure Objekts:
+	
+	\lstset{language=XML}
+	\begin{lstlisting}	
+	<object type="figure" unique_name="objekt1"
+	 standing="standing.jpg" width="100" 
+	 height="100"/>
+	\end{lstlisting}
+	
+
+	\begin{table}[!h]
+		\renewcommand{\arraystretch}{1.5}
+		\begin{tabularx}{\textwidth}{XXX}
+			Attribute & Optional & Erklärung\\\hline
+			standing & Nein & Bild für die stehende Spielfigur (jpg, png)
+		\end{tabularx}
+	\end{table}
+
+
+	\subsection{Der Typ \dice}
+	Objekte vom Typ \dice sind Würfel. Sie haben mehrere Seiten und können gewürfelt werden.
+
+	Beispiel eines \dice Objekts mit sechs Seiten:
+	
+	\lstset{language=XML}
+	\begin{lstlisting}	
+	<object type="dice" unique_name="dice1" width="30" height="30">
+		<side value="1">side1.jpg</side>
+		<side value="2">side2.jpg</side>
+		<side value="3">side3.jpg</side>
+		<side value="4">side4.jpg</side>
+		<side value="5">side5.jpg</side>
+		<side value="6">side6.jpg</side>
+	</object>
+	\end{lstlisting}
+	
+	Objekte vom Typ \dice haben als Werte Seitenobjekte mit Tag \textit{side}, mit einem Attribut \xmlattribute{value} und als Wert das Bild der Seite.
+
+	\chapter{Spielsteuerung}
+\end{document}

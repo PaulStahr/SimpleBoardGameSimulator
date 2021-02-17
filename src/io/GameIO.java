@@ -23,6 +23,7 @@ import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
+import gameObjects.definition.*;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -34,13 +35,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.definition.GameObject;
-import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectDice.DiceSide;
 import gameObjects.definition.GameObjectDice.DiceState;
-import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectBook.BookState;
+import gameObjects.definition.GameObjectBook.BookSide;
 import gameObjects.definition.GameObjectFigure.FigureState;
-import gameObjects.definition.GameObjectToken;
 import gameObjects.definition.GameObjectToken.TokenState;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
@@ -95,6 +94,7 @@ public class GameIO {
 		if (state instanceof TokenState) 					{elem.setAttribute(IOString.SIDE, Boolean.toString(((TokenState) state).side));}
 		if (state instanceof GameObjectFigure.FigureState)	{elem.setAttribute(IOString.STANDING, Boolean.toString(((GameObjectFigure.FigureState) state).standing));}
 		if (state instanceof GameObjectDice.DiceState)		{elem.setAttribute(IOString.SIDE, Integer.toString(((GameObjectDice.DiceState)state).side));}
+		if (state instanceof GameObjectBook.BookState)		{elem.setAttribute(IOString.SIDE, Integer.toString(((GameObjectBook.BookState)state).side));}
 	}
 
 	private static final int readAttribute(Element elem, String key, int def)
@@ -154,6 +154,10 @@ public class GameIO {
 		if (state instanceof GameObjectDice.DiceState && elem.getAttributeValue(IOString.SIDE) != null)
 		{
 			((DiceState)state).side = Integer.parseInt(elem.getAttributeValue(IOString.SIDE));
+		}
+		if (state instanceof GameObjectBook.BookState && elem.getAttributeValue(IOString.SIDE) != null)
+		{
+			((BookState)state).side = Integer.parseInt(elem.getAttributeValue(IOString.SIDE));
 		}
 	}
 
@@ -366,6 +370,24 @@ public class GameIO {
 				result = new GameObjectDice(objectName, type, width, height, dss.toArray(new DiceSide[dss.size()]), value, rotationStep);
 				break;
 			}
+			case IOString.BOOK:
+			{
+				ArrayList<BookSide> bss = new ArrayList<>();
+				for (Element side : elem.getChildren())
+				{
+					if (side.getName().equals(IOString.SIDE))
+					{
+						BufferedImage img = images.get(side.getValue());
+						if (img == null)
+						{
+							logger.warn("Image not found: ", side.getValue());
+						}
+						bss.add(new BookSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img, side.getValue()));
+					}
+				}
+				result = new GameObjectBook(objectName, type, width, height, bss.toArray(new BookSide[bss.size()]), value, rotationStep);
+				break;
+			}
 		}
 		ArrayList<String> groups = new ArrayList<String>();
 		for (Element child : elem.getChildren())
@@ -469,6 +491,16 @@ public class GameIO {
 		{
 			GameObjectDice dice = (GameObjectDice) gameObject;
 			for (DiceSide side : dice.dss)
+			{
+				Element sideElem = new Element(IOString.SIDE);
+				sideElem.setAttribute(IOString.VALUE, Integer.toString(side.value));
+				sideElem.setText(game.getImageKey(side.img));
+				elem.addContent(sideElem);
+			}
+		}
+		else if (gameObject instanceof  GameObjectBook){
+			GameObjectBook book = (GameObjectBook) gameObject;
+			for (BookSide side : book.bss)
 			{
 				Element sideElem = new Element(IOString.SIDE);
 				sideElem.setAttribute(IOString.VALUE, Integer.toString(side.value));

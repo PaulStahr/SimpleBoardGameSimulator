@@ -57,6 +57,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import gameObjects.definition.GameObjectBook;
 import gameObjects.functions.PlayerFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -399,10 +400,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (!player.visitor) {
 			if (arg0.getClickCount() == 2) {
 				//Play object with double click
-				if (hoveredObject != null && !ObjectFunctions.IsObjectInTableMiddle(this,hoveredObject)){
+				if (hoveredObject != null && !ObjectFunctions.IsObjectInTableMiddle(this,hoveredObject) && !(hoveredObject.go instanceof GameObjectBook)){
 					ObjectFunctions.playObject(this,gameInstance,player,hoveredObject);
 				}
-				else if(hoveredObject != null && ObjectFunctions.IsObjectInTableMiddle(this,hoveredObject)){
+				else if(hoveredObject != null && ObjectFunctions.IsObjectInTableMiddle(this,hoveredObject) && !(hoveredObject.go instanceof GameObjectBook)){
 					ObjectFunctions.takeTrick(this, gameInstance, player, hoveredObject, ial);
 				}
 				else{
@@ -413,6 +414,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 							break;
 						}
 					}
+				}
+			}
+			if (hoveredObject != null && hoveredObject.go instanceof GameObjectBook){
+				if (SwingUtilities.isLeftMouseButton(arg0)){
+					ObjectFunctions.nextBookPage(id, gameInstance, player, hoveredObject);
+				}
+				else if (SwingUtilities.isRightMouseButton(arg0)){
+					ObjectFunctions.previousBookPage(id, gameInstance, player, hoveredObject);
 				}
 			}
 		}
@@ -518,7 +527,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					isSelectStarted = true;
 				}
 				//Select objects on click
-				else if (!mouseInPrivateArea) {
+				else if (!mouseInPrivateArea && nearestObject != null) {
 					//Select unselected objects on click and deselect selected objects on Control+click
 					if (!ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, nearestObject.id) || arg0.isControlDown()) {
 						if (!arg0.isControlDown()) {
@@ -809,13 +818,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						for (int oId : ObjectFunctions.getStackRepresentatives(gameInstance, selectedObjects)) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, oi), ObjectFunctions.getStackBottom(gameInstance, oi))) {
-								ObjectFunctions.displayStack(id, gameInstance, player, oi, (int) (oi.getWidth(player.id) * cardOverlap));
+								ObjectFunctions.displayStack(this, gameInstance, player, oi, (int) (oi.getWidth(player.id) * cardOverlap));
 							} else {
 								if (selectedObjects.size() == 1) {
 									ObjectInstance selectedObject = gameInstance.getObjectInstanceById(selectedObjects.get(0));
-									ObjectFunctions.collectStack(id, gameInstance, player, selectedObject);
+									ObjectFunctions.collectStack(this, gameInstance, player, selectedObject);
 								} else {
-									ObjectFunctions.collectStack(id, gameInstance, player, oi);
+									ObjectFunctions.collectStack(this, gameInstance, player, oi);
 								}
 							}
 						}
@@ -837,13 +846,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						if (ial.size() > 0) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(ial.getI(0));
 							if (ObjectFunctions.haveSamePositions(ObjectFunctions.getStackTop(gameInstance, oi), ObjectFunctions.getStackBottom(gameInstance, oi))) {
-								ObjectFunctions.displayStack(id, gameInstance, player, oi, (int) (oi.getWidth(player.id) * cardOverlap));
+								ObjectFunctions.displayStack(this, gameInstance, player, oi, (int) (oi.getWidth(player.id) * cardOverlap));
 							} else {
 								if (selectedObjects.size() == 1) {
 									ObjectInstance selectedObject = gameInstance.getObjectInstanceById(selectedObjects.get(0));
-									ObjectFunctions.collectStack(id, gameInstance, player, selectedObject);
+									ObjectFunctions.collectStack(this, gameInstance, player, selectedObject);
 								} else {
-									ObjectFunctions.collectStack(id, gameInstance, player, oi);
+									ObjectFunctions.collectStack(this, gameInstance, player, oi);
 								}
 							}
 						}

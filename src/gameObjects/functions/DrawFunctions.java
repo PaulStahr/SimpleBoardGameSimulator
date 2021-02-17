@@ -18,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
+import gameObjects.definition.GameObjectBook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +89,9 @@ public class DrawFunctions {
                     else if (oi.go instanceof GameObjectFigure) {
                         drawFigureObjects(gamePanel, g, gameInstance, oi, player, 1);
                     }
+                    else if (oi.go instanceof GameObjectBook){
+                        drawBookObjects(gamePanel, g, gameInstance, oi, player, 1);
+                    }
                 }catch(Exception e)
                 {
                     logger.error("Error in drawing Tokens", e);
@@ -96,7 +100,11 @@ public class DrawFunctions {
         }
     }
 
-        public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, IntegerArrayList tmp){
+    public static void drawBookObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming) {
+        drawObject(gamePanel, g, gameInstance, gameInstance.getObjectInstanceById(oi.id), player, zooming, 5);
+    }
+
+    public static void drawTokenObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, IntegerArrayList tmp){
         //draw tokens in the order of its draw value
         if (ObjectFunctions.isStackTop(objectInstance)) {
             tmp.clear();
