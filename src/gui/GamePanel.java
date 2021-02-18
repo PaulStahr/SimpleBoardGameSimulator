@@ -960,7 +960,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 							ObjectFunctions.removeStackRelations(this, gameInstance, player, oi);
 							ial.add(stackList);
 						}
-						ObjectFunctions.giveObjects(this, gameInstance, player, ial);
+						ObjectFunctions.giveObjects(this, gameInstance, ial);
 					}
 					else if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD) {
 						//Scale hovered Object

@@ -293,9 +293,10 @@ public class DrawFunctions {
             Graphics2D g2 = (Graphics2D) g;
             AffineTransform tmp = g2.getTransform();
             g2.translate(objectInstance.state.posX, objectInstance.state.posY);
-            //draw object not in private area
+            //draw objects
             if (gamePanel.privateArea == null || !gamePanel.mouseInPrivateArea || !objectInstance.state.isActive) {
                 g2.rotate(Math.toRadians(objectInstance.state.rotation));
+                //Draw Dice Object
                 if (objectInstance.go instanceof GameObjectDice) {
                     GameObjectDice.DiceState diceState = (GameObjectDice.DiceState) objectInstance.state;
                     if (diceState.unfold) {
@@ -313,11 +314,13 @@ public class DrawFunctions {
                         }
                     }
                 }
+                //Draw Objects not in private area
                 if (objectInstance.state.owner_id == -1 || ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id)) {
                     g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
                 }
+                //Draw Objects in private area
                 else if (objectInstance.state.owner_id != -1){
-                    boolean x = ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id);
+                    //g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
                     //Draw Object in front of player
                     //Player playerOwner = gameInstance.getPlayerById(objectInstance.state.owner_id);
                     /*
@@ -342,9 +345,6 @@ public class DrawFunctions {
                 g2.rotate(-gamePanel.rotation);
                 g2.scale(gamePanel.privateArea.zooming/(sqrt(g2.getTransform().getDeterminant())), gamePanel.privateArea.zooming/(sqrt(g2.getTransform().getDeterminant())));
                 g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth()  * 0.5), -(int) (objectInstance.scale * img.getHeight()  * 0.5), (int) (objectInstance.scale * img.getWidth() ), (int) (objectInstance.scale * img.getHeight() ), null);
-            }
-            else{
-                boolean x = true;
             }
 
             //Define border strokes

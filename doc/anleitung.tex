@@ -9,6 +9,7 @@
 \newcommand{\card}{\textcolor{red}{card}\xspace}
 \newcommand{\gamefigure}{\textcolor{red}{figure}\xspace}
 \newcommand{\dice}{\textcolor{red}{dice}\xspace}
+\newcommand{\book}{\textcolor{red}{book}\xspace}
 \newcommand{\xmlattribute}[1]{\textcolor{green}{#1}}
 
 
@@ -198,6 +199,26 @@
 	\end{lstlisting}
 	
 	Objekte vom Typ \dice haben als Werte Seitenobjekte mit Tag \textit{side}, mit einem Attribut \xmlattribute{value} und als Wert das Bild der Seite.
+
+	\subsection{Der Typ \book}
+	Objekte vom Typ \book können wie Bücher verwendet werden. Sie haben mehrere Seiten und können vor-und zurück geblättert werden.
+	
+	Beispiel eines \book Objekts mit sechs Seiten:
+	
+	\lstset{language=XML}
+	\begin{lstlisting}	
+	<object type="book" unique_name="book1" width="30" height="30">
+		<side value="1">side1.jpg</side>
+		<side value="2">side2.jpg</side>
+		<side value="3">side3.jpg</side>
+		<side value="4">side4.jpg</side>
+		<side value="5">side5.jpg</side>
+		<side value="6">side6.jpg</side>
+	</object>
+	\end{lstlisting}
+	
+	Objekte vom Typ \book haben als Werte Seitenobjekte mit Tag \textit{side}, mit einem Attribut \xmlattribute{value} und als Wert das Bild der Seite.
+
 
 	\chapter{Spielsteuerung}
 \end{document}

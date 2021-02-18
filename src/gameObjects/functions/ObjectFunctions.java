@@ -553,7 +553,7 @@ public class ObjectFunctions {
     /**
      * Flips the given object
      *
-     * @param gamePanelId    id of game panel
+     * @param gamePanel    game panel
      * @param gameInstance   Instance of Game
      * @param player         Current player
      * @param objectInstance Instance of Object
@@ -1293,6 +1293,7 @@ public class ObjectFunctions {
                         offset = gamePanel.table.getDiameter()/2 - oi.getHeight(player.id)/2;
                     }
                     Point2D PlayerShift = new Point2D.Double(-Math.sin(Math.toRadians(angle))*offset, Math.cos(Math.toRadians(angle))*offset);
+                    collectStack(gamePanel, gameInstance, player, oi);
                     moveStackTo(gamePanel, gameInstance, player, ial, (int) (gamePanel.table.getTableCenter().getX() + PlayerShift.getX()), (int) (gamePanel.table.getTableCenter().getY() + PlayerShift.getY()));
                     rotateStack(gameInstance, ial, (int) angle);
                 }
@@ -1764,7 +1765,7 @@ public class ObjectFunctions {
     }
 
 
-    public static void giveObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList ial) {
+    public static void giveObjects(GamePanel gamePanel, GameInstance gameInstance, IntegerArrayList ial) {
         Collections.shuffle(ial);
         int playerNum = gameInstance.getPlayerNumber();
         int numElements = ial.size()/playerNum;
@@ -1772,20 +1773,20 @@ public class ObjectFunctions {
 
         int counter = 0;
         int playerCounter = 0;
-        for(Player player1 : gameInstance.getPlayerList())
+        for(Player player : gameInstance.getPlayerList())
         {
             //Set trick num to zero
-            player1.trickNum = 0;
-            gameInstance.update(new PlayerEditAction(gamePanel.id, player1, player1));
+            player.trickNum = 0;
+            gameInstance.update(new PlayerEditAction(gamePanel.id, player, player));
             int currentElementIndex = 0;
             while(currentElementIndex < numElements){
                 int Pos = numElements*playerCounter + currentElementIndex;
-                takeObjects(gamePanel,gameInstance,player1, gameInstance.getObjectInstanceById(ial.getI(Pos)));
+                takeObjects(gamePanel,gameInstance,player, gameInstance.getObjectInstanceById(ial.getI(Pos)));
                 currentElementIndex+=1;
             }
             if(counter < modElements){
                 int Pos = numElements*playerNum + counter;
-                takeObjects(gamePanel,gameInstance,player1, gameInstance.getObjectInstanceById(ial.getI(Pos)));
+                takeObjects(gamePanel,gameInstance,player, gameInstance.getObjectInstanceById(ial.getI(Pos)));
                 counter+= 1;
             }
             ++playerCounter;

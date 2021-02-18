@@ -1,4 +1,4 @@
-This is LuaHBTeX, Version 1.12.0 (TeX Live 2020/Debian)  (format=lualatex 2020.10.26)  17 FEB 2021 10:06
+This is LuaHBTeX, Version 1.12.0 (TeX Live 2020/Debian)  (format=lualatex 2020.10.26)  18 FEB 2021 10:01
  restricted system commands enabled.
 **anleitung.tex
 (./anleitung.tex
@@ -252,30 +252,30 @@ File: l3backend-pdfmode.def 2020-06-29 L3 backend support: PDF mode
 (./anleitung.aux)
 \openout1 = anleitung.aux
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 32.
-LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 32
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 33.
+LaTeX Font Info:    Trying to load font information for TS1+cmr on input line 33
 .
  (/usr/share/texlive/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2019/12/16 v2.5j Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 32.
-LaTeX Font Info:    ... okay on input line 32.
-Package scrbase Info: activating english \contentsname on input line 32.
-Package scrbase Info: activating english \listfigurename on input line 32.
-Package scrbase Info: activating english \listtablename on input line 32.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for TU/lmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 33.
+LaTeX Font Info:    ... okay on input line 33.
+Package scrbase Info: activating english \contentsname on input line 33.
+Package scrbase Info: activating english \listfigurename on input line 33.
+Package scrbase Info: activating english \listtablename on input line 33.
 
 (/usr/share/texlive/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -293,9 +293,9 @@ Package scrbase Info: activating english \listtablename on input line 32.
 )
 \c@lstlisting=\count190
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <14.4> on input line 34.
+(Font)              <14.4> on input line 35.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 34.
+(Font)              <7> on input line 35.
 
 
 LaTeX Warning: No \author given.
@@ -340,124 +340,124 @@ Class scrbook Warning: \float@addtolists detected!
 (scrbook)              deprecated \float@addtolist interface.
 
 LaTeX Font Info:    Font shape `TU/lmss/bx/it' in size <14.4> not available
-(Font)              Font shape `TU/lmss/bx/sl' tried instead on input line 37.
+(Font)              Font shape `TU/lmss/bx/sl' tried instead on input line 38.
 [5]
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 []|[]\TU/lmr/m/n/10.95 color[],
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 []\TU/lmr/m/n/10.95 put_down_area[],
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 []|\TU/lmr/m/n/10.95 Anzeige des
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 Tis-ches auf
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 dem Spielfeld,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 falls False wird
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 der Tisch nicht
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 angezeigt, []color[]
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 definiert die
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 []\TU/lmr/m/n/10.95 put_down_area[]
  []
 
 
-Underfull \hbox (badness 4595) in paragraph at lines 86--86
+Underfull \hbox (badness 4595) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 ist ein boolsches
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 bere-ich in der
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 er-scheinen soll,
  []
 
 
-Underfull \hbox (badness 5756) in paragraph at lines 86--86
+Underfull \hbox (badness 5756) in paragraph at lines 87--87
 []\TU/lmr/m/n/10.95 ta-ble_ra-dius[] gibt
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 den Ra-dius des
  []
 
 
-Underfull \hbox (badness 3601) in paragraph at lines 86--86
+Underfull \hbox (badness 3601) in paragraph at lines 87--87
 []|\TU/lmr/m/n/10.95 gibt an, ob der
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 Hand-karten-bere-ich
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 zum Spiel-start
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 einge-blendet sein
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 []|\TU/lmr/m/n/10.95 Falls true, wer-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 den zusät-zliche
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 In-for-ma-tio-nen
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 angezeigt, die
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 86--86
+Underfull \hbox (badness 10000) in paragraph at lines 87--87
 \TU/lmr/m/n/10.95 hil-fre-ich beim
  []
 
@@ -465,17 +465,24 @@ Underfull \hbox (badness 10000) in paragraph at lines 86--86
 Underfull \vbox (badness 2088) has occurred while \output is active []
 
  [7]
-Underfull \hbox (badness 1609) in paragraph at lines 151--151
+Underfull \hbox (badness 1609) in paragraph at lines 152--152
 []|\TU/lmr/m/n/10.95 Mögliche Ro-ta-tio-nen der
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 179--179
+Underfull \hbox (badness 10000) in paragraph at lines 180--180
 []|\TU/lmr/m/n/10.95 Bild für die ste-hende
  []
 
 [8]
-Overfull \hbox (48.21822pt too wide) in paragraph at lines 190--191
+Overfull \hbox (48.21822pt too wide) in paragraph at lines 191--192
+[][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
+][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
+[][][] 
+ []
+
+
+Overfull \hbox (48.21822pt too wide) in paragraph at lines 210--211
 [][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][
 ][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][][]
 [][][] 
@@ -489,13 +496,13 @@ chapter 2.
 [11] (./anleitung.aux))
 
 Here is how much of LuaTeX's memory you used:
- 5398 strings out of 481315
+ 5399 strings out of 481315
  100000,552014 words of node,token memory allocated
  451 words of node memory still in use:
    3 hlist, 1 vlist, 1 rule, 2 glue, 3 kern, 1 glyph, 4 attribute, 57 glue_spec,
  4 attribute_list, 1 write nodes
-   avail lists: 1:6,2:1058,3:101,4:325,5:337,6:50,7:2347,8:7,9:603,10:6,11:106
- 22526 multiletter control sequences out of 65536+600000
+   avail lists: 1:9,2:1555,3:101,4:540,5:379,6:50,7:2347,8:7,9:828,10:6,11:106
+ 22527 multiletter control sequences out of 65536+600000
  54 fonts using 5752123 bytes
  43i,10n,72p,10621b,491s stack positions out of 5000i,500n,10000p,200000b,100000s
 </usr/share/texmf/fonts/opentype/public/lm/lmromanslant10-regular.otf></usr/shar
@@ -506,7 +513,7 @@ egular.otf></usr/share/texmf/fonts/opentype/public/lm/lmroman12-regular.otf></us
 r/share/texmf/fonts/opentype/public/lm/lmsans10-bold.otf></usr/share/texlive/tex
 mf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/public/amsfonts/cm/cmr10.pfb>
-Output written on anleitung.pdf (11 pages, 63540 bytes).
+Output written on anleitung.pdf (11 pages, 64731 bytes).
 
 PDF statistics: 97 PDF objects out of 1000 (max. 8388607)
  60 compressed objects within 1 object stream
