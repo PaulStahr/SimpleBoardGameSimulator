@@ -9,6 +9,8 @@ import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.List;
 
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
@@ -26,6 +28,7 @@ public class PrivateArea {
     public double zoomingFactor = 1;
 
     private final IntegerArrayList privateObjects = new IntegerArrayList();
+    public final List<Point2D> privateObjectsPositions = new ArrayList<>();
     public final ReadOnlyIntegerArrayList objects = privateObjects.readOnly();
     public AffineTransform objectTransform;
     private final AffineTransform boardToScreenTransformation;
@@ -103,6 +106,16 @@ public class PrivateArea {
             double sectionSize = 180 / privateObjects.size();
             double angle = getAngle(posX, posY, originX, originY);
             return (int) ( angle/ sectionSize);
+        } else {
+            return -1;
+        }
+    }
+
+    public int getPrivateObjectIndexByPosition(int posX, int posY, int originX, int originY){
+        if (privateObjects.size() > 0) {
+            int section = getSectionByPosition(posX, posY, originX, originY);
+            System.out.println(section);
+            return Calculate.clip(section, 0, privateObjects.size() - 1);
         } else {
             return -1;
         }

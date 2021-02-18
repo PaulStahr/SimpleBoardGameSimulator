@@ -319,13 +319,15 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		//Redraw selected objects not in some private area
 		drawObjectsFromList(this, g, gameInstance, player, selectedObjects, ial);
 
-		//Draw all player related information
-		drawPlayerPositions(this, g, gameInstance, player, infoText);
-		g2.setTransform(tmp);
+
 		//Draw objects in private area
 		if (!player.visitor && privateArea.zooming != 0) {
 			drawTokensInPrivateArea(this, g, gameInstance, player, hoveredObject);
 		}
+
+		//Draw all player related information
+		drawPlayerPositions(this, g, gameInstance, player, infoText);
+		g2.setTransform(tmp);
 
 		//Draw debug informations
 		if (isDebug) {
@@ -541,13 +543,17 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 					}
 				} else if (mouseInPrivateArea && hoveredObject != null && this.privateArea.contains(hoveredObject.id)) {
+					Vector2d objectPosition = new Vector2d();
+					ObjectFunctions.getPrivateAreaHandCardPositionFromHoveredObject(this, gameInstance, objectPosition);
+					ObjectState state = hoveredObject.state.copy();
+					state.posX = objectPosition.getXI();
+					state.posY = objectPosition.getYI();
+					gameInstance.update(new GameObjectInstanceEditAction(id, player, hoveredObject, state));
+
 					ObjectFunctions.deselectAllSelected(this, gameInstance, player, ial);
 					ObjectFunctions.selectObject(this, gameInstance, player, hoveredObject.id);
 					ObjectFunctions.setNewDrawValue(this.id, gameInstance, player, hoveredObject);
-					ObjectState state = hoveredObject.state.copy();
-					state.posX = player.mouseXPos;
-					state.posY = player.mouseYPos;
-					gameInstance.update(new GameObjectInstanceEditAction(id, player, hoveredObject, state));
+
 				} else {
 					ObjectFunctions.deselectAllSelected(this, gameInstance, player, ial);
 				}
@@ -1035,9 +1041,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		//Scale hovered Object
 		if (!mouseInPrivateArea && hoveredObject != null){
 			outText = String.valueOf(e.getPreciseWheelRotation());
-			double scale = 1.05;
+			double scale = 0.95;
 			if((int) e.getPreciseWheelRotation() < 0) {
-				scale = 0.95;
+				scale = 1.05;
 			}
 
 			if ((hoveredObject.scale>0.1 || scale>1) && (hoveredObject.scale<2 || scale<1)) {

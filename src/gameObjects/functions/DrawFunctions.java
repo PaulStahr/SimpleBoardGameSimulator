@@ -14,11 +14,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
 import gameObjects.definition.GameObjectBook;
+import geometry.Vector2d;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -165,6 +167,42 @@ public class DrawFunctions {
             }
         }
         g2.setTransform(tmp);
+        if (gamePanel.hoveredObject != null && gameInstance.debug_mode) {
+            g2.fillRect(gamePanel.hoveredObject.state.posX-5, gamePanel.hoveredObject.state.posY-5, 10, 10);
+            if (gamePanel.hoveredObject.state.inPrivateArea && gamePanel.hoveredObject.state.owner_id != -1) {
+                Point2D transformPoint = new Point2D.Double(0, 0);
+
+                AffineTransform affineTransform = new AffineTransform();
+                Vector2d mouseBoardPos = new Vector2d();
+                gamePanel.screenToBoardPos(gamePanel.mouseScreenX, gamePanel.mouseScreenY, mouseBoardPos);
+                Point2D transformedPoint = gamePanel.privateArea.transformPoint(mouseBoardPos.getXI(), mouseBoardPos.getYI());
+                int index = gamePanel.privateArea.getPrivateObjectIndexByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY(), gamePanel.getWidth()/2, gamePanel.getHeight());
+                int oId = gamePanel.privateArea.getObjectIdByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY(), gamePanel.getWidth()/2, gamePanel.getHeight());
+                ObjectInstance objectInstance = gameInstance.getObjectInstanceById(oId);
+                if (gamePanel.privateArea.privateObjectsPositions.size() > index && index != -1) {
+                    AffineTransform temp = g2.getTransform();
+                    AffineTransform transform = new AffineTransform();
+
+                    affineTransform.translate(gamePanel.getWidth()/2, gamePanel.getHeight()-2*gamePanel.privateArea.objects.size());
+                    affineTransform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));
+                    affineTransform.rotate(gamePanel.privateArea.objects.indexOf(oId) * Math.PI / (gamePanel.privateArea.objects.size()));
+                    affineTransform.scale(gamePanel.privateArea.zooming, gamePanel.privateArea.zooming);
+                    affineTransform.translate(0, -250);
+
+                    g2.setTransform(affineTransform);
+                    g2.fillRect(- 5, - 5, 10, 10);
+
+                    double x = g2.getTransform().getTranslateX();
+                    double y = g2.getTransform().getTranslateY();
+
+                    Vector2d boardPos = new Vector2d();
+                    gamePanel.screenToBoardPos((int) x, (int) y, boardPos);
+
+                    g2.setTransform(temp);
+                }
+                g2.drawString(String.valueOf(index), 0, 0);
+            }
+        }
     }
 
     public static void drawSelection(GamePanel gamePanel, Graphics g, Player player){
@@ -210,10 +248,18 @@ public class DrawFunctions {
                     if (!objectInstance.state.isActive) {
                         BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
                         g2.translate(0, -250);
-
+                        Point2D ElementPosition = new Point2D.Double();
+                        ElementPosition.setLocation(g2.getTransform().getTranslateX(), g2.getTransform().getTranslateY());
                         g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * 0.5), -(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
                         g2.translate(0, 250);
                         g2.rotate(Math.PI / (gamePanel.privateArea.objects.size() + extraSpace));
+                        if (gamePanel.privateArea.privateObjectsPositions.size() <= i){
+                            gamePanel.privateArea.privateObjectsPositions.add(ElementPosition);
+                        }
+                        else{
+                            gamePanel.privateArea.privateObjectsPositions.set(i, ElementPosition);
+                        }
+
                     }
                 } else {
                     //TODO out ouf bound errors
@@ -221,7 +267,7 @@ public class DrawFunctions {
                         g2.translate(0, -250);
                         g2.translate(0, 250);
                         g2.rotate(Math.PI / (gamePanel.privateArea.objects.size() + extraSpace));
-                    } else if (i < gamePanel.privateArea.currentDragPosition) {
+                    } else if (i>=0 && i < gamePanel.privateArea.currentDragPosition) {
                         ObjectInstance objectInstance = gameInstance.getObjectInstanceById(gamePanel.privateArea.objects.getI(i));
                         if (!objectInstance.state.isActive) {
                             BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
@@ -230,7 +276,7 @@ public class DrawFunctions {
                             g2.translate(0, 250);
                             g2.rotate(Math.PI / (gamePanel.privateArea.objects.size() + extraSpace));
                         }
-                    } else if (i > gamePanel.privateArea.currentDragPosition) {
+                    } else if (i>=0 && i > gamePanel.privateArea.currentDragPosition) {
                         ObjectInstance objectInstance = gameInstance.getObjectInstanceById(gamePanel.privateArea.objects.getI(i - 1));
                         if (!objectInstance.state.isActive) {
                             BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
@@ -528,6 +574,10 @@ public class DrawFunctions {
         int yStep = 20;
         g2.setColor(player.color);
         g2.drawString("Mouse: (" + Integer.toString(gamePanel.mouseScreenX) + ", " + Integer.toString(gamePanel.mouseScreenY) + ")" + " Wheel: " + Integer.toString(gamePanel.mouseWheelValue), 50, yPos);
+        yPos+=yStep;
+        Vector2d boardPosition = new Vector2d();
+        gamePanel.screenToBoardPos(gamePanel.mouseScreenX, gamePanel.mouseScreenY, boardPosition);
+        g2.drawString("Board: (" + Integer.toString(boardPosition.getXI()) + ", " + Integer.toString(boardPosition.getYI()) + ")" + " Wheel: " + Integer.toString(gamePanel.mouseWheelValue), 50, yPos);
         yPos+=yStep;
         g2.drawString("Player Pos: " + Boolean.toString(gamePanel.mouseInPrivateArea), 50, yPos);
         yPos+=yStep;

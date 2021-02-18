@@ -21,6 +21,7 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
 import geometry.Vector2;
+import geometry.Vector2d;
 import gui.GamePanel;
 import main.Player;
 import util.Pair;
@@ -870,13 +871,22 @@ public class ObjectFunctions {
 
         //Move the whole stack to element object instance
     public static void collectStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
-        if (!haveSamePositions(getStackBottom(gameInstance, objectInstance), getStackTop(gameInstance, objectInstance)) && objectInstance.go instanceof GameObjectToken) {
-            IntegerArrayList stack = new IntegerArrayList();
-            getStackFromTop(gameInstance, objectInstance, stack);
+        IntegerArrayList stack = new IntegerArrayList();
+        getStackFromTop(gameInstance, objectInstance, stack);
+        if (!stackIsCollected(gamePanel, gameInstance, player, stack) && objectInstance.go instanceof GameObjectToken) {
             for (int id : stack) {
                 moveObjectTo(gamePanel, gameInstance, player, gameInstance.getObjectInstanceById(id), objectInstance);
             }
         }
+    }
+
+    public static boolean stackIsCollected(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList ial){
+        for (int i=0;i<ial.size();++i){
+            if (!haveSamePositions(gameInstance.getObjectInstanceById(ial.getI(0)), gameInstance.getObjectInstanceById(ial.get(i)))){
+                return false;
+            }
+        }
+        return true;
     }
 
     //check if objectInstance is at the bottom of a stack
@@ -1490,7 +1500,6 @@ public class ObjectFunctions {
         gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance, state));
         gamePanel.privateArea.updatePrivateObjects(gameInstance, player);
         insertIntoStack(gamePanel, gameInstance, player, objectInstance, idList, insertId, cardMargin);
-        idList.clear();
         moveOwnStackToBoardPosition(gamePanel, gameInstance, player, idList);
         deselectObject(gamePanel, gameInstance, player, objectInstance.id);
     }
@@ -1823,4 +1832,31 @@ public class ObjectFunctions {
         rotateStack(gameInstance, ial, (int) angle);
         ++player.trickNum;
     }
+
+    public static void getPrivateAreaHandCardPositionFromHoveredObject(GamePanel gamePanel, GameInstance gameInstance, Vector2d objectPosition) {
+        objectPosition.set(0, 0);
+        if (gamePanel.hoveredObject.state.inPrivateArea && gamePanel.hoveredObject.state.owner_id != -1) {
+            Point2D transformPoint = new Point2D.Double(0, 0);
+            AffineTransform affineTransform = new AffineTransform();
+            Vector2d mouseBoardPos = new Vector2d();
+            gamePanel.screenToBoardPos(gamePanel.mouseScreenX, gamePanel.mouseScreenY, mouseBoardPos);
+            Point2D transformedPoint = gamePanel.privateArea.transformPoint(mouseBoardPos.getXI(), mouseBoardPos.getYI());
+            int index = gamePanel.privateArea.getPrivateObjectIndexByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY(), gamePanel.getWidth() / 2, gamePanel.getHeight());
+            int oId = gamePanel.privateArea.getObjectIdByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY(), gamePanel.getWidth() / 2, gamePanel.getHeight());
+            ObjectInstance objectInstance = gameInstance.getObjectInstanceById(oId);
+            if (gamePanel.privateArea.privateObjectsPositions.size() > index && index != -1) {
+                AffineTransform transform = new AffineTransform();
+                affineTransform.translate(gamePanel.getWidth() / 2, gamePanel.getHeight() - 2 * gamePanel.privateArea.objects.size());
+                affineTransform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));
+                affineTransform.rotate(gamePanel.privateArea.objects.indexOf(oId) * Math.PI / (gamePanel.privateArea.objects.size()));
+                affineTransform.scale(gamePanel.privateArea.zooming, gamePanel.privateArea.zooming);
+                affineTransform.translate(0, -250);
+                double x = affineTransform.getTranslateX();
+                double y = affineTransform.getTranslateY();
+                gamePanel.screenToBoardPos((int) x, (int) y, objectPosition);
+            }
+
+        }
+    }
 }
+
