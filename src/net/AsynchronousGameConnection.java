@@ -1,6 +1,5 @@
 package net;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -18,12 +17,11 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
 
-import javax.imageio.ImageIO;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.DataHandler;
+import data.Texture;
 import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
@@ -476,7 +474,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                                     case GameStructureEditAction.EDIT_SESSION_PASSWORD:    objOut.writeUnshared(gi.password);break;
                                     case AddObjectAction.ADD_IMAGE:
                                     {
-                                        Map.Entry<String, BufferedImage> entry = gi.game.getImage(((AddObjectAction)gs).objectId);
+                                        Map.Entry<String, Texture> entry = gi.game.getImage(((AddObjectAction)gs).objectId);
                                         objOut.writeObject(entry.getKey());
                                         GameIO.writeImageToStream(entry.getValue(), "png", byteStream);
                                         objOut.writeInt(byteStream.size());
@@ -633,9 +631,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                             {
                                 String name = (String)objIn.readObject();
                                 int cap = objIn.readInt();
-                                cappedIn.setCap(cap);
-                                gi.game.images.put(name, ImageIO.read(cappedIn));
-                                cappedIn.drain();
+                                gi.game.images.put(name, new Texture(StreamUtil.toByteArray(objIn, cap), StringUtils.getFileType(name)));
                                 gi.update(action);
                                 break;
                             }

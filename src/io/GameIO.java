@@ -4,7 +4,6 @@ import static java.lang.Integer.max;
 
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -23,7 +22,6 @@ import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
-import gameObjects.definition.*;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -34,12 +32,18 @@ import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import data.Texture;
 import gameObjects.action.GameObjectInstanceEditAction;
+import gameObjects.definition.GameObject;
+import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectBook.BookSide;
+import gameObjects.definition.GameObjectBook.BookState;
+import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectDice.DiceSide;
 import gameObjects.definition.GameObjectDice.DiceState;
-import gameObjects.definition.GameObjectBook.BookState;
-import gameObjects.definition.GameObjectBook.BookSide;
+import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectFigure.FigureState;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.definition.GameObjectToken.TokenState;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
@@ -48,6 +52,7 @@ import gameObjects.instance.ObjectState;
 import main.Player;
 import net.AsynchronousGameConnection;
 import util.ArrayUtil;
+import util.StringUtils;
 import util.io.StreamUtil;
 
 public class GameIO {
@@ -330,7 +335,7 @@ public class GameIO {
 	 * @param images a HashMap of all images saved in the game
 	 * @return the created GameInstance
 	 */
-	private static GameObject createGameObjectFromElement(Element elem, HashMap<String, BufferedImage> images, Integer uniqueId)
+	private static GameObject createGameObjectFromElement(Element elem, HashMap<String, Texture> images, Integer uniqueId)
 	{
 		String objectName = elem.getAttributeValue(IOString.UNIQUE_NAME);
 		String type = elem.getAttributeValue(IOString.TYPE);
@@ -359,11 +364,8 @@ public class GameIO {
 				{
 					if (side.getName().equals(IOString.SIDE))
 					{
-						BufferedImage img = images.get(side.getValue());
-						if (img == null)
-						{
-							logger.warn("Image not found: ", side.getValue());
-						}
+						Texture img = images.get(side.getValue());
+						if (img == null){logger.warn("Image not found: ", side.getValue());}
 						dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img, side.getValue()));
 					}
 				}
@@ -377,11 +379,8 @@ public class GameIO {
 				{
 					if (side.getName().equals(IOString.SIDE))
 					{
-						BufferedImage img = images.get(side.getValue());
-						if (img == null)
-						{
-							logger.warn("Image not found: ", side.getValue());
-						}
+						Texture img = images.get(side.getValue());
+						if (img == null){logger.warn("Image not found: ", side.getValue());}
 						bss.add(new BookSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img, side.getValue()));
 					}
 				}
@@ -652,24 +651,31 @@ public class GameIO {
 		}
 	}
 	
-	public static final void writeImageToStream(BufferedImage img, String suffix, OutputStream out) throws IOException
+	public static final void writeImageToStream(Texture img, String suffix, OutputStream out) throws IOException
 	{
-		if (getVersion() < 9)
-    	{
-    		MemoryCacheImageOutputStream tmp = new MemoryCacheImageOutputStream(out);
-	    	ImageIO.write(img, suffix, tmp);
-    		tmp.close();
-    	}
+	    if (suffix == img.suffix)
+	    {
+	        img.writeTo(out);
+	    }
 	    else
 	    {
-	    	ImageIO.write(img, suffix, out);
-    	}
+    		if (getVersion() < 9)
+        	{
+        		MemoryCacheImageOutputStream tmp = new MemoryCacheImageOutputStream(out);
+    	    	ImageIO.write(img.getImage(), suffix, tmp);
+        		tmp.close();
+        	}
+    	    else
+    	    {
+    	    	ImageIO.write(img.getImage(), suffix, out);
+        	}
+	    }
     }
 	
 	public static void writeGameToZip(Game game, ZipOutputStream zipOutputStream) throws IOException
 	{	
 		// Save all images
-	    for (HashMap.Entry<String, BufferedImage> pair : game.images.entrySet()) {
+	    for (HashMap.Entry<String, Texture> pair : game.images.entrySet()) {
 	    	String key = pair.getKey();
 		    ZipEntry imageZipOutput = new ZipEntry(key);
 		    zipOutputStream.putNextEntry(imageZipOutput);
@@ -813,7 +819,7 @@ public class GameIO {
 			    	String suffix = name.substring(idx + 1);
 			    	if (ArrayUtil.firstEqualIndex(ImageIO.getReaderFileSuffixes(), suffix) != -1)
 			    	{
-			    		BufferedImage img = ImageIO.read(content);
+			    		Texture img = new Texture(content, StringUtils.getFileType(name));
 						result.game.images.put(name, img);
 			    	}
 			    }

@@ -1,8 +1,10 @@
 package gameObjects.definition;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.List;
 
+import data.Texture;
 import gameObjects.GameObjectColumnType;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
@@ -33,15 +35,25 @@ public abstract class GameObject {
 		this.isFixed = isFixed;
 	}
 	
-	public abstract BufferedImage getLook(ObjectState state, int playerId);
+	public abstract Texture getLook(ObjectState state, int playerId);
 
 	public int getWidth(ObjectState state, int playerId) {
-		BufferedImage img = getLook(state, playerId);
+		BufferedImage img;
+        try {
+            img = getLook(state, playerId).getImage();
+        } catch (IOException e) {
+            return 0;
+        }
 		return img == null ? 0 : (int) (img.getWidth()*0.2);
 	}
 
 	public int getHeight(ObjectState state, int playerId) {
-		BufferedImage img = getLook(state, playerId);
+		BufferedImage img;
+        try {
+            img = getLook(state, playerId).getImage();
+        } catch (IOException e) {
+            return 0;
+        }
 		return img == null ? 0 : (int) (img.getHeight()*0.2);
 	}
 

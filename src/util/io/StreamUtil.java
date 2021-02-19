@@ -81,6 +81,21 @@ public class StreamUtil {
         }
 	}
 
+   public static byte[] toByteArray(InputStream stream, int cap) throws IOException{
+        byte ch[] = new byte[Math.min(cap, Math.max(1, stream.available()))];
+        int len = 0;
+        int read = 0;
+        while ((read = stream.read(ch, len, Math.min(ch.length, cap) - len))!=-1)
+        {
+            len += read;
+            if (ch.length < Math.min(cap, len + stream.available()) || (stream.available() == 0 && ch.length == len))
+            {
+                ch = Arrays.copyOf(ch, Math.min(cap, Math.max(ch.length * 2, ch.length + stream.available())));
+            }
+        }
+        return len == ch.length ? ch : Arrays.copyOf(ch, len);
+    }
+
 	public static byte[] toByteArray(InputStream stream) throws IOException{
 		byte ch[] = new byte[Math.max(1, stream.available())];
 		int len = 0;
@@ -88,7 +103,7 @@ public class StreamUtil {
 		while ((read = stream.read(ch, len, ch.length - len))!=-1)
 		{
 			len += read;
-			if (ch.length - len - stream.available() < 0 || stream.available() == 0)
+			if (ch.length < len + stream.available() || (stream.available() == 0 && ch.length == len))
 			{
 				ch = Arrays.copyOf(ch, Math.max(ch.length * 2, ch.length + stream.available()));
 			}

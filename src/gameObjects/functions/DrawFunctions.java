@@ -16,19 +16,20 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import gameObjects.definition.GameObjectBook;
-import geometry.Vector2d;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gameObjects.definition.GameObjectBook;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import geometry.Vector2d;
 import gui.GamePanel;
 import main.Player;
 import util.data.IntegerArrayList;
@@ -41,7 +42,11 @@ public class DrawFunctions {
         g.clearRect(0, 0, gamePanel.getWidth(), gamePanel.getHeight());
         //TODO Florian:sometimes images are drawn twice (the active object?)
         g.drawString(String.valueOf(gamePanel.mouseWheelValue), gamePanel.mouseScreenX, gamePanel.mouseScreenY);
-        g.drawImage(gameInstance.game.background, 0, 0, gamePanel.getWidth(), gamePanel.getHeight(), Color.BLACK, null);
+        try {
+            g.drawImage(gameInstance.game.background.getImage(), 0, 0, gamePanel.getWidth(), gamePanel.getHeight(), Color.BLACK, null);
+        } catch (IOException e) {
+            logger.error("Can't draw background", e);
+        }
 
         if(gamePanel.table != null) {
             gamePanel.table.drawCompleteTable(gamePanel, gameInstance, g);
@@ -246,7 +251,7 @@ public class DrawFunctions {
                 if (extraSpace == 0) {
                     ObjectInstance objectInstance = gameInstance.getObjectInstanceById(gamePanel.privateArea.objects.getI(i));
                     if (!objectInstance.state.isActive) {
-                        BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
+                        BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId).getImageNoExc();
                         g2.translate(0, -250);
                         Point2D ElementPosition = new Point2D.Double();
                         ElementPosition.setLocation(g2.getTransform().getTranslateX(), g2.getTransform().getTranslateY());
@@ -270,7 +275,7 @@ public class DrawFunctions {
                     } else if (i>=0 && i < gamePanel.privateArea.currentDragPosition) {
                         ObjectInstance objectInstance = gameInstance.getObjectInstanceById(gamePanel.privateArea.objects.getI(i));
                         if (!objectInstance.state.isActive) {
-                            BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
+                            BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId).getImageNoExc();
                             g2.translate(0, -250);
                             g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * 0.5), -(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
                             g2.translate(0, 250);
@@ -279,7 +284,7 @@ public class DrawFunctions {
                     } else if (i>=0 && i > gamePanel.privateArea.currentDragPosition) {
                         ObjectInstance objectInstance = gameInstance.getObjectInstanceById(gamePanel.privateArea.objects.getI(i - 1));
                         if (!objectInstance.state.isActive) {
-                            BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId);
+                            BufferedImage img = objectInstance.go.getLook(objectInstance.state, playerId).getImageNoExc();
                             g2.translate(0, -250);
                             g2.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * 0.5), -(int) (objectInstance.scale * img.getHeight() * 0.5), (int) (objectInstance.scale * img.getWidth()), (int) (objectInstance.scale * img.getHeight()), null);
                             g2.translate(0, 250);
@@ -331,7 +336,7 @@ public class DrawFunctions {
      * @param borderWidth
      */
     public static void drawObject(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, double zooming, int borderWidth) {
-        BufferedImage img = objectInstance.go.getLook(objectInstance.state, player.id);
+        BufferedImage img = objectInstance.go.getLook(objectInstance.state, player.id).getImageNoExc();
         if (objectInstance.state == null || img == null) {
             logger.error("Object state is null");
         }
@@ -471,7 +476,7 @@ public class DrawFunctions {
         if (objectInstance != null) {
             Graphics2D g2 = (Graphics2D) g;
             //Define border strokes
-            BufferedImage img = objectInstance.go.getLook(objectInstance.state, player.id);
+            BufferedImage img = objectInstance.go.getLook(objectInstance.state, player.id).getImageNoExc();
             Stroke selectStroke = new BasicStroke(borderWidth,BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
             float strokePresentLength = Math.min((float)(objectInstance.scale * img.getHeight())/2.0f, (float)(objectInstance.scale * img.getWidth())/2.0f);
             float strokeAbsentLengthHeight = (float)(objectInstance.scale * img.getHeight() - strokePresentLength);
@@ -498,7 +503,7 @@ public class DrawFunctions {
             GameObjectDice dice = (GameObjectDice)objectInstance.go;
             for(int i = 0; i<dice.dss.length; ++i) {
                 GameObjectDice.DiceSide diceSide = dice.dss[i];
-                bufferedImages.add(diceSide.img);
+                bufferedImages.add(diceSide.img.getImageNoExc());
             }
 
         }

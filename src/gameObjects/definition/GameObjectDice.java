@@ -1,8 +1,8 @@
 package gameObjects.definition;
 
-import java.awt.image.BufferedImage;
 import java.util.Random;
 
+import data.Texture;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 
@@ -11,11 +11,11 @@ public class GameObjectDice extends GameObject{
 	public static class DiceSide
 	{
 		public final int value;
-		public BufferedImage img;
+		public Texture img;
 		public final String imgStr;
 
 	
-		public DiceSide(int value, BufferedImage img, String imgStr)
+		public DiceSide(int value, Texture img, String imgStr)
 		{
 			this.value = value;
 			this.img = img;
@@ -30,7 +30,7 @@ public class GameObjectDice extends GameObject{
 	}
 
 	@Override
-	public BufferedImage getLook(ObjectState state, int playerId) {
+	public Texture getLook(ObjectState state, int playerId) {
 		return dss[((DiceState)state).side].img;
 	}
 

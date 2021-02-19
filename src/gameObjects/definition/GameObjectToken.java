@@ -1,15 +1,14 @@
 package gameObjects.definition;
 
-import java.awt.image.BufferedImage;
-
+import data.Texture;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 
 public class GameObjectToken extends GameObject{
 	private String downsideLookId;
 	private String upsideLookId;
-	private BufferedImage upsideLook;
-	private BufferedImage downsideLook;
+	private Texture upsideLook;
+	private Texture downsideLook;
 	
 	public String getDownsideLookId()
 	{
@@ -33,14 +32,14 @@ public class GameObjectToken extends GameObject{
 		this.downsideLook = null;
 	}
 
-	public GameObjectToken(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, BufferedImage front, BufferedImage back, int value, int rotationStep, int isFixed) {
+	public GameObjectToken(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, Texture front, Texture back, int value, int rotationStep, int isFixed) {
 		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, rotationStep, isFixed);
 		this.upsideLook = front;
 		this.downsideLook = back;
 	}
 
 	@Override
-	public BufferedImage getLook(ObjectState state, int playerId) {
+	public Texture getLook(ObjectState state, int playerId) {
 		return ((TokenState)state).side != (state.owner_id != playerId)? upsideLook : downsideLook;
 	}
 	
@@ -93,15 +92,9 @@ public class GameObjectToken extends GameObject{
 		}
 	}
 	
-	public BufferedImage getUpsideLook()
-	{
-		return upsideLook;
-	}
+	public Texture getUpsideLook(){return upsideLook;}
 	
-	public BufferedImage getDownsideLook()
-	{
-		return downsideLook;
-	}
+	public Texture getDownsideLook(){return downsideLook;}
 
 	@Override
 	public void updateImages(GameInstance gi) {

@@ -12,14 +12,13 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
@@ -37,6 +36,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.Document;
 
+import data.Texture;
 import gameObjects.GameObjectColumnType;
 import gameObjects.GameObjectInstanceColumnType;
 import gameObjects.ImageColumnType;
@@ -57,6 +57,7 @@ import gameObjects.instance.ObjectState;
 import main.Player;
 import util.ArrayTools;
 import util.JFrameUtils;
+import util.StringUtils;
 import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.TableModel;
@@ -80,7 +81,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final JTabbedPane tabPane = new JTabbedPane();
 	public int id = (int)(Math.random() * Integer.MAX_VALUE);
 	private boolean isUpdating = false;
-	private Entry<String, BufferedImage>[] imageArray;
+	private Entry<String, Texture>[] imageArray;
 	private final LanguageHandler lh;
 	private final Player player;
 
@@ -118,7 +119,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		            List<? extends File> droppedFiles = (List<? extends File>)
 		                evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 		            for (File file : droppedFiles) {
-		            	gi.game.images.put(file.getName(), ImageIO.read(file));
+		            	gi.game.images.put(file.getName(), new Texture(Files.readAllBytes(file.toPath()), StringUtils.getFileType(file.getName())));
 		            	gi.update(new AddObjectAction(id, AddObjectAction.ADD_IMAGE, file.getName().hashCode()));
 		            }
 		        } catch (Exception ex) {
@@ -211,25 +212,19 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			textFieldTableRadius.setText(Float.toString(gi.tableRadius));
 			JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
 			comboBoxBackground.setSelectedItem(gi.game.getImageKey(gi.game.background));
-			textFieldPassword.setText(gi.password);
+            textFieldPassword.setText(gi.password);
 			textFieldSeats.setText(Integer.toString(gi.seats));
 			isUpdating = false;
 		}
 
 		@Override
 		public void itemStateChanged(ItemEvent arg0) {
-	    	if (!EventQueue.isDispatchThread())
-	    	{
-	    		throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");
-	    	}
-			if (isUpdating)
-			{
-				return;
-			}
+	    	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");}
+			if (isUpdating){return;}
 			isUpdating = true;
 			if (arg0.getStateChange() == ItemEvent.SELECTED) {
-		        gi.game.background = gi.game.images.get(arg0.getItem());
-		        gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_BACKGROUND));
+	            gi.game.background = gi.game.images.get(arg0.getItem());
+                gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_BACKGROUND));
 			}
 			isUpdating = false;
 		}
@@ -237,14 +232,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		
 		public void update(DocumentEvent event)
 		{
-	    	if (!EventQueue.isDispatchThread())
-	    	{
-	    		throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");
-	    	}
-			if (isUpdating)
-			{
-				return;
-			}
+	    	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");}
+			if (isUpdating){return;}
 			Document source = event.getDocument();
 			if (source == textFieldName.getDocument())
 			{
@@ -339,9 +328,9 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			else if (tableSource == tableModelImages)
 			{
-				Set<Entry<String, BufferedImage>> entrySet = gi.game.images.entrySet();
+				Set<Entry<String, Texture>> entrySet = gi.game.images.entrySet();
 				@SuppressWarnings("unchecked")
-				Entry<String, BufferedImage> entry = entrySet.toArray(new Entry[entrySet.size()])[row];
+				Entry<String, Texture> entry = entrySet.toArray(new Entry[entrySet.size()])[row];
 				gi.game.images.remove(entry.getKey(), entry.getValue());
 			}
 			else if (tableSource == tableModelGameObjects)

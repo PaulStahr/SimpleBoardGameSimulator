@@ -1,17 +1,16 @@
 package gameObjects.definition;
 
+import data.Texture;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
-
-import java.awt.image.BufferedImage;
 
 public class GameObjectBook extends GameObject{
     public static class BookSide{
         public final int value;
-        public BufferedImage img;
+        public Texture img;
         public final String imgStr;
 
-        public BookSide(int value, BufferedImage img, String imgStr){
+        public BookSide(int value, Texture img, String imgStr){
             this.value = value;
             this.img = img;
             this.imgStr = imgStr;
@@ -25,7 +24,7 @@ public class GameObjectBook extends GameObject{
     }
 
     @Override
-    public BufferedImage getLook(ObjectState state, int playerId) {
+    public Texture getLook(ObjectState state, int playerId) {
         return bss[((GameObjectBook.BookState)state).side].img;
     }
 

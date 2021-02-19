@@ -1,17 +1,18 @@
 package gameObjects.instance;
 import java.awt.Image;
-import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import data.Texture;
 import gameObjects.definition.GameObject;
 
 public class Game {
 	public String name;
-	public Image background;
+	public Texture background;
 	public ArrayList<GameObject> objects = new ArrayList<>();
-	public final HashMap<String, BufferedImage> images = new HashMap<>();
+	public final HashMap<String, Texture> images = new HashMap<>();
 	public GameObject getObject(String uniqueObjectName) {
 		for (int i = 0; i < objects.size(); ++i)
 		{
@@ -23,17 +24,38 @@ public class Game {
 		return null;
 	}
 
+	   /**
+     * Gets the initial image name from the images HashMap.
+     * The names function as keys in this array.
+     * @param image image for which the name is needed
+     * @return name of the image or null if image not found
+     * @throws IOException 
+     */
+    public String getImageKey(Texture image)
+    {
+        for (Map.Entry<String, Texture> mapEntry : images.entrySet())
+        {
+            if(mapEntry.getValue() == image)
+            {
+                return mapEntry.getKey();
+            }
+        }
+        return null;
+    }
+
+	
 	/**
 	 * Gets the initial image name from the images HashMap.
 	 * The names function as keys in this array.
 	 * @param image image for which the name is needed
 	 * @return name of the image or null if image not found
+	 * @throws IOException 
 	 */
-	public String getImageKey(Image image)
+	public String getImageKey(Image image) throws IOException
 	{
-		for (Map.Entry<String, BufferedImage> mapEntry : images.entrySet())
+		for (Map.Entry<String, Texture> mapEntry : images.entrySet())
 		{
-			if(mapEntry.getValue() == image)
+			if(mapEntry.getValue().getImage() == image)
 			{
 				return mapEntry.getKey();
 			}
@@ -62,8 +84,8 @@ public class Game {
 		return images.keySet().toArray(new String[images.size()]);
 	}
 
-	public Map.Entry<String, BufferedImage> getImage(int hash) {
-		for (Map.Entry<String, BufferedImage> mapEntry : images.entrySet())
+	public Map.Entry<String, Texture> getImage(int hash) {
+		for (Map.Entry<String, Texture> mapEntry : images.entrySet())
 		{
 			if(mapEntry.getKey().hashCode() == hash)
 			{
@@ -77,7 +99,7 @@ public class Game {
 		return objects.get(index);
 	}
 
-	public BufferedImage getImage(String standingLookStr) {
-		return images.get(standingLookStr);
+	public Texture getImage(String str) {
+		return images.get(str);
 	}
 }

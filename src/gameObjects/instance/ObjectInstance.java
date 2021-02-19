@@ -1,8 +1,8 @@
 package gameObjects.instance;
-import java.awt.Image;
 import java.util.Comparator;
 import java.util.List;
 
+import data.Texture;
 import gameObjects.GameObjectInstanceColumnType;
 import gameObjects.definition.GameObject;
 import gui.GamePanel;
@@ -39,15 +39,9 @@ public class ObjectInstance {
 		this.id = id;
 	}
 	
-	public Image getLook(int playerId)
-	{
-		return go.getLook(state, playerId);
-	}
+	public Texture getLook(int playerId){return go.getLook(state, playerId);}
 
-	public int getWidth(int playerId)
-	{
-		return go.getWidth(state, playerId) * this.state.scale;
-	}
+	public int getWidth(int playerId){return go.getWidth(state, playerId) * this.state.scale;}
 
 	public int getHeight(int playerId)
 	{

@@ -2,29 +2,37 @@ package gameObjects.definition;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import data.Texture;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 
 public class GameObjectFigure extends GameObject{
-	private transient BufferedImage standingLook;
-	private transient BufferedImage lyingLook;
+	private transient Texture standingLook;
+	private transient Texture lyingLook;
 	private String standingLookStr;
 	private String lyingLookStr;
-	public GameObjectFigure(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, BufferedImage standingLook, int value, int rotationStep, int isFixed) {
+	public GameObjectFigure(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, Texture standingLook, int value, int rotationStep, int isFixed) {
 		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, rotationStep,isFixed);
 		this.standingLook = standingLook;
 		// calc a rotated figure from standing figure
-		int width = standingLook.getWidth();
-	    int height = standingLook.getHeight();
-
-	    BufferedImage lyingFigure = new BufferedImage(height, width, standingLook.getType());
-
-	    Graphics2D graphics2D = lyingFigure.createGraphics();
-	    graphics2D.translate((height - width) / 2, (height - width) / 2);
-	    graphics2D.rotate(Math.PI / 2, height / 2, width / 2);
-	    graphics2D.drawRenderedImage(standingLook, null);
-	    this.lyingLook = lyingFigure;
+		try {
+    		int width = standingLook.getImage().getWidth();
+    	    int height = standingLook.getImage().getHeight();
+    
+    	    BufferedImage lyingFigure = new BufferedImage(height, width, standingLook.getImage().getType());
+    
+    	    Graphics2D graphics2D = lyingFigure.createGraphics();
+    	    graphics2D.translate((height - width) / 2, (height - width) / 2);
+    	    graphics2D.rotate(Math.PI / 2, height / 2, width / 2);
+    	    graphics2D.drawRenderedImage(standingLook.getImage(), null);
+            this.lyingLook = new Texture(lyingFigure, standingLook.suffix);
+		}
+		catch(IOException e)
+		{
+		    e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -35,7 +43,7 @@ public class GameObjectFigure extends GameObject{
 	}
 
 	@Override
-	public BufferedImage getLook(ObjectState state, int playerId) {
+	public Texture getLook(ObjectState state, int playerId) {
 		return ((FigureState)state).standing ? standingLook : lyingLook;
 	}
 	
@@ -84,12 +92,12 @@ public class GameObjectFigure extends GameObject{
 		}
 	}
 	
-	public BufferedImage getStandingLook()
+	public Texture getStandingLook()
 	{
 		return standingLook;
 	}
 	
-	public BufferedImage getlyingLook()
+	public Texture getlyingLook()
 	{
 		return lyingLook;
 	}
