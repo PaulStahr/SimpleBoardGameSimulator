@@ -3,6 +3,7 @@ package gameObjects;
 import java.awt.image.BufferedImage;
 import java.util.Map.Entry;
 
+import data.Texture;
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
 import util.data.UniqueObjects;
@@ -80,15 +81,27 @@ public enum ImageColumnType implements TableColumnType{
 				default:throw new IllegalArgumentException(getName());
 			}
 		}
+		else if (obj instanceof Texture)
+		{
+		    Texture t = (Texture)obj;
+		    switch (this)
+            {
+                case DELETE:    return "Delete";
+                case WIDTH:     return t.getImageNoExc().getWidth();
+                case HEIGHT:    return t.getImageNoExc().getHeight();
+                case ID:        return "id";
+                default:throw new IllegalArgumentException(getName());
+            }
+		}
 		else if (obj instanceof Entry<?, ?>)
 		{
 			@SuppressWarnings("unchecked")
-			Entry<String, BufferedImage> entry = (Entry<String, BufferedImage>)obj;
+			Entry<String, Texture> entry = (Entry<String, Texture>)obj;
 			switch (this)
 			{
 				case DELETE:	return "Delete";
-				case WIDTH:		return entry.getValue().getWidth();
-				case HEIGHT:	return entry.getValue().getHeight();
+				case WIDTH:		return entry.getValue().getImageNoExc().getWidth();
+				case HEIGHT:	return entry.getValue().getImageNoExc().getHeight();
 				case ID:		return entry.getKey();
 				default:throw new IllegalArgumentException(getName());
 			}
