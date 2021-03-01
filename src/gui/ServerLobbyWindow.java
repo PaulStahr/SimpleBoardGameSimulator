@@ -285,7 +285,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			client.setPort(Integer.parseInt(textFieldPort.getText()));
 			gmi.clear();
 			client.getGameInstanceMeta(gmi);
-			JFrameUtils.updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, connectColumn, visitColumn, deleteColumn);
+			JFrameUtils.updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, null, connectColumn, visitColumn, deleteColumn);
 		} catch (IOException | ClassNotFoundException e1) {
 			JFrameUtils.logErrorAndShow("Can't update information", e1, logger);
 		}

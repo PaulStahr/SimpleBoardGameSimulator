@@ -20,15 +20,9 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
     private static final GameObjectInstanceColumnType ct[] = GameObjectInstanceColumnType.values();
     private static final String[] columnNames = TableColumnType.getColumnNames(ct);
     
-    public static final int size()
-    {
-    	return ct.length;
-    }
+    public static final int size(){return ct.length;}
     
-    public static final GameObjectInstanceColumnType get(int index)
-    {
-    	return ct[index];
-    }
+    public static final GameObjectInstanceColumnType get(int index){return ct[index];}
     
 	public final String name;
 	public final Class<?> cl;
@@ -50,24 +44,16 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
 	}
 
 	@Override
-	public byte getOptionType() {
-		return optionType;
-	}
+	public byte getOptionType() {return optionType;}
 
 	@Override
-	public String[] getPossibleValues() {
-		return possibleValues.toArray(new String[possibleValues.size()]);
-	}
+	public String[] getPossibleValues() {return possibleValues.toArray(new String[possibleValues.size()]);}
 
 	@Override
-	public String getName() {
-		return name;
-	}
+	public String getName() {return name;}
 
 	@Override
-	public Class<?> getCl() {
-		return cl;
-	}
+	public Class<?> getCl() {return cl;}
 	
 	@Override
 	public Object getValue(Object obj) {

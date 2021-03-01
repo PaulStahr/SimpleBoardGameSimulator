@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
@@ -199,14 +200,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  		}
 
 		public void update() {
-	    	if (!EventQueue.isDispatchThread())
-	    	{
-	    		throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");
-	    	}
-			if (isUpdating)
-			{
-				return;
-			}
+	    	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");}
+			if (isUpdating)  {return;}
 			isUpdating = true;
 			textFieldName.setText(gi.name);
 			textFieldTableRadius.setText(Float.toString(gi.tableRadius));
@@ -234,28 +229,24 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		{
 	    	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");}
 			if (isUpdating){return;}
+            isUpdating = true;
 			Document source = event.getDocument();
 			if (source == textFieldName.getDocument())
 			{
 				gi.name = textFieldName.getText();
-				isUpdating = true;
 				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_SESSION_NAME));
-				isUpdating = false;
 			}
 			else if (source == textFieldTableRadius.getDocument())
 			{
 				gi.tableRadius = Integer.parseInt(textFieldTableRadius.getText());
-				isUpdating = true;
 				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_TABLE_RADIUS));
-				isUpdating = false;
 			}
 			else if (source == textFieldPassword.getDocument())
 			{
 				gi.password = textFieldPassword.getText();
-				isUpdating = true;
 				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_SESSION_PASSWORD));
-				isUpdating = false;
 			}
+            isUpdating = false;
 		}
 
 		@Override
@@ -276,31 +267,41 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	 */
 	private static final long serialVersionUID = 9089357847164495823L;
 
+	private Function<TableColumnType, String[]> comboBoxOverrides = new Function<TableColumnType, String[]>() {
+
+        @Override
+        public String[] apply(TableColumnType t) {
+            if (t == GameObjectInstanceColumnType.OWNER)
+            {
+                String[] result = new String[gi.getPlayerNumber() + 1];
+                result[0] = "-1";
+                for (int i = 0; i < result.length; ++i)
+                {
+                    result[i + 1] = String.valueOf(gi.getPlayerByIndex(i).id);
+                }
+                return result;
+            }
+            return null;
+        }
+    };
+	
 	private void updateTables()
 	{
-    	if (!EventQueue.isDispatchThread())
-    	{
-    		throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");
-    	}
-    	if (isUpdating)
-    	{
-    		return;
-    	}
+    	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");}
+    	if (isUpdating){return;}
 		isUpdating = true;
-		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, deleteObjectColumn);
-		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, resetObjectInstanceColumn, deleteObjectInstanceColumn);
-		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.entrySet().toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, deleteImageColumn);
-		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(true), Player.TYPES, tableModelPlayer, deletePlayerColumn, repairPlayerColumn);
+		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, null, deleteObjectColumn);
+		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
+		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.entrySet().toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, null, deleteImageColumn);
+		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(true), Player.TYPES, tableModelPlayer, null, deletePlayerColumn, repairPlayerColumn);
 		panelGeneral.update();
 		isUpdating = false;
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-		if (isUpdating)
-		{
-			return;
-		}
+		if (isUpdating){return;}
+		isUpdating = true;
 		if (ae instanceof ButtonColumn.TableButtonActionEvent)
 		{
 			ButtonColumn.TableButtonActionEvent event = (ButtonColumn.TableButtonActionEvent)ae;
@@ -350,6 +351,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 		}
 		updateTables();
+		isUpdating = false;
 	}
 	
 	@Override
@@ -538,19 +540,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 
 	@Override
 	public void tableChanged(TableModelEvent event) {
-    	if (!EventQueue.isDispatchThread())
-    	{
-    		throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");
-    	}
-		if (isUpdating)
-		{
-			return;
-		}
+    	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");}
+		if (isUpdating){return;}
 		int rowBegin = event.getFirstRow();
-    	if (rowBegin == TableModelEvent.HEADER_ROW)
-    	{
-    		return;
-    	}
+    	if (rowBegin == TableModelEvent.HEADER_ROW){return;}
     	isUpdating = true;
 		Object source = event.getSource();
 		int colBegin = event.getColumn() == TableModelEvent.ALL_COLUMNS ? 0 : event.getColumn();

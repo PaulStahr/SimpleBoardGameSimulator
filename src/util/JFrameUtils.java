@@ -36,6 +36,7 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.swing.ButtonGroup;
@@ -333,7 +334,7 @@ public class JFrameUtils{
 	private static final DefaultCellEditor checkBoxCellEditor = new DefaultCellEditor(new JCheckBox()); 
 
 
-    public static final void updateTable(JTable table, JScrollPane scrollPane, Object objectList[], List<TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
+    public static final void updateTable(JTable table, JScrollPane scrollPane, Object objectList[], List<TableColumnType> types, DefaultTableModel tm, Function<TableColumnType, String[]> possibleValueOverride, ButtonColumn ...buttonColumn)
     {
  		Object[][] rowData = new Object[objectList.length][types.size()];
      	for (int i = 0; i < rowData.length; ++i)
@@ -344,10 +345,10 @@ public class JFrameUtils{
      			rowData[i][j] = JFrameUtils.toTableEntry(types.get(j).getValue(obj));
      		}
      	}
-     	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, buttonColumn);
+     	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, possibleValueOverride, buttonColumn);
  	}
 	
-    public static final void updateTable(JTable table, JScrollPane scrollPane, List<? extends Object> objectList, List<TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
+    public static final void updateTable(JTable table, JScrollPane scrollPane, List<? extends Object> objectList, List<TableColumnType> types, DefaultTableModel tm, Function<TableColumnType, String[]> possibleValueOverride, ButtonColumn ...buttonColumn)
     {
  		Object[][] rowData = new Object[objectList.size()][types.size()];
      	for (int i = 0; i < rowData.length; ++i)
@@ -358,10 +359,10 @@ public class JFrameUtils{
      			rowData[i][j] = JFrameUtils.toTableEntry(types.get(j).getValue(obj));
      		}
      	}
-     	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, buttonColumn);
+     	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, possibleValueOverride, buttonColumn);
  	}
 	
-    public static final void updateTable(JTable table, JScrollPane scrollPane, Object[][] rowData, String names[], List<? extends TableColumnType> types, DefaultTableModel tm, ButtonColumn ...buttonColumn)
+    public static final void updateTable(JTable table, JScrollPane scrollPane, Object[][] rowData, String names[], List<? extends TableColumnType> types, DefaultTableModel tm, Function<TableColumnType, String[]> possibleValueOverride, ButtonColumn ...buttonColumn)
     {
     	tm.setDataVector(rowData,names);
     	for (int i = 0; i < types.size(); ++i)
@@ -370,7 +371,10 @@ public class JFrameUtils{
 			TableColumn column = table.getColumnModel().getColumn(i);
 		  	if (current.getOptionType() == ValueColumnTypes.TYPE_COMBOBOX)
 		 	{
-		     	JComboBox<String> comboBox = new JComboBox<String>(current.getPossibleValues());
+		  	    String possibleValues[] = null;
+		  	    if (possibleValueOverride != null){possibleValues = possibleValueOverride.apply(current);}
+		  	    if (possibleValues == null){possibleValues = current.getPossibleValues();}
+		     	JComboBox<String> comboBox = new JComboBox<String>(possibleValues);
 		     	column.setCellEditor(new DefaultCellEditor(comboBox));
 		 	}else if (current.getOptionType() == ValueColumnTypes.TYPE_CHECKBOX)
 		 	{
@@ -387,9 +391,9 @@ public class JFrameUtils{
     }
 
 	public static Object toTableEntry(Object value) {
-		if (value instanceof Boolean){	return value;}
-			else if (value == null){	return null;}
-			else{						return String.valueOf(value);}
+		if (value instanceof Boolean) {return value;}
+		else if (value == null)       {return null;}
+		else                          {return String.valueOf(value);}
 	}
 
 	public static <E>void updateComboBox(JComboBox<E> sendTo, E[] sendToNames) {
