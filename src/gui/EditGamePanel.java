@@ -163,11 +163,11 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		private static final long serialVersionUID = 3667665407550359889L;
 		private final JLabel labelName = new JLabel();
  		private final JTextField textFieldName = new JTextField();
- 		private final JLabel labelBackground = new JLabel("Background");
+ 		private final JLabel labelBackground = new JLabel();
  		private final JComboBox<String> comboBoxBackground = new JComboBox<String>();
  		private final JLabel labelTableRadius = new JLabel("Table Radius");
  		private final JTextField textFieldTableRadius = new JTextField();
- 		private final JLabel labelPassword = new JLabel("Password");
+ 		private final JLabel labelPassword = new JLabel();
  		private final JTextField textFieldPassword = new JTextField();
  		private final JLabel labelSeats = new JLabel();
  		private final JTextField textFieldSeats = new JTextField();
@@ -196,7 +196,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			tableModelImages.addTableModelListener(EditGamePanel.this);
 			tableModelGameObjects.addTableModelListener(EditGamePanel.this);
 			tableModelGameObjectInstances.addTableModelListener(EditGamePanel.this);
-			
+			lh.addLanguageChangeListener(this);;
  		}
 
 		public void update() {
@@ -259,7 +259,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		public void removeUpdate(DocumentEvent arg0) {update(arg0);}
 
 		@Override
-		public void languageChanged(Language language) {}
+		public void languageChanged(Language language) {
+		    labelBackground.setText(language.getString(Words.background));
+		    labelPassword.setText(language.getString(Words.password));
+		}
  	}
  	
 	/**
@@ -455,30 +458,17 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		@Override
 		public void changedUpdate(DocumentEvent e) {
 			Document source = e.getDocument();
-			if (updating)
-			{
-				return;
-			}
-			if (source == textFieldWidth.getDocument())
-			{
-				go.widthInMM = Integer.parseInt(textFieldWidth.getText());
-			}
-			else if (source == textFieldHeight.getDocument())
-			{
-				go.heightInMM = Integer.parseInt(textFieldHeight.getText());
-			}
+			if (updating){return;}
+			if       (source == textFieldWidth.getDocument())    {go.widthInMM = Integer.parseInt(textFieldWidth.getText());}
+			else if  (source == textFieldHeight.getDocument())   {go.heightInMM = Integer.parseInt(textFieldHeight.getText());}
 			isUpdating = true;
 			gi.update(new GameObjectEditAction(id, go.uniqueObjectName));
 			isUpdating = false;
 		}
 		@Override
-		public void insertUpdate(DocumentEvent e) {
-			changedUpdate(e);
-		}
+		public void insertUpdate(DocumentEvent e) {changedUpdate(e);}
 		@Override
-		public void removeUpdate(DocumentEvent e) {
-			changedUpdate(e);
-		}
+		public void removeUpdate(DocumentEvent e) {changedUpdate(e);}
 
 		@Override
 		public void itemStateChanged(ItemEvent event) {
@@ -486,14 +476,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			if (go instanceof GameObjectToken)
 			{
 				GameObjectToken got = (GameObjectToken)go;
-				if (source == comboBoxFrontImage)
-				{
-					got.setUpsideLook((String)comboBoxFrontImage.getSelectedItem());
-				}
-				if (source == comboBoxFrontImage)
-				{
-					got.setDownsideLook((String)comboBoxBackImage.getSelectedItem());
-				}
+				if (source == comboBoxFrontImage)   {got.setUpsideLook((String)comboBoxFrontImage.getSelectedItem());}
+				if (source == comboBoxBackImage)    {got.setDownsideLook((String)comboBoxBackImage.getSelectedItem());}
 				isUpdating = true;
 				gi.update(new GameObjectEditAction(id, got.uniqueObjectName));
 				isUpdating = false;
@@ -597,7 +581,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 					{
 						ObjectState state = instance.state.copy();
 						switch (type) {
-							case OWNER:state.owner_id = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
+							case OWNER:state.owner_id        = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
 							case ABOVE:state.aboveInstanceId = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
 							case BELOW:state.belowInstanceId = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());break;
 							default:break;

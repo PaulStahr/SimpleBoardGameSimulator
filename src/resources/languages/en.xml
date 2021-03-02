@@ -116,4 +116,6 @@
     <reconnect>reconnect</reconnect>
     <sync_pull>pull</sync_pull>
     <status>status</status>
+    <background>background</background>
+    <password>password</password>
 </xml>

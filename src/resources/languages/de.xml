@@ -108,4 +108,6 @@
     <reconnect>Neu verbinden</reconnect>
     <sync_pull>Synchronisieren</sync_pull>
     <status>Status</status>
+    <background>Hintergrund</background>
+    <password>Passwort</password>
 </xml>
