@@ -32,6 +32,7 @@ import gameObjects.action.message.UserSoundMessageAction;
 import gameObjects.action.message.UsertextMessageAction;
 import gameObjects.action.player.PlayerAddAction;
 import gameObjects.action.player.PlayerEditAction;
+import gameObjects.action.player.PlayerMousePositionUpdate;
 import gameObjects.action.player.PlayerRemoveAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
@@ -426,17 +427,17 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                     try
                     {
                         if (action instanceof GameObjectInstanceEditAction)
-                         {
+                        {
                             objOut.writeUnshared(action);
                             GameIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).state);
                             ++outputEvents;
-                         }
+                        }
                         else if (action instanceof PlayerEditAction)
-                         {
+                        {
                             objOut.writeUnshared(action);
-                            GameIO.writePlayerToStreamObject(objOut, ((PlayerEditAction)action).getEditedPlayer(gi));
+                            if (!(action instanceof PlayerMousePositionUpdate)) {GameIO.writePlayerToStreamObject(objOut, ((PlayerEditAction)action).getEditedPlayer(gi));}
                             ++outputEvents;
-                         }
+                        }
                         else if (action instanceof UsertextMessageAction 
                                 || action instanceof UserFileMessage
                                 || action instanceof UserSoundMessageAction
@@ -600,6 +601,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                     }
                     if (action instanceof PlayerEditAction)
                     {
+                        if (action instanceof PlayerMousePositionUpdate)
+                        {
+                            gi.update(action);
+                            ++inputEvents;
+                            continue;
+                        }
                         PlayerEditAction actionEdit = (PlayerEditAction)inputObject;
                         Player editedPlayer = actionEdit.getEditedPlayer(gi);
                         GameIO.editPlayerFromStreamObject(objIn, editedPlayer);

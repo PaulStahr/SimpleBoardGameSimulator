@@ -57,8 +57,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import gameObjects.definition.GameObjectBook;
-import gameObjects.functions.PlayerFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,13 +70,16 @@ import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.player.PlayerAddAction;
 import gameObjects.action.player.PlayerEditAction;
+import gameObjects.action.player.PlayerMousePositionUpdate;
 import gameObjects.action.player.PlayerRemoveAction;
+import gameObjects.definition.GameObjectBook;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.functions.DrawFunctions;
 import gameObjects.functions.MoveFunctions;
 import gameObjects.functions.ObjectFunctions;
+import gameObjects.functions.PlayerFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
@@ -353,21 +354,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		//Check if some key is pressed
 		if (player != null) {
 			//set the mouse position of the player to send to other players
-			player.setMousePos(mouseBoardPos.getXI(), mouseBoardPos.getYI());
+		    gameInstance.update(new PlayerMousePositionUpdate(id, player, player, mouseBoardPos.getXI(), mouseBoardPos.getYI()));
 
 			if (!player.visitor) {
 				//Disable action string if mouse moves and no key is pressed
 				if (downKeys.size() == 0) {
 					player.actionString = "";
-				}
-				gameInstance.update(new PlayerEditAction(id, player, player));
+	         	}
 				//get nearest object concerning the mouse position
 				ObjectInstance nearestObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 				//do actions if mouse is in the private area or not and there is some nearest object
 				if (mouseInPrivateArea && nearestObject != null && !arg0.isControlDown() && !arg0.isShiftDown() && !arg0.isAltDown()) {
-					if (hoveredObject != null) {
-						hoveredObject.state.isActive = false;
-					}
+					hoveredObject.state.isActive &= hoveredObject == null;
 					nearestObject.state.isActive = false;
 					ObjectFunctions.hoverObject(this, gameInstance, player, nearestObject);
 				} else if (!mouseInPrivateArea) {

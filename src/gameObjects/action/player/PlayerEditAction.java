@@ -27,19 +27,13 @@ public class PlayerEditAction extends GameAction{
 
 	public Player getSourcePlayer(GameInstance instance)
 	{
-		if (sourcePlayerObject == null)
-		{
-			return sourcePlayerObject = instance.getPlayerById(sourcePlayer);
-		}
+		if (sourcePlayerObject == null)   {sourcePlayerObject = instance.getPlayerById(sourcePlayer);}
 		return sourcePlayerObject;
 	}
 	
 	public Player getEditedPlayer(GameInstance instance)
 	{
-		if (editedPlayerObject == null)
-		{
-			return editedPlayerObject = instance.getPlayerById(editedPlayer);
-		}
+		if (editedPlayerObject == null)   {editedPlayerObject = instance.getPlayerById(editedPlayer);}
 		return editedPlayerObject;
 	}
 }
