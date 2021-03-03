@@ -69,6 +69,7 @@ import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.player.PlayerAddAction;
+import gameObjects.action.player.PlayerCharacterPositionUpdate;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerMousePositionUpdate;
 import gameObjects.action.player.PlayerRemoveAction;
@@ -84,6 +85,7 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
 import geometry.Matrix3d;
+import geometry.TransformConversion;
 import geometry.Vector2d;
 import io.GameIO;
 import main.Player;
@@ -113,8 +115,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	
 	final GameInstance gameInstance;
 	public ObjectInstance hoveredObject = null;
-	IntegerArrayList objOrigPosX = new IntegerArrayList();
-	IntegerArrayList objOrigPosY = new IntegerArrayList();
+	private final IntegerArrayList objOrigPosX = new IntegerArrayList();
+	private final IntegerArrayList objOrigPosY = new IntegerArrayList();
 	private Player player;
 	public final int id = (int)System.nanoTime();
 	private final IntegerArrayList ial = new IntegerArrayList();
@@ -502,15 +504,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void mousePressed(MouseEvent arg0) {
 		if (!player.visitor) {
 			if (checkFirstMouseClick(arg0)) {
-				if (SwingUtilities.isLeftMouseButton(arg0)) {
-					isLeftMouseKeyHold = true;
-				}
-				if (SwingUtilities.isRightMouseButton(arg0)) {
-					isRightMouseKeyHold = true;
-				}
-				if (SwingUtilities.isMiddleMouseButton(arg0)) {
-					isMiddleMouseKeyHold = true;
-				}
+				isLeftMouseKeyHold |= SwingUtilities.isLeftMouseButton(arg0);
+				isRightMouseKeyHold |= SwingUtilities.isRightMouseButton(arg0);
+				isMiddleMouseKeyHold |= SwingUtilities.isMiddleMouseButton(arg0);
 				//get nearest object concerning the mouse position
 				ObjectInstance nearestObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 				mouseScreenX = arg0.getX();
@@ -702,17 +698,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			repaint();
 		}
 
-		if (action instanceof PlayerAddAction){
-			if (table != null) {
-				table.updatePlayers(gameInstance);
-			}
-		}
-		else if (action instanceof PlayerRemoveAction)
-		{
-			if (table !=null)
-			{
-				table.updatePlayers(gameInstance);
-			}
+		if ((action instanceof PlayerAddAction || action instanceof PlayerRemoveAction) && table != null){
+			table.updatePlayers(gameInstance);
 		}
 	}
 
@@ -1101,22 +1088,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void componentMoved(ComponentEvent arg0) {}
 
 	@Override
-	public void componentResized(ComponentEvent arg0) {
-		updateGameTransform();
-	}
+	public void componentResized(ComponentEvent arg0) {updateGameTransform();}
 
 	@Override
-	public void componentShown(ComponentEvent arg0) {
-		updateGameTransform();
-	}
+	public void componentShown(ComponentEvent arg0) {updateGameTransform();}
 
 	public void updateGameTransform()
 	{
-		gameTransform.setIdentity();
-		gameTransform.affineTranslate(-getWidth() / 2, -getHeight() / 2);
-		gameTransform.scale(1 / zooming);
-		gameTransform.rotateZ(rotation);
-		gameTransform.affineTranslate(-translateX, -translateY);
 		boardToScreenTransformation.setToIdentity();
 		boardToScreenTransformation.translate(getWidth() / 2, getHeight() / 2);
 		boardToScreenTransformation.scale(zooming, zooming);
@@ -1128,27 +1106,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		} catch (NoninvertibleTransformException e) {
 			logger.error("Transformation not invertible");
 		}
+		TransformConversion.copy(screenToBoardTransformation, gameTransform);
 		if (player != null)
 		{
-			player.screenToBoardTransformation.setTransform(screenToBoardTransformation);
-			player.screenWidth = getWidth();
-			player.screenHeight = getHeight();
-			gameInstance.update(new PlayerEditAction(id, player, player));
+			gameInstance.update(new PlayerCharacterPositionUpdate(id, player, player, screenToBoardTransformation, player.screenWidth, player.screenHeight));
 		}
 	}
 
-	public AffineTransform getBoardToScreenTransform(){
-		return boardToScreenTransformation;
-	}
+	public AffineTransform getBoardToScreenTransform(){return boardToScreenTransformation;}
 
-	public void screenToBoardPos(int x, int y, Vector2d out)
-	{
-		gameTransform.transformAffine(x, y, out);
-	}
-	public void boardToScreenPos(Point2D boardCoordinates, Point2D screenCooardinates)
-	{
-		boardToScreenTransformation.transform(boardCoordinates, screenCooardinates);
-	}
+	public void screenToBoardPos(int x, int y, Vector2d out){gameTransform.transformAffine(x, y, out);}
+
+	public void boardToScreenPos(Point2D boardCoordinates, Point2D screenCooardinates){boardToScreenTransformation.transform(boardCoordinates, screenCooardinates);}
 
 	public void translateBoard(KeyEvent keyEvent){
 		double tmpX = 0;

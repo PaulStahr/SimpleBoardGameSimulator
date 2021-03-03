@@ -17,7 +17,9 @@ import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.GameStructureObjectEditAction;
 import gameObjects.action.player.PlayerAddAction;
+import gameObjects.action.player.PlayerCharacterPositionUpdate;
 import gameObjects.action.player.PlayerEditAction;
+import gameObjects.action.player.PlayerMousePositionUpdate;
 import gameObjects.action.player.PlayerRemoveAction;
 import gameObjects.definition.GameObject;
 import gameObjects.functions.CheckingFunctions;
@@ -192,7 +194,20 @@ public class GameInstance {
 	}
 
 	public void update(GameAction action) {
-		if (action instanceof GameObjectEditAction)
+	    if (action instanceof PlayerMousePositionUpdate)
+	    {
+	        PlayerMousePositionUpdate pmpu = (PlayerMousePositionUpdate)action;
+	        pmpu.getEditedPlayer(this).setMousePos(pmpu.mouseX, pmpu.mouseY);
+	    }
+	    else if (action instanceof PlayerCharacterPositionUpdate)
+        {
+	        PlayerCharacterPositionUpdate pcpu = (PlayerCharacterPositionUpdate)action;
+	        Player edited = pcpu.getEditedPlayer(this);
+	        edited.screenWidth = pcpu.screenWidth;
+	        edited.screenHeight = pcpu.screenHeight;
+	        edited.screenToBoardTransformation.setTransform(pcpu.scaleX, pcpu.shearY, pcpu.shearX, pcpu.scaleY, pcpu.translateX, pcpu.translateY);
+        }
+	    else if (action instanceof GameObjectEditAction)
 		{
 			GameObject obj = ((GameObjectEditAction) action).getObject(this);
 			obj.updateImages(this);

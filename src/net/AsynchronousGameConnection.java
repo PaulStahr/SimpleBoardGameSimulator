@@ -31,6 +31,7 @@ import gameObjects.action.message.UserFileMessage;
 import gameObjects.action.message.UserSoundMessageAction;
 import gameObjects.action.message.UsertextMessageAction;
 import gameObjects.action.player.PlayerAddAction;
+import gameObjects.action.player.PlayerCharacterPositionUpdate;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerMousePositionUpdate;
 import gameObjects.action.player.PlayerRemoveAction;
@@ -435,7 +436,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                         else if (action instanceof PlayerEditAction)
                         {
                             objOut.writeUnshared(action);
-                            if (!(action instanceof PlayerMousePositionUpdate)) {GameIO.writePlayerToStreamObject(objOut, ((PlayerEditAction)action).getEditedPlayer(gi));}
+                            if (!(action instanceof PlayerMousePositionUpdate || action instanceof PlayerCharacterPositionUpdate)) {GameIO.writePlayerToStreamObject(objOut, ((PlayerEditAction)action).getEditedPlayer(gi));}
                             ++outputEvents;
                         }
                         else if (action instanceof UsertextMessageAction 
@@ -601,7 +602,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                     }
                     if (action instanceof PlayerEditAction)
                     {
-                        if (action instanceof PlayerMousePositionUpdate)
+                        if (action instanceof PlayerMousePositionUpdate || action instanceof PlayerCharacterPositionUpdate)
                         {
                             gi.update(action);
                             ++inputEvents;
