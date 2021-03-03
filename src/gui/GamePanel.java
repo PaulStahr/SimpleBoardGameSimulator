@@ -1165,8 +1165,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		if (isTranslation) {
 			updateGameTransform();
-			player.setMousePos(mouseBoardPos.getXI(), mouseBoardPos.getYI());
-			gameInstance.update(new PlayerEditAction(id, player, player));
+			gameInstance.update(new PlayerMousePositionUpdate(id, player, player, mouseBoardPos.getXI(), mouseBoardPos.getYI()));
 		}
 	}
 
