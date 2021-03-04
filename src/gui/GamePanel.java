@@ -742,10 +742,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 			else if (e.getKeyCode() == KeyEvent.VK_C && !shiftDown) {
 				int count = 0;
-				ial.clear();
-				for( int i : selectedObjects) {
-					ial.add(i);
-				}
+                ial.set(selectedObjects);
 				for (int oId : ial) {
 					ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 					if (oi.go instanceof GameObjectToken) {
@@ -770,10 +767,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			//Only allowed if mouse is not clicked
 			if (!(isLeftMouseKeyHold || isRightMouseKeyHold || isMiddleMouseKeyHold)) {
 				if (e.getKeyCode() == KeyEvent.VK_F && !shiftDown && !altDown) {
-					ial.clear();
-					for( int i : selectedObjects) {
-						ial.add(i);
-					}
+                    ial.set(selectedObjects);
 					for (int oId : ial) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 						ObjectFunctions.flipTokenObject(id, gameInstance, player, oi);
@@ -784,19 +778,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						ObjectFunctions.rollTheDice(id, gameInstance, player, hoveredObject);
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_F && shiftDown) {
-					ial.clear();
-					for( int i : selectedObjects) {
-						ial.add(i);
-					}
+                    ial.set(selectedObjects);
 					for (int oId : ObjectFunctions.getStackRepresentatives(gameInstance, ial)) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 						ObjectFunctions.flipTokenStack(this, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, oi));
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_S) {
-					ial.clear();
-					for( int i : selectedObjects) {
-						ial.add(i);
-					}
+                    ial.set(selectedObjects);
 					for (int oId : ObjectFunctions.getStackRepresentatives(gameInstance, ial)) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 						ObjectFunctions.shuffleStack(this, gameInstance, player, oi);
@@ -883,10 +871,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 						repaint();
 					} else if (e.getKeyCode() == KeyEvent.VK_R && shiftDown) {
-						ial.clear();
-						for( int i : selectedObjects) {
-							ial.add(i);
-						}
+                        ial.set(selectedObjects);
 						for (int oId : ial) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.removeStackRelations(this, gameInstance, player, oi);
@@ -898,29 +883,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 						ObjectFunctions.deselectAllSelected(this, gameInstance, player, ial);
 					} else if (e.getKeyCode() == KeyEvent.VK_M && shiftDown && !altDown) {
-						ial.clear();
-						for( int i : selectedObjects) {
-							ial.add(i);
-						}
+                        ial.set(selectedObjects);
 						for (int oId : ial) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.stackAllObjectsOfGroup(this, gameInstance, player, oi, false);
 						}
 
 					} else if (e.getKeyCode() == KeyEvent.VK_M && shiftDown && altDown) {
-						ial.clear();
-						for( int i : selectedObjects) {
-							ial.add(i);
-						}
+                        ial.set(selectedObjects);
 						for (int oId : ial) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.stackAllObjectsOfGroup(this, gameInstance, player, oi, true);
 						}
 					}else if (e.getKeyCode() == KeyEvent.VK_M && !shiftDown) {
-						ial.clear();
-						for (int i : selectedObjects) {
-							ial.add(i);
-						}
+						ial.set(selectedObjects);
 						ObjectFunctions.makeStack(this, gameInstance, player, ial);
 					} else if (altDown && !boardTranslation && scaledObjects.size() > 0) {
 						for (int oId : ObjectFunctions.getStackRepresentatives(gameInstance, selectedObjects)) {
@@ -933,10 +909,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 						repaint();
 					} else if (e.getKeyCode() == KeyEvent.VK_F && altDown) {
-						ial.clear();
-						for( int i : selectedObjects) {
-							ial.add(i);
-						}
+						ial.set(selectedObjects);
 						for (int oId : ial) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.fixObject(id, gameInstance, player, oi);
@@ -1205,22 +1178,22 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		public void languageChanged(Language lang) {
 			removeAll();
 			setLayout(new GridLayout(16, 1, 20, 0));
-			add(new JLabel(lang.getString(Words.sit_down) 					+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_ENTER, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.move_top_card) 				+ ": " + new ControlCombination(0, 0,  -1, 1).toString(lang)));
-			add(new JLabel(lang.getString(Words.move_stack) 				+ ": " + new ControlCombination(0, 1, -1, 1).toString(lang)));
-			add(new JLabel(lang.getString(Words.take_objects_to_hand)	 	+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_T, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.drop_all_hand_cards) + ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_D, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.get_bottom_card) 			+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  -1, 2).toString(lang)));
-			add(new JLabel(lang.getString(Words.shuffle_stack) 				+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_S, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.flip_card)					+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_F, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.flip_stack)					+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_F, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.view_collect_stack)	 		+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_V, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.collect_selected_objects)	+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_M, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.collect_all_objects)  		+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_M, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.rotate_object)  			+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_R, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.dissolve_stack)				+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_R, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.count_objects)				+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_C, 0).toString(lang)));
-			add(new JLabel(lang.getString(Words.count_values)				+ ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_C, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.sit_down)                + ": " + new ControlCombination(0, -1,  KeyEvent.VK_ENTER, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.move_top_card) 	         + ": " + new ControlCombination(0, 0,  -1, 1).toString(lang)));
+			add(new JLabel(lang.getString(Words.move_stack)              + ": " + new ControlCombination(0, 1, -1, 1).toString(lang)));
+			add(new JLabel(lang.getString(Words.take_objects_to_hand)    + ": " + new ControlCombination(0, -1,  KeyEvent.VK_T, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.drop_all_hand_cards)     + ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_D, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.get_bottom_card)         + ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  -1, 2).toString(lang)));
+			add(new JLabel(lang.getString(Words.shuffle_stack)           + ": " + new ControlCombination(0, -1,  KeyEvent.VK_S, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.flip_card)		         + ": " + new ControlCombination(0, -1,  KeyEvent.VK_F, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.flip_stack)	             + ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_F, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.view_collect_stack)	     + ": " + new ControlCombination(0, -1,  KeyEvent.VK_V, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.collect_selected_objects)+ ": " + new ControlCombination(0, -1,  KeyEvent.VK_M, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.collect_all_objects)     + ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_M, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.rotate_object)           + ": " + new ControlCombination(0, -1,  KeyEvent.VK_R, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.dissolve_stack)	         + ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_R, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.count_objects)           + ": " + new ControlCombination(0, -1,  KeyEvent.VK_C, 0).toString(lang)));
+			add(new JLabel(lang.getString(Words.count_values)            + ": " + new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_C, 0).toString(lang)));
 			revalidate();
 		}
 	}
