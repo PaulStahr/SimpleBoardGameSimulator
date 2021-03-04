@@ -23,6 +23,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import data.Texture;
 import gameObjects.definition.GameObjectBook;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectFigure;
@@ -336,6 +337,11 @@ public class DrawFunctions {
      * @param borderWidth
      */
     public static void drawObject(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance objectInstance, Player player, double zooming, int borderWidth) {
+        if (objectInstance.go == null)      {throw new NullPointerException("GameObject is null");}
+        if (player == null)                 {throw new NullPointerException("Player is null");}
+        if (objectInstance.state == null)   {throw new NullPointerException("State is null");}
+        Texture look = objectInstance.go.getLook(objectInstance.state, player.id);
+        if (look == null)                   {throw new NullPointerException("Look is null " + objectInstance.go.getClass());}
         BufferedImage img = objectInstance.go.getLook(objectInstance.state, player.id).getImageNoExc();
         if (objectInstance.state == null || img == null) {
             logger.error("Object state is null");
@@ -515,30 +521,30 @@ public class DrawFunctions {
         IntegerArrayList ial = new IntegerArrayList();
         int hoverId = (hoveredObject== null) ? -1 : hoveredObject.id;
         int drawValue = (hoveredObject== null) ? -1 : hoveredObject.state.drawValue;
-        String stringSelectedObjects = "";
-        String stringHandCards = "";
-        String stringActiveObjects = "";
-        String stringHoveredStack = "";
-        String stringPrivateAreaCards = "";
+        StringBuilder stringSelectedObjects = new StringBuilder();
+        StringBuilder stringHandCards = new StringBuilder();
+        StringBuilder stringActiveObjects = new StringBuilder();
+        StringBuilder stringHoveredStack = new StringBuilder();
+        StringBuilder stringPrivateAreaCards = new StringBuilder();
 
 
         for (int i = 0; i < selectedObjects.size(); ++i)
         {
             if (i==0) {
-                stringSelectedObjects += Integer.toString(selectedObjects.get(i));
+                stringSelectedObjects.append(selectedObjects.get(i));
             }
             else{
-                stringSelectedObjects += "; " + Integer.toString(selectedObjects.get(i));
+                stringSelectedObjects.append("; ").append(selectedObjects.get(i));
             }
         }
         for (int i = 0; i < gameInstance.getObjectNumber(); ++i)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             if (oi.state.owner_id == player.id) {
-                if (stringHandCards.equals("")) {
-                    stringHandCards += Integer.toString(oi.id);
+                if (stringHandCards.length() == 0) {
+                    stringHandCards.append(oi.id);
                 } else {
-                    stringHandCards += "; " + Integer.toString(oi.id);
+                    stringHandCards.append("; ").append(oi.id);
                 }
             }
         }
@@ -547,10 +553,10 @@ public class DrawFunctions {
         {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             if (oi.state.isActive) {
-                if (stringActiveObjects.equals("")) {
-                    stringActiveObjects += Integer.toString(oi.id);
+                if (stringActiveObjects.length() == 0) {
+                    stringActiveObjects.append(oi.id);
                 } else {
-                    stringActiveObjects += "; " + Integer.toString(oi.id);
+                    stringActiveObjects.append("; ").append(oi.id);
                 }
             }
         }
@@ -559,7 +565,7 @@ public class DrawFunctions {
         if (ial.size()>1) {
             for (int i : ial) {
                 ObjectInstance oi = gameInstance.getObjectInstanceById(i);
-                stringHoveredStack += "|" + oi.state.aboveInstanceId + " " + oi.id + " " + oi.state.belowInstanceId + "|";
+                stringHoveredStack.append('|').append(oi.state.aboveInstanceId).append(' ').append(oi.id).append(' ').append(oi.state.belowInstanceId).append('|');
             }
         }
 
@@ -567,10 +573,10 @@ public class DrawFunctions {
         {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             if (oi.state.inPrivateArea) {
-                if (stringPrivateAreaCards.equals("")) {
-                    stringPrivateAreaCards += Integer.toString(oi.id);
+                if (stringPrivateAreaCards.length() == 0) {
+                    stringPrivateAreaCards.append(oi.id);
                 } else {
-                    stringPrivateAreaCards += "; " + Integer.toString(oi.id);
+                    stringPrivateAreaCards.append("; ").append(oi.id);
                 }
             }
         }
