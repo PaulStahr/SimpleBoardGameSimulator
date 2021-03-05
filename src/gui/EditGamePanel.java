@@ -78,7 +78,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final JScrollPane scrollPaneGameObjects = new JScrollPane(tableGameObjects);
 	private final JScrollPane scrollPaneImages = new JScrollPane(tableImages);
 	private final JScrollPane scrollPanePlayer = new JScrollPane(tablePlayer);
-	private final GeneralPanel panelGeneral = new GeneralPanel();	
+	private final GeneralPanel panelGeneral;
 	private final JTabbedPane tabPane = new JTabbedPane();
 	public int id = (int)(Math.random() * Integer.MAX_VALUE);
 	private boolean isUpdating = false;
@@ -89,6 +89,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	public EditGamePanel(GameInstance gi, LanguageHandler lh, Player player) {
 		this.gi = gi;
 		this.lh = lh;
+		panelGeneral = new GeneralPanel(lh);
 		this.player = player;
 		Language language = lh.getCurrentLanguage();
 		GroupLayout layout = new GroupLayout(this);
@@ -173,7 +174,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  		private final JTextField textFieldSeats = new JTextField();
 		//private final JButton buttonResetAll = new JButton("Reset All");
 
- 		public GeneralPanel()
+ 		public GeneralPanel(LanguageHandler lh)
  		{
  			GroupLayout layout = new GroupLayout(this);
  			setLayout(layout);
@@ -276,9 +277,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
         public String[] apply(TableColumnType t) {
             if (t == GameObjectInstanceColumnType.OWNER)
             {
-                String[] result = new String[gi.getPlayerNumber() + 1];
+                int count = gi.getPlayerNumber();
+                String[] result = new String[count + 1];
                 result[0] = "-1";
-                for (int i = 0; i < result.length; ++i)
+                for (int i = 0; i < count; ++i)
                 {
                     result[i + 1] = String.valueOf(gi.getPlayerByIndex(i).id);
                 }
