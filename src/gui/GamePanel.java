@@ -367,7 +367,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				ObjectInstance nearestObject = ObjectFunctions.getNearestObjectByPosition(this, gameInstance, player, mouseBoardPos.getXI(), mouseBoardPos.getYI(), 1, null);
 				//do actions if mouse is in the private area or not and there is some nearest object
 				if (mouseInPrivateArea && nearestObject != null && !arg0.isControlDown() && !arg0.isShiftDown() && !arg0.isAltDown()) {
-					hoveredObject.state.isActive &= hoveredObject == null;
+					if (hoveredObject != null)
+				    {
+				        hoveredObject.state.isActive = false;
+				    }
 					nearestObject.state.isActive = false;
 					ObjectFunctions.hoverObject(this, gameInstance, player, nearestObject);
 				} else if (!mouseInPrivateArea) {

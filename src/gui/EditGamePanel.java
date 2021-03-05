@@ -197,7 +197,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			tableModelImages.addTableModelListener(EditGamePanel.this);
 			tableModelGameObjects.addTableModelListener(EditGamePanel.this);
 			tableModelGameObjectInstances.addTableModelListener(EditGamePanel.this);
-			lh.addLanguageChangeListener(this);;
+			lh.addLanguageChangeListener(this);
  		}
 
 		public void update() {
