@@ -341,6 +341,13 @@ public class ArrayUtil {
 		for (; iBegin < iEnd; ++iBegin, ++oBegin)
 		{
 			out[oBegin] += mult * in[iBegin];
+		}
+	}
+
+	public static void multAdd(double[] in, int iBegin, int iEnd, double[] out, int oBegin, double mult) {
+		for (; iBegin < iEnd; ++iBegin, ++oBegin)
+		{
+			out[oBegin] += mult * in[iBegin];
 		}	
 	}
 
@@ -355,7 +362,7 @@ public class ArrayUtil {
 		}
 		return res;
 	}
-	
+
 	public static int firstUnequalIndex(Object data[], int begin, int end, Object key)
 	{
 		for (; begin < end; ++begin)
@@ -389,6 +396,13 @@ public class ArrayUtil {
 		}
 	}
 	
+	public static void write(float[] data, int begin, int end, DataOutputStream outBuf) throws IOException {
+		for (int i = begin; i < end; ++i)
+		{
+			outBuf.writeFloat(data[i]);
+		}
+	}
+
 	public static void write(IntegerList ial, int begin, int end, DataOutputStream outBuf) throws IOException {
 		for (int i = begin; i < end; ++i)
 		{
@@ -415,6 +429,13 @@ public class ArrayUtil {
 		for (int i = begin; i < end; ++i)
 		{
 			data[i] = inBuf.readInt();
+		}
+	}
+
+	public static void readFloats(float[] data, int begin, int end, DataInputStream inBuf) throws IOException {
+		for (int i = begin; i < end; ++i)
+		{
+			data[i] = inBuf.readFloat();
 		}
 	}
 
@@ -518,4 +539,15 @@ public class ArrayUtil {
 	public static void iota(Integer[] data) {
 		for (int i = 0; i < data.length; ++i){data[i] = i;}
 	}
+
+    public static double qdist(DoubleList l0, int begin0, DoubleList l1, int begin1, int size) {
+        double result = 0;
+        while (size != 0)
+        {
+            double diff = l0.getD(begin0++) - l1.getD(begin1++);
+            result += diff * diff;
+            --size;
+        }
+        return result;
+    }
 }

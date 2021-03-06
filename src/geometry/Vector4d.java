@@ -21,8 +21,6 @@
  ******************************************************************************/
 package geometry;
 
-import geometry.Vector3f;
-
 /** 
 * @author  Paul Stahr
 * @version 04.02.2012
@@ -43,12 +41,7 @@ public final class Vector4d implements Vectord
      * @param y L\u00E4nge des Vektors in y-Richtung
      * @param z L\u00E4nge des Vektors in z-Tichtung
      */
-    public Vector4d(final double x,final double y,final double z,final double w){
-        this.x=x;
-        this.y=y;
-        this.z=z;
-        this.w=w;
-    }
+    public Vector4d(final double x,final double y,final double z,final double w){this.x=x; this.y=y; this.z=z; this.w=w;}
 
     @Override
     public void setElem(int index, double value)
@@ -68,11 +61,11 @@ public final class Vector4d implements Vectord
     {
     	switch (index)
     	{
-    	case 0: return x;
-    	case 1: return y;
-    	case 2: return z;
-    	case 3: return w;
-    	default: throw new ArrayIndexOutOfBoundsException(index);
+        	case 0: return x;
+        	case 1: return y;
+        	case 2: return z;
+        	case 3: return w;
+        	default: throw new ArrayIndexOutOfBoundsException(index);
     	}
     }
     
@@ -80,9 +73,7 @@ public final class Vector4d implements Vectord
      * erzeugt einen neuen Vektor
      * @param vektor der Vektor dessen eigenschaften \u00FCbernommen werden
      */
-    public Vector4d(final Vector4d vector){
-        set(vector);
-    }
+    public Vector4d(final Vector4d vector){set(vector);}
         
     /**
      * Subtrahiert den Vektor
@@ -229,10 +220,7 @@ public final class Vector4d implements Vectord
      * @param z z-Wert des Vektors
      */
     public final void set(final double x, final double y, final double z, final double w){
-        this.x=x;
-        this.y=y;
-        this.z=z;
-        this.w=w;
+        this.x=x;this.y=y;this.z=z;this.w=w;
     }
 
     /**
@@ -269,10 +257,7 @@ public final class Vector4d implements Vectord
     }
     
     @Override
-    public final int size()
-    {
-    	return 4;
-    }
+    public final int size(){return 4;}
 
     @Override
 	public final double dot() {
