@@ -21,25 +21,45 @@
  ******************************************************************************/
 package geometry;
 
-public class Matrix3d implements Matrixd{
+import maths.algorithm.Calculate;
+import util.data.DoubleArrayList;
+import util.data.DoubleList;
+
+public class Matrix3d implements Matrixd, DoubleList{
 	public double m00, m01, m02, m10, m11, m12, m20, m21, m22;
 
-	
 	public Matrix3d(){this(1,0,0,0,1,0,0,0,1);}
 	
+    public Matrix3d(Matrix3d m){
+        this.m00 = m.m00;this.m01 = m.m01;this.m02 = m.m02;
+        this.m10 = m.m10;this.m11 = m.m11;this.m12 = m.m12;
+        this.m20 = m.m20;this.m21 = m.m21;this.m22 = m.m22;
+    }
+
 	public Matrix3d(double x0, double x1, double x2, double y0, double y1, double y2, double z0, double z1, double z2){
 		this.m00 = x0;this.m01 = x1;this.m02 = x2;
 		this.m10 = y0;this.m11 = y1;this.m12 = y2;
 		this.m20 = z0;this.m21 = z1;this.m22 = z2;
 	}
+
+    public final void setColMajor(final double mat[]){
+        m00 = mat[0];  m01 = mat[1];  m02 = mat[2];
+        m10 = mat[3];  m11 = mat[4];  m12 = mat[5];
+        m20 = mat[6];  m21 = mat[7];  m22 = mat[8];
+    }
+
+    public final void setColMajor(final double mat[], int pos, int stride){
+        m00 = mat[pos]; m01 = mat[pos+1]; m02 = mat[pos+2];pos += stride;
+        m10 = mat[pos]; m11 = mat[pos+1]; m12 = mat[pos+2];pos += stride;
+        m20 = mat[pos]; m21 = mat[pos+1]; m22 = mat[pos+2];
+    }
 	
-	//public final void transform(Rotation3 rot){
-		//double radX = rot.getXRadians();
-		//double radY = rot.getXRadians();
-		//double radZ = rot.getXRadians();
-		
-	//}
-	
+    public final void getColMajor(final double mat[], int begin, int stride){
+        mat[begin] = m00; mat[begin+1] = m01; mat[begin+2] = m02;begin += stride;
+        mat[begin] = m10; mat[begin+1] = m11; mat[begin+2] = m12;begin += stride;
+        mat[begin] = m20; mat[begin+1] = m21; mat[begin+2] = m22;
+    }
+    
 	public void setIdentity()
 	{
 		this.m00 = this.m11 = this.m22 = 1;
@@ -53,17 +73,9 @@ public class Matrix3d implements Matrixd{
 		v.z = (float)(m02 * x + m12 * y + m22 * z);
 	}
 	
-	public final double getNewX(double x, double y, double z){
-		return m00 * x + m10 * y + m20 * z;
-	}
-
-	public final double getNewY(double x, double y, double z){
-		return m01 * x + m11 * y + m21 * z;
-	}
-
-	public final double getNewZ(double x, double y, double z){
-		return m02 * x + m12 * y + m22 * z;
-	}
+	public final double getNewX(double x, double y, double z){return m00 * x + m10 * y + m20 * z;}
+	public final double getNewY(double x, double y, double z){return m01 * x + m11 * y + m21 * z;}
+	public final double getNewZ(double x, double y, double z){return m02 * x + m12 * y + m22 * z;}
 	
 	@Override
 	public final double get(int x, int y) {
@@ -74,6 +86,9 @@ public class Matrix3d implements Matrixd{
 		}
 		throw new ArrayIndexOutOfBoundsException(x);
 	}
+	
+   @Override
+    public final int size() {return 9;}
 
 	@Override
 	public final int cols() {return 3;}
@@ -133,24 +148,29 @@ public class Matrix3d implements Matrixd{
 		v.y = m01 * x + m11 * y + m21;
 	}
 
-	public final double transformAffineX(double x, double y) {
-		return m00 * x + m10 * y + m20;
-	}
-	
-	public final double transformAffineY(double x, double y) {
-		return m01 * x + m11 * y + m21;
+	public final double ldotAffineX(double x, double y) {return m00 * x + m10 * y + m20;}
+	public final double ldotAffineY(double x, double y) {return m01 * x + m11 * y + m21;}
+
+	public void set(double m00, double m01, double m02, double m10, double m11, double m12, double m20, double m21, double m22){
+		this.m00 = m00;this.m01 = m01;this.m02 = m02;
+		this.m10 = m10;this.m11 = m11;this.m12 = m12;
+		this.m20 = m20;this.m21 = m21;this.m22 = m22;
 	}
 
-	public void set(double x0, double x1, double x2, double y0, double y1, double y2, double z0, double z1, double z2){
-		this.m00 = x0;this.m01 = x1;this.m02 = x2;
-		this.m10 = y0;this.m11 = y1;this.m12 = y2;
-		this.m20 = z0;this.m21 = z1;this.m22 = z2;
+	public void setRowMajor(double m00, double m01, double m02, double m10, double m11, double m12, double m20, double m21, double m22){
+		this.m00 = m00;this.m01 = m01;this.m02 = m02;
+		this.m10 = m10;this.m11 = m11;this.m12 = m12;
+		this.m20 = m20;this.m21 = m21;this.m22 = m22;
 	}
 
-	public final void affineTranslate(double translateX, double translateY) {
-		m20 += translateX;
-		m21 += translateY;
-	}
+    public final void preTranslate(double x, double y)
+    {
+        m02 += x * m00 + y * m01;
+        m12 += x * m10 + y * m11;
+        m22 += x * m20 + y * m21;
+    }
+    
+    public final void postTranslate(double x, double y){m02 += x;m12 += y;}
 
 	public final void scale(double d) {
 		this.m00 *= d;this.m01 *= d; this.m02 *= d;
@@ -158,10 +178,167 @@ public class Matrix3d implements Matrixd{
 		this.m20 *= d;this.m21 *= d; this.m22 *= d;
 	}
 
-	public void transformAffine(double x, double y, Vector2d out) {
-		out.x = transformAffineX(x, y);
-		out.y = transformAffineY(x, y);
-	}
+	public final void affineScale(double s)
+    {
+        m00 *= s; m10 *= s;
+        m01 *= s; m11 *= s;
+    }
+
+    public final void preScale(double x, double y) {
+        m00 *= x; m01 *= y;
+        m10 *= x; m11 *= y;
+    }
+
+    public final void postScale(double x, double y)
+    {
+        m00 *= x; m02 *= x; m02 *= x;
+        m10 *= y; m11 *= y; m12 *= y;
+    }
+
+    public final void rdot(Vector3d vector){
+        final double x = vector.x, y = vector.y, z = vector.z;
+        vector.x = m00 * x + m10 * y + m20 * z;
+        vector.y = m01 * x + m11 * y + m21 * z;
+        vector.z = m02 * x + m12 * y + m22 * z;
+    }
+
+    public final void ldot(Vector3d vector){
+        final double x = vector.x, y = vector.y, z = vector.z;
+        vector.x = m00 * x + m01 * y + m02 * z;
+        vector.y = m10 * x + m11 * y + m12 * z;
+        vector.z = m20 * x + m21 * y + m22 * z;
+    }
+
+    public final void ldotAffine(Vector2d vector)                       {ldotAffine(vector.x, vector.y, vector);} 
+    public final void rdotAffine(Vector2d vector)                       {rdotAffine(vector.x, vector.y, vector);}
+    public void rdotAffine(float[] position, int i, Vector2d result)    {rdotAffine(position[i], position[i + 1], result);}
+    public void rdotAffine(double[] position, int i, Vector2d result)   {rdotAffine(position[i], position[i + 1], result);}
+    public void rdotAffine(DoubleList position, int i, Vector2d result) {rdotAffine(position.getD(i), position.getD(i + 1), result);}
+    public final void ldot(Vector2d vector)                             {ldot(vector.x, vector.y, vector);}
+    
+    public final void rdotAffine(double x, double y, Vector2d vector){
+        vector.x = m00 * x + m01 * y + m02;
+        vector.y = m10 * x + m11 * y + m12;
+    }
+    
+    public final void ldot(double x, double y, Vector2d vector)
+    {
+        vector.x = m00 * x + m10 * y;
+        vector.y = m01 * x + m11 * y;
+    }
+    
+    public final void rdot(double x, double y, Vector2d result)
+    {       
+        result.x = m00 * x + m01 * y;
+        result.y = m10 * x + m11 * y;
+    }
+    
+    public void rdot(double x, double y, float[] out, int i) {
+        out[i++] = (float)(m00 * x + m01 * y);
+        out[i++] = (float)(m10 * x + m11 * y);
+    }
+    
+    public void rdot(Vector2d in, float result[], int i)    {rdot(in.x, in.y, result, i);}
+    public void rdot(Vector2d in, double result[], int i)   {rdot(in.x, in.y, result, i);}
+    public void rdot(Vector2d in, DoubleList result, int i) {rdot(in.x, in.y, result, i);}
+    public void rdot(Vector2d in, Object result, int i)     {rdot(in.x, in.y, result, i);}
+    
+    public void rdot(double x, double y, double[] out, int i) {
+        out[i++] = m00 * x + m01 * y;
+        out[i++] = m10 * x + m11 * y;
+    }
+    
+    public void rdot(double x, double y, DoubleList out, int i) {
+        out.setElem(i++, m00 * x + m01 * y);
+        out.setElem(i++, m10 * x + m11 * y);
+    }
+    
+    public final void rdot(Vector2d vector){rdot(vector.x, vector.y, vector);}
+    
+    public final void rdot(double x, double y, Object out, int pos)
+    {
+        if (out instanceof float[])        {rdot(x, y, out, pos);}
+        else if (out instanceof double[])  {rdot(x, y, out, pos);}
+        else if (out instanceof DoubleList){rdot(x, y, out, pos);}
+        else                               {throw new IllegalArgumentException(out.getClass().toString());}
+    }
+    
+    public final void rdot(Object in, int pos, Vector2d out)
+    {
+        if (in instanceof float[])         {rdot((float[])in, pos, out);}
+        else if (in instanceof double[])   {rdot((double[])in, pos, out);}
+        else if (in instanceof DoubleList) {rdot((DoubleList)in, pos, out);}
+        else                               {throw new IllegalArgumentException(in.getClass().toString());}
+    }
+    
+    public final void rdot(float in[], int index, Vector2d vector)     {rdot(in[index], in[index + 1], vector);}
+    public final void rdot(double in[], int index, Vector2d vector)    {rdot(in[index], in[index + 1], vector);}
+    public final void rdot(DoubleList in, int index, Vector2d vector)  {rdot(in.getD(index), in.getD(index + 1), vector);}
+    
+    public final void rdotAffine(Object in, int pos, Vector2d out)
+    {
+        if      (in instanceof float[])     {rdotAffine(in, pos, out);}
+        else if (in instanceof double[])    {rdotAffine(in, pos, out);}
+        else if (in instanceof DoubleList)  {rdotAffine(in, pos, out);}
+        else{throw new IllegalArgumentException(in.getClass().toString());}
+    }
+    
+    public final void rdotAffine(Vector2d in, Object out, int pos)
+    {
+        if      (out instanceof float[])            {rdotAffine(in, (float[])out, pos);}
+        else if (out instanceof double[])   {rdotAffine(in, (double[])out, pos);}
+        else if (out instanceof DoubleList) {rdotAffine(in, (DoubleList)out, pos);}
+        else    {throw new IllegalArgumentException(in.getClass().toString());}
+    }
+
+    public final void ldotAffine(Vector2d vector, Vector2d out)             {ldotAffine(vector.x, vector.y, out);}
+    public final void rdotAffine(Vector2d vector, Vector2d out)             {rdotAffine(vector.x, vector.y, out);}
+    public final void rdotAffine(Vector2d vector, float out[], int index)   {rdotAffine(vector.x, vector.y, out, index);}
+    public final void rdotAffine(Vector2d vector, double out[], int index)  {rdotAffine(vector.x, vector.y, out, index);}
+    public final void rdotAffine(Vector2d vector, DoubleList out, int index){rdotAffine(vector.x, vector.y, out, index);}
+    public final void ldotAffine(Vector2d vector, float out[], int index)   {ldotAffine(vector.x, vector.y, out, index);}
+    
+    public final void ldotAffine(double x, double y, Vector2d out){
+        out.x = m00 * x + m10 * y + m20;
+        out.y = m01 * x + m11 * y + m21;
+    }
+        
+    public final void ldotAffine(double x, double y, float out[], int index){
+        out[index]   = (float)(m00 * x + m10 * y + m20);
+        out[++index] = (float)(m01 * x + m11 * y + m21);
+    }
+    
+    public final void rdotAffine(double x, double y, float out[], int index){
+        out[index]   = (float)(m00 * x + m01 * y + m02);
+        out[++index] = (float)(m10 * x + m11 * y + m12);
+    }
+    
+    public final void rdotAffine(double x, double y, double out[], int index){
+        out[index]   = m00 * x + m01 * y + m02;
+        out[++index] = m10 * x + m11 * y + m12;
+    }
+    
+    public final void rdotAffine(double x, double y, DoubleList out, int index){
+        out.setElem(index++,m00 * x + m01 * y + m02);
+        out.setElem(index++,m10 * x + m11 * y + m12);
+    }
+    
+    public final void ldotAffine(DoubleArrayList in, int inIndex, float[] out, int outIndex){ldotAffine(in.getD(inIndex), in.getD(++inIndex), out, outIndex);}
+    public final void rdotAffine(DoubleArrayList in, int inIndex, float[] out, int outIndex){rdotAffine(in.getD(inIndex), in.getD(++inIndex), out, outIndex);}
+    public final void rdotAffine(float in[], int inIndex, float[] out, int outIndex)        {rdotAffine(in[inIndex], in[inIndex + 1], out, outIndex);}
+    public final void rdotAffine(double in[], int inIndex, float[] out, int outIndex)       {rdotAffine(in[inIndex], in[inIndex + 1], out, outIndex);}
+    
+    public final void ldot(double x, double y, double z, float out[], int index){
+        out[index]   = (float)(m00 * x + m10 * y + m20 * z);
+        out[++index] = (float)(m01 * x + m11 * y + m21 * z);
+        out[++index] = (float)(m02 * x + m12 * y + m22 * z);
+    }
+    
+    public final void rdot(double x, double y, double z, float out[], int index){
+        out[index]   = (float)(m00 * x + m01 * y + m02 * z);
+        out[++index] = (float)(m10 * x + m11 * y + m12 * z);
+        out[++index] = (float)(m20 * x + m21 * y + m22 * z);
+    }
 	
 	public final void rotateZ(double value)
 	{
@@ -176,4 +353,47 @@ public class Matrix3d implements Matrixd{
 		double tmp1 = -sin * this.m20 + cos * this.m21;
 		this.m20 = tmp0; this.m21 = tmp1;}
 	}
+	
+	public final void invert(Matrix3d read)
+    {
+        double [] mat = new double[size() * 2];
+        read.getColMajor(mat, 0, 6);
+        mat[3] = mat[10] = mat[17] = 1;
+        Calculate.toRREF(mat, 3);
+        setColMajor(mat, 3, 6);
+    }
+	    
+
+	
+   @Override
+    public final String toString(){
+        StringBuilder strB = new StringBuilder(24);
+        strB.append(m00).append(' ').append(m01).append(' ').append(m02).append(' ').append('\n');
+        strB.append(m10).append(' ').append(m11).append(' ').append(m12).append(' ').append('\n');
+        strB.append(m20).append(' ').append(m21).append(' ').append(m22).append(' ').append('\n');
+        return strB.toString();
+    }
+   
+   @Override
+   public final double getD(int index) {
+       switch(index)
+       {
+       case 0: return m00; case 1: return m01; case 2: return m02;
+       case 3: return m10; case 4: return m11; case 5: return m12;
+       case 6: return m20; case 7: return m21; case 8:return m22;
+       default:throw new ArrayIndexOutOfBoundsException(index);
+       }
+   }
+   
+   
+   @Override
+   public final void setElem(int i, double value)
+   {
+       switch(i) {
+       case 0: m00 = value;return;case 1: m01 = value;return;case 2: m02 = value;return;
+       case 3: m10 = value;return;case 4: m11 = value;return;case 5: m12 = value;return;
+       case 6: m20 = value;return;case 7: m21 = value;return;case 8:m22 = value;return;
+       }
+       throw new ArrayIndexOutOfBoundsException(i);
+   }
 }

@@ -1091,7 +1091,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public AffineTransform getBoardToScreenTransform(){return boardToScreenTransformation;}
 
-	public void screenToBoardPos(int x, int y, Vector2d out){gameTransform.transformAffine(x, y, out);}
+	public void screenToBoardPos(int x, int y, Vector2d out){gameTransform.rdotAffine(x, y, out);}//TODO check
 
 	public void boardToScreenPos(Point2D boardCoordinates, Point2D screenCooardinates){boardToScreenTransformation.transform(boardCoordinates, screenCooardinates);}
 
