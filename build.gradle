@@ -14,7 +14,9 @@ dependencies {
     implementation 'com.hynnet:logback-classic:1.1.3'
 
     testCompile 'junit:junit:4.12'
+    compile 'junit:junit:4.12'
 }
 
 mainClassName = 'main.Main'
 sourceSets.main.java.srcDirs = ['src']
+sourceSets.test.java.srcDirs = ['src/test']
