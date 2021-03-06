@@ -187,11 +187,12 @@ public class Matrix3d implements Matrixd, DoubleList{
     public final void preScale(double x, double y) {
         m00 *= x; m01 *= y;
         m10 *= x; m11 *= y;
+        m20 *= x; m21 *= y;
     }
 
     public final void postScale(double x, double y)
     {
-        m00 *= x; m02 *= x; m02 *= x;
+        m00 *= x; m01 *= x; m02 *= x;
         m10 *= y; m11 *= y; m12 *= y;
     }
 
@@ -354,17 +355,16 @@ public class Matrix3d implements Matrixd, DoubleList{
 		this.m20 = tmp0; this.m21 = tmp1;}
 	}
 	
-	public final void invert(Matrix3d read)
+	public final boolean invert(Matrix3d read)
     {
         double [] mat = new double[size() * 2];
         read.getColMajor(mat, 0, 6);
         mat[3] = mat[10] = mat[17] = 1;
-        Calculate.toRREF(mat, 3);
+        if (Calculate.toRREF(mat, 3) != 3){return false;}
         setColMajor(mat, 3, 6);
+        return true;
     }
-	    
 
-	
    @Override
     public final String toString(){
         StringBuilder strB = new StringBuilder(24);
@@ -395,5 +395,51 @@ public class Matrix3d implements Matrixd, DoubleList{
        case 6: m20 = value;return;case 7: m21 = value;return;case 8:m22 = value;return;
        }
        throw new ArrayIndexOutOfBoundsException(i);
+   }
+   
+   public final void dotl(Matrix3d lhs)
+   {
+       double x = lhs.m00 * m00 + lhs.m01 * m10 + lhs.m02 * m20;
+       double y = lhs.m10 * m00 + lhs.m11 * m10 + lhs.m12 * m20;
+       double z = lhs.m20 * m00 + lhs.m21 * m10 + lhs.m22 * m20;
+            m00 = x;       m10 = y;       m20 = z;
+              x = lhs.m00 * m01 + lhs.m01 * m11 + lhs.m02 * m21;
+              y = lhs.m10 * m01 + lhs.m11 * m11 + lhs.m12 * m21;
+              z = lhs.m20 * m01 + lhs.m21 * m11 + lhs.m22 * m21;
+            m01 = x;       m11 = y;       m21 = z;
+              x = lhs.m00 * m02 + lhs.m01 * m12 + lhs.m02 * m22;
+              y = lhs.m10 * m02 + lhs.m11 * m12 + lhs.m12 * m22;
+              z = lhs.m20 * m02 + lhs.m21 * m12 + lhs.m22 * m22;
+            m02 = x;       m12 = y;       m22 = z;
+   }
+   
+   public final void dotr(Matrix3d rhs)
+   {
+       double v0 = m00 * rhs.m00 + m01 * rhs.m10 + m02 * rhs.m20;
+       double v1 = m00 * rhs.m01 + m01 * rhs.m11 + m02 * rhs.m21;
+       double v2 = m00 * rhs.m02 + m01 * rhs.m12 + m02 * rhs.m22;
+                   m00 = v0;      m01 = v1;      m02 = v2;
+              v0 = m10 * rhs.m00 + m11 * rhs.m10 + m12 * rhs.m20;
+              v1 = m10 * rhs.m01 + m11 * rhs.m11 + m12 * rhs.m21;
+              v2 = m10 * rhs.m02 + m11 * rhs.m12 + m12 * rhs.m22;
+                   m10 = v0;      m11 = v1;      m12 = v2;
+              v0 = m20 * rhs.m00 + m21 * rhs.m10 + m22 * rhs.m20;
+              v1 = m20 * rhs.m01 + m21 * rhs.m11 + m22 * rhs.m21;
+              v2 = m20 * rhs.m02 + m21 * rhs.m12 + m22 * rhs.m22;
+                   m20 = v0;      m21 = v1;      m22 = v2;
+   }
+
+   public final void dot(Matrix3d lhs, Matrix3d rhs) {
+       if (lhs == this){dotl(rhs);return;}
+       if (rhs == this){dotr(lhs);return;}
+       m00 = lhs.m00 * rhs.m00 + lhs.m01 * rhs.m10 + lhs.m02 * rhs.m20;
+       m01 = lhs.m00 * rhs.m01 + lhs.m01 * rhs.m11 + lhs.m02 * rhs.m21;
+       m02 = lhs.m00 * rhs.m02 + lhs.m01 * rhs.m12 + lhs.m02 * rhs.m22;
+       m10 = lhs.m10 * rhs.m00 + lhs.m11 * rhs.m10 + lhs.m12 * rhs.m20;
+       m11 = lhs.m10 * rhs.m01 + lhs.m11 * rhs.m11 + lhs.m12 * rhs.m21;
+       m12 = lhs.m10 * rhs.m02 + lhs.m11 * rhs.m12 + lhs.m12 * rhs.m22;
+       m20 = lhs.m20 * rhs.m00 + lhs.m21 * rhs.m10 + lhs.m22 * rhs.m20;
+       m21 = lhs.m20 * rhs.m01 + lhs.m21 * rhs.m11 + lhs.m22 * rhs.m21;
+       m22 = lhs.m20 * rhs.m02 + lhs.m21 * rhs.m12 + lhs.m22 * rhs.m22;
    }
 }

@@ -63,13 +63,14 @@ public final class Matrix4d implements Matrixd, DoubleList{
 		this.m30 = w0;this.m31 = w1;this.m32 = w2;this.m33 = w3;
 	}
 	
-	public final void invert(Matrix4d read)
+	public final boolean invert(Matrix4d read)
 	{
 		double [] mat = new double[size() * 2];
 		read.getColMajor(mat, 0, 8);
 		mat[4] = mat[13] = mat[22] = mat[31] = 1;
-		Calculate.toRREF(mat, 4);
+		if (Calculate.toRREF(mat, 4) != 4) {return false;}
 		setColMajor(mat, 4, 8);
+		return true;
 	}
 
 	@Override
@@ -360,7 +361,7 @@ public final class Matrix4d implements Matrixd, DoubleList{
 
 	public final void postScale(double x, double y, double z)
 	{
-		m00 *= x; m02 *= x; m02 *= x; m03 *= x;
+		m00 *= x; m01 *= x; m02 *= x; m03 *= x;
 		m10 *= y; m11 *= y; m12 *= y; m13 *= y;
 		m20 *= z; m21 *= z; m22 *= z; m23 *= z;
 	}
@@ -646,16 +647,8 @@ public final class Matrix4d implements Matrixd, DoubleList{
 	}
 
 	public final void dot(Matrix4d lhs, Matrix4d rhs) {
-		if (lhs == this)
-		{
-			dotl(rhs);
-			return;
-		}
-		if (rhs == this)
-		{
-			dotr(lhs);
-			return;
-		}
+		if (lhs == this){dotl(rhs);return;}
+		if (rhs == this){dotr(lhs);return;}
 		m00 = lhs.m00 * rhs.m00 + lhs.m01 * rhs.m10 + lhs.m02 * rhs.m20 + lhs.m03 * rhs.m30;
 		m01 = lhs.m00 * rhs.m01 + lhs.m01 * rhs.m11 + lhs.m02 * rhs.m21 + lhs.m03 * rhs.m31;
 		m02 = lhs.m00 * rhs.m02 + lhs.m01 * rhs.m12 + lhs.m02 * rhs.m22 + lhs.m03 * rhs.m32;

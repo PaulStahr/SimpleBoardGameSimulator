@@ -7,42 +7,9 @@ import java.awt.geom.AffineTransform;
 import org.junit.Test;
 
 import geometry.Matrix3d;
-import geometry.Matrix4d;
 import geometry.TransformConversion;
-import util.ArrayUtil;
 
-public class TransformConversionTest {
-    @Test
-    public void testInverse3()
-    {
-        Matrix3d orig = new Matrix3d(1,1,-1,-1,1,1,1,-1,1);
-        Matrix3d mat = new Matrix3d(orig);
-        mat.invert(mat);
-        mat.invert(mat);
-        try{
-            assertTrue(ArrayUtil.qdist(orig, 0, mat, 0, mat.size()) < 0.1);
-        }catch(AssertionError e){
-            throw new AssertionError(orig + "!=" + mat, e);
-        }        
-    }
-    
-    
-    @Test
-    public void testInverse4()
-    {
-        Matrix4d orig = new Matrix4d(1,1,-1,1,-1,1,1,1,1,-1,1,1,1,1,1,-1);
-        Matrix4d mat = new Matrix4d(orig);
-        System.out.println(mat);
-        mat.invert(mat);
-        System.out.println(mat);
-        mat.invert(mat);
-        try{
-            assertTrue(ArrayUtil.qdist(orig, 0, mat, 0, mat.size()) < 0.1);
-        }catch(AssertionError e){
-            throw new AssertionError(orig + "!=" + mat, e);
-        }        
-    }
-    
+public class TransformConversionTest {    
     @Test
     public void testCompatibility()
     {
