@@ -101,7 +101,7 @@ public class MatrixTest {
         try{
             assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
         }catch(AssertionError e) {
-            throw new AssertionError(orig + "!=" + mat, e);
+            throw new AssertionError(orig +"*" + mat + "=" + dotprod + "!=" + identity, e);
         }
         orig.postTranslate(3, 4, 5);
         mat.preTranslate(-3, -4, -5);
@@ -109,7 +109,7 @@ public class MatrixTest {
         try{
             assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
         }catch(AssertionError e) {
-            throw new AssertionError(orig + "!=" + mat, e);
+            throw new AssertionError(orig +"*" + mat + "=" + dotprod + "!=" + identity, e);
         }
     }
     
@@ -125,16 +125,15 @@ public class MatrixTest {
         try{
             assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
         }catch(AssertionError e) {
-            throw new AssertionError(orig + "!=" + mat, e);
+            throw new AssertionError(orig +"*" + mat + "=" + dotprod + "!=" + identity, e);
         }
         orig.postScale(2, 4, 8);
         mat.preScale(0.5, 0.25, 0.125);
-        mat.invert(mat);
         dotprod.dot(orig,mat);
         try{
             assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
         }catch(AssertionError e) {
-            throw new AssertionError(orig + "!=" + mat, e);
+            throw new AssertionError(orig +"*" + mat + "=" + dotprod + "!=" + identity, e);
         }
     }
 }
