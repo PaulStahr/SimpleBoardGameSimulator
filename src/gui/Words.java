@@ -105,5 +105,6 @@ public enum Words {
     sync_pull,
     status,
     background,
-    password;
+    password,
+    seats;
 }

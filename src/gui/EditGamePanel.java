@@ -96,14 +96,15 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(tabPane));
 		layout.setVerticalGroup(layout.createSequentialGroup().addComponent(tabPane));
-		lh.addLanguageChangeListener(this);
 		tabPane.addTab(language.getString(Words.general), panelGeneral);
 		tabPane.addTab(language.getString(Words.game_objects), scrollPaneGameObjects);
 		tabPane.addTab(language.getString(Words.game_object_instances), scrollPaneGameObjectInstances);
 		tabPane.addTab(language.getString(Words.images), scrollPaneImages);
 		tabPane.addTab(language.getString(Words.player), scrollPanePlayer);
+        languageChanged(lh.getCurrentLanguage());
+        lh.addLanguageChangeListener(this);
 		tableGameObjects.addMouseListener(this);
-		updateTables();
+		JFrameUtils.runByDispatcher(this);
 		gi.addChangeListener(this);
 		tableModelPlayer.addTableModelListener(this);
 		
@@ -197,6 +198,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			tableModelImages.addTableModelListener(EditGamePanel.this);
 			tableModelGameObjects.addTableModelListener(EditGamePanel.this);
 			tableModelGameObjectInstances.addTableModelListener(EditGamePanel.this);
+			languageChanged(lh.getCurrentLanguage());
 			lh.addLanguageChangeListener(this);
  		}
 
@@ -205,7 +207,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			if (isUpdating)  {return;}
 			isUpdating = true;
 			textFieldName.setText(gi.name);
-			textFieldTableRadius.setText(Float.toString(gi.tableRadius));
+			textFieldTableRadius.setText(Integer.toString(gi.tableRadius));
 			JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
 			comboBoxBackground.setSelectedItem(gi.game.getImageKey(gi.game.background));
             textFieldPassword.setText(gi.password);
@@ -261,8 +263,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 
 		@Override
 		public void languageChanged(Language language) {
+            labelName.setText(language.getString(Words.name));
 		    labelBackground.setText(language.getString(Words.background));
 		    labelPassword.setText(language.getString(Words.password));
+		    labelSeats.setText(language.getString(Words.seats));
 		}
  	}
  	
@@ -345,14 +349,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			else if (tableSource == tableModelPlayer)
 			{
-				if (button == deletePlayerColumn)
-				{
-					gi.update(new PlayerRemoveAction(id, player, gi.getPlayerByIndex(row)));
-				}
-				else if (button == repairPlayerColumn)
-				{
-					gi.repairPlayerConsistency(gi.getPlayerByIndex(row).id, player, new ArrayList<>());
-				}
+				if (button == deletePlayerColumn)       {gi.update(new PlayerRemoveAction(id, player, gi.getPlayerByIndex(row)));}
+				else if (button == repairPlayerColumn)	{gi.repairPlayerConsistency(gi.getPlayerByIndex(row).id, player, new ArrayList<>());}
 			}
 		}
 		updateTables();
@@ -363,6 +361,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	public void run()
 	{
 		updateTables();
+		panelGeneral.update();
 	}
 
 	@Override
@@ -387,10 +386,9 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		private final GameObject go;
 		private final GameInstance gi;
 		boolean updating = false;
-		private final ArrayList<JComboBox> imageComboBoxes = new ArrayList<>();
+		private final ArrayList<JComboBox<String>> imageComboBoxes = new ArrayList<>();
 		private final JComboBox<String> comboBoxFrontImage;
 		private final JComboBox<String> comboBoxBackImage;
-		private final LanguageHandler lh;
 		
 		private void updateImages()
 		{
@@ -404,7 +402,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		public ObjectEditPanel(GameObject go, GameInstance gi, LanguageHandler lh)
 		{
 			this.gi = gi;
-			this.lh = lh;
 			//GroupLayout layout = new GroupLayout(this);
 			//setLayout(layout);YES_NO_OPTION
 			setLayout(JFrameUtils.DOUBLE_COLUMN_LAUYOUT);
@@ -455,7 +452,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				comboBoxFrontImage = null;
 				comboBoxBackImage = null;
 			}
-			languageChanged(lh.getCurrentLanguage());
+            languageChanged(lh.getCurrentLanguage());
+			lh.addLanguageChangeListener(this);
 		}
 		@Override
 		public void changedUpdate(DocumentEvent e) {

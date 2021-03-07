@@ -118,4 +118,5 @@
     <status>status</status>
     <background>background</background>
     <password>password</password>
+    <seats>seats</seats>
 </xml>
