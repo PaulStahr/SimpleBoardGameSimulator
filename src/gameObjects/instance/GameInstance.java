@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.locks.StampedLock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +51,7 @@ public class GameInstance {
 	public boolean debug_mode = false;
 	private long maxDrawValue = 0;
 	public int tableRadius = 1200;
+	private final StampedLock lock = new StampedLock();
 	
 	public static interface GameChangeListener
 	{
@@ -102,14 +104,18 @@ public class GameInstance {
 	
 	public Player getPlayerById(int id)
 	{
-		for (int i = 0; i < players.size(); ++i)
-		{
-			if (players.get(i).id == id)
-			{
-				return players.get(i);
-			}
-		}
-		return null;
+	    long stamp = lock.readLock();
+	    try
+	    {
+    		for (int i = 0; i < players.size(); ++i)
+    		{
+    			if (players.get(i).id == id)
+    			{
+    				return players.get(i);
+    			}
+    		}
+		    return null;
+	    }finally {lock.unlockRead(stamp);}
 	}
 
 	public Player getPlayerByIndex(int idx){return players.get(idx);}
@@ -135,14 +141,30 @@ public class GameInstance {
 	
 	public Player getPlayerByName(String name)
 	{
-		for (int i = 0; i < players.size(); ++i)
-		{
-			if (players.get(i).getName().equals(name))
-			{
-				return players.get(i);
-			}
-		}
-		return null;
+	    int tries = 0;
+	    while (true)
+	    {
+	        long stamp = lock.tryOptimisticRead();
+	        lock:{
+                try
+                {
+            		for (int i = 0; i < players.size(); ++i)
+            		{
+            		    Player pl = players.get(i);
+            			if (name.equals(pl.getName()))
+            			{
+            			    if (!lock.validate(stamp)){break lock;}
+            				return pl;
+            			}
+            		}
+            		if (!lock.validate(stamp)){break lock;}
+        		    return null;
+        		}catch (Exception e) {
+        		    if (tries < 5){logger.debug("Possible Read-Write Invalidation retry " + (tries++) +" of 5");}
+        		    else          {throw e;}
+        		}
+	        }
+	    }
 	}
 
 	public ObjectInstance addObjectInstance(ObjectInstance objectInstance)
@@ -160,14 +182,29 @@ public class GameInstance {
 	
 	public ObjectInstance getObjectInstanceById(int id)
 	{
-		for (int i = 0; i < objects.size(); ++i)
-		{
-			if (objects.get(i).id == id)
-			{
-				return objects.get(i);
-			}
-		}
-		return null;
+        int tries = 0;
+        while (true)
+        {
+            long stamp = lock.tryOptimisticRead();
+            lock:{
+                try
+                {
+            		for (int i = 0; i < objects.size(); ++i)
+            		{
+            			if (objects.get(i).id == id)
+            			{
+                            if (!lock.validate(stamp)){break lock;}
+            				return objects.get(i);
+            			}
+            		}
+                    if (!lock.validate(stamp)){break lock;}
+                    return null;
+                }catch (Exception e) {
+                    if (tries < 5){logger.debug("Possible Read-Write Invalidation retry " + (tries++) +" of 5");}
+                    else          {throw e;}
+                }
+            }
+        }
 	}
 
 	public ObjectInstance getObjectInstanceByIndex(int index){return this.objects.get(index);}
@@ -216,23 +253,30 @@ public class GameInstance {
 		{
 			GameObjectInstanceEditAction editAction = (GameObjectInstanceEditAction) action;
 			ObjectInstance oi = editAction.getObject(this);
-			maxDrawValue = max(maxDrawValue , oi.state.drawValue);
-			oi.state.set(editAction.state);
+			if (oi == null)
+			{
+			    logger.error("Can't find edited object " + editAction.object);
+			}else {
+			    maxDrawValue = max(maxDrawValue , oi.state.drawValue);
+			    oi.state.set(editAction.state);
+			}
 		}
 		else if (action instanceof PlayerRemoveAction)
 		{
 			PlayerRemoveAction rpa = (PlayerRemoveAction)action;
 			for (int i = 0; i < objects.size(); ++i)
-			{
-				if (objects.get(i).state.owner_id == rpa.editedPlayer)
+			{    
+			    ObjectInstance oi = objects.get(i);
+			    ObjectState state = oi.state;
+				if (state.owner_id == rpa.editedPlayer)
 				{
-					objects.get(i).state.owner_id = -1;
-					objects.get(i).state.inPrivateArea = false;
+					state.owner_id = -1;
+					state.inPrivateArea = false;
 				}
-				if (objects.get(i).state.isSelected == rpa.editedPlayer)
+				if (state.isSelected == rpa.editedPlayer)
 				{
-					objects.get(i).state.isSelected = -1;
-					objects.get(i).state.isActive = false;
+					state.isSelected = -1;
+					state.isActive = false;
 				}
 			}
 			players.remove(rpa.getEditedPlayer(this));
@@ -247,15 +291,16 @@ public class GameInstance {
 					case GameStructureEditAction.REMOVE_OBJECT_INSTANCE:
 					{
 						ObjectInstance oi = getObjectInstanceById(gsoea.objectId);
-						if (oi.state.aboveInstanceId != -1)
+						ObjectState state = oi.state;
+						if (state.aboveInstanceId != -1)
 						{
-							getObjectInstanceById(oi.state.aboveInstanceId).state.belowInstanceId = oi.state.belowInstanceId;
-							oi.state.aboveInstanceId = -1;
+							getObjectInstanceById(state.aboveInstanceId).state.belowInstanceId = state.belowInstanceId;
+							state.aboveInstanceId = -1;
 						}
 						if (oi.state.belowInstanceId != -1)
 						{
-							getObjectInstanceById(oi.state.belowInstanceId).state.aboveInstanceId = oi.state.aboveInstanceId;
-							oi.state.belowInstanceId = -1;
+							getObjectInstanceById(state.belowInstanceId).state.aboveInstanceId = state.aboveInstanceId;
+							state.belowInstanceId = -1;
 						}
 						objects.remove(gsoea.objectId);
 						break;
