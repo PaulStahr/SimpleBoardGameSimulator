@@ -169,12 +169,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
          */
         private static final long serialVersionUID = -1419752365189157656L;
         final int id;
-        public CommandPing(int id) {this.id = id;}
+        final int ttl;
+        public CommandPing(int id, int ttl) {this.id = id;this.ttl = ttl;}
     }
 
     static class CommandPingForward extends CommandPing{
-        private static int sid = 0;
-        public CommandPingForward() {super(sid++);}
+        private static int sid = (int)System.nanoTime();
+        public CommandPingForward(int ttl) {super(sid++, ttl);}
 
         /**
          *
@@ -183,7 +184,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 
     static class CommandPingBack extends CommandPing{
 
-        public CommandPingBack(int id) {super(id);}
+        public CommandPingBack(int id, int ttl) {super(id, ttl);}
 
         /**
          *
@@ -228,7 +229,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
     }
 
     public final PingInformation ping(PingCallback callback, long timeout) {
-        CommandPingForward cpf = new CommandPingForward();
+        CommandPingForward cpf = new CommandPingForward(1);
         PingInformation pc = new PingInformation(cpf.id, timeout, callback, false);
         pings.add(pc);
         queueOutput(cpf);
@@ -547,7 +548,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                 }
                 if (inputObject instanceof CommandPingForward)
                 {
-                    queueOutput(new CommandPingBack(((CommandPingForward)inputObject).id));
+                    CommandPingForward ping = ((CommandPingForward)inputObject);
+                    queueOutput(new CommandPingBack(ping.id, ping.ttl));
                     continue;
                 }
                 if (inputObject instanceof CommandPingBack)
