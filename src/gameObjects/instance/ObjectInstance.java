@@ -79,7 +79,7 @@ public class ObjectInstance {
 		}
 	}
 
-	public ObjectState getState() {
-		return state;
-	}
+	public ObjectState getState() {return state;}
+
+    public ObjectState copyState() {return state.copy();}
 }
