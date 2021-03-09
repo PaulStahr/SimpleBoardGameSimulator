@@ -526,7 +526,7 @@ public class GameIO {
 	{
 		at.setTransform(
 				Double.parseDouble(elem.getAttributeValue(IOString.SCALE_X)), Double.parseDouble(elem.getAttributeValue(IOString.SHEAR_Y)),
-				Double.parseDouble(elem.getAttributeValue(IOString.SCALE_Y)), Double.parseDouble(elem.getAttributeValue(IOString.SHEAR_X)),
+				Double.parseDouble(elem.getAttributeValue(IOString.SHEAR_X)), Double.parseDouble(elem.getAttributeValue(IOString.SCALE_Y)),
 				Double.parseDouble(elem.getAttributeValue(IOString.TRANSLATE_X)), Double.parseDouble(elem.getAttributeValue(IOString.TRANSLATE_Y)));
 		return elem;
 	}

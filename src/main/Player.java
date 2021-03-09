@@ -6,12 +6,11 @@ import java.util.List;
 import java.util.Random;
 
 import gameObjects.PlayerColumnType;
-import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 
-public class Player implements Comparable {
+public class Player implements Comparable<Object> {
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{PlayerColumnType.ID, PlayerColumnType.NAME, PlayerColumnType.REPAIR, PlayerColumnType.DELETE});
     public int trickNum = 0;
     private String name;
@@ -29,6 +28,7 @@ public class Player implements Comparable {
 	private transient int nameModCount = 0;
 
 	public boolean visitor = false;
+    public volatile long lastReceivedSignal;
 	
 	public String getName()
 	{
@@ -130,5 +130,29 @@ public class Player implements Comparable {
 	public int compareTo(Object o) {
 		int compareId = ((Player)o).id;
 		return this.id - compareId;
+	}
+
+	public String toStringAdvanced()
+	{
+	    return name + " " + id + " " + color + " " + mouseXPos + " " + mouseYPos + " " + screenToBoardTransformation + " " + playerAtTableRotation + " " + playerAtTablePosition;
+	}
+
+	@Override
+	public boolean equals(Object oth)
+	{
+	    if (oth == this) {return true;}
+	    if (oth instanceof Player)
+	    {
+	        Player other = (Player)oth;
+	        return name.equals(other.name)
+	                && id== other.id
+	                && color.equals(other.color)
+	                && mouseXPos == other.mouseXPos
+	                && mouseYPos == other.mouseYPos
+	                && screenToBoardTransformation.equals(other.screenToBoardTransformation)
+	                && playerAtTableRotation == other.playerAtTableRotation
+	                && playerAtTablePosition == other.playerAtTablePosition;
+	    }
+	    return false;
 	}
 }
