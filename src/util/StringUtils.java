@@ -710,4 +710,13 @@ public class StringUtils {
 		}
 		return strB;
 	}
+
+
+    public static StringBuilder toString(IntegerArrayList ial, char c, StringBuilder strB) {
+        for (int i = 0; i < ial.size(); ++i) {
+            strB.append(ial.getI(i));
+            if (i != 0) {strB.append(c);}
+        }
+        return strB;
+    }
 }
