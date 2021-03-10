@@ -21,6 +21,16 @@ public class GameObjectDice extends GameObject{
 			this.img = img;
 			this.imgStr = imgStr;
 		}
+
+        public DiceSide(DiceSide other) {
+            this.value = other.value;
+            this.img = new Texture(other.img);
+            this.imgStr = other.imgStr;
+        }
+
+        public DiceSide copy() {
+            return new DiceSide(this);
+        }
 	}
 	public DiceSide dss[];
 	
@@ -29,7 +39,16 @@ public class GameObjectDice extends GameObject{
 		this.dss = sides;
 	}
 
-	@Override
+	public GameObjectDice(GameObjectDice other) {
+	    super(other);
+	    dss = new DiceSide[other.dss.length];
+	    for (int i = 0; i < dss.length; ++i)
+	    {
+	        dss[i] = other.dss[i].copy();
+	    }
+    }
+
+    @Override
 	public Texture getLook(ObjectState state, int playerId) {
 		return dss[((DiceState)state).side].img;
 	}
@@ -116,4 +135,6 @@ public class GameObjectDice extends GameObject{
 		}
 	}
 
+    @Override
+    public GameObject copy() {return new GameObjectDice(this);}
 }

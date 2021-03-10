@@ -56,6 +56,7 @@ public abstract class ObjectState implements Serializable {
 		this.lastChange = state.lastChange;
 		this.isActive = state.isActive;
 		this.drawValue = state.drawValue;
+		this.lastChange = state.lastChange;
 	}
 
 	public abstract ObjectState copy();
@@ -94,5 +95,26 @@ public abstract class ObjectState implements Serializable {
 			return e.toString();
 		}
 		return bos.toString();
+	}
+	
+	@Override
+    public boolean equals(Object other)
+	{
+	    if (other == this){return true;}
+	    if (!(other instanceof ObjectState)){return false;}
+	    ObjectState os = (ObjectState)other;
+	    return this.posX == os.posX
+	            && this.posY == os.posY
+	            && this.rotation == os.rotation
+	            && this.scale == os.scale
+	            && this.owner_id == os.owner_id
+	            && this.isSelected == os.isSelected
+	            && this.inPrivateArea == os.inPrivateArea
+	            && this.aboveInstanceId == os.aboveInstanceId
+	            && this.belowInstanceId == os.belowInstanceId
+	            && this.value == os.value
+	            && this.drawValue == os.drawValue
+	            && this.rotationStep == os.rotationStep
+	            && this.isFixed == os.isFixed;
 	}
 }

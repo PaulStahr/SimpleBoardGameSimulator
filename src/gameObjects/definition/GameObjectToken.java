@@ -7,18 +7,12 @@ import gameObjects.instance.ObjectState;
 public class GameObjectToken extends GameObject{
 	private String downsideLookId;
 	private String upsideLookId;
-	private Texture upsideLook;
 	private Texture downsideLook;
+    private Texture upsideLook;
 	
-	public String getDownsideLookId()
-	{
-		return downsideLookId;
-	}
+	public String getDownsideLookId(){return downsideLookId;}
 	
-	public String getUpsideLookId()
-	{
-		return upsideLookId;
-	}
+	public String getUpsideLookId(){return upsideLookId;}
 	
 	public void setUpsideLook(String upsideLookId)
 	{
@@ -38,7 +32,15 @@ public class GameObjectToken extends GameObject{
 		this.downsideLook = back;
 	}
 
-	@Override
+	public GameObjectToken(GameObjectToken other) {
+	    super(other);
+        this.downsideLookId = other.downsideLookId;
+        this.upsideLookId = other.upsideLookId;
+        this.downsideLook = other.downsideLook;
+        this.upsideLook = other.upsideLook;
+    }
+
+    @Override
 	public Texture getLook(ObjectState state, int playerId) {
 		return ((TokenState)state).side != (state.owner_id != playerId)? upsideLook : downsideLook;
 	}
@@ -101,4 +103,7 @@ public class GameObjectToken extends GameObject{
 		downsideLook = gi.game.getImage(downsideLookId);
 		upsideLook = gi.game.getImage(upsideLookId);
 	}
+
+    @Override
+    public GameObject copy() {return new GameObjectToken(this);}
 }

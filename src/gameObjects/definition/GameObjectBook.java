@@ -15,12 +15,27 @@ public class GameObjectBook extends GameObject{
             this.img = img;
             this.imgStr = imgStr;
         }
+
+        public BookSide(BookSide other) {
+            this.value = other.value;
+            this.img = new Texture(other.img);
+            this.imgStr = other.imgStr;
+        }
     }
     public BookSide bss[];
 
     public GameObjectBook(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, GameObjectBook.BookSide sides[], int value, int rotationStep){
         super(uniqueObjectName, objectType, widthInMM, heightInMM, value, rotationStep, 0);
         this.bss = sides;
+    }
+
+    public GameObjectBook(GameObjectBook other) {
+        super(other);
+        this.bss = new BookSide[other.bss.length];
+        for (int i = 0; i < bss.length; ++i)
+        {
+            this.bss[i] = new BookSide(other.bss[i]);
+        }
     }
 
     @Override
@@ -98,5 +113,6 @@ public class GameObjectBook extends GameObject{
         return bss[state.side];
     }
 
-
+    @Override
+    public GameObject copy() {return new GameObjectBook(this);}
 }

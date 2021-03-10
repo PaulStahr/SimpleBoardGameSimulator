@@ -2,6 +2,9 @@ package gameObjects.action;
 
 import java.io.Serializable;
 
+import gameObjects.instance.GameInstance;
+import main.Player;
+
 public abstract class GameAction implements Serializable{
 	/**
 	 * 
@@ -13,5 +16,8 @@ public abstract class GameAction implements Serializable{
 	{
 		this.source = source;
 	}
-	
+
+    public int sourcePlayerId() {return -1;}
+
+    public Player getSourcePlayer(GameInstance gameInstance) {return null;}
 }

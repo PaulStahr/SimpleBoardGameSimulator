@@ -35,7 +35,15 @@ public class GameObjectFigure extends GameObject{
 		}
 	}
 	
-	@Override
+	public GameObjectFigure(GameObjectFigure other) {
+	    super(other);
+        this.standingLook = other.standingLook.copy();
+        this.lyingLook = other.lyingLook.copy();
+        this.standingLookStr = other.standingLookStr;
+        this.lyingLookStr = other.lyingLookStr;
+    }
+
+    @Override
 	public void updateImages(GameInstance gi)
 	{
 		standingLook = gi.game.getImage(standingLookStr);
@@ -101,4 +109,7 @@ public class GameObjectFigure extends GameObject{
 	{
 		return lyingLook;
 	}
+
+    @Override
+    public GameObject copy() {return new GameObjectFigure(this);}
 }

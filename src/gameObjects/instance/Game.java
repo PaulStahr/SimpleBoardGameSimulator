@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import data.Texture;
 import gameObjects.definition.GameObject;
@@ -13,7 +14,24 @@ public class Game {
 	public Texture background;
 	public ArrayList<GameObject> objects = new ArrayList<>();
 	public final HashMap<String, Texture> images = new HashMap<>();
-	public GameObject getObject(String uniqueObjectName) {
+	public Game(Game other) {
+        this.name = other.name;
+        this.background = new Texture(other.background);
+        for (int i = 0; i < objects.size(); ++i)
+        {
+            objects.add(other.objects.get(i).copy());
+        }
+        for (Entry<String, Texture> entry : images.entrySet())
+        {
+            images.put(entry.getKey(), entry.getValue().copy());
+        }
+    }
+	
+	public Game copy() {return new Game(this);}
+
+    public Game() {}
+
+    public GameObject getObject(String uniqueObjectName) {
 		for (int i = 0; i < objects.size(); ++i)
 		{
 			if (objects.get(i).uniqueObjectName.equals(uniqueObjectName))

@@ -12,6 +12,7 @@ import javax.imageio.ImageIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import util.ImageUtil;
 import util.io.StreamUtil;
 
 public class Texture {
@@ -32,6 +33,12 @@ public class Texture {
     public Texture(BufferedImage img, String suffix) {
         this.img = img;
         this.suffix = suffix;
+    }
+
+    public Texture(Texture background) {
+        this.data = background.data == null ? null : background.data.clone();
+        this.img = background.img == null ? null : ImageUtil.deepCopy(background.img);
+        this.suffix = background.suffix;
     }
 
     public byte[] getData() throws IOException {
@@ -74,4 +81,6 @@ public class Texture {
     }
     
     public void writeTo(OutputStream out) throws IOException{out.write(getData());}
+
+    public Texture copy() {return new Texture(this);}
 }

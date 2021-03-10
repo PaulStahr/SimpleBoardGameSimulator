@@ -35,7 +35,18 @@ public abstract class GameObject {
 		this.isFixed = isFixed;
 	}
 	
-	public abstract Texture getLook(ObjectState state, int playerId);
+	public GameObject(GameObject other) {
+        this.widthInMM = other.widthInMM;
+        this.heightInMM = other.heightInMM;
+        this.uniqueObjectName = other.uniqueObjectName;
+        this.objectType = other.objectType;
+        this.value = other.value;
+        this.rotationStep = other.rotationStep;
+        this.isFixed = other.isFixed;
+        this.groups = other.groups.clone();
+    }
+
+    public abstract Texture getLook(ObjectState state, int playerId);
 
 	public int getWidth(ObjectState state, int playerId) {
 		BufferedImage img;
@@ -67,4 +78,6 @@ public abstract class GameObject {
 	}
 
 	public abstract void updateImages(GameInstance gi);
+
+    public abstract GameObject copy();
 }
