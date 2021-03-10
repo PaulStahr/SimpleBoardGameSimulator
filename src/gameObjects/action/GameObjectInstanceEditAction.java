@@ -24,7 +24,7 @@ public class GameObjectInstanceEditAction extends GameAction{
 
 	public GameObjectInstanceEditAction(int source, Player player, ObjectInstance activeObject, ObjectState state) {
 		super(source);
-		this.player = player.id;
+		this.player = player == null ? -1 : player.id;
 		this.playerObject = player;
 		this.object = activeObject.id;
 		this.activeObject = activeObject;

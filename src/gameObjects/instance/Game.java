@@ -17,11 +17,11 @@ public class Game {
 	public Game(Game other) {
         this.name = other.name;
         this.background = background == null ? null : new Texture(other.background);
-        for (int i = 0; i < objects.size(); ++i)
+        for (int i = 0; i < other.objects.size(); ++i)
         {
             objects.add(other.objects.get(i).copy());
         }
-        for (Entry<String, Texture> entry : images.entrySet())
+        for (Entry<String, Texture> entry : other.images.entrySet())
         {
             images.put(entry.getKey(), entry.getValue().copy());
         }

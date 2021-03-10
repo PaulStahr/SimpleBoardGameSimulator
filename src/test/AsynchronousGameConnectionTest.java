@@ -27,9 +27,9 @@ public class AsynchronousGameConnectionTest {
     public AsynchronousGameConnectionTest() throws IOException {
         game.objects.add(new GameObjectToken("token", "card", 10, 10, null, null, 5, 90, 0));
         gi0 = new GameInstance(game, "Foobar");
+        gi0.addObjectInstance(new ObjectInstance(game.objects.get(0), 4));
         gi1 = new GameInstance(gi0);
         assertEquals(gi0.hashCode(), gi1.hashCode());
-        gi0.addObjectInstance(new ObjectInstance(game.objects.get(0), 4));
         PipedInputStream pis0 = new PipedInputStream();
         PipedOutputStream pos0 = new PipedOutputStream(pis0);
         PipedInputStream pis1 = new PipedInputStream();
@@ -66,6 +66,7 @@ public class AsynchronousGameConnectionTest {
     @Test
     public void simpleConnectionTest() throws IOException
     {
+        assert (gi0.hashCode() == gi1.hashCode());
         ObjectInstance oi = gi0.getObjectInstanceById(4);
         ObjectState state = oi.copyState();
         state.posX = 4;

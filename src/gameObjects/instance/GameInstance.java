@@ -231,7 +231,8 @@ public class GameInstance {
 	
 	public GameObject getObjectByIndex(int index){return this.game.objects.get(index);}
 	
-	public int getHash()
+	@Override
+    public int hashCode()
 	{
 		int result = 0;
 		for (int i = 0; i < objects.size(); ++i)
@@ -242,10 +243,10 @@ public class GameInstance {
 		{
 			result ^= players.get(i).hashCode();
 		}
-		result ^= name.hashCode();
-		result ^= hidden ? 0xB : 0;
-		result ^= game.hashCode();
-		return result;
+     	result ^= name.hashCode();
+     	result ^= hidden ? 0xB : 0;
+     	result ^= game.hashCode();
+     	return result;
 	}
 
 	public void update(GameAction action) {
