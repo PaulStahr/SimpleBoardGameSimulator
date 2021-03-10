@@ -22,7 +22,7 @@ public class Texture {
     public String suffix;
     
     public Texture(InputStream in, String suffix) throws IOException {
-        this.data = StreamUtil.toByteArray(in);
+        this.data = in == null ? null : StreamUtil.toByteArray(in);
         this.suffix = suffix;
     }
     
@@ -35,10 +35,10 @@ public class Texture {
         this.suffix = suffix;
     }
 
-    public Texture(Texture background) {
-        this.data = background.data == null ? null : background.data.clone();
-        this.img = background.img == null ? null : ImageUtil.deepCopy(background.img);
-        this.suffix = background.suffix;
+    public Texture(Texture other) {
+        this.data = other.data == null ? null : other.data.clone();
+        this.img = other.img == null ? null : ImageUtil.deepCopy(other.img);
+        this.suffix = other.suffix;
     }
 
     public byte[] getData() throws IOException {

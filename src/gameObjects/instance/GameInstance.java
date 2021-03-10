@@ -45,7 +45,7 @@ public class GameInstance {
 	public boolean table = true;
     public boolean put_down_area = true;
     public int seats = -1;
-	public List<String> seatColors = new ArrayList<>(Arrays.asList("#e81123", "#00188f", "#009e49", "#ff8c00", "#68217a", "#00bcf2", "#ec008c", "#fff100", "#00b294", "#bad80a"));
+	public List<String> seatColors = Arrays.asList("#e81123", "#00188f", "#009e49", "#ff8c00", "#68217a", "#00bcf2", "#ec008c", "#fff100", "#00b294", "#bad80a");
 	public String tableColor = "";
 	public int admin = -1;
 	public boolean debug_mode = false;
@@ -58,6 +58,16 @@ public class GameInstance {
 		public void changeUpdate(GameAction action);
 	}
 	
+	public GameInstance(GameInstance other)
+	{
+	    this.game = new Game(other.game);
+        this.password = other.password;
+	    this.name = other.name;
+	    this.hidden =other.hidden;
+	    for (ObjectInstance oi : other.objects){objects.add(oi.copy());}
+	    for (Player pl : other.players)        {players.add(pl.copy());}
+	}
+
 	public GameInstance(Game game, String name)
 	{
 		this.game = game;
@@ -104,18 +114,28 @@ public class GameInstance {
 	
 	public Player getPlayerById(int id)
 	{
-	    long stamp = lock.readLock();
-	    try
-	    {
-    		for (int i = 0; i < players.size(); ++i)
-    		{
-    			if (players.get(i).id == id)
-    			{
-    				return players.get(i);
-    			}
-    		}
-		    return null;
-	    }finally {lock.unlockRead(stamp);}
+        int tries = 0;
+        while (true)
+        {
+            long stamp = lock.tryOptimisticRead();
+            lock:{
+                try
+                {
+            		for (int i = 0; i < players.size(); ++i)
+            		{
+            			if (players.get(i).id == id)
+            			{
+                            if (!lock.validate(stamp)){break lock;}
+               				return players.get(i);
+            			}
+            		}
+                	if (lock.validate(stamp)){return null;}
+                }catch (Exception e) {
+                    if (tries < 5){logger.debug("Possible Read-Write Invalidation retry " + (tries++) +" of 5");}
+                    else          {throw e;}
+                }
+            }
+        }	
 	}
 
 	public Player getPlayerByIndex(int idx){return players.get(idx);}
@@ -153,12 +173,11 @@ public class GameInstance {
             		    Player pl = players.get(i);
             			if (name.equals(pl.getName()))
             			{
-            			    if (!lock.validate(stamp)){break lock;}
-            				return pl;
+            			    if (lock.validate(stamp)){return pl;}
+            			    break lock;
             			}
             		}
-            		if (!lock.validate(stamp)){break lock;}
-        		    return null;
+            		if (lock.validate(stamp)){return null;}
         		}catch (Exception e) {
         		    if (tries < 5){logger.debug("Possible Read-Write Invalidation retry " + (tries++) +" of 5");}
         		    else          {throw e;}
@@ -197,8 +216,7 @@ public class GameInstance {
             				return objects.get(i);
             			}
             		}
-                    if (!lock.validate(stamp)){break lock;}
-                    return null;
+                    if (lock.validate(stamp)){return null;}
                 }catch (Exception e) {
                     if (tries < 5){logger.debug("Possible Read-Write Invalidation retry " + (tries++) +" of 5");}
                     else          {throw e;}
@@ -231,6 +249,11 @@ public class GameInstance {
 	}
 
 	public void update(GameAction action) {
+	    Player sourcePlayer = action.getSourcePlayer(this);
+	    if (sourcePlayer != null)
+        {
+	        sourcePlayer.lastReceivedSignal = System.nanoTime();
+        }
 	    if (action instanceof PlayerMousePositionUpdate)
 	    {
 	        PlayerMousePositionUpdate pmpu = (PlayerMousePositionUpdate)action;

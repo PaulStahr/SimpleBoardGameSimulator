@@ -39,7 +39,15 @@ public class ObjectInstance {
 		this.id = id;
 	}
 	
-	public Texture getLook(int playerId){return go.getLook(state, playerId);}
+	public ObjectInstance(ObjectInstance other) {
+        this.state = other.state.copy();
+        this.go = other.go.copy();
+        this.id = other.id;
+        this.scale = other.scale;
+        this.tmpScale = other.tmpScale;
+    }
+
+    public Texture getLook(int playerId){return go.getLook(state, playerId);}
 
 	public int getWidth(int playerId){return go.getWidth(state, playerId) * this.state.scale;}
 
@@ -82,4 +90,6 @@ public class ObjectInstance {
 	public ObjectState getState() {return state;}
 
     public ObjectState copyState() {return state.copy();}
+
+    public ObjectInstance copy() {return new ObjectInstance(this);}
 }

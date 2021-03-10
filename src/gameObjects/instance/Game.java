@@ -16,7 +16,7 @@ public class Game {
 	public final HashMap<String, Texture> images = new HashMap<>();
 	public Game(Game other) {
         this.name = other.name;
-        this.background = new Texture(other.background);
+        this.background = background == null ? null : new Texture(other.background);
         for (int i = 0; i < objects.size(); ++i)
         {
             objects.add(other.objects.get(i).copy());

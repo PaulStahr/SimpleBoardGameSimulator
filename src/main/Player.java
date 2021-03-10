@@ -72,7 +72,21 @@ public class Player implements Comparable<Object> {
 		setPlayerColor();
 	}
 
-	@Override
+	public Player(Player other) {
+        this.name = other.name;
+        this.id = other.id;
+        this.color = other.color;
+        this.mouseXPos = other.mouseXPos;
+        this.mouseYPos = other.mouseYPos;
+        this.screenWidth = other.screenWidth;
+        this.screenHeight = other.screenHeight;
+        this.screenToBoardTransformation.setTransform(other.screenToBoardTransformation);
+        this.playerAtTableTransform.setTransform(other.playerAtTableTransform);
+        this.playerAtTableRotation = other.playerAtTableRotation;
+        this.playerAtTablePosition = other.playerAtTablePosition;
+    }
+
+    @Override
 	public String toString() {
 		return "(" + name + " " + id + ")";
 	}
@@ -155,4 +169,6 @@ public class Player implements Comparable<Object> {
 	    }
 	    return false;
 	}
+
+    public Player copy() {return new Player(this);}
 }
