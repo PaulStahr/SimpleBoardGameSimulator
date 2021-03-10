@@ -276,10 +276,7 @@ public abstract class Options
 
     private Options(){}
     
-    public static final int modCount()
-    {
-        return modCount;
-    }
+    public static final int modCount(){return modCount;}
     
     public synchronized static void addModificationListener(Runnable runnable)
     {
@@ -318,19 +315,14 @@ public abstract class Options
     		this.lastModification = lastModification;
     	}
     	
-    	public final int getLastMod()
-    	{
-    		return lastModification;
-    	}
+    	public final int getLastMod(){return lastModification;}
     	
     	public abstract String typeValue();
 
 		public abstract String stringValue();
 		
 		@Override
-		public String toString(){
-			return name + ':' + '=' + stringValue();
-		}
+		public String toString(){return name + ':' + '=' + stringValue();}
     }
     
     private static OptionTreeNode createNodeInstance(String name, Object value, int lastModification)
@@ -355,19 +347,12 @@ public abstract class Options
     	}
     	
 		@Override
-		public String typeValue() {
-			return "bool";
-		}
+		public String typeValue() {return "bool";}
 		
-		public boolean get()
-		{
-			return value;
-		}
+		public boolean get(){return value;}
 		
 		@Override
-		public String stringValue() {
-			return String.valueOf(value);
-		}
+		public String stringValue() {return String.valueOf(value);}
     }
     
     public static class OptionTreeLeafInteger extends OptionTreeNode
@@ -380,19 +365,12 @@ public abstract class Options
     	}
     	
 		@Override
-		public String typeValue() {
-			return "int";
-		}
+		public String typeValue() {return "int";}
 		
-		public int get()
-		{
-			return value;
-		}
+		public int get(){return value;}
 		
 		@Override
-		public String stringValue() {
-			return String.valueOf(value);
-		}
+		public String stringValue() {return String.valueOf(value);}
 	}
     
     public static class OptionTreeLeafDouble extends OptionTreeNode
@@ -405,19 +383,12 @@ public abstract class Options
     	}
     	
 		@Override
-		public String typeValue() {
-			return "double";
-		}
+		public String typeValue() {return "double";}
 		
-		public double get()
-		{
-			return value;
-		}
+		public double get(){return value;}
 		
 		@Override
-		public String stringValue() {
-			return String.valueOf(value);
-		}
+		public String stringValue() {return String.valueOf(value);}
 	}
     
     public static class OptionTreeLeafFloat extends OptionTreeNode
@@ -435,9 +406,7 @@ public abstract class Options
 		public float get(){return value;}
 		
 		@Override
-		public String stringValue() {
-			return String.valueOf(value);
-		}
+		public String stringValue() {return String.valueOf(value);}
 	}
     
     public static class OptionTreeLeafColor extends OptionTreeNode
@@ -455,9 +424,7 @@ public abstract class Options
 		public Color get(){return value;}
 		
 		@Override
-		public String stringValue() {
-			return String.valueOf(value.getRGB());
-		}
+		public String stringValue() {return String.valueOf(value.getRGB());}
 	}
     
     public static class OptionTreeLeafString extends OptionTreeNode
@@ -470,19 +437,12 @@ public abstract class Options
     	}
     	
 		@Override
-		public String typeValue() {
-			return "string";
-		}
+		public String typeValue() {return "string";}
 		
-		public String get()
-		{
-			return value;
-		}
+		public String get(){return value;}
 		
 		@Override
-		public String stringValue() {
-			return String.valueOf(value);
-		}
+		public String stringValue() {return String.valueOf(value);}
 	}
     
     public static class OptionTreeLeafBigInteger extends OptionTreeNode
@@ -494,20 +454,13 @@ public abstract class Options
     		value = init;
     	}
     	
-    	public BigInteger get()
-    	{
-    		return value;
-    	}
+    	public BigInteger get(){return value;}
     	
 		@Override
-		public String typeValue() {
-			return "bigint";
-		}
+		public String typeValue() {return "bigint";}
 		
 		@Override
-		public String stringValue() {
-			return String.valueOf(value);
-		}
+		public String stringValue() {return String.valueOf(value);}
 	}
     
     public static class OptionTreeInnerNode extends OptionTreeNode
@@ -520,14 +473,10 @@ public abstract class Options
     	}
     	
 		@Override
-    	public String typeValue() {
-    		return "void";
-    	}
+    	public String typeValue() {return "void";}
     	
 		@Override
-    	public String stringValue() {
-    		return "void";
-    	}
+    	public String stringValue() {return "void";}
 		
 		public final OptionTreeNode getChild(String name)
     	{//TODO no alloc
@@ -580,15 +529,9 @@ public abstract class Options
     	return createNode(new StringUtils().split(name, 0, name.length(), '.'), root, value);
     }
     
-    public static final OptionTreeNode getNode(final CharSequence name)
-    {
-   		return getNode(new StringUtils().split(name, 0, name.length(), '.'));
-    }
+    public static final OptionTreeNode getNode(final CharSequence name){return getNode(new StringUtils().split(name, 0, name.length(), '.'));}
 
-    public static final OptionTreeNode getNode(OptionTreeNode root, final CharSequence name)
-    {
-   		return getNode(root,new StringUtils().split(name, 0, name.length(), '.'));
-    }
+    public static final OptionTreeNode getNode(OptionTreeNode root, final CharSequence name){return getNode(root,new StringUtils().split(name, 0, name.length(), '.'));}
 
     public static final OptionTreeInnerNode getInnerNode(final CharSequence name)
     {
@@ -615,18 +558,8 @@ public abstract class Options
     	OptionTreeNode otn = root;
     	for (int i = 0; i < str.length; ++i)
     	{
-    		if (otn == null)
-    		{
-    			return null;
-    		}
-    		if (i == str.length - 1)
-    		{
-    			otn = ((OptionTreeInnerNode)otn).createChild(str[i], value);
-    		}
-    		else
-    		{
-    			otn = ((OptionTreeInnerNode)otn).createChild(str[i], null);
-    		}
+    		if (otn == null){return null;}
+			otn = ((OptionTreeInnerNode)otn).createChild(str[i], i == str.length - 1 ? value : null);
     	}
    		return otn;   
    	}
