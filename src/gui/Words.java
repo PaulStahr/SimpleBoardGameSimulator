@@ -106,5 +106,6 @@ public enum Words {
     status,
     background,
     password,
-    seats;
+    seats,
+    show_ping;
 }
