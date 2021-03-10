@@ -7,4 +7,7 @@
   	<name type="string"></name>
   	<id type="int">1</id>
   </last_connection>
+  <gui type="void">
+    <show_ping type="bool">true</show_ping>
+  </gui>
 </options>

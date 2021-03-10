@@ -111,4 +111,5 @@
     <background>Hintergrund</background>
     <password>Passwort</password>
     <seats>Sitzplätze</seats>
+    <show_ping>Zeige Ping</show_ping>
 </xml>
