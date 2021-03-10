@@ -343,7 +343,12 @@ public final class Matrix4d implements Matrixd, DoubleList{
 		m33 += x * m30 + y * m31 + z * m32;
 	}
 	
-	public final void postTranslate(double x, double y, double z){m03 += x;m13 += y;m23 += z;}
+	public final void postTranslate(double x, double y, double z){
+        m00 += m30 * x; m10 += m30 * y; m20 += m30 * z;
+        m01 += m31 * x; m11 += m31 * y; m21 += m31 * z;
+        m02 += m32 * x; m12 += m32 * y; m22 += m32 * z;
+	    m03 += m33 * x; m13 += m33 * y; m23 += m33 * z;
+	}
 	
 	public final void affineScale(double s)
 	{

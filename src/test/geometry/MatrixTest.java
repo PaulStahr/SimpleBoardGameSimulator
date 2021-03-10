@@ -48,7 +48,7 @@ public class MatrixTest {
         Matrix3d mat = new Matrix3d(orig);
         Matrix3d identity = new Matrix3d();
         Matrix3d dotprod = new Matrix3d();
-        mat.invert(mat);
+        mat.invert();
         dotprod.dot(orig, mat);
         try{
             assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, identity.size()) < 0.1);

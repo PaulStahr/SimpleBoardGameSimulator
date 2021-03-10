@@ -170,7 +170,11 @@ public class Matrix3d implements Matrixd, DoubleList{
         m22 += x * m20 + y * m21;
     }
     
-    public final void postTranslate(double x, double y){m02 += x;m12 += y;}
+    public final void postTranslate(double x, double y){
+        m00 += m20 * x; m10 += m20 * y;
+        m01 += m21 * x; m11 += m21 * y;
+        m02 += m22 * x; m12 += m22 * y;
+    }
 
 	public final void scale(double d) {
 		this.m00 *= d;this.m01 *= d; this.m02 *= d;
@@ -354,7 +358,9 @@ public class Matrix3d implements Matrixd, DoubleList{
 		double tmp1 = -sin * this.m20 + cos * this.m21;
 		this.m20 = tmp0; this.m21 = tmp1;}
 	}
-	
+
+	public final boolean invert(){return invert(this);}
+
 	public final boolean invert(Matrix3d read)
     {
         double [] mat = new double[size() * 2];
@@ -442,4 +448,24 @@ public class Matrix3d implements Matrixd, DoubleList{
        m21 = lhs.m20 * rhs.m01 + lhs.m21 * rhs.m11 + lhs.m22 * rhs.m21;
        m22 = lhs.m20 * rhs.m02 + lhs.m21 * rhs.m12 + lhs.m22 * rhs.m22;
    }
+
+   public void transpose(Matrix3d other)
+   {
+       if (other == this)
+       {
+           transpose();
+       }
+       else
+       {
+           m00 = other.m00; m01 = other.m10; m02 = other.m20;
+           m10 = other.m01; m11 = other.m11; m12 = other.m21;
+           m20 = other.m02; m21 = other.m12; m22 = other.m22;
+       }
+   }
+
+   public void transpose() {
+        double tmp = m01; m10 = m01; m01 = tmp;
+               tmp = m02; m20 = m02; m02 = tmp;
+               tmp = m12; m21 = m12; m12 = tmp;
+}
 }
