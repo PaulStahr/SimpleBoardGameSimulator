@@ -1,6 +1,6 @@
 package test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -23,7 +23,6 @@ public class GameActionTest {
         state.posX = 4;
         state.posY = 2;
         gi.update(new GameObjectInstanceEditAction(-1, -1, 4, state));
-        assertEquals(state.posX, gi.getObjectInstanceById(4).state.posX);
-        assertEquals(state.posY, gi.getObjectInstanceById(4).state.posY);
+        assertTrue(state.equals(gi.getObjectInstanceById(4).state));
     }
 }

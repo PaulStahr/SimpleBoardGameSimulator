@@ -1,5 +1,7 @@
 package test;
 
+import static org.junit.Assert.assertTrue;
+
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,12 +36,6 @@ public class GameIOTest {
         } catch (JDOMException e) {
             throw new AssertionError(e);
         }
-        try
-        {
-            assert (res.equals(pl));
-        } catch (AssertionError e)
-        {
-            throw new AssertionError(pl.toStringAdvanced() + "!=" + res.toStringAdvanced(), e);
-        }
+        assertTrue(pl.toStringAdvanced() + "!=" + res.toStringAdvanced(), res.equals(pl));
     }
 }

@@ -22,10 +22,6 @@ public class TransformConversionTest {
         mat3d.invert(mat3d);
              //at.rotate(2);
         //mat3d.rotateZ(2);
-        try{
-            assertTrue(TransformConversion.qdist(at, mat3d) < 0.1);
-        }catch(AssertionError e){
-            throw new AssertionError(at + "!=" + mat3d, e);
-       }
+        assertTrue(at + "!=" + mat3d, TransformConversion.qdist(at, mat3d) < 0.1);
     }
 }

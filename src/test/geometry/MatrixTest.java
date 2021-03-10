@@ -18,11 +18,7 @@ public class MatrixTest {
         Matrix3d dotprod = new Matrix3d();
         assertTrue(mat.invert(mat));
         dotprod.dot(orig,mat);
-        try{
-            assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
-        }catch(AssertionError e) {
-            throw new AssertionError(orig + "!=" + mat, e);
-        }      
+        assertTrue(orig + "!=" + mat, ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
     }
 
     @Test
@@ -34,11 +30,7 @@ public class MatrixTest {
         Matrix4d dotprod = new Matrix4d();
         assertTrue(mat.invert(mat));
         dotprod.dot(orig,mat);
-        try{
-            assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
-        }catch(AssertionError e) {
-            throw new AssertionError(orig + "!=" + mat, e);
-        }
+        assertTrue(orig + "!=" + mat, ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
     }
     
     @Test
@@ -50,19 +42,11 @@ public class MatrixTest {
         Matrix3d dotprod = new Matrix3d();
         mat.invert();
         dotprod.dot(orig, mat);
-        try{
-            assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, identity.size()) < 0.1);
-        }catch(AssertionError e){
-            throw new AssertionError(orig +"*" + mat + "=" + dotprod + "!=" + identity, e);
-        }
+        assertTrue(orig +"*" + mat + "=" + dotprod + "!=" + identity, ArrayUtil.qdist(dotprod, 0, identity, 0, identity.size()) < 0.1);
         orig.postTranslate(3, 4);
         mat.preTranslate(-3, -4);
         dotprod.dot(orig, mat);
-        try{
-            assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, identity.size()) < 0.1);
-        }catch(AssertionError e){
-            throw new AssertionError(orig +"*" + mat + "=" + dotprod + "!=" + identity, e);
-        }
+        assertTrue(orig +"*" + mat + "=" + dotprod + "!=" + identity, ArrayUtil.qdist(dotprod, 0, identity, 0, identity.size()) < 0.1);
     }
 
     @Test
@@ -74,19 +58,11 @@ public class MatrixTest {
         Matrix3d dotprod = new Matrix3d();
         assertTrue(mat.invert(mat));
         dotprod.dot(orig, mat);
-        try{
-            assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, identity.size()) < 0.1);
-        }catch(AssertionError e){
-            throw new AssertionError(orig +"*" + mat + "=" + dotprod + "!=" + identity, e);
-        }
+        assertTrue(orig +"*" + mat + "=" + dotprod + "!=" + identity, ArrayUtil.qdist(dotprod, 0, identity, 0, identity.size()) < 0.1);
         orig.postScale(2, 4);
         mat.preScale(0.5, 0.25);
         dotprod.dot(orig, mat);
-        try{
-            assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, identity.size()) < 0.1);
-        }catch(AssertionError e){
-            throw new AssertionError(orig +"*" + mat + "=" + dotprod + "!=" + identity, e);
-        }
+        assertTrue(orig +"*" + mat + "=" + dotprod + "!=" + identity, ArrayUtil.qdist(dotprod, 0, identity, 0, identity.size()) < 0.1);
     }
 
     @Test
@@ -98,19 +74,11 @@ public class MatrixTest {
         Matrix4d dotprod = new Matrix4d();
         assertTrue(mat.invert(mat));
         dotprod.dot(orig,mat);
-        try{
-            assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
-        }catch(AssertionError e) {
-            throw new AssertionError(orig +"*" + mat + "=" + dotprod + "!=" + identity, e);
-        }
+        assertTrue(orig +"*" + mat + "=" + dotprod + "!=" + identity, ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
         orig.postTranslate(3, 4, 5);
         mat.preTranslate(-3, -4, -5);
         dotprod.dot(orig,mat);
-        try{
-            assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
-        }catch(AssertionError e) {
-            throw new AssertionError(orig +"*" + mat + "=" + dotprod + "!=" + identity, e);
-        }
+        assertTrue(orig +"*" + mat + "=" + dotprod + "!=" + identity, ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
     }
     
     @Test
@@ -122,18 +90,10 @@ public class MatrixTest {
         Matrix4d dotprod = new Matrix4d();
         assertTrue(mat.invert(mat));
         dotprod.dot(orig,mat);
-        try{
-            assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
-        }catch(AssertionError e) {
-            throw new AssertionError(orig +"*" + mat + "=" + dotprod + "!=" + identity, e);
-        }
+        assertTrue(orig +"*" + mat + "=" + dotprod + "!=" + identity, ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
         orig.postScale(2, 4, 8);
         mat.preScale(0.5, 0.25, 0.125);
         dotprod.dot(orig,mat);
-        try{
-            assertTrue(ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
-        }catch(AssertionError e) {
-            throw new AssertionError(orig +"*" + mat + "=" + dotprod + "!=" + identity, e);
-        }
+        assertTrue(orig +"*" + mat + "=" + dotprod + "!=" + identity, ArrayUtil.qdist(dotprod, 0, identity, 0, mat.size()) < 0.1);
     }
 }
