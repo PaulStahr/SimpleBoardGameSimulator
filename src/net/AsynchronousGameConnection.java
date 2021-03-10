@@ -578,7 +578,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                     if (action instanceof GameObjectInstanceEditAction)
                     {
                         GameObjectInstanceEditAction actionEdit = (GameObjectInstanceEditAction)inputObject;
-                        ObjectState state = actionEdit.getObject(gi).state.copy();
+                        ObjectInstance oi = actionEdit.getObject(gi);
+                        if (oi == null) {logger.error("Couldn't find object " + actionEdit.object);}
+                        ObjectState state = oi.state.copy();
                         actionEdit.state = state;
                         if (state.lastChange > action.when)
                         {

@@ -25,6 +25,7 @@ public class PlayerEditAction extends GameAction{
 		this.editedPlayer = (editedPlayerObject = editedPlayer).id;
 	}
 
+	@Override
 	public Player getSourcePlayer(GameInstance instance)
 	{
 		if (sourcePlayerObject == null)   {sourcePlayerObject = instance.getPlayerById(sourcePlayer);}
@@ -36,4 +37,7 @@ public class PlayerEditAction extends GameAction{
 		if (editedPlayerObject == null)   {editedPlayerObject = instance.getPlayerById(editedPlayer);}
 		return editedPlayerObject;
 	}
+	
+    @Override 
+    public int sourcePlayerId(){return sourcePlayer;}
 }
