@@ -1,5 +1,7 @@
 package gui;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
@@ -51,6 +53,7 @@ import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerRemoveAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectToken;
+import gameObjects.functions.CheckingFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
@@ -107,7 +110,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		JFrameUtils.runByDispatcher(this);
 		gi.addChangeListener(this);
 		tableModelPlayer.addTableModelListener(this);
-		
 		scrollPaneImages.setDropTarget(new DropTarget() {
 		    /**
 			 * 
@@ -132,7 +134,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		    }
 		});
 	}
-	
+
 	@Override
 	public void languageChanged(Language language) {
 		tabPane.setTitleAt(tabPane.indexOfComponent(panelGeneral), 					language.getString(Words.general));
@@ -150,13 +152,28 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				EditGamePanel.this.actionPerformed(e);
  	    }
     };
+
  	private final ButtonColumn deleteObjectColumn = new ButtonColumn(tableGameObjects,tableAction, GameObject.TYPES.indexOf(GameObjectColumnType.DELETE));
  	private final ButtonColumn resetObjectInstanceColumn = new ButtonColumn(tableGameObjectInstances,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.RESET));
  	private final ButtonColumn deleteObjectInstanceColumn = new ButtonColumn(tableGameObjectInstances,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
  	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableImages,tableAction, IMAGE_TYPES.indexOf(ImageColumnType.DELETE));
  	private final ButtonColumn deletePlayerColumn = new ButtonColumn(tablePlayer,tableAction, Player.TYPES.indexOf(PlayerColumnType.DELETE));
-	private final ButtonColumn repairPlayerColumn = new ButtonColumn(tablePlayer, tableAction, Player.TYPES.indexOf(PlayerColumnType.REPAIR)); 	
- 	
+	private final ButtonColumn repairPlayerColumn = new ButtonColumn(tablePlayer, tableAction, Player.TYPES.indexOf(PlayerColumnType.REPAIR)) {
+	    /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
+        private final ArrayList<ObjectInstance> tmp = new ArrayList<>();
+        private final ArrayList<ObjectInstance> tmp2 = new ArrayList<>();
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            comp.setForeground(CheckingFunctions.checkPlayerConsistency(gi.getPlayerByIndex(row).id, tmp, tmp2, gi) == null ? Color.BLACK : Color.RED);
+            return comp;
+        }
+	};
+
  	private class GeneralPanel extends JPanel implements ItemListener, DocumentListener, LanguageChangeListener
  	{
  		/**
