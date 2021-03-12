@@ -86,7 +86,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 	protected String receiverPlayerName = "all";
 	private final JComboBox<String> sendTo = new JComboBox<String>();
 	private	 int playerModCount = 0;
-	private int receiverPlayerId;
+	private Player receiverPlayer;
 	
 	void updatePlayerList()
 	{
@@ -155,7 +155,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 		            List<? extends File> droppedFiles = (List<? extends File>)
 		                evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 	                for (File file : droppedFiles) {
-		            	game.update(new UserFileMessage(id, player.id, receiverPlayerId, file.getName(), Files.readAllBytes(file.toPath())));
+		            	game.update(new UserFileMessage(id, player, receiverPlayer, file.getName(), Files.readAllBytes(file.toPath())));
 		            }
 		        } catch (Exception ex) {
 		            ex.printStackTrace();
@@ -328,20 +328,11 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 			receiverPlayerName = (String) sendTo.getSelectedItem();
 			if (receiverPlayerName == "all")
 			{
-				receiverPlayerId = -1;
+				receiverPlayer = null;
 			}
-			else
+			else if ((receiverPlayer = game.getPlayerByName(receiverPlayerName)) == null)
 			{
-				Player pl = game.getPlayerByName(receiverPlayerName);
-				if (pl == null)
-				{
-					logger.error("Player " + receiverPlayerName + " not found");
-					receiverPlayerId = -1;
-				}
-				else
-				{
-					receiverPlayerId = pl.id;
-				}
+				logger.error("Player " + receiverPlayerName + " not found");
 			}
 			int receiverIndex = chatPanes.indexOfTab(receiverPlayerName);
 			if (receiverIndex >= 0) {
@@ -357,7 +348,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 			String inputText = messageInput.getText();
 			if(inputText.length() > 0) {
 				messageInput.setText("");
-				game.update(new UsertextMessageAction(id, player.id, receiverPlayerId, inputText));
+				game.update(new UsertextMessageAction(id, player, receiverPlayer, inputText));
 			}
 		}
 	}
@@ -401,7 +392,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 						} catch (IOException e) {
 							logger.error("Can't copy sound", e);
 						}
-	    				game.update(new UserSoundMessageAction(id, player.id, receiverPlayerId, bos.toByteArray()));
+	    				game.update(new UserSoundMessageAction(id, player, receiverPlayer, bos.toByteArray()));
 	    	        	bos.reset();
 	    	        	line.close();
 	    		        line = null;

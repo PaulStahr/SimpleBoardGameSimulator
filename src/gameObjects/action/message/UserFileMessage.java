@@ -1,5 +1,7 @@
 package gameObjects.action.message;
 
+import main.Player;
+
 public class UserFileMessage extends UserMessage{
 
 	/**
@@ -15,7 +17,13 @@ public class UserFileMessage extends UserMessage{
 		this.data = data;
 	}
 
-	public String getFilename()
+	public UserFileMessage(int source, Player sourcePlayer, Player destinationPlayer, String filename, byte[] data) {
+	    super(source, sourcePlayer, destinationPlayer);
+        this.filename = filename;
+        this.data = data;
+    }
+
+    public String getFilename()
 	{
 		return filename;
 	}

@@ -16,7 +16,8 @@ public class UserMessage extends GameAction{
 	private transient Player sourcePl;
 	private transient Player destPl;
 
-	public Player getSourcePlayer(GameInstance gi)
+	@Override
+    public Player getSourcePlayer(GameInstance gi)
 	{
 		if (sourcePl == null){sourcePl = gi.getPlayerById(sourcePlayer);}
 		return sourcePl;
@@ -34,4 +35,10 @@ public class UserMessage extends GameAction{
 		this.destinationPlayer = destinationPlayer;
 	}
 
+	public UserMessage(int source, Player sourcePlayer, Player destinationPlayer)
+	{
+	    this(source, sourcePlayer == null ? -1 : sourcePlayer.id, destinationPlayer == null ? -1 : destinationPlayer.id);
+	    this.sourcePl = sourcePlayer;
+	    this.destPl = destinationPlayer;
+	}
 }

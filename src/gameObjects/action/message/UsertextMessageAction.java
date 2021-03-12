@@ -1,5 +1,7 @@
 package gameObjects.action.message;
 
+import main.Player;
+
 public class UsertextMessageAction extends UserMessage{
 	/**
 	 * 
@@ -9,6 +11,11 @@ public class UsertextMessageAction extends UserMessage{
 	public UsertextMessageAction(int source, int sourcePlayer, int destinationPlayer, String message) {
 		super(source, sourcePlayer, destinationPlayer);
 		this.message = message;
+	}
+	
+	public UsertextMessageAction(int source, Player sourcePlayer, Player destinationPlayer, String message) {
+	    super(source, sourcePlayer, destinationPlayer);
+	    this.message = message;
 	}
 
 }

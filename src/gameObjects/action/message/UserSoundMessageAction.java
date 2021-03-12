@@ -1,5 +1,7 @@
 package gameObjects.action.message;
 
+import main.Player;
+
 public class UserSoundMessageAction extends UserMessage{
 	/**
 	 * 
@@ -10,8 +12,12 @@ public class UserSoundMessageAction extends UserMessage{
 		super(source, sourcePlayer, destinationPlayer);
 		this.message = message;
 	}
-	public byte[] getData() {
+	public UserSoundMessageAction(int source, Player sourcePlayer, Player destinationPlayer, byte[] message) {
+        super(source, sourcePlayer, destinationPlayer);
+        this.message = message;
+    }
+
+    public byte[] getData() {
 		return message;
 	}
-
 }
