@@ -143,11 +143,9 @@ public class PrivateArea {
         }
 
     }
-
-    public Point2D transformPoint(int posX, int posY) {
-        Point2D res = new Point2D.Double(posX, posY);
-        boardToScreenTransformation.transform(res, res);
-        return res;
+    
+    public Point2D transformPoint(Point2D in, Point2D out) {
+        return boardToScreenTransformation.transform(in, out);
     }
 
 	public boolean contains(int id) {

@@ -21,6 +21,7 @@
  ******************************************************************************/
 package util;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -348,7 +349,14 @@ public class JFrameUtils{
      	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, possibleValueOverride, buttonColumn);
  	}
 	
-    public static final void updateTable(JTable table, JScrollPane scrollPane, List<? extends Object> objectList, List<TableColumnType> types, DefaultTableModel tm, Function<TableColumnType, String[]> possibleValueOverride, ButtonColumn ...buttonColumn)
+    public static final void updateTable(
+            JTable table,
+            JScrollPane scrollPane,
+            List<? extends Object> objectList,
+            List<TableColumnType> types,
+            DefaultTableModel tm,
+            Function<TableColumnType, String[]> possibleValueOverride,
+            ButtonColumn ...buttonColumn)
     {
  		Object[][] rowData = new Object[objectList.size()][types.size()];
      	for (int i = 0; i < rowData.length; ++i)
@@ -362,7 +370,15 @@ public class JFrameUtils{
      	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, possibleValueOverride, buttonColumn);
  	}
 	
-    public static final void updateTable(JTable table, JScrollPane scrollPane, Object[][] rowData, String names[], List<? extends TableColumnType> types, DefaultTableModel tm, Function<TableColumnType, String[]> possibleValueOverride, ButtonColumn ...buttonColumn)
+    public static final void updateTable(
+            JTable table,
+            JScrollPane scrollPane,
+            Object[][] rowData,
+            String names[],
+            List<? extends TableColumnType> types,
+            DefaultTableModel tm,
+            Function<TableColumnType, String[]> possibleValueOverride,
+            ButtonColumn ...buttonColumn)
     {
     	tm.setDataVector(rowData,names);
     	for (int i = 0; i < types.size(); ++i)

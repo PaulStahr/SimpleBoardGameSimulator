@@ -17,15 +17,9 @@ public enum PlayerColumnType implements TableColumnType{
     private static final PlayerColumnType ct[] = PlayerColumnType.values();
     private static final String[] columnNames = TableColumnType.getColumnNames(ct);
     
-    public static final int size()
-    {
-    	return ct.length;
-    }
+    public static final int size(){return ct.length;}
     
-    public static final PlayerColumnType get(int index)
-    {
-    	return ct[index];
-    }
+    public static final PlayerColumnType get(int index){return ct[index];}
     
 	public final String name;
 	public final Class<?> cl;

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gameObjects.GameInstanceColumnType;
+import gameObjects.action.DestroyInstance;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
@@ -342,6 +343,10 @@ public class GameInstance {
 				logger.error("Error in Change Listener", e);
 			}
 		}
+		if (action instanceof DestroyInstance)
+        {
+            changeListener.clear();
+        }
 	}
 
 	public String[] getPlayerNames() {

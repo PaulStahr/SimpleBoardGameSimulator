@@ -311,7 +311,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
         }
     };
 	
-	private void updateTables()
+    @SuppressWarnings("unchecked")
+    private void updateTables()
 	{
     	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");}
     	if (isUpdating){return;}
@@ -336,7 +337,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			ButtonColumn button = event.getButton();
 			if (tableSource== tableModelGameObjectInstances)
 			{
-				
 				if (button == resetObjectInstanceColumn)
 				{
 					ObjectInstance oi = gi.getObjectInstanceByIndex(row);

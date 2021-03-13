@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import data.DataHandler;
 import data.Texture;
 import gameObjects.action.AddObjectAction;
+import gameObjects.action.DestroyInstance;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
@@ -80,6 +81,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
         {
             if (logger.isDebugEnabled()){logger.debug("Queue Action != " + inputThread.getName());}
             queueOutput(action);
+        }
+        if (action instanceof DestroyInstance)
+        {
+            stop = true;
         }
     }
 
@@ -321,26 +326,19 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                     outputObject = queuedOutputs.size() == 0 ? null : queuedOutputs.pop();
                 }
             }
-            
-            if (outputObject == null)
-            {
-                continue;
-            }
+            if (outputObject == null){continue;}
             if (logger.isDebugEnabled()){logger.debug("Next queued object:" + outputObject.toString());}
             try
             {
                 if (outputObject instanceof CommandWrite)
                 {
+                    if (byteStream.size() != 0){throw new RuntimeException("Byte-Stream was not cleared");}
                     strB.append(NetworkString.WRITE).append(' ');
                     int id = ((CommandWrite) outputObject).id;
                     switch (((CommandWrite) outputObject).type)
                     {
                         case NetworkString.GAME_INSTANCE:
                         {
-                            if (byteStream.size() != 0)
-                            {
-                                throw new RuntimeException();
-                            }
                             GameIO.writeSnapshotToZip(gi, byteStream);
                             if (logger.isDebugEnabled()){logger.debug("Write game instance to stream " + byteStream.size());}
                             strB.append(NetworkString.ZIP).append(' ').append(NetworkString.GAME_INSTANCE).append(' ').append(byteStream.size());
@@ -458,13 +456,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                         { 
                             GameStructureEditAction gs = (GameStructureEditAction)action;
                             objOut.writeUnshared(gs);
-                            if (action instanceof PlayerAddAction)
+                            if (gs instanceof PlayerAddAction)
                             {
                                 GameIO.writePlayerToStreamObject(objOut, ((PlayerAddAction)action).getPlayer(gi));
-                            }
-                            else if (action instanceof PlayerRemoveAction)
-                            {
-                                
                             }
                             else
                             {
@@ -479,7 +473,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                                     {
                                         Map.Entry<String, Texture> entry = gi.game.getImage(((AddObjectAction)gs).objectId);
                                         objOut.writeObject(entry.getKey());
-                                        GameIO.writeImageToStream(entry.getValue(), "png", byteStream);
+                                        GameIO.writeImageToStream(entry.getValue(), StringUtils.getFileType(entry.getKey()), byteStream);
                                         objOut.writeInt(byteStream.size());
                                         byteStream.writeTo(objOut);
                                         byteStream.reset();

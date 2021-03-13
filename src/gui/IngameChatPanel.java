@@ -365,7 +365,6 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
     }
 	
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    Thread th;
     
     public void keyChanged(KeyEvent arg0)
     {
@@ -398,7 +397,6 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 	    		        line = null;
 	            	}
 	            }, "Capture sound");
-	            th.start();
 	        } catch (LineUnavailableException ex) {
 	            ex.printStackTrace();
 	        }
