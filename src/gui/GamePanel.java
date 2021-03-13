@@ -89,6 +89,7 @@ import geometry.TransformConversion;
 import geometry.Vector2d;
 import io.GameIO;
 import main.Player;
+import util.StringUtils;
 import util.TimedUpdateHandler;
 import util.data.DoubleArrayList;
 import util.data.IntegerArrayList;
@@ -103,12 +104,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	private static final Logger logger = LoggerFactory.getLogger(GamePanel.class);
 	
 	static boolean invert_rotation = false;
+	static boolean show_ping = false;
 	static {
 		Options.addModificationListener(new Runnable() {
 
 			@Override
 			public void run() {
 				invert_rotation = Options.getBoolean("invert_rotation", false);
+				show_ping = Options.getBoolean("gui.show_ping", false);
 			}
 		});		
 	}
@@ -217,8 +220,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 	};
 
-
-
 	public GamePanel(GameInstance gameInstance, LanguageHandler lh)
 	{
 		this.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -256,7 +257,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			try {
 				playerImages[i] = ImageIO.read(DataHandler.getResourceAsStream("images/kenney-animalpack/PNG/Round/id" + String.valueOf(i) + ".png"));
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("Can't read PlayerImage", e);
 			}
 		}
 		//Read the audio clips
@@ -336,7 +337,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (isDebug) {
 			DrawFunctions.drawDebugInfo(this, g2, gameInstance, player);
 		}
-
+		if (show_ping) {
+            g2.drawString("Last Signal", getWidth() - 100, 80);		    
+		    for (int i = 0; i < gameInstance.getPlayerNumber(); ++i)
+		    {
+		        Player pl = gameInstance.getPlayerByIndex(i);
+		        g2.drawString(pl.getName() + " " + ((System.nanoTime() - pl.lastReceivedSignal) / 100000000) / 10f, getWidth() - 100, 100 + 20 * i);
+		    }
+		}
 	}
 
 	/** Get mouse position and active objects while moving the mouse around the board
@@ -593,9 +601,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					if (!player.visitor) {
 						ObjectFunctions.getOwnedStack(gameInstance, player, ial);
 						StringBuilder strB = new StringBuilder();
-						for (int id : ial) {
-							strB.append(id).append(' ');
-						}
+						StringUtils.toString(ial, ' ', strB).append(' ');
 						outText = strB.toString();
 
 
@@ -763,7 +769,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (mouseInStacker){
 				if(hoveredObject != null && e.getKeyCode() == KeyEvent.VK_M && !shiftDown)
 				{
-					ObjectFunctions.stackObjectsInTableMiddleToOneSide(this, gameInstance, player, gameInstance.getObjectInstanceById(hoveredObject.id), ial, false);
+					ObjectFunctions.stackObjectsInTableMiddleToOneSide(this, gameInstance, player, gameInstance.getObjectInstanceById(hoveredObject.id), ial, ObjectFunctions.SIDE_TO_BACK);
 				}
 			}
 
@@ -900,7 +906,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 					}else if (e.getKeyCode() == KeyEvent.VK_M && !shiftDown) {
 						ial.set(selectedObjects);
-						ObjectFunctions.makeStack(this, gameInstance, player, ial);
+						ObjectFunctions.makeStack(this, gameInstance, player, ial, ObjectFunctions.SIDE_UNCHANGED);
 					} else if (altDown && !boardTranslation && scaledObjects.size() > 0) {
 						for (int oId : ObjectFunctions.getStackRepresentatives(gameInstance, selectedObjects)) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);

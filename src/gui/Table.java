@@ -1,13 +1,22 @@
 package gui;
 
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 
 import gameObjects.functions.PlayerFunctions;
 import gameObjects.instance.GameInstance;
 import main.Player;
-import org.w3c.dom.css.Rect;
 
 public class Table {
     private int diameter;
@@ -101,7 +110,7 @@ public class Table {
         drawPlayers(gameInstance, g);
     }
 
-    private void drawPlayers(GameInstance gameInstance, Graphics g) {
+    private void drawPlayers(GameInstance gameInstance, Graphics g) {//TODO this method seems to do nothing
         Graphics2D graphics2D = (Graphics2D) g;
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
@@ -110,9 +119,10 @@ public class Table {
         for (Shape shape : playerShapes){
             // set background color
             int place = 0;
-            for (int j = 0; j < gameInstance.getPlayerNumber(); ++j)
+            if (counter < gameInstance.getPlayerNumber())
             {
-                if (counter < gameInstance.getPlayerNumber()) {
+                for (int j = 0; j < gameInstance.getPlayerNumber(); ++j)
+                {
                     if (gameInstance.getPlayerByIndex(j).id < gameInstance.getPlayerByIndex(counter).id) {
                         ++place;
                     }
@@ -196,8 +206,7 @@ public class Table {
         return this.tableOrigin;
     }
 
-    public Point2D getTableCenter(){
-        Point2D tableCenter = new Point2D.Double();
+    public Point2D getTableCenter(Point2D tableCenter){
         tableCenter.setLocation(this.tableOrigin.getX() + diameter/2, this.tableOrigin.getY() + diameter/2);
         return tableCenter;
     }

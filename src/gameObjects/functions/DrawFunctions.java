@@ -147,7 +147,7 @@ public class DrawFunctions {
             int imageNumber = pIdx % 10;
 
             BufferedImage img = gamePanel.playerImages[imageNumber];
-            g2.translate((p.screenWidth)/2, p.screenHeight - 20);
+            g2.translate(p.screenWidth/2, p.screenHeight - 20);
             double scale = 0.5 / Math.sqrt(playerDeterminant * determinant);
             g2.scale(scale, scale);
             g2.translate(-img.getWidth()/2, 0);
@@ -158,7 +158,6 @@ public class DrawFunctions {
             //draw mouse position of other players
             g2.setStroke(basicStroke);
             g2.translate(p.mouseXPos, p.mouseYPos);
-
 
             AffineTransform newTmp = g2.getTransform();
             AffineTransform newTransform = new AffineTransform();
@@ -176,19 +175,17 @@ public class DrawFunctions {
         if (gamePanel.hoveredObject != null && gameInstance.debug_mode) {
             g2.fillRect(gamePanel.hoveredObject.state.posX-5, gamePanel.hoveredObject.state.posY-5, 10, 10);
             if (gamePanel.hoveredObject.state.inPrivateArea && gamePanel.hoveredObject.state.owner_id != -1) {
-                Point2D transformPoint = new Point2D.Double(0, 0);
-
-                AffineTransform affineTransform = new AffineTransform();
                 Vector2d mouseBoardPos = new Vector2d();
                 gamePanel.screenToBoardPos(gamePanel.mouseScreenX, gamePanel.mouseScreenY, mouseBoardPos);
-                Point2D transformedPoint = gamePanel.privateArea.transformPoint(mouseBoardPos.getXI(), mouseBoardPos.getYI());
+                Point2D transformedPoint = new Point2D.Double(mouseBoardPos.getXI(), mouseBoardPos.getYI());
+                gamePanel.privateArea.transformPoint(transformedPoint, transformedPoint);
                 int index = gamePanel.privateArea.getPrivateObjectIndexByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY(), gamePanel.getWidth()/2, gamePanel.getHeight());
                 int oId = gamePanel.privateArea.getObjectIdByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY(), gamePanel.getWidth()/2, gamePanel.getHeight());
-                ObjectInstance objectInstance = gameInstance.getObjectInstanceById(oId);
+                //ObjectInstance objectInstance = gameInstance.getObjectInstanceById(oId);
                 if (gamePanel.privateArea.privateObjectsPositions.size() > index && index != -1) {
                     AffineTransform temp = g2.getTransform();
-                    AffineTransform transform = new AffineTransform();
-
+                    
+                    AffineTransform affineTransform = new AffineTransform();
                     affineTransform.translate(gamePanel.getWidth()/2, gamePanel.getHeight()-2*gamePanel.privateArea.objects.size());
                     affineTransform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));
                     affineTransform.rotate(gamePanel.privateArea.objects.indexOf(oId) * Math.PI / (gamePanel.privateArea.objects.size()));
@@ -198,11 +195,11 @@ public class DrawFunctions {
                     g2.setTransform(affineTransform);
                     g2.fillRect(- 5, - 5, 10, 10);
 
-                    double x = g2.getTransform().getTranslateX();
-                    double y = g2.getTransform().getTranslateY();
+                    //double x = g2.getTransform().getTranslateX();
+                    //double y = g2.getTransform().getTranslateY();
 
-                    Vector2d boardPos = new Vector2d();
-                    gamePanel.screenToBoardPos((int) x, (int) y, boardPos);
+                    /*Vector2d boardPos = new Vector2d();
+                    gamePanel.screenToBoardPos((int) x, (int) y, boardPos);*/
 
                     g2.setTransform(temp);
                 }
@@ -265,7 +262,6 @@ public class DrawFunctions {
                         else{
                             gamePanel.privateArea.privateObjectsPositions.set(i, ElementPosition);
                         }
-
                     }
                 } else {
                     //TODO out ouf bound errors
@@ -299,8 +295,6 @@ public class DrawFunctions {
 
         g2.setTransform(tmp);
         if (activeObject != null && !activeObject.state.isActive && activeObject.state.owner_id == playerId) {
-            Graphics2D g2d = (Graphics2D)g;
-            tmp = g2d.getTransform();
             AffineTransform transform = new AffineTransform();
 
             transform.translate(gamePanel.getWidth()/2, gamePanel.getHeight()-2*gamePanel.privateArea.objects.size());
@@ -310,7 +304,7 @@ public class DrawFunctions {
             transform.translate(-activeObject.getWidth(player.id) / 2, -activeObject.getHeight(player.id) / 2);
             transform.translate(0, -250);
             drawPrivateAreaBorder(g, gameInstance, player, activeObject, 5, player.color, transform);
-            g2d.setTransform(tmp);
+            g2.setTransform(tmp);
         }
     }
 
@@ -480,10 +474,9 @@ public class DrawFunctions {
 
     public static void drawPrivateAreaBorder(Graphics g, GameInstance gameInstance, Player player, ObjectInstance objectInstance, int borderWidth, Color color, AffineTransform transform){
         if (objectInstance != null) {
-            Graphics2D g2 = (Graphics2D) g;
             //Define border strokes
             BufferedImage img = objectInstance.go.getLook(objectInstance.state, player.id).getImageNoExc();
-            Stroke selectStroke = new BasicStroke(borderWidth,BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
+            //Stroke selectStroke = new BasicStroke(borderWidth,BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER);
             float strokePresentLength = Math.min((float)(objectInstance.scale * img.getHeight())/2.0f, (float)(objectInstance.scale * img.getWidth())/2.0f);
             float strokeAbsentLengthHeight = (float)(objectInstance.scale * img.getHeight() - strokePresentLength);
             float strokeAbsentLengthWidth = (float)(objectInstance.scale * img.getWidth() - strokePresentLength);
@@ -614,7 +607,5 @@ public class DrawFunctions {
         yPos+=yStep;
         g2.drawString("Number of Pressed Keys: " + Integer.toString(gamePanel.downKeys.size()), 50, yPos);
         yPos+=yStep;
-
-
     }
 }

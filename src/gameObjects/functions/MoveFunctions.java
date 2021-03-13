@@ -1,7 +1,6 @@
 package gameObjects.functions;
 
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 import javax.swing.SwingUtilities;
 
@@ -30,7 +29,8 @@ public class MoveFunctions {
                  ObjectFunctions.splitStackAtN(gamePanel.id, gameInstance, player, activeObject, mouseWheelValue);
              }
              /*Move the dragged objects to the position*/
-             player.actionString = "Took " + ObjectFunctions.countStack(gameInstance, activeObject) + (ObjectFunctions.countStack(gameInstance, activeObject) > 1 ? " objects " : " object");
+             int count = ObjectFunctions.countStack(gameInstance, activeObject);
+             player.actionString = "Took " + count + (count > 1 ? " objects " : " object");
              ObjectFunctions.moveStackTo(gamePanel, gameInstance, player, activeObject, xDiff, yDiff);
              /*Display uncollected stack*/
              if (!ObjectFunctions.isStackCollected(gameInstance, activeObject)) {
@@ -67,15 +67,12 @@ public class MoveFunctions {
     public static void dragObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, MouseEvent arg0, IntegerArrayList selectedObjectIds, IntegerArrayList objOrigPosX, IntegerArrayList objOrigPosY, Vector2d mousePressedGamePos, Vector2d mouseBoardPos, int mouseWheelValue){
         int counter = 0;
         for (int id : selectedObjectIds) {
-            boolean selectedDrag = false;
-            if (selectedObjectIds.size() > 1) {
-                selectedDrag = true;
-            }
+            boolean selectedDrag = selectedObjectIds.size() > 1;
             ObjectInstance oi = gameInstance.getObjectInstanceById(id);
-            MoveFunctions.dragTokens(gamePanel, gameInstance, player, oi, arg0, objOrigPosX.get(counter) - mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter) - mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue, selectedDrag);
-            MoveFunctions.dragDices(gamePanel, gameInstance, player, oi, arg0, objOrigPosX.get(counter) - mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter) - mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
-            MoveFunctions.dragFigures(gamePanel, gameInstance, player, oi, arg0, objOrigPosX.get(counter) - mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter) - mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
-            MoveFunctions.dragBooks(gamePanel, gameInstance, player, oi, arg0, objOrigPosX.get(counter) - mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter) - mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
+            MoveFunctions.dragTokens(gamePanel, gameInstance, player, oi, arg0, objOrigPosX.getI(counter) - mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter) - mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue, selectedDrag);
+            MoveFunctions.dragDices(gamePanel, gameInstance, player, oi, arg0, objOrigPosX.getI(counter) - mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter) - mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
+            MoveFunctions.dragFigures(gamePanel, gameInstance, player, oi, arg0, objOrigPosX.getI(counter) - mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter) - mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
+            MoveFunctions.dragBooks(gamePanel, gameInstance, player, oi, arg0, objOrigPosX.getI(counter) - mousePressedGamePos.getXI() + mouseBoardPos.getXI(), objOrigPosY.get(counter) - mousePressedGamePos.getYI() + mouseBoardPos.getYI(), mouseWheelValue);
             counter += 1;
         }
         gamePanel.repaint();
