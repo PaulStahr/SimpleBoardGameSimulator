@@ -65,7 +65,7 @@ public class LanguageHandler {
         setCurrentLanguage(object);
     }
 
-    Language getCurrentLanguage(){
+    public Language getCurrentLanguage(){
         return currentLanguage;
     }
 

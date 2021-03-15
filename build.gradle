@@ -20,3 +20,4 @@ dependencies {
 mainClassName = 'main.Main'
 sourceSets.main.java.srcDirs = ['src']
 sourceSets.test.java.srcDirs = ['src/test']
+sourceSets.main.resources.srcDirs= ["src"]
