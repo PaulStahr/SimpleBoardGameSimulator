@@ -120,4 +120,8 @@
     <password>password</password>
     <seats>seats</seats>
     <show_ping>Show ping</show_ping>
+    <create_new_game>Create New Game</create_new_game>
+    <start_new_game>Start New Game</start_new_game>
+    <load_game>Load Game</load_game>
+    <create_game>Create Game</create_game>
 </xml>

@@ -112,4 +112,8 @@
     <password>Passwort</password>
     <seats>Sitzplätze</seats>
     <show_ping>Zeige Ping</show_ping>
+    <create_new_game>Neues Spiel erstellen</create_new_game>
+    <start_new_game>Neues Spiel starten</start_new_game>
+    <load_game>Spiel Laden</load_game>
+    <create_game>Spiel Erstellen</create_game>
 </xml>

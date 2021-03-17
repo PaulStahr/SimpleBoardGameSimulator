@@ -60,6 +60,11 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	public IngameChatPanel chatPanel;
 	public JToolBar toolBar;
 
+	private final JMenu menuStatus = new JMenu();
+	private final JMenu menuFile = new JMenu();
+	private final JMenu menuExtras = new JMenu();
+	private final JMenu menuControls = new JMenu();
+
 	private final JMenuItem menuItemExit = new JMenuItem();
 	private final JMenuItem menuItemEditGame = new JMenuItem();
 	private final JMenuItem menuItemSaveGame = new JMenuItem();
@@ -67,14 +72,13 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	private final JMenuItem menuItemAbout = new JMenuItem();
 	private final JMenuItem menuItemControls = new JMenuItem();
 	private final JMenuItem menuItemTetris = new JMenuItem();
-	private final JMenu menuStatus = new JMenu();
+
 	private final JMenuItem menuItemStatusPlayerConsistency = new JMenuItem("Correct Card-Consistency");
 	private final JMenuItem menuItemStatusGaiaConsistency = new JMenuItem("Correct Free-Object-Consistency");
 	private final JMenuItem menuItemSyncPull = new JMenuItem();
 	private final JMenuItem menuItemReconnect = new JMenuItem();
-	private final JMenu menuFile = new JMenu();
-	private final JMenu menuExtras = new JMenu();
-	private final JMenu menuControls = new JMenu();
+
+
 	private final LanguageHandler lh;
 	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 

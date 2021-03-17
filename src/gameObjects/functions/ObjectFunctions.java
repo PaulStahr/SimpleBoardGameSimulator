@@ -1809,6 +1809,11 @@ public class ObjectFunctions {
         ++player.trickNum;
     }
 
+    /**
+     * @param gamePanel
+     * @param gameInstance
+     * @param objectPosition
+     */
     public static void getPrivateAreaHandCardPositionFromHoveredObject(GamePanel gamePanel, GameInstance gameInstance, Vector2d objectPosition) {
         objectPosition.set(0, 0);
         if (gamePanel.hoveredObject.state.inPrivateArea && gamePanel.hoveredObject.state.owner_id != -1) {

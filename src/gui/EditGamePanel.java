@@ -258,8 +258,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			else if (source == textFieldTableRadius.getDocument())
 			{
-				gi.tableRadius = Integer.parseInt(textFieldTableRadius.getText());
-				gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_TABLE_RADIUS));
+				if(textFieldTableRadius.getText() != "") {
+					gi.tableRadius = Integer.parseInt(textFieldTableRadius.getText());
+					gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_TABLE_RADIUS));
+				}
 			}
 			else if (source == textFieldPassword.getDocument())
 			{

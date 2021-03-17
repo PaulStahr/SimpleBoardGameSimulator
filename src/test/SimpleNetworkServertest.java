@@ -26,6 +26,7 @@ public class SimpleNetworkServertest {
     public static List<Player> PlayerList = new ArrayList<>();
     public static List<GameWindow> GameWindowList = new ArrayList<>();
     public static int AdditionalPlayers = 0;
+    public static boolean startGame = false;
     public static GameServer startNewServer(int port)
     {
     	GameServer gs = new GameServer(port);
@@ -91,38 +92,39 @@ public class SimpleNetworkServertest {
 				}
 	    	}
     	}
-    	{
-    	   	Player player = new Player("Paul", 8);
-    	   	FileInputStream fis = new FileInputStream("PrivateGames/CrewNormal.zip");
+
+    	if (startGame) {
+			Player player = new Player("Paul", 8);
+			FileInputStream fis = new FileInputStream("PrivateGames/Crew.zip");
 			GameInstance gi = new GameInstance(new Game(), null);
 			GameIO.readSnapshotFromZip(fis, gi);
 			gi.name = "Testsession";
 			gi.addPlayer(null, player);
-	    	fis.close();
-	    	connectAndStartGame(address, port, player, gi, lh);
-    	}
-    	try {
-    		Thread.sleep(800);
-    	}catch(InterruptedException e) {}
-    	
+			fis.close();
+			connectAndStartGame(address, port, player, gi, lh);
+
+			try {
+				Thread.sleep(800);
+			} catch (InterruptedException e) {
+			}
 
 
-	   	Player player = new Player("Florian", 2);
-	    GameWindow gw = connectAndJoinGame(address, port, player, "Testsession", lh);
-    	try {
-    		Thread.sleep(1000);
-    	}catch(InterruptedException e) {
-			logger.error("Unecpected interrupt", e);
-    	}
-
-		for(int i=0; i<AdditionalPlayers; ++i)
-		{
-			PlayerList.add(new Player("TestPlayer" + (i+1), 3+i));
-			GameWindowList.add(connectAndJoinGame(address, port, PlayerList.get(PlayerList.size()-1), "Testsession", lh));
+			Player player1 = new Player("Florian", 2);
+			GameWindow gw = connectAndJoinGame(address, port, player, "Testsession", lh);
 			try {
 				Thread.sleep(1000);
-			}catch(InterruptedException e) {
+			} catch (InterruptedException e) {
 				logger.error("Unecpected interrupt", e);
+			}
+
+			for (int i = 0; i < AdditionalPlayers; ++i) {
+				PlayerList.add(new Player("TestPlayer" + (i + 1), 3 + i));
+				GameWindowList.add(connectAndJoinGame(address, port, PlayerList.get(PlayerList.size() - 1), "Testsession", lh));
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					logger.error("Unecpected interrupt", e);
+				}
 			}
 		}
 	}

@@ -1,7 +1,6 @@
 package gui;
 
-import java.awt.Container;
-import java.awt.EventQueue;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -73,8 +72,9 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private final JTable tableOpenGames = new JTable(tableModelOpenGames);
 	private final JScrollPane scrollPaneOpenGames = new JScrollPane(tableOpenGames);
     private final JButton buttonPoll = new JButton();
-    private final JButton buttonCreateGame = new JButton();
+    private final JButton buttonLoadGame = new JButton();
     private final JButton buttonStartServer = new JButton();
+	private final JButton buttonCreateGame = new JButton();
 
     private final JTextField textFieldId = new JTextField(String.valueOf(Options.getInteger("last_connection.id")));
     private final JLabel labelAddress = new JLabel();
@@ -108,7 +108,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		{
 			updateCurrentGames();
 		}
-		else if (source == buttonCreateGame)
+		else if (source == buttonLoadGame)
 		{
 			JFileChooser fileChooser = new JFileChooserRecentFiles();
 			fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
@@ -170,6 +170,10 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				JFrameUtils.showInfoMessage(lh.getCurrentLanguage().getString(Words.server_stop_info), logger);
 				gs.stop();
 			}
+		}
+		else if (source == buttonCreateGame){
+			CreateNewGameWindow ow = new CreateNewGameWindow(lh);
+			ow.setVisible(true);
 		}
 		else if (e instanceof ButtonColumn.TableButtonActionEvent)
 		{
@@ -311,8 +315,9 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				.addComponent(scrollPaneOpenGames)
 				.addGroup(layout.createSequentialGroup()
 						.addComponent(buttonPoll)
-						.addComponent(buttonCreateGame)
-						.addComponent(buttonStartServer)));
+						.addComponent(buttonLoadGame)
+						.addComponent(buttonStartServer)
+						.addComponent(buttonCreateGame)));
 		layout.setVerticalGroup(layout.createSequentialGroup()
 				.addGroup(layout
 						.createParallelGroup()
@@ -328,15 +333,17 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				.addGroup(layout
 						.createParallelGroup()
 						.addComponent(buttonPoll)
-						.addComponent(buttonCreateGame)
-						.addComponent(buttonStartServer)));
+						.addComponent(buttonLoadGame)
+						.addComponent(buttonStartServer)
+						.addComponent(buttonCreateGame)));
 		setLayout(layout);
 		buttonPoll.addActionListener(this);
 		tableOpenGames.getSelectionModel().addListSelectionListener(this);
 		tableOpenGames.getModel().addTableModelListener(this);
 		this.client = client;
-		buttonCreateGame.addActionListener(this);
+		buttonLoadGame.addActionListener(this);
 		buttonStartServer.addActionListener(this);
+		buttonCreateGame.addActionListener(this);
 		String Port = Integer.toString(client.getPort());
 		String Address = client.getAddress();
 		//textFieldAddress.setText(client.getAddress());
@@ -384,13 +391,13 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	@Override
 	public void languageChanged(Language language) {
 		buttonPoll.setText(language.getString(Words.refresh));
-		buttonCreateGame.setText(language.getString(Words.new_game));
+		buttonLoadGame.setText(language.getString(Words.load_game));
 		buttonStartServer.setText(language.getString(Words.start_server));
+		buttonCreateGame.setText(language.getString(Words.create_game));
 		labelAddress.setText(language.getString(Words.server_address));
 		labelPort.setText(language.getString(Words.port));
 		labelName.setText(language.getString(Words.player_name));
 		labelId.setText(language.getString(Words.player_id));
-
 		this.setTitle(language.getString(Words.game_list));
 	}
 }
