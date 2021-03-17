@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -25,6 +26,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import data.DataHandler;
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,9 @@ import util.jframe.JFileChooserRecentFiles;
 import util.jframe.PasswordDialog;
 import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableModel;
+
+import static test.SimpleNetworkServertest.connectAndStartGame;
+import static test.SimpleNetworkServertest.startNewServer;
 
 public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener, LanguageChangeListener{
 	/**
@@ -172,6 +177,37 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			}
 		}
 		else if (source == buttonCreateGame){
+			String address = "127.0.0.1";
+			int port = 8000 + (int)(Math.random() * 100);
+			GameServer gs = startNewServer(port);
+			Player player = new Player("NewGame", 1);
+			FileInputStream fis = null;
+			try {
+				String game_string = DataHandler.getResourceFolder() + "StartGame.zip";
+				fis = new FileInputStream("src/resources/StartGame.zip");
+			} catch (IOException fileNotFoundException) {
+				fileNotFoundException.printStackTrace();
+			}
+			GameInstance gi = new GameInstance(new Game(), null);
+			try {
+				GameIO.readSnapshotFromZip(fis, gi);
+			} catch (IOException ioException) {
+				ioException.printStackTrace();
+			} catch (JDOMException jdomException) {
+				jdomException.printStackTrace();
+			}
+			gi.name = "Create Game";
+			gi.addPlayer(null, player);
+			try {
+				fis.close();
+			} catch (IOException ioException) {
+				ioException.printStackTrace();
+			}
+			try {
+				connectAndStartGame(address, port, player, gi, lh);
+			} catch (IOException ioException) {
+				ioException.printStackTrace();
+			}
 			CreateNewGameWindow ow = new CreateNewGameWindow(lh);
 			ow.setVisible(true);
 		}

@@ -95,7 +95,7 @@ public class SimpleNetworkServertest {
 
     	if (startGame) {
 			Player player = new Player("Paul", 8);
-			FileInputStream fis = new FileInputStream("PrivateGames/Crew.zip");
+			FileInputStream fis = new FileInputStream("PrivateGames/CrewNormal.zip");
 			GameInstance gi = new GameInstance(new Game(), null);
 			GameIO.readSnapshotFromZip(fis, gi);
 			gi.name = "Testsession";
@@ -110,7 +110,7 @@ public class SimpleNetworkServertest {
 
 
 			Player player1 = new Player("Florian", 2);
-			GameWindow gw = connectAndJoinGame(address, port, player, "Testsession", lh);
+			GameWindow gw = connectAndJoinGame(address, port, player1, "Testsession", lh);
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {

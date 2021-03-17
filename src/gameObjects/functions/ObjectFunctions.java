@@ -267,7 +267,7 @@ public class ObjectFunctions {
     	ObjectState state = objectInstance.state.copy();
         state.posX = posX;
         state.posY = posY;
-        state.rotation = (int) PlayerFunctions.GetCurrentPlayerRotation(gamePanel, gameInstance,player);
+        state.rotation = (int) PlayerFunctions.GetCurrentPlayerRotation(gamePanel, gameInstance, player);
         gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance, state));
     }
 
