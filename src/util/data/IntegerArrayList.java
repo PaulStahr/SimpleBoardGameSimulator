@@ -33,19 +33,12 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 	private int data[];
 	private int length;
 	
-	public IntegerArrayList(){
-		this(5);
-	}
-	
-	public IntegerArrayList(int initialElements){
-		data = new int[initialElements];
-	}
-	
-	public void fill(IntBuffer buf)
-	{
-		Buffers.fillIntBuffer(buf, data, length);
-	}
-	
+	public IntegerArrayList(){this(5);}
+
+	public IntegerArrayList(int initialElements){data = new int[initialElements];}
+
+	public void fill(IntBuffer buf){Buffers.fillIntBuffer(buf, data, length);}
+
 	public void add(int index, int value)
 	{
 		if (length == data.length){
@@ -63,39 +56,25 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		--length;
 		return tmp;
 	}
-	
+
 	@Override
-	public Integer remove(int index)
-	{
-		return removeI(index);
-	}
-	
+	public Integer remove(int index){return removeI(index);}
+
 	@Override
-	public void add(int index, Integer value)
-	{
-		add(index, (int)value);
-	}
-	
+	public void add(int index, Integer value){add(index, (int)value);}
+
 	public int pop(){
 		int last = data[length - 1];
 		--length;
 		return last;
 	}
-	
+
 	@Override
-	public Integer set(int index, Integer value){
-		return set(index, (int)value);
-	}
-	
+	public Integer set(int index, Integer value){return set(index, (int)value);}
+
 	public void set(IntegerArrayList list){
-		if (this.data.length < list.size())
-		{
-			this.data = Arrays.copyOf(list.data, list.length);
-		}
-		else
-		{
-			System.arraycopy(list.data, 0, this.data, 0, list.length);
-		}
+		if (this.data.length < list.size())   {this.data = Arrays.copyOf(list.data, list.length);}
+		else                                  {System.arraycopy(list.data, 0, this.data, 0, list.length);}
 		this.length = list.length;
 	}
 	
@@ -104,18 +83,13 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		data[index] = value;
 		return old;
 	}
-	
+
 	@Override
-	public void setElem(int index, int value)
-	{
-		data[index] = value;
-	}
-	
+	public void setElem(int index, int value){data[index] = value;}
+
 	@Override
-	public boolean add(Integer value){
-		return add((int)value);
-	}
-	
+	public boolean add(Integer value){return add((int)value);}
+
 	public boolean add(int value){
 		if (length == data.length){
 			data = Arrays.copyOf(data, Math.max(data.length + 1, data.length * 2));
@@ -124,12 +98,9 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		++length;
 		return true;
 	}
-	
 
-	public void add(IntegerArrayList objectIds) {
-		add(objectIds.data, 0, objectIds.length);
-	}
-	
+	public void add(IntegerArrayList objectIds) {add(objectIds.data, 0, objectIds.length);}
+
 	private void enlargeTo(int length)
 	{
 		if (length > data.length)
@@ -170,44 +141,25 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 	}
 
 	@Override
-	public int size() {
-		return length;
-	}
+	public int size() {return length;}
 
-	public boolean contains(Integer value){
-		return indexOf((int)value) != -1;
-	}
-	
-	public boolean contains(int value){
-		return indexOf(value) != -1;
-	}
-	
-	public int indexOf(Integer value){
-		return indexOf((int)value);
-	}
-	
-	public int indexOf(int value){
-		return ArrayUtil.linearSearch(data, 0, length, value);
-	}
+	public boolean contains(Integer value){return indexOf((int)value) != -1;}
 
-	public int[] toArrayI() {
-		return Arrays.copyOf(data, length);
-	}
-	
+	public boolean contains(int value){return indexOf(value) != -1;}
+
+	public int indexOf(Integer value){return indexOf((int)value);}
+
+	public int indexOf(int value){return ArrayUtil.linearSearch(data, 0, length, value);}
+
+	public int[] toArrayI() {return Arrays.copyOf(data, length);}
+
 	@Override
-	public void clear(){
-		length = 0;
-	}
-	
+	public void clear(){length = 0;}
 
-	public int last() {
-		return data[length - 1];
-	}
+	public int last() {return data[length - 1];}
 
-	public ReadOnlyIntegerArrayList readOnly() {
-		return new ReadOnlyIntegerArrayList();
-	}
-	
+	public ReadOnlyIntegerArrayList readOnly() {return new ReadOnlyIntegerArrayList();}
+
 	public class ReadOnlyIntegerArrayList extends AbstractList<Integer> implements IntegerList
 	{
 		@Override
@@ -230,35 +182,20 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		}
 		
 		@Override
-		public final void setElem(int index, int elem)
-		{
-			throw new RuntimeException();
-		}
+		public final void setElem(int index, int elem){throw new RuntimeException();}
 
-		public boolean contains(Integer value){
-			return indexOf((int)value) != -1;
-		}
-		
-		public boolean contains(int value){
-			return indexOf(value) != -1;
-		}
-		
-		public int indexOf(Integer value){
-			return indexOf((int)value);
-		}
-		
-		public int indexOf(int value){
-			return ArrayUtil.linearSearch(data, 0, length, value);
-		}
+		public boolean contains(Integer value){return indexOf((int)value) != -1;}
 
-		public int[] toArrayI() {
-			return Arrays.copyOf(data, length);
-		}
+		public boolean contains(int value){return indexOf(value) != -1;}
+
+		public int indexOf(Integer value){return indexOf((int)value);}
+
+		public int indexOf(int value){return ArrayUtil.linearSearch(data, 0, length, value);}
+
+		public int[] toArrayI() {return Arrays.copyOf(data, length);}
 	}
 
-	public void write(int[] out, int begin) {
-		System.arraycopy(data, 0, out, begin, size());
-	}
+	public void write(int[] out, int begin) {System.arraycopy(data, 0, out, begin, size());}
 
     @Override
     public boolean removeIf(Predicate<? super Integer> predicate) {

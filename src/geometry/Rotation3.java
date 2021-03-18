@@ -32,10 +32,10 @@ public final class Rotation3 implements Vectorf, Vectori, Vectord
 {
 	public static final float MULT_INT_TO_DEG = -(float)(180./Integer.MIN_VALUE);
 	public static final float MULT_INT_TO_RAD = -(float)(Math.PI/Integer.MIN_VALUE);
-	public static final double DMULT_INT_TO_RAD = -(double)(Math.PI/Integer.MIN_VALUE);
+	public static final double DMULT_INT_TO_RAD = -(Math.PI/Integer.MIN_VALUE);
 	public static final float MULT_DEG_TO_INT = -(float)(Integer.MIN_VALUE/180.);
 	public static final float MULT_RAD_TO_INT = -(float)(Integer.MIN_VALUE/Math.PI);
-	public static final double DMULT_RAD_TO_INT = -(double)(Integer.MIN_VALUE/Math.PI);
+	public static final double DMULT_RAD_TO_INT = -(Integer.MIN_VALUE/Math.PI);
     private int x,y,z;
 
     public Rotation3(){}
@@ -142,6 +142,7 @@ public final class Rotation3 implements Vectorf, Vectori, Vectord
         z = r.z;
     }
     
+    @Override
     public final String toString()
     {
     	return toString(new StringBuilder()).toString();    	

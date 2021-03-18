@@ -1,6 +1,6 @@
 package util.data;
 
-public interface IntegerList{
+public interface IntegerList {
 	public int getI(int index);
 	
 	public int size();

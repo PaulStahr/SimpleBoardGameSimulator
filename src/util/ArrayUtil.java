@@ -248,7 +248,8 @@ public class ArrayUtil {
 	public static final float[] setToLength(float[] data, int length) {return data.length == length ? data : new float[length];}
 
 	public static float[]	ensureLength(float[] data, int size) 	{return data.length >= size ? data : new float[size];}
-	public static byte[] 	ensureLength(byte[] data, int size) 	{return data.length >= size ? data : new byte[size];}
+    public static byte[]    ensureLength(byte[] data, int size)     {return data.length >= size ? data : new byte[size];}
+    public static long[]    ensureLength(long[] data, int size)     {return data.length >= size ? data : new long[size];}
 
 	public static int max(int[] imageColorArray, int begin, int end) {
 		int max = Integer.MIN_VALUE;

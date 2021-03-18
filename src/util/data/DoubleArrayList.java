@@ -24,50 +24,42 @@ package util.data;
 import java.nio.DoubleBuffer;
 import java.util.AbstractList;
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 import util.Buffers;
 
 public class DoubleArrayList extends AbstractList<Double> implements DoubleList{
 	private double data[];
 	private int length;
-	
-	public void fill(DoubleBuffer buf)
-	{
-		Buffers.fillDoubleBuffer(buf, data, length);
-	}
-	
-	public DoubleArrayList(){
-		this(5);
-	}
-	
-	public DoubleArrayList(int initialElements){
-		data = new double[initialElements];
-	}
-	
+
+	public void fill(DoubleBuffer buf){Buffers.fillDoubleBuffer(buf, data, length);}
+
+	public DoubleArrayList(){this(5);}
+
+	public DoubleArrayList(int initialElements){data = new double[initialElements];}
+
 	public double pop(){
 		double last = data[length - 1];
 		--length;
 		return last;
 	}
-	
+
 	@Override
 	public Double set(int index, Double value){
 		double old = data[index];
 		data[index] = value;
 		return old;
 	}
-	
+
 	public double set(int index, double value){
 		double old = data[index];
 		data[index] = value;
 		return old;
 	}
-	
+
 	@Override
-	public boolean add(Double value){
-		return add((double)value);
-	}
-	
+	public boolean add(Double value){return add((double)value);}
+
 	public void add(DoubleList dl){
 		int size = dl.size();
 		ensureSize(this.length + size);
@@ -109,7 +101,8 @@ public class DoubleArrayList extends AbstractList<Double> implements DoubleList{
 		return data[index];
 	}
 	
-	public double getD(int index){
+	@Override
+    public double getD(int index){
 		if (index >= length)
 			throw new ArrayIndexOutOfBoundsException(index);
 		return data[index];
@@ -137,22 +130,14 @@ public class DoubleArrayList extends AbstractList<Double> implements DoubleList{
 	}
 
 	@Override
-	public int size() {
-		return length;
-	}
+	public int size() {return length;}
 
-	public boolean contains(Double value){
-		return indexOf((double)value) != -1;
-	}
-	
-	public boolean contains(double value){
-		return indexOf(value) != -1;
-	}
-	
-	public int indexOf(Double value){
-		return indexOf((double)value);
-	}
-	
+	public boolean contains(Double value){return indexOf((double)value) != -1;}
+
+	public boolean contains(double value){return indexOf(value) != -1;}
+
+	public int indexOf(Double value){return indexOf((double)value);}
+
 	public int indexOf(double value){
 		for (int i=0;i<length;++i){
 			if (data[i] == value){
@@ -162,14 +147,10 @@ public class DoubleArrayList extends AbstractList<Double> implements DoubleList{
 		return -1;
 	}
 
-	public double[] toArrayD() {
-		return Arrays.copyOf(data, length);
-	}
-	
+	public double[] toArrayD() {return Arrays.copyOf(data, length);}
+
 	@Override
-	public void clear(){
-		length = 0;
-	}
+	public void clear(){length = 0;}
 
 	public void setSize(int i) {
 		length = i;
@@ -180,7 +161,20 @@ public class DoubleArrayList extends AbstractList<Double> implements DoubleList{
 	}
 
 	@Override
-	public void setElem(int index, double value) {
-		data[index] = value;
-	}
+	public void setElem(int index, double value) {data[index] = value;}
+
+    @Override
+    public boolean removeIf(Predicate<? super Double> predicate) {
+        int write = 0;
+        int read;
+        for (read = 0; read < size(); ++read)
+        {
+            if (!predicate.test(data[read]))
+            {
+                data[write++] = data[read];
+            }
+        }
+        length = write;
+        return write != read;
+    }
 }

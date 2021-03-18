@@ -24,6 +24,7 @@ package util.data;
 import java.nio.ByteBuffer;
 import java.util.AbstractList;
 import java.util.Arrays;
+import java.util.function.Predicate;
 
 import util.ArrayUtil;
 import util.Buffers;
@@ -259,5 +260,18 @@ public class ByteArrayList extends AbstractList<Byte> implements ByteList{
 		System.arraycopy(data, 0, out, begin, size());
 	}
 
-
+    @Override
+    public boolean removeIf(Predicate<? super Byte> predicate) {
+        int write = 0;
+        int read;
+        for (read = 0; read < size(); ++read)
+        {
+            if (!predicate.test(data[read]))
+            {
+                data[write++] = data[read];
+            }
+        }
+        length = write;
+        return write != read;
+    }
 }

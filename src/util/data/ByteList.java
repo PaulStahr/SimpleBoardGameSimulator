@@ -1,6 +1,8 @@
 package util.data;
 
-public interface ByteList{
+import java.util.List;
+
+public interface ByteList extends List<Byte>{
 	public byte getB(int index);
 	
 	public int size();
