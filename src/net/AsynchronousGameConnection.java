@@ -206,6 +206,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
         public final long timeout;
         public final PingCallback callback;
         boolean timeouted;
+        boolean succesfull = false;
 
         @Override
         public void run()           {callback.run(this);}
@@ -218,24 +219,26 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
             this.callback = callback;
             this.timeouted = timeouted;
         }
+
+        public boolean successfull() {return succesfull;}
     }
 
     private final ArrayList<PingInformation> pings = new ArrayList<>();
 
-    public final void triggerTimeoutPings()
-    {
-        final long time = System.nanoTime();
-        for (int read = 0, write = 0; read < pings.size(); ++read)
-        {
-            PingInformation current = pings.get(read);
-            if (time > current.timeout){current.timeouted=true; DataHandler.tp.run(current, "Ping Callback");
-            }else{pings.set(write++, current);}
-        }
-    }
-
-    public final PingInformation ping(PingCallback callback, long timeout) {
+    public final PingInformation ping(final PingCallback callback, long timeout) {
         CommandPingForward cpf = new CommandPingForward(1);
-        PingInformation pc = new PingInformation(cpf.id, timeout, callback, false);
+        final PingInformation pc = new PingInformation(cpf.id, timeout, callback, false);
+        DataHandler.hs.enqueue(new Runnable() {
+            @Override
+            public void run()
+            {
+                if (!pc.successfull()) {
+                    pc.timeouted = true;
+                    pc.run();
+                }
+                pings.remove(pc);
+            }
+        }, timeout);
         pings.add(pc);
         queueOutput(cpf);
         return pc;
@@ -312,6 +315,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                     output.flush();
                 } catch (IOException e1) {
                     logger.error("Error during flushing output", e1);
+                    if (e1 instanceof SocketException)
+                    {
+                        return;
+                    }
                 }
                 synchronized(queuedOutputs)
                 {
@@ -417,7 +424,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                     strB.setLength(0);
                 }
                 else if (outputObject instanceof String){}
-                else if (outputObject instanceof TimingOffsetChanged)
+                else if (outputObject instanceof TimingOffsetChanged || outputObject instanceof CommandPing)
                 {
                     objOut.writeUnshared(outputObject);
                 }
@@ -549,13 +556,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                 if (inputObject instanceof CommandPingBack)
                 {
                     CommandPingBack cpb = (CommandPingBack)inputObject;
-                    final long time = System.nanoTime();
-                    for (int read = 0, write = 0; read < pings.size(); ++read)
+                    for (int read = 0; read < pings.size(); ++read)
                     {
                         PingInformation current = pings.get(read);
                         if (current.id == cpb.id){DataHandler.tp.run(current, "Ping Callback");}
-                        else if (time > current.timeout) {current.timeouted = true; DataHandler.tp.run(current, "Ping Callback");}
-                        else{pings.set(write++, current);}
                     }
                     continue;
                 }

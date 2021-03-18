@@ -33,6 +33,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import util.HeapSceduler;
 import util.StringUtils;
 import util.ThreadPool;
 import util.TimedUpdater;
@@ -52,10 +53,12 @@ public abstract class DataHandler
     public static final TimedUpdater timedUpdater = new TimedUpdater(10);
     public static volatile int openWindows = 0;
 	public static final ThreadPool tp = new ThreadPool();
+	public static final HeapSceduler hs = new HeapSceduler();
 
-	
-	
-	
+	static {
+	    hs.start();
+	}
+
 	public static void loadLib(String file) throws IOException {
     	InputStream in = DataHandler.getResourceAsStream(file);
     	String name = file.substring(Math.max(0,file.lastIndexOf('/')));
@@ -70,14 +73,11 @@ public abstract class DataHandler
 	
     private DataHandler(){}
     
-    public static final URL getResource(String resource)
-    {
-    	return DataHandler.class.getResource(DataHandler.getResourceFolder().concat(resource));
-    }
+    public static final URL getResource(String resource){return DataHandler.class.getResource(DataHandler.getResourceFolder().concat(resource));}
     
     public static final InputStream getResourceAsStream(String file)
     {
-    	System.out.println("Read File: " + getResourceFolder().concat(file));
+    	if (logger.isDebugEnabled()) {logger.debug("Read File: " + getResourceFolder().concat(file));}
     	return DataHandler.class.getResourceAsStream(getResourceFolder().concat(file));
     }
     
@@ -89,9 +89,7 @@ public abstract class DataHandler
 		return res;
     }
 
-    public static final String getResourceFolder(){
-    	return resourceFolder;
-    }
+    public static final String getResourceFolder(){return resourceFolder;}
     
     public static final List<String> getRecentFiles(ArrayList<String> list){
       	String value = Options.getString("recent_files");
@@ -141,6 +139,4 @@ public abstract class DataHandler
     		logger.error("Error at adding recent file: ", e);
     	}
     }
-
-
 }
