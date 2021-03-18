@@ -266,7 +266,7 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
         int read;
         for (read = 0; read < size(); ++read)
         {
-            if (!predicate.test(read))
+            if (!predicate.test(data[read]))
             {
                 data[write++] = data[read];
             }
