@@ -115,10 +115,11 @@ public class LanguageHandler {
         }
     }
 
-    void addLanguageChangeListener(LanguageChangeListener languageChangeListener){
+    public void addLanguageChangeListener(LanguageChangeListener languageChangeListener){
         languageChangeListeners.add(new WeakReference<LanguageChangeListener>(languageChangeListener));
     }
-    void removeLanguageChangeListener(LanguageChangeListener l){
+
+    public void removeLanguageChangeListener(LanguageChangeListener l){
     	ListTools.removeReference(languageChangeListeners, l);
     }
 }

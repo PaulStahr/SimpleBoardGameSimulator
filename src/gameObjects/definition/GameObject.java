@@ -34,8 +34,10 @@ public abstract class GameObject {
 		this.rotationStep = rotationStep;
 		this.isFixed = isFixed;
 	}
-	
-	public GameObject(GameObject other) {
+
+	public GameObject(GameObject other) {set(other);}
+
+    public void set(GameObject other) {
         this.widthInMM = other.widthInMM;
         this.heightInMM = other.heightInMM;
         this.uniqueObjectName = other.uniqueObjectName;
