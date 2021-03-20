@@ -24,6 +24,7 @@ import java.util.function.Function;
 
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -52,13 +53,13 @@ import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerRemoveAction;
 import gameObjects.definition.GameObject;
-import gameObjects.definition.GameObjectToken;
 import gameObjects.functions.CheckingFunctions;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
+import gui.game.edit.ObjectEditPanel;
 import main.Player;
 import util.ArrayTools;
 import util.JFrameUtils;
@@ -394,126 +395,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		}
 	}
 	
-	public class ObjectEditPanel extends JPanel implements DocumentListener, ItemListener, LanguageChangeListener{
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = -1555265079401333395L;
-		private final JLabel labelName = new JLabel();
-		private final JTextField textFieldName = new JTextField();
-		private final JLabel labelWidth = new JLabel();
-		private final JTextField textFieldWidth = new JTextField();
-		private final JLabel labelHeight = new JLabel();
-		private final JTextField textFieldHeight = new JTextField();
-		private final GameObject go;
-		private final GameInstance gi;
-		boolean updating = false;
-		private final ArrayList<JComboBox<String>> imageComboBoxes = new ArrayList<>();
-		private final JComboBox<String> comboBoxFrontImage;
-		private final JComboBox<String> comboBoxBackImage;
-		
-		private void updateImages()
-		{
-			String imageNames[] = gi.game.images.keySet().toArray(new String[gi.game.images.size()]);
-			for (int i = 0; i < imageComboBoxes.size(); ++i)
-			{
-				JFrameUtils.updateComboBox(imageComboBoxes.get(i), imageNames);
-			}
-		}
-		
-		public ObjectEditPanel(GameObject go, GameInstance gi, LanguageHandler lh)
-		{
-			this.gi = gi;
-			//GroupLayout layout = new GroupLayout(this);
-			//setLayout(layout);YES_NO_OPTION
-			setLayout(JFrameUtils.DOUBLE_COLUMN_LAUYOUT);
-			this.go = go;
-			textFieldName.setText(go.uniqueObjectName);
-			textFieldWidth.setText(Integer.toString(go.widthInMM));
-			textFieldHeight.setText(Integer.toString(go.heightInMM));
-			textFieldWidth.getDocument().addDocumentListener(this);
-			textFieldHeight.getDocument().addDocumentListener(this);
-			
-			add(labelName);
-			add(textFieldName);
-			add(labelWidth);
-			add(textFieldWidth);
-			add(labelHeight);
-			add(textFieldHeight);
-			
-			/*layout.setHorizontalGroup(
- 					layout.createSequentialGroup()
- 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelWidth).addComponent(labelHeight))
- 					.addGroup(layout.createParallelGroup().addComponent(textFieldName).addComponent(textFieldWidth).addComponent(textFieldHeight)));
- 			layout.setVerticalGroup(
- 					layout.createSequentialGroup()
- 					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName))
- 					.addGroup(layout.createParallelGroup().addComponent(labelWidth).addComponent(textFieldWidth))
- 					.addGroup(layout.createParallelGroup().addComponent(labelHeight).addComponent(textFieldHeight)));*/
- 			
-			if(go instanceof GameObjectToken)
-			{
-				JLabel labelFrontImage = new JLabel("Front Image");
-				JLabel labelBackImage = new JLabel("Back Image");
-				comboBoxFrontImage = new JComboBox<String>();
-				comboBoxBackImage = new JComboBox<String>();
-				imageComboBoxes.add(comboBoxFrontImage);
-				imageComboBoxes.add(comboBoxBackImage);
-				updateImages();
-				GameObjectToken token = (GameObjectToken)go;
-				comboBoxFrontImage.setSelectedItem(gi.game.getImageKey(token.getUpsideLook()));
-				comboBoxBackImage.setSelectedItem(gi.game.getImageKey(token.getDownsideLook()));
-				comboBoxFrontImage.addItemListener(this);
-				add(labelFrontImage);
-				add(comboBoxFrontImage);
-				add(labelBackImage);
-				add(comboBoxBackImage);
-			}
-			else
-			{
-				comboBoxFrontImage = null;
-				comboBoxBackImage = null;
-			}
-            languageChanged(lh.getCurrentLanguage());
-			lh.addLanguageChangeListener(this);
-		}
-		@Override
-		public void changedUpdate(DocumentEvent e) {
-			Document source = e.getDocument();
-			if (updating){return;}
-			if       (source == textFieldWidth.getDocument())    {go.widthInMM = Integer.parseInt(textFieldWidth.getText());}
-			else if  (source == textFieldHeight.getDocument())   {go.heightInMM = Integer.parseInt(textFieldHeight.getText());}
-			isUpdating = true;
-			gi.update(new GameObjectEditAction(id, go.uniqueObjectName));
-			isUpdating = false;
-		}
-		@Override
-		public void insertUpdate(DocumentEvent e) {changedUpdate(e);}
-		@Override
-		public void removeUpdate(DocumentEvent e) {changedUpdate(e);}
-
-		@Override
-		public void itemStateChanged(ItemEvent event) {
-			Object source = event.getSource();
-			if (go instanceof GameObjectToken)
-			{
-				GameObjectToken got = (GameObjectToken)go;
-				if (source == comboBoxFrontImage)   {got.setUpsideLook((String)comboBoxFrontImage.getSelectedItem());}
-				if (source == comboBoxBackImage)    {got.setDownsideLook((String)comboBoxBackImage.getSelectedItem());}
-				isUpdating = true;
-				gi.update(new GameObjectEditAction(id, got.uniqueObjectName));
-				isUpdating = false;
-			}
-		}
-
-		@Override
-		public void languageChanged(Language language) {
-			labelName.setText(language.getString(Words.name));
-			labelWidth.setText(language.getString(Words.width));
-			labelHeight.setText(language.getString(Words.height));
-		}
-	}
-	
 	@Override
 	public void mouseClicked(MouseEvent arg0) {}
 
@@ -534,7 +415,19 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	        if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
 	            JFrame frame = new JFrame();
 	            frame.setLayout(JFrameUtils.SINGLE_COLUMN_LAYOUT);
-	            frame.add(new ObjectEditPanel(gi.game.objects.get(row), gi, lh));
+	            GameObject go = gi.game.objects.get(row);
+	            GameObject gocp = go.copy();
+	            frame.add(new ObjectEditPanel(gocp, gi, lh));
+	            JButton buttonOk = new JButton("Ok");
+	            buttonOk.addActionListener(new ActionListener() {
+                    
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        go.set(gocp);
+                        gi.update(new GameObjectEditAction(id, go));
+                    }
+                });
+	            frame.add(buttonOk);
 	            frame.setSize(300,300);
 	            frame.setVisible(true);
 	        }
