@@ -36,6 +36,8 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 	private final JComboBox<LanguageSummary> comboBoxLanguages = new JComboBox<>();
 	private final JLabel labelShowPing = new JLabel();
 	private final JCheckBox checkBoxShowPing = new JCheckBox();
+	private final JLabel labelDebug = new JLabel();
+	private final JCheckBox checkBoxDebug = new JCheckBox();
 	private final LanguageHandler lh;
 	
 	public OptionWindow(LanguageHandler lh)
@@ -50,6 +52,7 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		languageChanged(lh.getCurrentLanguage());
 		
 		checkBoxShowPing.setSelected(Options.getBoolean("gui.show_ping", false));
+		checkBoxDebug.setSelected(Options.getBoolean("debug", false));
 		
 		panelSettings.setLayout(JFrameUtils.DOUBLE_COLUMN_LAUYOUT);
 		panelSettings.add(labelLanguage);
@@ -60,6 +63,8 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		panelSettings.add(comboBoxLayoutManager);
 		panelSettings.add(labelShowPing);
 		panelSettings.add(checkBoxShowPing);
+		panelSettings.add(labelDebug);
+		panelSettings.add(checkBoxDebug);
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(panelSettings).addGroup(layout.createSequentialGroup().addComponent(buttonOk).addComponent(buttonAccept).addComponent(buttonCancel)));
@@ -79,6 +84,7 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		labelLanguage.setText(language.getString(Words.language));
 		labelInvertRotation.setText(language.getString(Words.invert_rotation));
 		labelShowPing.setText(language.getString(Words.show_ping));
+		labelDebug.setText(language.getString(Words.debug));
 	}
 
 	@Override
@@ -93,10 +99,12 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		        	JFrameLookAndFeelUtil.setLookAndFeel(JFrameLookAndFeelUtil.installedLookAndFeels.get(comboBoxLayoutManager.getSelectedIndex()));
 				}
 			});
+            Options.set("layout_manager", JFrameLookAndFeelUtil.installedLookAndFeels.get(comboBoxLayoutManager.getSelectedIndex()).getClassName());
+            Options.set("invert_rotation", checkBoxInvertRotation.isSelected());
+            Options.set("gui.show_ping", checkBoxShowPing.isSelected());
+            Options.set("debug", checkBoxDebug.isSelected());
+            Options.triggerUpdates();
 		}
-    	Options.set("layout_manager", JFrameLookAndFeelUtil.installedLookAndFeels.get(comboBoxLayoutManager.getSelectedIndex()).getClassName());
-    	Options.set("invert_rotation", checkBoxInvertRotation.isSelected());
-    	Options.set("gui.show_ping", checkBoxShowPing.isSelected());
 		if (source == buttonOk || source == buttonCancel)
 		{
 			dispose();

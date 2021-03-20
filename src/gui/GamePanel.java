@@ -105,6 +105,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	
 	static boolean invert_rotation = false;
 	static boolean show_ping = false;
+	static boolean isDebug = false;
 	static {
 		Options.addModificationListener(new Runnable() {
 
@@ -112,6 +113,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			public void run() {
 				invert_rotation = Options.getBoolean("invert_rotation", false);
 				show_ping = Options.getBoolean("gui.show_ping", false);
+				isDebug = Options.getBoolean("debug", false);
 			}
 		});		
 	}
@@ -182,7 +184,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	//Show text only if in debug mode
 	public String outText = "";
-	public boolean isDebug = true;
 
 	public PrivateArea privateArea;
 	public Table table = null;
@@ -227,7 +228,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		this.table = new Table(gameInstance, 2*tableRadius,new Point2D.Double(-tableRadius,-tableRadius));
 		this.gameInstance = gameInstance;
 		this.privateArea = new PrivateArea(this, gameInstance, boardToScreenTransformation, screenToBoardTransformation);
-		this.isDebug = gameInstance.debug_mode;
 
 		if (!this.gameInstance.private_area) {
 			this.privateArea.zooming = 0;

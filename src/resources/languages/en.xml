@@ -124,4 +124,5 @@
     <start_new_game>Start New Game</start_new_game>
     <load_game>Load Game</load_game>
     <create_game>Create Game</create_game>
+    <debug>Debug</debug>
 </xml>

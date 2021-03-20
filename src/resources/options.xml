@@ -9,5 +9,6 @@
   </last_connection>
   <gui type="void">
     <show_ping type="bool">true</show_ping>
+    <depug type="bool">false</depug>
   </gui>
 </options>

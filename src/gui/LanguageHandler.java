@@ -37,26 +37,11 @@ public class LanguageHandler {
 		}
 		public boolean update(Language lang) {
 			Component component = get();
-        	if (component instanceof JLabel)
-        	{
-        		((JLabel)component).setText(lang.getString(word));
-        	}
-        	else if (component instanceof JTextField)
-        	{
-        		((JTextField)component).setText(lang.getString(word));
-        	}
-           	else if (component instanceof JMenuItem)
-        	{
-        		((JMenuItem)component).setText(lang.getString(word));
-        	}
-           	else if (component instanceof JMenu)
-        	{
-        		((JMenu)component).setText(lang.getString(word));
-        	}
-           	else
-           	{
-           		return false;
-           	}
+        	if      (component instanceof JLabel)      {((JLabel)    component).setText(lang.getString(word));}
+        	else if (component instanceof JTextField)  {((JTextField)component).setText(lang.getString(word));}
+           	else if (component instanceof JMenuItem)   {((JMenuItem) component).setText(lang.getString(word));}
+           	else if (component instanceof JMenu)       {((JMenu)     component).setText(lang.getString(word));}
+           	else                                       {return false;}
         	return true;
 		}
     }
