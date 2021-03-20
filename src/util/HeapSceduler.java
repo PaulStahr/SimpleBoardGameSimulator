@@ -68,14 +68,14 @@ public class HeapSceduler implements Runnable{
         Runnable r= rHeap[index];
         while (true)
         {
-           int next = index * 2 + (index * 2 + 2 < length && tHeap[index * 2 + 2] < tHeap[index * 2 + 1] ? 2 : 1);
+           int next = index * 2 + (index * 2 + 2 < length && tHeap[index * 2 + 1] < tHeap[index * 2 + 2] ? 1 : 2);
 
            if (next >= length || time >= tHeap[next])
            {
               break;
            }
            rHeap[index] = rHeap[next];
-           tHeap[index] = tHeap[index];
+           tHeap[index] = tHeap[next];
            index = next;
         }
         rHeap[index] = r;
@@ -117,11 +117,26 @@ public class HeapSceduler implements Runnable{
             try{
                 r.run();
             }
-            catch(Exception e)
+            catch(Throwable e)
             {
                 logger.error("Exception in running sceduled event", e);
             }
         }
         th = null;
+    }
+
+    public void checkHeapOrder() {
+        for (int i = 1; i < length; ++i)
+        {
+            if (tHeap[i] < tHeap[(i - 1) / 2])
+            {
+                throw new RuntimeException("Heap order is wrong [" + i + "]=" + tHeap[i] + "<["+ (i - 2)/2 + "]=" +tHeap[(i - 1) / 2]);
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        return Arrays.toString(Arrays.copyOf(tHeap, length));
     }
 }
