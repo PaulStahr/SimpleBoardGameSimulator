@@ -18,30 +18,20 @@ public class HeapScedulerTest {
     public void testHeapSceduler(){
         long time = System.nanoTime();
         final AtomicInteger counter = new AtomicInteger();
-        hs.enqueue(new Runnable() {
-            @Override
-            public void run() {
-                hs.checkHeapOrder();
-                assertEquals(hs.toString(), counter.get(), 2);
-                counter.incrementAndGet();
-            }
-        }, time + 300);
-        hs.enqueue(new Runnable() {
-            @Override
-            public void run() {
-                hs.checkHeapOrder();
-                assertEquals(hs.toString(), counter.get(), 0);
-                counter.incrementAndGet();
-            }
-        }, time + 100);
-        hs.enqueue(new Runnable() {
-            @Override
-            public void run() {
-                hs.checkHeapOrder();
-                assertEquals(hs.toString(), counter.get(), 1);
-                counter.incrementAndGet();
-            }
-        }, time + 200);
+        
+        int order[] = new int[] {2,0,1};
+        for (int i = 0; i < order.length; ++i)
+        {
+            final int current = order[i];
+            hs.enqueue(new Runnable() {
+                @Override
+                public void run() {
+                    hs.checkHeapOrder();
+                    assertEquals(hs.toString(), counter.get(), current);
+                    counter.incrementAndGet();
+                }
+            }, time + current);    
+        }
         hs.start();
         try {
             Thread.sleep(10);
