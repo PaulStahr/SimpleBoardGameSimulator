@@ -813,15 +813,11 @@ public class GameIO {
 			}
 			else
 			{
-			    int idx = name.lastIndexOf('.');
-			    if (idx != -1)
+			    String filetype = StringUtils.getFileType(name);
+			    if (filetype != null && ArrayUtil.firstEqualIndex(ImageIO.getReaderFileSuffixes(), filetype) != -1)
 			    {
-			    	String suffix = name.substring(idx + 1);
-			    	if (ArrayUtil.firstEqualIndex(ImageIO.getReaderFileSuffixes(), suffix) != -1)
-			    	{
-			    		Texture img = new Texture(content, StringUtils.getFileType(name));
-						result.game.images.put(name, img);
-			    	}
+		    		Texture img = new Texture(content, filetype);
+					result.game.images.put(name, img);
 			    }
 			}
 		}
