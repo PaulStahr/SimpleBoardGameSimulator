@@ -49,14 +49,33 @@ public class ObjectEditPanel extends JPanel implements DocumentListener, ItemLis
         }
     }
 
+    public static void setValid(GameObject in, GameObject out)
+    {
+        if (in.uniqueObjectName != null) {out.uniqueObjectName = in.uniqueObjectName;}
+        if (in.widthInMM != Integer.MIN_VALUE) {out.widthInMM = in.widthInMM;}
+        if (in.heightInMM != Integer.MIN_VALUE) {out.widthInMM = in.heightInMM;}
+        if (in instanceof GameObjectToken && out instanceof GameObjectToken) {
+            GameObjectToken inT = (GameObjectToken)in;
+            GameObjectToken outT = (GameObjectToken)out;
+            if (inT.getDownsideLook() != null) {inT.setDownsideLook(outT.getDownsideLookId());}
+            if (inT.getUpsideLook() != null) {inT.setUpsideLook(outT.getUpsideLookId());}
+        }
+    }
+
     public static GameObject reduce(List<GameObject> go) {
         GameObject first = go.get(0).copy();
         for (int i = 1; i < go.size(); ++i)
         {
             GameObject current = go.get(i);
             if (!current.uniqueObjectName.equals(first.uniqueObjectName)){first.uniqueObjectName = null;}
-            if (current.widthInMM != first.widthInMM)                    {first.widthInMM = Integer.MIN_VALUE;}             
-            if (current.heightInMM != first.heightInMM)                  {first.heightInMM = Integer.MIN_VALUE;}             
+            if (current.widthInMM != first.widthInMM)                    {first.widthInMM = Integer.MIN_VALUE;}
+            if (current.heightInMM != first.heightInMM)                  {first.heightInMM = Integer.MIN_VALUE;}
+            if (first instanceof GameObjectToken && current instanceof GameObjectToken) {
+                GameObjectToken firstToken = (GameObjectToken)first;
+                GameObjectToken currentToken = (GameObjectToken)current;
+                if (firstToken.getDownsideLook() != currentToken.getDownsideLook()) {firstToken.setDownsideLook(null);}
+                if (firstToken.getUpsideLook() != currentToken.getUpsideLook()) {firstToken.setUpsideLook(null);}
+            }
         }
         return first;
     }
