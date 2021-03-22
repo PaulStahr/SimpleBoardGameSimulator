@@ -21,7 +21,6 @@
  ******************************************************************************/
 package util;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -158,47 +157,30 @@ public class JFrameUtils{
 	public static abstract class DocumentChangeListener implements DocumentListener{
 		public abstract void update(DocumentEvent de);
 		
-		
 		@Override
-		public final void changedUpdate(DocumentEvent de) {
-			update(de);
-		}
+		public final void changedUpdate(DocumentEvent de) {update(de);}
 
-		
 		@Override
-		public final void insertUpdate(DocumentEvent de) {
-			update(de);
-		}
+		public final void insertUpdate(DocumentEvent de) {update(de);}
 
-		
 		@Override
-		public final void removeUpdate(DocumentEvent de) {
-			update(de);
-		}		
+		public final void removeUpdate(DocumentEvent de) {update(de);}		
 	}
 		
 	public static class OpenWindowListener implements ActionListener{
 		final JFrame frame;
-		public OpenWindowListener(JFrame frame){
-			this.frame = frame;
-		}
+		public OpenWindowListener(JFrame frame){this.frame = frame;}
 		
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			frame.setVisible(true);
-		}
+		public void actionPerformed(ActionEvent e) {frame.setVisible(true);}
 	}
 
 	public static class CloseWindowListener implements ActionListener{
 		private final JFrame frame;
-		public CloseWindowListener(JFrame frame){
-			this.frame = frame;
-		}
+		public CloseWindowListener(JFrame frame){this.frame = frame;}
 		
 		@Override
-		public void actionPerformed(ActionEvent e) {
-			frame.dispose();
-		}
+		public void actionPerformed(ActionEvent e) {frame.dispose();}
 	}
 
 	public static final ActionListener closeParentWindowListener = new ActionListener(){
@@ -227,8 +209,7 @@ public class JFrameUtils{
 			this.frame = frame;
 			this.pack = pack;
 		}
-		
-		
+
 		@Override
 		public void propertyChange(PropertyChangeEvent arg0) {
 			SwingUtilities.updateComponentTreeUI(frame);
@@ -242,9 +223,7 @@ public class JFrameUtils{
 	public static final class RedrawMenuItemPropertyListener implements PropertyChangeListener {
 		private final JComponent menu;
 		
-		public RedrawMenuItemPropertyListener(JComponent menu){
-			this.menu = menu;
-		}
+		public RedrawMenuItemPropertyListener(JComponent menu){this.menu = menu;}
 		
 		@Override
 		public final void propertyChange(PropertyChangeEvent arg0) {
@@ -302,15 +281,10 @@ public class JFrameUtils{
 	{
 		private final String message;
 
-		public ShowMessageClass(String message)
-		{
-			this.message = message;
-		}
+		public ShowMessageClass(String message){this.message = message;}
 		
 		@Override
-		public void run() {
-			JOptionPane.showMessageDialog(null, message);
-		}
+		public void run() {JOptionPane.showMessageDialog(null, message);}
 		
 	}
 

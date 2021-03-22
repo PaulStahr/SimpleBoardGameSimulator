@@ -21,25 +21,21 @@
  ******************************************************************************/
 package geometry;
 
+import java.util.AbstractList;
+
 /** 
 * @author  Paul Stahr
 * @version 04.02.2012
 */
 
-public final class Vector2d implements Vectord, Vector2{
+public final class Vector2d extends AbstractList<Double> implements Vectord, Vector2{
 	public double x, y;
 
 	public Vector2d(){}
 	
-	public Vector2d(double x, double y)
-	{
-		this.x = x;this.y = y;
-	}
+	public Vector2d(double x, double y){this.x = x;this.y = y;}
 	
-	public Vector2d(Vector2d vec)
-	{
-		x = vec.x;y = vec.y;
-	}
+	public Vector2d(Vector2d vec){x = vec.x;y = vec.y;}
 	
 	@Override
 	public final double getD(int index)
@@ -91,9 +87,7 @@ public final class Vector2d implements Vectord, Vector2{
 		this.x = x;
 		this.y = y;
 	}
-	
-	
-	
+
 	public void add(Vector2d v)
 	{
 		x += v.x;
@@ -101,15 +95,9 @@ public final class Vector2d implements Vectord, Vector2{
 	}
 	
     @Override
-	public final String toString()
-    {
-    	return toString(new StringBuilder()).toString();    	
-    }
+	public final String toString(){return toString(new StringBuilder()).toString();    	}
     
-    public final StringBuilder toString(StringBuilder strB)
-    {
-    	return strB.append('(').append(x).append(',').append(y).append(')');
-    }
+    public final StringBuilder toString(StringBuilder strB){return strB.append('(').append(x).append(',').append(y).append(')');}
     
     @Override
 	public final int size()
@@ -128,10 +116,7 @@ public final class Vector2d implements Vectord, Vector2{
 	}
 	
 	@Override
-	public final double dot()
-	{
-		return x * x + y * y;
-	}
+	public final double dot(){return x * x + y * y;}
 
 	@Override
 	public void add(double[] data, int index) {
@@ -150,22 +135,17 @@ public final class Vector2d implements Vectord, Vector2{
 	}
 
 	@Override
-	public double getXD() {
-		return x;
-	}
+	public double getXD() {return x;}
 
 	@Override
-	public double getYD() {
-		return y;
-	}
+	public double getYD() {return y;}
 
 	@Override
-	public int getXI() {
-		return (int)x;
-	}
+	public int getXI() {return (int)x;}
 
 	@Override
-	public int getYI() {
-		return (int)y;
-	}
+	public int getYI() {return (int)y;}
+
+    @Override
+    public Double get(int index) {return getD(index);}
 }
