@@ -23,6 +23,7 @@ package util.data;
 
 import java.util.AbstractList;
 import java.util.Arrays;
+import java.util.Spliterator;
 
 public class SortedIntegerArrayList extends AbstractList<Integer> implements SortedIntegerList{
     public static final ReadOnlySortedIntegerArrayList EMPTY_LIST = new SortedIntegerArrayList().readOnly();
@@ -65,8 +66,7 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 
 	@Override
 	public int getI(int index){
-		if (index >= length)
-			throw new ArrayIndexOutOfBoundsException(index);
+		if (index >= length) {throw new ArrayIndexOutOfBoundsException(index);}
 		return data[index];
 	}
 
@@ -83,13 +83,12 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 
 	public int[] toArrayI() {return Arrays.copyOf(data, length);}
 
-	public void removeObject(int id) {
+	public boolean removeObject(int id) {
 		int index = Arrays.binarySearch(data, 0, length, id);
-		if (index >= 0)
-		{
-			System.arraycopy(data, index + 1, data, index, length - index - 1);
-			--length;
-		}
+		if (index < 0){return false;}
+		System.arraycopy(data, index + 1, data, index, length - index - 1);
+		--length;
+		return true;
 	}
 
 	@Override
@@ -167,21 +166,33 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 	public ReadOnlySortedIntegerArrayList readOnly() {return new ReadOnlySortedIntegerArrayList();}
 
 	@Override
-	public void setElem(int index, int value) {throw new RuntimeException();}
+	public void setElem(int index, int value) {throw new UnsupportedOperationException();}
 
-	public class ReadOnlySortedIntegerArrayList extends AbstractList<Integer> implements SortedIntegerList
+	@Override
+    public Spliterator<Integer> spliterator() {return SortedIntegerList.super.spliterator();}
+
+    @Override
+    public Integer remove(int index) {
+        Integer elem = data[index];
+        System.arraycopy(data, index + 1, data, index, length - index - 1);
+        --length;
+        return elem;
+    }
+
+	@Override
+    public boolean remove(Object o) {return o instanceof Integer && removeObject((int)o);}
+
+    public class ReadOnlySortedIntegerArrayList extends AbstractList<Integer> implements SortedIntegerList
 	{
 		@Override
 		public Integer get(int index) {
-			if (index >= length)
-				throw new ArrayIndexOutOfBoundsException(index);
+			if (index >= length) {throw new ArrayIndexOutOfBoundsException(index);}
 			return data[index];
 		}
 
 		@Override
 		public int getI(int index){
-			if (index >= length)
-				throw new ArrayIndexOutOfBoundsException(index);
+			if (index >= length) {throw new ArrayIndexOutOfBoundsException(index);}
 			return data[index];
 		}
 
@@ -203,5 +214,8 @@ public class SortedIntegerArrayList extends AbstractList<Integer> implements Sor
 
 		@Override
 		public void setElem(int index, int value) {throw new UnsupportedOperationException();}
+
+        @Override
+        public Spliterator<Integer> spliterator() {return SortedIntegerList.super.spliterator();}
 	}
 }

@@ -1,6 +1,8 @@
 package util.data;
 
-public interface SortedIntegerList extends IntegerList {
+import java.util.Set;
+
+public interface SortedIntegerList extends IntegerList, Set<Integer> {
 
 	boolean hasMatch(int[] data, int begin, int end);
 

@@ -69,13 +69,9 @@ public class RecentFileList extends JPanel  implements ListSelectionListener{
     	add(files);
     }
 
-    public void clear() {
-        listModel.clear();
-    }
+    public void clear() {listModel.clear();}
 
-    public void add(File file) {
-        listModel.add(file);
-    }
+    public void add(File file) {listModel.add(file);}
     
     public void add(String files[])
     {
@@ -107,13 +103,9 @@ public class RecentFileList extends JPanel  implements ListSelectionListener{
         }
 
         @Override
-        public int getSize() {
-            return files.size();
-        }
+        public int getSize() {return files.size();}
 
         @Override
-        public File getElementAt(int index) {
-            return files.get(index);
-        }
+        public File getElementAt(int index) {return files.get(index);}
     }
 }

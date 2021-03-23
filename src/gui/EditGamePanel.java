@@ -413,18 +413,28 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	        Point point = mouseEvent.getPoint();
 	        int row = table.rowAtPoint(point);
 	        if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
+	            int selectedRows[] = table.getSelectedRows();
 	            JFrame frame = new JFrame();
 	            frame.setLayout(JFrameUtils.SINGLE_COLUMN_LAYOUT);
-	            GameObject go = gi.game.objects.get(row);
-	            GameObject gocp = go.copy();
+	            final ArrayList<GameObject> go = new ArrayList<>();
+	            for (int i = 0; i < selectedRows.length; ++i)
+	            {
+	                go.add(gi.game.objects.get(selectedRows[i]));
+	            }
+	            go.add(gi.game.objects.get(row));
+	            GameObject gocp = ObjectEditPanel.reduce(go);
 	            frame.add(new ObjectEditPanel(gocp, gi, lh));
 	            JButton buttonOk = new JButton("Ok");
 	            buttonOk.addActionListener(new ActionListener() {
                     
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        go.set(gocp);
-                        gi.update(new GameObjectEditAction(id, go));
+                        for (int i = 0; i < go.size(); ++i)
+                        {
+                            GameObject current = go.get(i);
+                            ObjectEditPanel.setValid(gocp, current);
+                            gi.update(new GameObjectEditAction(id, current));
+                        }
                     }
                 });
 	            frame.add(buttonOk);
