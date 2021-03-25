@@ -1,11 +1,14 @@
 package gui;
 
-import java.awt.*;
+import static test.SimpleNetworkServertest.connectAndStartGame;
+import static test.SimpleNetworkServertest.startNewServer;
+
+import java.awt.Container;
+import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -26,11 +29,11 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
-import data.DataHandler;
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
 import data.Options;
 import data.Options.OptionTreeNode;
@@ -44,13 +47,11 @@ import net.AsynchronousGameConnection;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
+import util.ThreadPool.RunnableObject;
 import util.jframe.JFileChooserRecentFiles;
 import util.jframe.PasswordDialog;
 import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableModel;
-
-import static test.SimpleNetworkServertest.connectAndStartGame;
-import static test.SimpleNetworkServertest.startNewServer;
 
 public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener, LanguageChangeListener{
 	/**
@@ -186,7 +187,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				String game_string = DataHandler.getResourceFolder() + "StartGame.zip";
 				fis = new FileInputStream("src/resources/StartGame.zip");
 			} catch (IOException fileNotFoundException) {
-				fileNotFoundException.printStackTrace();
+				logger.error("File not Found", fileNotFoundException);
 			}
 			GameInstance gi = new GameInstance(new Game(), null);
 			try {
@@ -319,17 +320,32 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		}
     }
 
-	private void updateCurrentGames() {
-		try {
-			client.setAdress(textFieldAddress.getText());
-			client.setPort(Integer.parseInt(textFieldPort.getText()));
-			gmi.clear();
-			client.getGameInstanceMeta(gmi);
-			JFrameUtils.updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, null, connectColumn, visitColumn, deleteColumn);
-		} catch (IOException | ClassNotFoundException e1) {
-			JFrameUtils.logErrorAndShow("Can't update information", e1, logger);
-		}
-	}
+	private RunnableObject updateGamesRunnable = new RunnableObject("Update Games", null) {
+	    @Override
+        public void run() {
+            try {
+                client.setAdress(textFieldAddress.getText());
+                client.setPort(Integer.parseInt(textFieldPort.getText()));
+                gmi.clear();
+                client.getGameInstanceMeta(gmi);
+                JFrameUtils.runByDispatcher(new Runnable() {
+                    @Override
+                    public void run() {
+                        JFrameUtils.updateTable(tableOpenGames, scrollPaneOpenGames, gmi, GameInstance.TYPES, tableModelOpenGames, null, connectColumn, visitColumn, deleteColumn);                                                 
+                    }
+                });
+            } catch (IOException | ClassNotFoundException e1) {
+                JFrameUtils.runByDispatcher(new Runnable() {
+                    @Override
+                    public void run() {
+                        JFrameUtils.logErrorAndShow("Can't update information", e1, logger);
+                    }
+                });
+            }
+        }
+	};
+	
+	private void updateCurrentGames() {DataHandler.tp.run(updateGamesRunnable, false);}
 
 	public ServerLobbyWindow(SynchronousGameClientLobbyConnection client, LanguageHandler lh)
 	{
@@ -391,30 +407,21 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	
     @Override
 	public void tableChanged(TableModelEvent e) {
-    	if (!EventQueue.isDispatchThread())
-    	{
-    		//TODO do we need this line
-    		//throw new RuntimeException("Table Changes only allowed by dispatchment thread");
-    	}
-       	if (!isUpdating )
+    	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Table Changes only allowed by dispatchment thread");}
+       	if (isUpdating ){return;}
+   		int rowBegin = e.getFirstRow();
+    	if (rowBegin == TableModelEvent.HEADER_ROW){return;}
+    	isUpdating = true;
+		Object source = e.getSource();
+		int colBegin = e.getColumn() == TableModelEvent.ALL_COLUMNS ? 0 : e.getColumn();
+    	int rowEnd = e.getLastRow() + 1;
+		if (source == tableModelOpenGames)
 		{
-       		int rowBegin = e.getFirstRow();
-        	if (rowBegin == TableModelEvent.HEADER_ROW)
-        	{
-        		return;
-        	}
-        	isUpdating = true;
- 			Object source = e.getSource();
-    		int colBegin = e.getColumn() == TableModelEvent.ALL_COLUMNS ? 0 : e.getColumn();
-        	int rowEnd = e.getLastRow() + 1;
-			if (source == tableModelOpenGames)
-			{
-				
-				//tablechanged(e, tableOperGames, scene.surfaceObjectList, colBegin, rowBegin, rowEnd, tableModelOpenGames, GameInstance.TYPES);
-			}
-
-			isUpdating = false;
+			
+			//tablechanged(e, tableOperGames, scene.surfaceObjectList, colBegin, rowBegin, rowEnd, tableModelOpenGames, GameInstance.TYPES);
 		}
+
+		isUpdating = false;
     }
     
 
