@@ -653,7 +653,7 @@ public class GameIO {
 	
 	public static final void writeImageToStream(Texture img, String suffix, OutputStream out) throws IOException
 	{
-	    if (suffix == img.suffix)
+	    if (suffix.equals(img.suffix))
 	    {
 	        img.writeTo(out);
 	    }
