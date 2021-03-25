@@ -48,7 +48,7 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 			new FuncControl(Words.shuffle_stack, 	new ControlCombination(0, -1, KeyEvent.VK_S, 0)),
 			new FuncControl(Words.merge_objects, 	new ControlCombination(0, -1, KeyEvent.VK_M, 0)),
 			new FuncControl(Words.play_card_face_up, new ControlCombination(0, 0, -1, 32)),
-			new FuncControl(Words.collect_all_objects_of_a_group, new ControlCombination(InputEvent.CTRL_DOWN_MASK, 2,  KeyEvent.VK_M, 0)),
+			new FuncControl(Words.collect_all_objects_of_a_group, new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_M, 0)),
 			new FuncControl(Words.flip_objects_roll_dice, new ControlCombination(0, -1,  KeyEvent.VK_F, 0)),
 			new FuncControl(Words.unfold_dice, new ControlCombination(0, -1,  KeyEvent.VK_V, 0)),
 			new FuncControl(Words.zoom, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),

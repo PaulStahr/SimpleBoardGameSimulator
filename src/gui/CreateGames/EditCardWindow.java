@@ -1,2 +1,4 @@
-package gui.CreateGames;public class EditCardWindow {
+package gui.CreateGames;
+
+public class EditCardWindow {
 }

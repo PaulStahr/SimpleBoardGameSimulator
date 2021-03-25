@@ -1,2 +1,4 @@
-package gui.CreateGames;public class TypeWindow {
+package gui.CreateGames;
+
+public class TypeWindow {
 }

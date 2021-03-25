@@ -307,12 +307,14 @@ public class GameIO {
 						for (int i = 0; i < Integer.parseInt(elem.getAttributeValue(IOString.NUMBER)); ++i) {
 							ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), uniqueId);
 							editStateFromElement(oi.state, elem);
+							oi.state.drawValue = max(oi.state.drawValue, uniqueId);
 							gi.addObjectInstance(oi);
 							++uniqueId;
 						}
 					} else {
 						ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), uniqueId);
 						editStateFromElement(oi.state, elem);
+						oi.state.drawValue = max(oi.state.drawValue, uniqueId);
 						gi.addObjectInstance(oi);
 						++uniqueId;
 					}

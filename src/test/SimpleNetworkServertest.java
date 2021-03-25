@@ -26,7 +26,7 @@ public class SimpleNetworkServertest {
     public static List<Player> PlayerList = new ArrayList<>();
     public static List<GameWindow> GameWindowList = new ArrayList<>();
     public static int AdditionalPlayers = 0;
-    public static boolean startGame = false;
+    public static boolean startGame = true;
     public static GameServer startNewServer(int port)
     {
     	GameServer gs = new GameServer(port);

@@ -271,3 +271,10 @@ public class CreateNewGameWindow extends JFrame implements LanguageChangeListene
         }
     }
 }
+
+class ObjectTransferHandler extends TransferHandler{
+
+    public ObjectTransferHandler(){
+
+    }
+}
