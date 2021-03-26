@@ -98,8 +98,7 @@ public class HeapSceduler implements Runnable{
                         }
                         else if (tHeap[0] > currentTime)
                         {
-                            long waittime = (tHeap[0] - currentTime) / 1000000l;
-                            this.wait(waittime);
+                            this.wait((tHeap[0] - currentTime + 999999) / 1000000l);
                         }
                         else
                         {
