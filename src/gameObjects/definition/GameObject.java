@@ -18,19 +18,21 @@ public abstract class GameObject {
 	public String uniqueObjectName;
 	public String objectType;
 	public int value;
+	public int sortValue;
 	public int rotationStep;
 	public int isFixed;
 	public String groups[] = UniqueObjects.EMPTY_STRING_ARRAY;
 
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectColumnType.ID, GameObjectColumnType.NAME, GameObjectColumnType.DELETE});
 
-	public GameObject(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, int value, int rotationStep, int isFixed)
+	public GameObject(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, int value, int sortValue, int rotationStep, int isFixed)
 	{
 		this.uniqueObjectName = uniqueObjectName;
 		this.objectType = objectType;
 		this.widthInMM = widthInMM;
 		this.heightInMM = heightInMM;
 		this.value = value;
+		this.sortValue = sortValue;
 		this.rotationStep = rotationStep;
 		this.isFixed = isFixed;
 	}

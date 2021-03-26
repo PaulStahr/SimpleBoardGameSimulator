@@ -93,6 +93,7 @@ public class GameIO {
 		elem.setAttribute(IOString.ABOVE, 			Integer.toString(state.aboveInstanceId));
 		elem.setAttribute(IOString.BELOW,			Integer.toString(state.belowInstanceId));
 		elem.setAttribute(IOString.VALUE, 			Integer.toString(state.value));
+		elem.setAttribute(IOString.SORT_VALUE,		Integer.toString(state.sortValue));
 		elem.setAttribute(IOString.ROTATION_STEP, 	Integer.toString(state.rotationStep));
 		elem.setAttribute(IOString.IS_FIXED, 		Boolean.toString(state.isFixed));
 		elem.setAttribute(IOString.IN_PRIVATE_AREA, Boolean.toString(state.inPrivateArea));
@@ -145,6 +146,7 @@ public class GameIO {
 		state.posX 				= readAttribute(elem, IOString.X, state.posX);
 		state.posY 				= readAttribute(elem, IOString.Y, state.posY);
 		state.value				= readAttribute(elem, IOString.VALUE, state.value);
+		state.sortValue         = readAttribute(elem, IOString.SORT_VALUE, state.sortValue);
 		state.rotationStep		= readAttribute(elem, IOString.ROTATION_STEP, state.rotationStep);
 		state.isFixed			= readAttribute(elem, IOString.IS_FIXED, state.isFixed);
 		state.inPrivateArea       = readAttribute(elem, IOString.IN_PRIVATE_AREA, state.inPrivateArea);
@@ -188,6 +190,7 @@ public class GameIO {
         state.rotation = is.readInt();
         state.scale = is.readInt();
         state.value = is.readInt();
+        state.sortValue = is.readInt();
         state.rotationStep = is.readInt();
         state.isFixed = is.readBoolean();
         if (state instanceof TokenState)
@@ -217,6 +220,7 @@ public class GameIO {
         out.writeInt(state.rotation);
         out.writeInt(state.scale);
         out.writeInt(state.value);
+        out.writeInt(state.sortValue);
         out.writeInt(state.rotationStep);
         out.writeBoolean(state.isFixed);
         if (state instanceof TokenState)
@@ -307,7 +311,12 @@ public class GameIO {
 						for (int i = 0; i < Integer.parseInt(elem.getAttributeValue(IOString.NUMBER)); ++i) {
 							ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), uniqueId);
 							editStateFromElement(oi.state, elem);
-							oi.state.drawValue = max(oi.state.drawValue, uniqueId);
+							if (oi.state.isFixed){
+								oi.state.drawValue = 0;
+							}
+							else {
+								oi.state.drawValue = max(oi.state.drawValue, uniqueId + 1);
+							}
 							gi.addObjectInstance(oi);
 							++uniqueId;
 						}
@@ -345,18 +354,19 @@ public class GameIO {
 		int width = readAttribute(elem, IOString.WIDTH, 66);
 		int height = readAttribute(elem, IOString.HEIGHT, 88);
 		int value = readAttribute(elem, IOString.VALUE, 0);
+		int sortValue = readAttribute(elem, IOString.SORT_VALUE, 0);
 		int rotationStep = readAttribute(elem, IOString.ROTATION_STEP, 90);
 		int isFixed = readAttribute(elem, IOString.IS_FIXED, 0);
 		switch(type)
 		{
 			case IOString.CARD:
 			{
-				result = new GameObjectToken(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value, rotationStep, isFixed);
+				result = new GameObjectToken(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value, sortValue, rotationStep, isFixed);
 				break;
 			}
 			case IOString.FIGURE:
 			{
-				result = new GameObjectFigure(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.STANDING)), value, rotationStep, isFixed);
+				result = new GameObjectFigure(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.STANDING)), value, sortValue, rotationStep, isFixed);
 				break;
 			}
 			case IOString.DICE:
@@ -371,7 +381,7 @@ public class GameIO {
 						dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img, side.getValue()));
 					}
 				}
-				result = new GameObjectDice(objectName, type, width, height, dss.toArray(new DiceSide[dss.size()]), value, rotationStep);
+				result = new GameObjectDice(objectName, type, width, height, dss.toArray(new DiceSide[dss.size()]), value, sortValue, rotationStep);
 				break;
 			}
 			case IOString.BOOK:
@@ -386,7 +396,7 @@ public class GameIO {
 						bss.add(new BookSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img, side.getValue()));
 					}
 				}
-				result = new GameObjectBook(objectName, type, width, height, bss.toArray(new BookSide[bss.size()]), value, rotationStep);
+				result = new GameObjectBook(objectName, type, width, height, bss.toArray(new BookSide[bss.size()]), value, sortValue, rotationStep);
 				break;
 			}
 		}
@@ -476,6 +486,7 @@ public class GameIO {
 		{
 			GameObjectToken token = (GameObjectToken) gameObject;
 			elem.setAttribute(IOString.VALUE, Integer.toString(token.value));
+			elem.setAttribute(IOString.SORT_VALUE, Integer.toString(token.sortValue));
 			elem.setAttribute(IOString.FRONT, game.getImageKey(token.getUpsideLook()));
 			if (token.getDownsideLook() != null)
 			{

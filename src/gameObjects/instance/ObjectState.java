@@ -26,6 +26,7 @@ public abstract class ObjectState implements Serializable {
 	public int aboveInstanceId = -1;
 	public int belowInstanceId = -1;
 	public int value;
+	public int sortValue = 0;
 	public int drawValue = 0;
 	public int rotationStep = 90;
 

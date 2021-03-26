@@ -14,10 +14,7 @@ import javax.swing.SwingUtilities;
 
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.player.PlayerEditAction;
-import gameObjects.definition.GameObject;
-import gameObjects.definition.GameObjectBook;
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectToken;
+import gameObjects.definition.*;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
@@ -982,15 +979,13 @@ public class ObjectFunctions {
     }
 
     //drop all objects from the hand of player
-    public static void dropObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
-        if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
-            ArrayList<ObjectInstance> oiList = new ArrayList<>();
-            getOwnedStack(gameInstance, player, oiList);
-            ObjectFunctions.removeFromOwnStack(gamePanel, gameInstance, player, oiList);
-            ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, oiList);
-            //stack all dropped objects
-            makeStack(gamePanel, gameInstance, player,oiList, SIDE_UNCHANGED);
-        }
+    public static void dropObjects(GamePanel gamePanel, GameInstance gameInstance, Player player) {
+        ArrayList<ObjectInstance> oiList = new ArrayList<>();
+        getOwnedStack(gameInstance, player, oiList);
+        ObjectFunctions.removeFromOwnStack(gamePanel, gameInstance, player, oiList);
+        ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, oiList);
+        //stack all dropped objects
+        makeStack(gamePanel, gameInstance, player,oiList, SIDE_UNCHANGED);
     }
 
     public static void dropObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
@@ -1129,7 +1124,7 @@ public class ObjectFunctions {
                     diceState.unfold = false;
                 }
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, oi, state));
-                ObjectFunctions.updateSelectedObjects(gamePanel, gameInstance,player);
+                gamePanel.updateSelectedObjects(gamePanel, gameInstance,player);
             }
         }
     }
@@ -1145,7 +1140,7 @@ public class ObjectFunctions {
         ial.clear();
         ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
         ObjectFunctions.deselectObjects(gamePanel, gameInstance, player, ial);
-        ObjectFunctions.updateSelectedObjects(gamePanel, gameInstance,player);
+        gamePanel.updateSelectedObjects(gamePanel, gameInstance,player);
     }
 
     public static void hoverObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
@@ -1185,7 +1180,7 @@ public class ObjectFunctions {
             state.isActive = true;
             state.isSelected = player.id;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, oi, state));
-            ObjectFunctions.updateSelectedObjects(gamePanel, gameInstance, player);
+            gamePanel.updateSelectedObjects(gamePanel, gameInstance, player);
             gamePanel.audioClips.get("select").setFramePosition(0);
             gamePanel.audioClips.get("select").start();
         }
@@ -1203,10 +1198,7 @@ public class ObjectFunctions {
         objectInstances.sort(new Comparator<Integer>() {
             @Override
             public int compare(Integer o1, Integer o2) {
-                if (gameInstance.getObjectInstanceById(o1).state.drawValue > gameInstance.getObjectInstanceById(o2).state.drawValue){
-                    return o1;
-                }
-                return o1;
+                return gameInstance.getObjectInstanceById(o1).state.drawValue - gameInstance.getObjectInstanceById(o2).state.drawValue;
             }
         });
         for (int id: objectInstances)
@@ -1271,11 +1263,6 @@ public class ObjectFunctions {
                 ial.add(oi.id);
             }
         }
-    }
-
-    public static void updateSelectedObjects(GamePanel gamePanel, GameInstance gameInstance, Player player)
-    {
-        ObjectFunctions.getSelectedObjects(gameInstance, player, gamePanel.selectedObjects);
     }
 
     public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance activeObject, int posX, int posY, double zooming, int maxInaccuracy) {
@@ -1750,7 +1737,7 @@ public class ObjectFunctions {
         return false;
     }
 
-    public static IntegerArrayList getStackRepresentatives(GameInstance gameInstance, IntegerArrayList objectIds) {
+    public static IntegerArrayList getObjectRepresentatives(GameInstance gameInstance, IntegerArrayList objectIds) {
         IntegerArrayList ial = new IntegerArrayList();
         for (int id : objectIds) {
             if (gameInstance.getObjectInstanceById(id).go instanceof GameObjectToken) {
@@ -1759,11 +1746,14 @@ public class ObjectFunctions {
                     ial.add(topId);
                 }
             }
+            else if (gameInstance.getObjectInstanceById(id).go instanceof GameObjectFigure){
+                ial.add(id);
+            }
         }
         return ial;
     }
 
-    public static ArrayList<ObjectInstance> getStackRepresentatives(GameInstance gameInstance, ArrayList<ObjectInstance> objectInstances) {
+    public static ArrayList<ObjectInstance> getObjectRepresentatives(GameInstance gameInstance, ArrayList<ObjectInstance> objectInstances) {
         ArrayList<ObjectInstance> objectInstances1 = new ArrayList<>();
         IntegerArrayList ial = new IntegerArrayList();
         for (ObjectInstance oi : objectInstances) {
@@ -1771,7 +1761,7 @@ public class ObjectFunctions {
                 ial.add(oi.id);
             }
         }
-        for (int id : getStackRepresentatives(gameInstance, ial)) {
+        for (int id : getObjectRepresentatives(gameInstance, ial)) {
             objectInstances1.add(gameInstance.getObjectInstanceById(id));
         }
         return objectInstances1;
@@ -1789,6 +1779,48 @@ public class ObjectFunctions {
             ial.add(instance.id);
         }
         return ial;
+    }
+
+    public static void integerArrayListToObjectList(GameInstance gameInstance, IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
+        oiList.clear();
+        for (int id : ial){
+            oiList.add(gameInstance.getObjectInstanceById(id));
+        }
+    }
+
+    public static void objectListToIntegerArrayList(GameInstance gameInstance, IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
+        ial.clear();
+        for (ObjectInstance oi : oiList){
+            ial.add(oi.id);
+        }
+    }
+
+    public static void sortByValue(GameInstance gameInstance, ArrayList<ObjectInstance> oiList){
+        oiList.sort(new Comparator<ObjectInstance>() {
+            @Override
+            public int compare(ObjectInstance o1, ObjectInstance o2) {
+                return o1.state.sortValue - o2.state.sortValue;
+            }
+        });
+    }
+
+    public static void sortHandCardsByValue(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
+        getOwnedStack(gameInstance, player, ial);
+        integerArrayListToObjectList(gameInstance, ial, oiList);
+        sortByValue(gameInstance, oiList);
+        for (int i = 0; i < oiList.size(); ++i){
+            removeFromOwnStack(gamePanel, gameInstance, player, oiList.get(i).id);
+            insertIntoOwnStack(gamePanel, gameInstance, player, oiList.get(i), i, 0);
+        }
+    }
+
+    public static void sortByDrawValue(GameInstance gameInstance, ArrayList<ObjectInstance> oiList){
+        oiList.sort(new Comparator<ObjectInstance>() {
+            @Override
+            public int compare(ObjectInstance o1, ObjectInstance o2) {
+                return o1.state.drawValue - o2.state.drawValue;
+            }
+        });
     }
 
     public static void setNewDrawValue(int gamePanelId, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList){
@@ -1842,7 +1874,7 @@ public class ObjectFunctions {
     }
 
 
-    public static void giveObjects(GamePanel gamePanel, GameInstance gameInstance, IntegerArrayList ial) {
+    public static void giveObjects(GamePanel gamePanel, GameInstance gameInstance, IntegerArrayList ial, ArrayList<ObjectInstance> oiList) {
         Collections.shuffle(ial);
         int playerNum = gameInstance.getPlayerNumber();
         int numElements = ial.size()/playerNum;
@@ -1866,8 +1898,11 @@ public class ObjectFunctions {
                 takeObjects(gamePanel,gameInstance,player, gameInstance.getObjectInstanceById(ial.getI(Pos)));
                 counter+= 1;
             }
+            IntegerArrayList integerList = new IntegerArrayList();
+            sortHandCardsByValue(gamePanel, gameInstance, player, integerList, oiList);
             ++playerCounter;
         }
+
     }
 
     public static boolean isInTableMiddle(GamePanel gamePanel, int xi, int yi) {

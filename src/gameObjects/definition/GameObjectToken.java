@@ -26,8 +26,8 @@ public class GameObjectToken extends GameObject{
 		this.downsideLook = null;
 	}
 
-	public GameObjectToken(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, Texture front, Texture back, int value, int rotationStep, int isFixed) {
-		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, rotationStep, isFixed);
+	public GameObjectToken(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, Texture front, Texture back, int value, int sortValue, int rotationStep, int isFixed) {
+		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, sortValue, rotationStep, isFixed);
 		this.upsideLook = front;
 		this.downsideLook = back;
 	}
@@ -50,6 +50,7 @@ public class GameObjectToken extends GameObject{
 	{
 		TokenState state = new TokenState();
 		state.value = this.value;
+		state.sortValue = this.sortValue;
 		state.rotationStep = this.rotationStep;
 		state.isFixed = (this.isFixed != 0);
 	    return state;

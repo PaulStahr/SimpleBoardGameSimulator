@@ -64,23 +64,8 @@ public class DrawFunctions {
 
     public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, IntegerArrayList ial){
         //Draw all objects
-        IntegerArrayList oiList = new IntegerArrayList();
-        IntegerArrayList fixedObjects = new IntegerArrayList();
-        for (int idx : ial){
-            if (!gameInstance.getObjectInstanceByIndex(idx).state.isFixed)
-            {
-                oiList.add(gameInstance.getObjectInstanceByIndex(idx).id);
-            }
-            else
-            {
-                fixedObjects.add(gameInstance.getObjectInstanceByIndex(idx).id);
-            }
-        }
-        //Draw the fixed objects first
-        drawObjectsFromList(gamePanel,g,gameInstance,player,fixedObjects,ial);
-
-        drawObjectsFromList(gamePanel,g,gameInstance,player,oiList,ial);
-
+        IntegerArrayList tmp = new IntegerArrayList();
+        drawObjectsFromList(gamePanel,g,gameInstance,player,ial,tmp);
     }
 
     public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, IntegerArrayList oiList, IntegerArrayList ial) {
@@ -237,7 +222,7 @@ public class DrawFunctions {
 
         if (gamePanel.privateArea.objects.size() != 0) {
             int extraSpace; //Private Area needs extra space if object is dragged into it
-            if (gamePanel.privateArea.currentDragPosition != -1 && gamePanel.hoveredObject != null && gamePanel.selectedObjects.size() != 0 && !gamePanel.isSelectStarted) {
+            if (gamePanel.privateArea.currentDragPosition != -1 && gamePanel.hoveredObject != null && gamePanel.getNumberOfSelectedObjects() != 0 && !gamePanel.isSelectStarted) {
                 extraSpace = 1;
             } else {
                 extraSpace = 0;
@@ -510,7 +495,7 @@ public class DrawFunctions {
 
     public static void drawDebugInfo(GamePanel gamePanel, Graphics2D g2, GameInstance gameInstance, Player player) {
         ObjectInstance hoveredObject = gamePanel.hoveredObject;
-        IntegerArrayList selectedObjects = gamePanel.selectedObjects;
+        IntegerArrayList selectedObjects = gamePanel.getSelectedObjects();
         IntegerArrayList ial = new IntegerArrayList();
         int hoverId = (hoveredObject== null) ? -1 : hoveredObject.id;
         int drawValue = (hoveredObject== null) ? -1 : hoveredObject.state.drawValue;

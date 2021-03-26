@@ -119,10 +119,16 @@
     <background>background</background>
     <password>password</password>
     <seats>seats</seats>
+<<<<<<< Updated upstream
     <show_ping>Show ping</show_ping>
+=======
+>>>>>>> Stashed changes
     <create_new_game>Create New Game</create_new_game>
     <start_new_game>Start New Game</start_new_game>
     <load_game>Load Game</load_game>
     <create_game>Create Game</create_game>
+<<<<<<< Updated upstream
     <debug>Debug</debug>
+=======
+>>>>>>> Stashed changes
 </xml>

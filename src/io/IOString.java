@@ -65,4 +65,5 @@ public class IOString {
     public static final String ORIGINAL_ROTATION = "original_rotation";
 	public static final String VISITOR = "visitor";
 	public static final String BOOK = "book";
+	public static final String SORT_VALUE = "sort_value";
 }

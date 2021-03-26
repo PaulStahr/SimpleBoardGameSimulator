@@ -13,8 +13,8 @@ public class GameObjectFigure extends GameObject{
 	private transient Texture lyingLook;
 	private String standingLookStr;
 	private String lyingLookStr;
-	public GameObjectFigure(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, Texture standingLook, int value, int rotationStep, int isFixed) {
-		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, rotationStep,isFixed);
+	public GameObjectFigure(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, Texture standingLook, int value, int sortValue, int rotationStep, int isFixed) {
+		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, sortValue, rotationStep,isFixed);
 		this.standingLook = standingLook;
 		// calc a rotated figure from standing figure
 		try {

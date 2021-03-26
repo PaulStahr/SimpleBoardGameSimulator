@@ -111,10 +111,16 @@
     <background>Hintergrund</background>
     <password>Passwort</password>
     <seats>Sitzplätze</seats>
+<<<<<<< Updated upstream
     <show_ping>Zeige Ping</show_ping>
+=======
+>>>>>>> Stashed changes
     <create_new_game>Neues Spiel erstellen</create_new_game>
     <start_new_game>Neues Spiel starten</start_new_game>
     <load_game>Spiel Laden</load_game>
     <create_game>Spiel Erstellen</create_game>
+<<<<<<< Updated upstream
     <debug>Testmodus</debug>
+=======
+>>>>>>> Stashed changes
 </xml>

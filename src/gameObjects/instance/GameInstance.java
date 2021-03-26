@@ -46,7 +46,7 @@ public class GameInstance {
 	public boolean table = true;
     public boolean put_down_area = true;
     public int seats = -1;
-	public List<String> seatColors = Arrays.asList("#e81123", "#00188f", "#009e49", "#ff8c00", "#68217a", "#00bcf2", "#ec008c", "#fff100", "#00b294", "#bad80a");
+	public ArrayList<String> seatColors = new ArrayList(Arrays.asList("#e81123", "#00188f", "#009e49", "#ff8c00", "#68217a", "#00bcf2", "#ec008c", "#fff100", "#00b294", "#bad80a"));
 	public String tableColor = "";
 	public int admin = -1;
 	public boolean debug_mode = false;
