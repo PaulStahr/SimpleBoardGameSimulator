@@ -84,6 +84,7 @@ import geometry.TransformConversion;
 import geometry.Vector2d;
 import io.GameIO;
 import main.Player;
+import util.Pair;
 import util.StringUtils;
 import util.TimedUpdateHandler;
 import util.data.DoubleArrayList;
@@ -120,6 +121,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	private Player player;
 	public final int id = (int)System.nanoTime();
 	private final IntegerArrayList ial = new IntegerArrayList();
+	private final IntegerArrayList ial2 = new IntegerArrayList();
 	private final ArrayList<ObjectInstance> objectInstanceList = new ArrayList<>();
 
 	int maxInaccuracy = 20;
@@ -303,7 +305,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
         g2.setTransform(boardToScreenTransformation);
 
         //Draw all objects not in some private area
-		drawObjectsFromList(this,g,gameInstance,player,ObjectFunctions.getDrawOrder(gameInstance));
+		ObjectFunctions.getDrawOrder(gameInstance, ial);
+		drawObjectsFromList(this,g,gameInstance,player, ial);
 
 		//Draw selection rectangle
 		drawSelection(this, g, player);
@@ -317,9 +320,18 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		AffineTransform tmp = g2.getTransform();
 		g2.setTransform(boardToScreenTransformation);
 		//Redraw selected objects not in some private area
-		ObjectFunctions.integerArrayListToObjectList(gameInstance, selectedObjects, objectInstanceList);
-		ObjectFunctions.sortByDrawValue(gameInstance, objectInstanceList);
-		drawObjectsFromList(this, g, gameInstance, player, selectedObjects, ial);
+		ial.clear();
+		for (int id : selectedObjects){
+			ial.add(id);
+			ObjectFunctions.getAllAboveLyingObjects(this, gameInstance, player, gameInstance.getObjectInstanceById(id), ial2);
+			for(int id2 : ial2){
+				if (!ial.contains(id2)){
+					ial.add(id2);
+				}
+			}
+		}
+		ObjectFunctions.sortByDrawValue(gameInstance, ial);
+		drawObjectsFromList(this, g, gameInstance, player, ial, ial2);
 
 
 		//Draw objects in private area
@@ -555,7 +567,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 					ObjectFunctions.deselectAllSelected(this, gameInstance, player, ial);
 					ObjectFunctions.selectObject(this, gameInstance, player, hoveredObject.id);
-					ObjectFunctions.setNewDrawValue(this.id, gameInstance, player, hoveredObject);
+					ObjectFunctions.setNewDrawValue(this, gameInstance, player, hoveredObject);
 
 				} else {
 					ObjectFunctions.deselectAllSelected(this, gameInstance, player, ial);
@@ -572,6 +584,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 					}
 					//Handle all drags of Objects
+					sortSelectedObjects();
 					MoveFunctions.dragObjects(this, gameInstance, player, arg0, selectedObjects, objOrigPosX, objOrigPosY, mousePressedGamePos, mouseBoardPos, mouseWheelValue);
 				}
 				if (this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)) {
@@ -604,6 +617,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 
 						if (!isSelectStarted) {
+							sortSelectedObjects();
 							MoveFunctions.dragObjects(this, gameInstance, player, arg0, selectedObjects, objOrigPosX, objOrigPosY, mousePressedGamePos, mouseBoardPos, mouseWheelValue);
 							/*Handle all drags of Token Objects*/
 							if (this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)) {
@@ -639,7 +653,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (!isSelectStarted && selectedObjects.size() > 0 && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
 				for (int id : ObjectFunctions.getObjectRepresentatives(gameInstance, selectedObjects)) {
 					ObjectInstance oi = gameInstance.getObjectInstanceById(id);
-					ObjectFunctions.setNewDrawValue(this.id, gameInstance, player, oi);
+					ObjectFunctions.setNewDrawValue(this, gameInstance, player, oi);
 					ObjectFunctions.releaseObjects(arg0, this, gameInstance, player, oi, mouseScreenX, mouseScreenY, 1);
 					if (oi.go instanceof GameObjectDice && SwingUtilities.isMiddleMouseButton(arg0)) {
 						ObjectFunctions.rollTheDice(id, gameInstance, player, oi);
@@ -970,7 +984,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					}
 					else if (e.getKeyCode() == KeyEvent.VK_S){
 						if (hoveredObject != null){
-							ObjectFunctions.sortHandCardsByValue(this, gameInstance, player, ial, objectInstanceList);
+							ObjectFunctions.sortHandCardsByValue(this, gameInstance, player, ial, objectInstanceList, false);
 						}
 					}
 				}
@@ -1181,6 +1195,50 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public IntegerArrayList getSelectedObjects(){
 		return this.selectedObjects;
+	}
+
+	public void sortSelectedObjects(){
+		ial.clear();
+		for (Integer i : selectedObjects){
+			ial.add(i);
+		}
+		IntegerArrayList sortedObjPosX = new IntegerArrayList();
+		IntegerArrayList sortedObjPosY = new IntegerArrayList();
+		if (objOrigPosX.size() > 0) {
+			for (int i : selectedObjects) {
+				sortedObjPosX.add(0);
+			}
+			for (int i : selectedObjects) {
+				sortedObjPosY.add(0);
+			}
+		}
+
+		ial.sort(new Comparator<Integer>() {
+			@Override
+			public int compare(Integer o1, Integer o2) {
+				return gameInstance.getObjectInstanceById(o1).state.drawValue - gameInstance.getObjectInstanceById(o2).state.drawValue;
+			}
+		});
+		if (objOrigPosX.size() > 0) {
+			for (int i = 0; i < ial.size(); ++i) {
+
+
+				int idx = selectedObjects.indexOf(ial.get(i));
+				sortedObjPosX.set(i, objOrigPosX.getI(idx));
+				sortedObjPosY.set(i, objOrigPosY.getI(idx));
+			}
+			objOrigPosX.clear();
+			objOrigPosY.clear();
+		}
+		selectedObjects.clear();
+
+		for (int i = 0; i < ial.size(); ++i){
+			selectedObjects.add(ial.get(i));
+			if (sortedObjPosX.size() > 0) {
+				objOrigPosX.add(sortedObjPosX.get(i));
+				objOrigPosY.add(sortedObjPosY.get(i));
+			}
+		}
 	}
 
 	class SheetPanel extends JPanel implements LanguageChangeListener{

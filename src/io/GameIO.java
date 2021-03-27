@@ -53,6 +53,7 @@ import main.Player;
 import net.AsynchronousGameConnection;
 import util.ArrayUtil;
 import util.StringUtils;
+import util.data.IntegerArrayList;
 import util.io.StreamUtil;
 
 public class GameIO {
@@ -73,169 +74,41 @@ public class GameIO {
 		} return Integer.parseInt(version);
 	}
 
-	/**
-	 * Write an ObjectState to an XML-Element. All fields of @param state
-	 * will be added as Attributes to @param elem. If state is a TokenState
-	 * or a FigureState, it will also write the side of standing attribute respectively.
-	 * @param state the ObjectState
-	 * @param elem the Element
-	 */
-	private static void writeStateToElement(ObjectState state, Element elem)
-	{
-		elem.setAttribute(IOString.X, 				Integer.toString(state.posX));
-		elem.setAttribute(IOString.Y, 				Integer.toString(state.posY));
-		elem.setAttribute(IOString.R, 				Integer.toString(state.rotation));
-		elem.setAttribute(IOString.ORIGINAL_ROTATION, 				Integer.toString(state.originalRotation));
-		elem.setAttribute(IOString.S, 				Integer.toString(state.scale));
-		elem.setAttribute(IOString.OWNER_ID, 		Integer.toString(state.owner_id));
-		elem.setAttribute(IOString.IS_SELECTED, 		Integer.toString(state.isSelected));
-		elem.setAttribute(IOString.DRAW_VALUE, 		Integer.toString(state.drawValue));
-		elem.setAttribute(IOString.ABOVE, 			Integer.toString(state.aboveInstanceId));
-		elem.setAttribute(IOString.BELOW,			Integer.toString(state.belowInstanceId));
-		elem.setAttribute(IOString.VALUE, 			Integer.toString(state.value));
-		elem.setAttribute(IOString.SORT_VALUE,		Integer.toString(state.sortValue));
-		elem.setAttribute(IOString.ROTATION_STEP, 	Integer.toString(state.rotationStep));
-		elem.setAttribute(IOString.IS_FIXED, 		Boolean.toString(state.isFixed));
-		elem.setAttribute(IOString.IN_PRIVATE_AREA, Boolean.toString(state.inPrivateArea));
-		if (state instanceof TokenState) 					{elem.setAttribute(IOString.SIDE, Boolean.toString(((TokenState) state).side));}
-		if (state instanceof GameObjectFigure.FigureState)	{elem.setAttribute(IOString.STANDING, Boolean.toString(((GameObjectFigure.FigureState) state).standing));}
-		if (state instanceof GameObjectDice.DiceState)		{elem.setAttribute(IOString.SIDE, Integer.toString(((GameObjectDice.DiceState)state).side));}
-		if (state instanceof GameObjectBook.BookState)		{elem.setAttribute(IOString.SIDE, Integer.toString(((GameObjectBook.BookState)state).side));}
-	}
-
-	private static final int readAttribute(Element elem, String key, int def)
+	static final int readAttribute(Element elem, String key, int def)
 	{
 		Attribute attribute = elem.getAttribute(key);
 		return attribute != null ? Integer.parseInt(attribute.getValue()) : def;
 	}
-	
-	private static final long readAttribute(Element elem, String key, long def)
+
+	static final long readAttribute(Element elem, String key, long def)
 	{
 		Attribute attribute = elem.getAttribute(key);
 		return attribute != null ? Long.parseLong(attribute.getValue()) : def;
 	}
-	
-	private static final boolean readAttribute(Element elem, String key, boolean def)
+
+	static final boolean readAttribute(Element elem, String key, boolean def)
 	{
 		Attribute attribute = elem.getAttribute(key);
 		return attribute != null ? Boolean.parseBoolean(attribute.getValue()) : def;
 	}
 
-	private static String readAttribute(Element elem, String key, String def) {
+	static final String readAttribute(Element elem, String key, String def) {
 		Attribute attribute = elem.getAttribute(key);
 		return attribute != null ? attribute.getValue() : def;
 	}
-	
-	/**
-	 * Edit a ObjectState from an XML Element. The Attributes "x", "y"
-	 * and "r" are needed in @param elem. All others are optional.
-	 * @param elem the Element with all needed information
-	 * @param state the ObjectState that shall the updated
-	 */
-	private static void editStateFromElement(ObjectState state, Element elem)
-	{
-		state.rotation        = readAttribute(elem, IOString.R, state.rotation);
-        state.originalRotation = readAttribute(elem, IOString.R, state.originalRotation);
-        state.originalRotation = readAttribute(elem, IOString.ORIGINAL_ROTATION, state.originalRotation);
-		state.scale 			= readAttribute(elem, IOString.S, state.scale);
-		state.aboveInstanceId 	= readAttribute(elem, IOString.ABOVE, state.aboveInstanceId);
-		state.belowInstanceId 	= readAttribute(elem, IOString.BELOW, state.belowInstanceId);
-		state.owner_id 			= readAttribute(elem, IOString.OWNER_ID, state.owner_id);
-		state.isSelected 		= readAttribute(elem, IOString.IS_SELECTED, state.isSelected);
-		state.drawValue			= readAttribute(elem, IOString.DRAW_VALUE, state.drawValue);
-		state.posX 				= readAttribute(elem, IOString.X, state.posX);
-		state.posY 				= readAttribute(elem, IOString.Y, state.posY);
-		state.value				= readAttribute(elem, IOString.VALUE, state.value);
-		state.sortValue         = readAttribute(elem, IOString.SORT_VALUE, state.sortValue);
-		state.rotationStep		= readAttribute(elem, IOString.ROTATION_STEP, state.rotationStep);
-		state.isFixed			= readAttribute(elem, IOString.IS_FIXED, state.isFixed);
-		state.inPrivateArea       = readAttribute(elem, IOString.IN_PRIVATE_AREA, state.inPrivateArea);
-		if (state instanceof TokenState)
-		{
-		    ((TokenState)state).side = readAttribute(elem, IOString.SIDE, ((TokenState)state).side);
-    	}
-		if (state instanceof GameObjectFigure.FigureState && elem.getAttribute(IOString.STANDING) != null)
-		{
-			((GameObjectFigure.FigureState)state).standing = Boolean.parseBoolean(elem.getAttributeValue(IOString.STANDING));
-		}
-		if (state instanceof GameObjectDice.DiceState && elem.getAttributeValue(IOString.SIDE) != null)
-		{
-			((DiceState)state).side = Integer.parseInt(elem.getAttributeValue(IOString.SIDE));
-		}
-		if (state instanceof GameObjectBook.BookState && elem.getAttributeValue(IOString.SIDE) != null)
-		{
-			((BookState)state).side = Integer.parseInt(elem.getAttributeValue(IOString.SIDE));
+
+	public static void readAttribute(Element elem, String key, IntegerArrayList def) {
+		Attribute attribute = elem.getAttribute(key);
+		if (attribute != null) {
+			IntegerArrayList ial = new IntegerArrayList(attribute.getValue());
+			def.clear();
+			for (int id : ial){
+				def.add(id);
+			}
 		}
 	}
 
-    public static void simulateStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
-    {
-        int skip = 41;
-        if (state instanceof TokenState)      {skip += 1;}
-        else if (state instanceof DiceState)  {skip += 4;}
-        else if (state instanceof FigureState){skip += 1;}
-        StreamUtil.skip(is, skip);
-    }
 
-    public static void editStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
-    {
-        state.aboveInstanceId = is.readInt();
-        state.belowInstanceId = is.readInt();
-        state.inPrivateArea = is.readBoolean();
-        state.owner_id = is.readInt();
-        state.isSelected = is.readInt();
-        state.drawValue = is.readInt();
-        state.posX = is.readInt();
-        state.posY = is.readInt();
-        state.rotation = is.readInt();
-        state.scale = is.readInt();
-        state.value = is.readInt();
-        state.sortValue = is.readInt();
-        state.rotationStep = is.readInt();
-        state.isFixed = is.readBoolean();
-        if (state instanceof TokenState)
-        {
-            ((TokenState)state).side = is.readBoolean();
-        }
-        else if (state instanceof DiceState)
-        {
-            ((DiceState)state).side = is.readInt();
-        }
-        else if (state instanceof FigureState)
-        {
-            ((FigureState) state).standing = is.readBoolean();
-        }
-    }
-
-    public static void writeStateToStreamObject(ObjectOutputStream out, ObjectState state) throws IOException
-    {
-        out.writeInt(state.aboveInstanceId);
-        out.writeInt(state.belowInstanceId);
-        out.writeBoolean(state.inPrivateArea);
-        out.writeInt(state.owner_id);
-        out.writeInt(state.isSelected);
-        out.writeInt(state.drawValue);
-        out.writeInt(state.posX);
-        out.writeInt(state.posY);
-        out.writeInt(state.rotation);
-        out.writeInt(state.scale);
-        out.writeInt(state.value);
-        out.writeInt(state.sortValue);
-        out.writeInt(state.rotationStep);
-        out.writeBoolean(state.isFixed);
-        if (state instanceof TokenState)
-        {
-            out.writeBoolean(((TokenState)state).side);
-        }
-        else if (state instanceof DiceState)
-        {
-            out.writeInt(((DiceState)state).side);
-        }
-        else if (state instanceof FigureState)
-        {
-            out.writeBoolean(((FigureState) state).standing);
-        }
-    }
 
 	/**
 	 * Edit a GameInstance from an XML Element.
@@ -251,7 +124,7 @@ public class GameIO {
 			String name = elem.getName();
 			switch (name) {
 				case IOString.PLAYER:
-					Player player = createPlayerFromElement(elem);
+					Player player = PlayerIO.createPlayerFromElement(elem);
 					gi.addPlayer(null, player);
 					break;
 				case IOString.NAME:
@@ -310,20 +183,25 @@ public class GameIO {
 					if (elem.getAttributeValue(IOString.NUMBER) != null) {
 						for (int i = 0; i < Integer.parseInt(elem.getAttributeValue(IOString.NUMBER)); ++i) {
 							ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), uniqueId);
-							editStateFromElement(oi.state, elem);
+							ObjectStateIO.editStateFromElement(oi.state, elem);
 							if (oi.state.isFixed){
 								oi.state.drawValue = 0;
 							}
 							else {
-								oi.state.drawValue = max(oi.state.drawValue, uniqueId + 1);
+								oi.state.drawValue = max(max(oi.state.drawValue, uniqueId), 1);
 							}
 							gi.addObjectInstance(oi);
 							++uniqueId;
 						}
 					} else {
 						ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), uniqueId);
-						editStateFromElement(oi.state, elem);
-						oi.state.drawValue = max(oi.state.drawValue, uniqueId);
+						ObjectStateIO.editStateFromElement(oi.state, elem);
+						if (oi.state.isFixed){
+							oi.state.drawValue = 0;
+						}
+						else {
+							oi.state.drawValue = max(max(oi.state.drawValue, uniqueId), 1);
+						}
 						gi.addObjectInstance(oi);
 						++uniqueId;
 					}
@@ -415,40 +293,6 @@ public class GameIO {
 	}
 
 	/**
-	 * Creates a new Player. All needed information will be retrieved
-	 * from the XML-element @param elem.
-	 * @param elem the Element with all needed information
-	 * @return the created GameInstance
-	 */
-	private static Player createPlayerFromElement(Element elem)
-	{
-		Player result = new Player(
-				elem.getAttributeValue(IOString.NAME),
-				Integer.parseInt(elem.getAttributeValue(IOString.ID)),
-				new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR))),
-				Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X)),
-				Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y)));
-		result.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
-		result.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
-		result.visitor = Boolean.parseBoolean(elem.getAttributeValue(IOString.VISITOR));
-		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), result.screenToBoardTransformation);
-		return result;
-	}
-	
-	private static Player editPlayerFromElement(Element elem, Player player)
-	{
-		player.setName(elem.getAttributeValue(IOString.NAME));
-		player.color = new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR)));
-		player.mouseXPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X));
-		player.mouseYPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y));
-		player.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
-		player.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
-		player.visitor = Boolean.parseBoolean(elem.getAttributeValue(IOString.VISITOR));
-		editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), player.screenToBoardTransformation);
-		return player;
-	}
-
-	/**
 	 * Creates a new Element that represents the @param objectInstance.
 	 * ATTENTION: Does not save the fields GameObject go, double scale and Player inHand.
 	 * @param objectInstance the ObjectInstance that shall be encoded
@@ -458,7 +302,7 @@ public class GameIO {
 	{
 		Element elem = new Element(IOString.OBJECT);
 		elem.setAttribute(IOString.UNIQUE_NAME, objectInstance.go.uniqueObjectName);
-		writeStateToElement(objectInstance.state, elem);
+		ObjectStateIO.writeStateToElement(objectInstance.state, elem);
 		return elem;
 	}
 
@@ -523,7 +367,7 @@ public class GameIO {
 		return elem;
 	}
 	
-	private static Element createElementFromAffineTransform(AffineTransform at)
+	static Element createElementFromAffineTransform(AffineTransform at)
 	{
 		Element elem = new Element(IOString.AFFINE_TRANSFORM);
 		elem.setAttribute(IOString.SCALE_X, Double.toString(at.getScaleX()));
@@ -535,7 +379,7 @@ public class GameIO {
 		return elem;
 	}
 	
-	private static Element editAffineTransformFromElement(Element elem, AffineTransform at)
+	static Element editAffineTransformFromElement(Element elem, AffineTransform at)
 	{
 		at.setTransform(
 				Double.parseDouble(elem.getAttributeValue(IOString.SCALE_X)), Double.parseDouble(elem.getAttributeValue(IOString.SHEAR_Y)),
@@ -544,24 +388,6 @@ public class GameIO {
 		return elem;
 	}
 
-	/**
-	 * Creates a new Element that represents the @param player.
-	 * @param player the Player that shall be encoded
-	 * @return the created Element
-	 */
-	private static Element createElementFromPlayer(Player player) {
-		Element elem = new Element(IOString.PLAYER);
-		elem.setAttribute(IOString.NAME, player.getName());
-		elem.setAttribute(IOString.ID, Integer.toString(player.id));
-		elem.setAttribute(IOString.COLOR, Integer.toString(player.color.getRGB()));
-		elem.setAttribute(IOString.MOUSE_X, Integer.toString(player.mouseXPos));
-		elem.setAttribute(IOString.MOUSE_Y, Integer.toString(player.mouseYPos));
-		elem.setAttribute(IOString.SCREEN_W, Integer.toString(player.screenWidth));
-		elem.setAttribute(IOString.SCREEN_H, Integer.toString(player.screenHeight));
-		elem.setAttribute(IOString.VISITOR, Boolean.toString(player.visitor));
-		elem.addContent(createElementFromAffineTransform(player.screenToBoardTransformation));
-		return elem;
-	}
 
 	/**
 	 * Creates a snapshot of a current GameInstance @param gi incl. the
@@ -593,7 +419,7 @@ public class GameIO {
         	}
 			for (int idx = 0; idx < gi.getPlayerNumber(); idx++) {
 				Player player = gi.getPlayerByIndex(idx);
-				root_inst.addContent(createElementFromPlayer(player));
+				root_inst.addContent(PlayerIO.createElementFromPlayer(player));
 			}
 
 	        Element sessionName = new Element(IOString.NAME);
@@ -748,28 +574,6 @@ public class GameIO {
 		}
 	}
 
-	/**
-	 * Encodes all fields of @param object to an XML document and puts
-	 * it into @param os.
-	 * @param object the ObjectState that shall be encoded
-	 * @param output the OutputStream the Game will be written to
-	 */
-	public static void writeObjectStateToStreamXml(ObjectState object, OutputStream output) throws IOException
-	{
-		Document doc = new Document();
-    	Element elem = new Element(IOString.OBJECT_STATE);
-		writeStateToElement(object, elem);
-		doc.addContent(elem);
-    	new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
-	}
-
-	public static void writePlayerToStream(Player player, OutputStream output) throws IOException
-	{
-		Document doc = new Document();
-		Element elem = createElementFromPlayer(player);
-    	doc.addContent(elem);
-    	new XMLOutputter(Format.getPrettyFormat()).output(doc, output);
-	}
 
 	// TODO fertig machen
 	public static void writeObjectInstanceToZip(ObjectInstance game, ByteArrayOutputStream byteStream) {
@@ -802,7 +606,9 @@ public class GameIO {
 		in.close();
 		return result;
 	}
-	
+
+
+
 	private static class GameSnapshotreader
 	{
 		ByteArrayOutputStream gameBuffer = new ByteArrayOutputStream();
@@ -934,22 +740,6 @@ public class GameIO {
 		
 	}
 
-	/**
-	 * Edit the ObjectState @param objectState from information encoded in @param input.
-	 * ATTENTION 1: @param input is expected to contain an XML document
-	 * that can be used to build a Document via the SAXBuilder.
-	 * ATTENTION 2: Only the root element will be considered and it has to have the
-	 * attributes "x", "y" and "r". All other attributes are optional.
-	 * @param objectState the ObjectState to be edited
-	 * @param input the InputStream with all update information
-	 */
-	public static void editObjectStateFromStream(ObjectState objectState, InputStream input) throws IOException, JDOMException
-	{
-		Document doc = new SAXBuilder().build(input);
-    	Element elem = doc.getRootElement();
-
-    	editStateFromElement(objectState, elem);
-	}
 
 	/**
 	 * Edit the GameInstance @param gi from information encoded in @param input.
@@ -1022,18 +812,12 @@ public class GameIO {
 		editGameInstanceFromStream(inputStream, gi);
 	}
 
-	public static void editPlayerFromStreamZip(InputStream is, Player gi) throws JDOMException, IOException
-	{
-		Document doc = new SAXBuilder().build(is);
-    	Element root = doc.getRootElement();
-		editPlayerFromElement(root, gi);
-	}
-
 	public static void writeObjectToStreamObject(ObjectOutputStream objOut, GameObject editedObject) throws IOException {
 		objOut.writeInt(editedObject.widthInMM);
 		objOut.writeInt(editedObject.heightInMM);
 		objOut.writeInt(editedObject.rotationStep);
 		objOut.writeInt(editedObject.value);
+		objOut.writeInt(editedObject.sortValue);
 		objOut.writeObject(editedObject.objectType);
 		objOut.writeObject(editedObject.isFixed);
 		if (editedObject instanceof GameObjectToken)
@@ -1049,6 +833,7 @@ public class GameIO {
 		object.heightInMM = objIn.readInt();
 		object.rotationStep = objIn.readInt();
 		object.value = objIn.readInt();
+		object.sortValue = objIn.readInt();
 		object.objectType = (String)objIn.readObject();
 		object.isFixed = objIn.readInt();
 		if (object instanceof GameObjectToken)
@@ -1059,47 +844,6 @@ public class GameIO {
 		}
 	}
 	
-	public static void editPlayerFromStreamObject(ObjectInputStream is, Player player) throws ClassNotFoundException, IOException
-	{
-		if (player == null)
-		{
-			is.readObject();
-			StreamUtil.skip(is, 68);
-			throw new NullPointerException();
-		}
-		player.setName((String)is.readObject());
-		//read player color
-		player.color = new Color(is.readInt());
-		//read player mouse position
-		player.mouseXPos = is.readInt();
-		player.mouseYPos = is.readInt();
-		//read player window position
-		player.screenToBoardTransformation.setTransform(is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble(),is.readDouble(), is.readDouble());
-		player.screenWidth = is.readInt();
-		player.screenHeight = is.readInt();
-		player.visitor = is.readBoolean();
-	}
-	
-	public static void writePlayerToStreamObject(ObjectOutputStream out, Player player) throws IOException
-	{
-		out.writeObject(player.getName());
-		//write player color
-		out.writeInt(player.color.getRGB());
-		//write player mouse position
-		out.writeInt(player.mouseXPos);
-		out.writeInt(player.mouseYPos);
-		//write player window position
-		out.writeDouble(player.screenToBoardTransformation.getScaleX());
-		out.writeDouble(player.screenToBoardTransformation.getShearY());
-		out.writeDouble(player.screenToBoardTransformation.getShearX());
-		out.writeDouble(player.screenToBoardTransformation.getScaleY());
-		out.writeDouble(player.screenToBoardTransformation.getTranslateX());
-		out.writeDouble(player.screenToBoardTransformation.getTranslateY());
-		out.writeInt(player.screenWidth);
-		out.writeInt(player.screenHeight);
-		out.writeBoolean(player.visitor);
-	}
-	
 	public static void writeGameObjectInstanceEditActionToStreamObject(ObjectOutputStream out, GameObjectInstanceEditAction action) throws IOException
 	{
 		out.writeInt(action.source);
@@ -1107,48 +851,6 @@ public class GameIO {
 		out.writeInt(action.object);
 	}
 
-	public static Player readPlayerFromStream(InputStream is) throws JDOMException, IOException
-	{
-		Document doc = new SAXBuilder().build(is);
-    	Element root = doc.getRootElement();
-
-		return createPlayerFromElement(root);
-	}
-
-
-	public static void editPlayerFromZip(InputStream inputStream, Player player) throws IOException, JDOMException {
-		ZipInputStream stream = new ZipInputStream(inputStream);
-		ZipEntry entry;
-		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		while ((entry = stream.getNextEntry()) != null)
-		{
-		    StreamUtil.copy(stream, byteStream);
-			if (entry.getName().equals(IOString.PLAYER_XML))
-			{
-				editPlayerFromStreamZip(new ByteArrayInputStream(byteStream.toByteArray()), player);
-			}
-			byteStream.reset();
-		}
-		stream.close();
-	}
-	
-	public static Player readPlayerFromZip(InputStream inputStream) throws IOException, JDOMException {
-		ZipInputStream stream = new ZipInputStream(inputStream);
-		ZipEntry entry;
-		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		Player pl = null;
-		while ((entry = stream.getNextEntry()) != null)
-		{
-		    StreamUtil.copy(stream, byteStream);
-			if (entry.getName().equals(IOString.PLAYER_XML))
-			{
-				pl = readPlayerFromStream(new ByteArrayInputStream(byteStream.toByteArray()));
-			}
-			byteStream.reset();
-		}
-		stream.close();
-		return pl;
-	}
 
 	
 }

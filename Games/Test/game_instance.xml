@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xml>
+<name>NeuesSpiel</name>
+<object unique_name="sechserwuerfel" number="3" x="150" y="150" r="0"/>
+<object unique_name="caro10" x="100" y="100" r="0"/>
+</xml>

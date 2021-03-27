@@ -37,6 +37,17 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 
 	public IntegerArrayList(int initialElements){data = new int[initialElements];}
 
+	public IntegerArrayList(String stringList){
+		this(0);
+		if (!stringList.equals("")) {
+			String[] SplitString = stringList.split(",");
+			for (String str : SplitString) {
+				add(Integer.valueOf(str));
+			}
+		}
+
+	}
+
 	public void fill(IntBuffer buf){Buffers.fillIntBuffer(buf, data, length);}
 
 	public void add(int index, int value)
@@ -196,6 +207,17 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 	}
 
 	public void write(int[] out, int begin) {System.arraycopy(data, 0, out, begin, size());}
+
+	public String toString(){
+		String str = "";
+		for (int i = 0; i < size(); ++i){
+			if (i > 0) {
+				str += ",";
+			}
+			str += String.valueOf(i);
+		}
+		return str;
+	}
 
     @Override
     public boolean removeIf(Predicate<? super Integer> predicate) {

@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import io.GameIO;
+import io.ObjectStateIO;
+import util.data.IntegerArrayList;
 
 public abstract class ObjectState implements Serializable {
 	/**
@@ -25,7 +27,11 @@ public abstract class ObjectState implements Serializable {
 	/*stacking objects on top of each other*/
 	public int aboveInstanceId = -1;
 	public int belowInstanceId = -1;
-	public int value;
+
+	public int liesOnId = -1;
+	public IntegerArrayList aboveLyingObectIds = new IntegerArrayList();
+
+	public int value = 0;
 	public int sortValue = 0;
 	public int drawValue = 0;
 	public int rotationStep = 90;
@@ -34,7 +40,8 @@ public abstract class ObjectState implements Serializable {
 	public boolean isFixed = false;
 
 
-    @Override
+
+	@Override
 	public int hashCode()
 	{
 		return posX ^ (posY << 16) ^ rotation ^ scale ^ owner_id;
@@ -51,7 +58,14 @@ public abstract class ObjectState implements Serializable {
 		this.inPrivateArea = state.inPrivateArea;
 		this.aboveInstanceId = state.aboveInstanceId;
 		this.belowInstanceId = state.belowInstanceId;
+		this.liesOnId = state.liesOnId;
+		this.aboveLyingObectIds.clear();
+		IntegerArrayList ial = new IntegerArrayList();
+		for (Integer i : state.aboveLyingObectIds){
+			this.aboveLyingObectIds.add(i);
+		}
 		this.value = state.value;
+		this.sortValue = state.sortValue;
 		this.rotationStep = state.rotationStep;
 		this.isFixed = state.isFixed;
 		this.lastChange = state.lastChange;
@@ -79,8 +93,9 @@ public abstract class ObjectState implements Serializable {
 		inPrivateArea = false;
 		aboveInstanceId = -1;
 		belowInstanceId = -1;
-		value = 0;
-		drawValue = 0;
+		liesOnId = -1;
+		aboveLyingObectIds.clear();
+		drawValue = 1;
 		rotationStep = 90;
 		isFixed = false;
 		lastChange = System.nanoTime();
@@ -91,7 +106,7 @@ public abstract class ObjectState implements Serializable {
 	{
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		try {
-			GameIO.writeObjectStateToStreamXml(this, bos);
+			ObjectStateIO.writeObjectStateToStreamXml(this, bos);
 		} catch (IOException e) {
 			return e.toString();
 		}
@@ -113,6 +128,8 @@ public abstract class ObjectState implements Serializable {
 	            && this.inPrivateArea == os.inPrivateArea
 	            && this.aboveInstanceId == os.aboveInstanceId
 	            && this.belowInstanceId == os.belowInstanceId
+				&& this.liesOnId == os.liesOnId
+				&& this.aboveLyingObectIds.equals(os.aboveLyingObectIds)
 	            && this.value == os.value
 	            && this.drawValue == os.drawValue
 	            && this.rotationStep == os.rotationStep

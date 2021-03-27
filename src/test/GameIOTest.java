@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
+import io.PlayerIO;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 
@@ -27,8 +28,8 @@ public class GameIOTest {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         Player res;
         try {
-            GameIO.writePlayerToStream(pl, bos);
-            res = GameIO.readPlayerFromStream(new ByteArrayInputStream(bos.toByteArray()));
+            PlayerIO.writePlayerToStream(pl, bos);
+            res = PlayerIO.readPlayerFromStream(new ByteArrayInputStream(bos.toByteArray()));
             res.playerAtTablePosition =4; //TODO Florian is this supposed to be not send?
             res.playerAtTableRotation = 2;
         } catch (IOException e) {

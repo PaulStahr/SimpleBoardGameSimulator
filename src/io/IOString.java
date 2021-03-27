@@ -66,4 +66,6 @@ public class IOString {
 	public static final String VISITOR = "visitor";
 	public static final String BOOK = "book";
 	public static final String SORT_VALUE = "sort_value";
+    public static final String LYING_ON = "lying_on";
+	public static final String LYING_ABOVE = "lying_above";
 }
