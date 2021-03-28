@@ -2,7 +2,6 @@ package io;
 
 import static java.lang.Integer.max;
 
-import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,18 +36,13 @@ import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectBook;
 import gameObjects.definition.GameObjectBook.BookSide;
-import gameObjects.definition.GameObjectBook.BookState;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectDice.DiceSide;
-import gameObjects.definition.GameObjectDice.DiceState;
 import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectFigure.FigureState;
 import gameObjects.definition.GameObjectToken;
-import gameObjects.definition.GameObjectToken.TokenState;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import gameObjects.instance.ObjectState;
 import main.Player;
 import net.AsynchronousGameConnection;
 import util.ArrayUtil;

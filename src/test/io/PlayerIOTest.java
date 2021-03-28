@@ -1,4 +1,4 @@
-package test;
+package test.io;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,25 +10,22 @@ import java.io.ObjectOutputStream;
 
 import org.junit.Test;
 
-import gameObjects.definition.GameObjectToken;
-import gameObjects.instance.ObjectState;
-import io.ObjectStateIO;
+import io.PlayerIO;
+import main.Player;
 
-public class ObjectStateIOTest {
+public class PlayerIOTest {
     @Test
-    public void testSimulateRead() throws IOException {
-        ObjectState state = new GameObjectToken.TokenState();
-        state.aboveLyingObectIds.add(3);
-        state.aboveLyingObectIds.add(6);
-        state.aboveLyingObectIds.add(1);
+    public void testSimulateRead() throws IOException, ClassNotFoundException {
+        Player player = new Player("Max", 53);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream objOut = new ObjectOutputStream(out);
-        ObjectStateIO.writeStateToStreamObject(objOut, state);
+        PlayerIO.writePlayerToStreamObject(objOut, player);
         objOut.close();
         out.close();
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
         ObjectInputStream objIn = new ObjectInputStream(in);
-        ObjectStateIO.simulateStateFromStreamObject(objIn, state);
+        PlayerIO.simulateEditPlayerFromObject(objIn);
         assertEquals("Stream has still bytes which were not scipped", 0, objIn.available());
     }
+
 }

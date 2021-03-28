@@ -58,17 +58,22 @@ public class PlayerIO {
         return player;
     }
 
+    public static void simulateEditPlayerFromObject(ObjectInputStream is) throws IOException, ClassNotFoundException
+    {
+        is.readObject();
+        long toScip = 5 * 4 + 6 * 8 + 1;
+        long skipped = StreamUtil.skip(is, toScip);
+        if (toScip != skipped)
+        {
+            throw new IOException("Needed to scip " + toScip + " bytes but got " + skipped);
+        }
+    }
 
     public static void editPlayerFromStreamObject(ObjectInputStream is, Player player) throws ClassNotFoundException, IOException
     {
         if (player == null)
         {
-            is.readObject();
-            long skipped = StreamUtil.skip(is, 68);
-            if (68 != skipped)
-            {
-                throw new IOException("Needed to scip " + 68 + " bytes but got " + skipped);
-            }
+            simulateEditPlayerFromObject(is);
             throw new NullPointerException();
         }
         player.setName((String)is.readObject());
