@@ -3,6 +3,7 @@
 <new_game>Neues Spiel</new_game>
 <update>Update</update>
 <refresh>Aktualisieren</refresh>
+<autorefresh>Automatisch Aktualisieren</autorefresh>
 <general>Allgemein</general>
 <game_objects>Spiel Objekte</game_objects>
 <game_object_instances>Spiel Objekt Instanzen</game_object_instances>

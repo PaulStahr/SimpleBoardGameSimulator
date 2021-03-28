@@ -4,6 +4,7 @@ public enum Words {
     new_game,
     update,
     refresh,
+    autorefresh,
     general,
     game_objects,
     game_object_instances,
