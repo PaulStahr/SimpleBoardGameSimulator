@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
-import io.GameIO;
 import io.ObjectStateIO;
 import util.data.IntegerArrayList;
 
@@ -59,11 +58,7 @@ public abstract class ObjectState implements Serializable {
 		this.aboveInstanceId = state.aboveInstanceId;
 		this.belowInstanceId = state.belowInstanceId;
 		this.liesOnId = state.liesOnId;
-		this.aboveLyingObectIds.clear();
-		IntegerArrayList ial = new IntegerArrayList();
-		for (Integer i : state.aboveLyingObectIds){
-			this.aboveLyingObectIds.add(i);
-		}
+		this.aboveLyingObectIds.set(state.aboveLyingObectIds);
 		this.value = state.value;
 		this.sortValue = state.sortValue;
 		this.rotationStep = state.rotationStep;

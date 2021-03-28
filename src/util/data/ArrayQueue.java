@@ -181,7 +181,8 @@ public class ArrayQueue<E> implements Queue<E>{
 		{
 			throw new NoSuchElementException();
 		}
-		E head = (E)data[begin];
+		@SuppressWarnings("unchecked")
+        E head = (E)data[begin];
 		++begin;
 		return head;
 	}
@@ -197,7 +198,8 @@ public class ArrayQueue<E> implements Queue<E>{
 		{
 			return null;
 		}
-		E head = (E)data[begin];
+		@SuppressWarnings("unchecked")
+        E head = (E)data[begin];
 		++begin;
 		return head;
 	}
@@ -208,7 +210,8 @@ public class ArrayQueue<E> implements Queue<E>{
 		{
 			throw new NoSuchElementException();
 		}
-		E head = (E)data[begin];
+		@SuppressWarnings("unchecked")
+        E head = (E)data[begin];
 		++begin;
 		return head;
 	}

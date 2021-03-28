@@ -8,6 +8,7 @@ import java.util.Comparator;
 
 import gameObjects.instance.ObjectInstance;
 import util.data.DoubleList;
+import util.data.IntegerArrayList;
 import util.data.IntegerList;
 
 public class ArrayUtil {
@@ -550,5 +551,20 @@ public class ArrayUtil {
             --size;
         }
         return result;
+    }
+
+    public static void unifySorted(IntegerArrayList ial) {
+        if (ial.isEmpty()) {return;}
+        int current = ial.getI(0);
+        int write = 0;
+        for (int read = 1; read < ial.size(); ++read)
+        {
+            if (current != ial.getI(read)){
+                ial.set(write++, current);
+                current = ial.getI(read);
+            }
+        }
+        ial.set(write, current);
+        ial.removeRange(write, ial.size());
     }
 }

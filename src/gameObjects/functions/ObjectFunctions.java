@@ -14,7 +14,10 @@ import javax.swing.SwingUtilities;
 
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.player.PlayerEditAction;
-import gameObjects.definition.*;
+import gameObjects.definition.GameObject;
+import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
@@ -275,7 +278,6 @@ public class ObjectFunctions {
     public static void getStack(GameInstance gameInstance, ObjectInstance objectInstance, IntegerArrayList objectStack) {
         getStackFromTop(gameInstance, objectInstance, objectStack);
     }
-
 
     private static void makeStack(GameInstance gameInstance, IntegerArrayList objectStack, IntegerArrayList oldPos, int actionSource, Player player){
         for (int i = 0; i < objectStack.size(); i++) {
@@ -939,9 +941,9 @@ public class ObjectFunctions {
         ial.removeIf(new Predicate<Integer>() {
             @Override
             public boolean test(Integer id) {
-                ObjectInstance oi = gameInstance.getObjectInstanceById(id);
-                p.setLocation(oi.state.posX, oi.state.posY);
-                gamePanel.getBoardToScreenTransform().transform(p, p);
+                ObjectState state = gameInstance.getObjectInstanceById(id).state;
+                p.setLocation(state.posX, state.posY);
+                gamePanel.boardToScreenPos(p, p);
                 return !shape.contains(p);
             }
         });
@@ -1361,7 +1363,7 @@ public class ObjectFunctions {
             for (int i = 0; i < stackElements.size(); ++i) {
                 ObjectInstance currentObject = gameInstance.getObjectInstanceById(stackElements.getI(i));
                 if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1 && !ObjectFunctions.objectIsSelectedByOtherPlayer(gameInstance, player, currentObject.id)) {
-                    if (side != 0){flipTokenToSide(gamePanel.id, gameInstance, player, currentObject, side == 1);}
+                    if (side != SIDE_UNCHANGED){flipTokenToSide(gamePanel.id, gameInstance, player, currentObject, side == SIDE_TO_FRONT);}
                     ObjectState state = currentObject.state.copy();
                     state.rotation = currentObject.state.originalRotation;
                     if (i == 0 && stackElements.size() > 1) {

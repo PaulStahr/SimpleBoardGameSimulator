@@ -37,7 +37,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
@@ -84,7 +91,6 @@ import geometry.TransformConversion;
 import geometry.Vector2d;
 import io.GameIO;
 import main.Player;
-import util.Pair;
 import util.StringUtils;
 import util.TimedUpdateHandler;
 import util.data.DoubleArrayList;
@@ -195,7 +201,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public Set<Integer> downKeys = new HashSet<>();
 	
-	TimedUpdateHandler autosave = new TimedUpdateHandler() {
+	private final TimedUpdateHandler autosave = new TimedUpdateHandler() {
 		@Override
 		public void update() {
 			if (isVisible())
@@ -210,7 +216,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					logger.error("Can't create autosave", e);
 				}
 			}
-			
 		}
 		
 		@Override
@@ -322,7 +327,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		//Redraw selected objects not in some private area
 		ial.clear();
 		for (int id : selectedObjects){
-			ial.add(id);
+		    if (!ial.contains(id)) {ial.add(id);}
 			ObjectFunctions.getAllAboveLyingObjects(this, gameInstance, player, gameInstance.getObjectInstanceById(id), ial2);
 			for(int id2 : ial2){
 				if (!ial.contains(id2)){
@@ -331,6 +336,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 		ObjectFunctions.sortByDrawValue(gameInstance, ial);
+		//ArrayUtil.unifySorted(ial);
 		drawObjectsFromList(this, g, gameInstance, player, ial, ial2);
 
 
@@ -535,7 +541,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				screenToBoardPos(arg0.getX(), arg0.getY(), mousePressedGamePos);
 				mouseBoardPos.set(mousePressedGamePos);
 				mouseInPrivateArea = ObjectFunctions.isInPrivateArea(this, mouseBoardPos.getXI(), mouseBoardPos.getYI());
-				this.updateSelectedObjects(this, gameInstance, player);
+				GamePanel.updateSelectedObjects(this, gameInstance, player);
 				if (!isSelectStarted && hoveredObject == null) {
 					if (!arg0.isControlDown()) {
 						ObjectFunctions.deselectAllSelected(this, gameInstance, player, ial);
@@ -1197,48 +1203,44 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		return this.selectedObjects;
 	}
 
+	private static void sortObjectsByDrawValue(
+	        IntegerArrayList selectedObjects,
+	        IntegerArrayList ial,
+	        IntegerArrayList objOrigPosX,
+	        IntegerArrayList objOrigPosY,
+	        GameInstance gameInstance)
+	{
+	    ial.set(selectedObjects);
+        IntegerArrayList sortedObjPosX = new IntegerArrayList();
+        IntegerArrayList sortedObjPosY = new IntegerArrayList();
+        if (objOrigPosX.size() > 0) {
+            for (int i = 0; i < selectedObjects.size();++i) {
+                sortedObjPosX.add(0);
+                sortedObjPosY.add(0);
+            }
+        }
+        ial.sort(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return gameInstance.getObjectInstanceById(o1).state.drawValue - gameInstance.getObjectInstanceById(o2).state.drawValue;
+            }
+        });
+        if (objOrigPosX.size() > 0) {
+            for (int i = 0; i < ial.size(); ++i) {
+                int idx = selectedObjects.indexOf(ial.getI(i));
+                sortedObjPosX.set(i, objOrigPosX.getI(idx));
+                sortedObjPosY.set(i, objOrigPosY.getI(idx));
+            }
+        }
+        selectedObjects.set(ial);
+        if (sortedObjPosX.size() > 0) {
+            objOrigPosX.set(sortedObjPosX);
+            objOrigPosY.set(sortedObjPosY);
+        }
+	}
+	
 	public void sortSelectedObjects(){
-		ial.clear();
-		for (Integer i : selectedObjects){
-			ial.add(i);
-		}
-		IntegerArrayList sortedObjPosX = new IntegerArrayList();
-		IntegerArrayList sortedObjPosY = new IntegerArrayList();
-		if (objOrigPosX.size() > 0) {
-			for (int i : selectedObjects) {
-				sortedObjPosX.add(0);
-			}
-			for (int i : selectedObjects) {
-				sortedObjPosY.add(0);
-			}
-		}
-
-		ial.sort(new Comparator<Integer>() {
-			@Override
-			public int compare(Integer o1, Integer o2) {
-				return gameInstance.getObjectInstanceById(o1).state.drawValue - gameInstance.getObjectInstanceById(o2).state.drawValue;
-			}
-		});
-		if (objOrigPosX.size() > 0) {
-			for (int i = 0; i < ial.size(); ++i) {
-
-
-				int idx = selectedObjects.indexOf(ial.get(i));
-				sortedObjPosX.set(i, objOrigPosX.getI(idx));
-				sortedObjPosY.set(i, objOrigPosY.getI(idx));
-			}
-			objOrigPosX.clear();
-			objOrigPosY.clear();
-		}
-		selectedObjects.clear();
-
-		for (int i = 0; i < ial.size(); ++i){
-			selectedObjects.add(ial.get(i));
-			if (sortedObjPosX.size() > 0) {
-				objOrigPosX.add(sortedObjPosX.get(i));
-				objOrigPosY.add(sortedObjPosY.get(i));
-			}
-		}
+		sortObjectsByDrawValue(selectedObjects, ial, objOrigPosX, objOrigPosY, gameInstance);
 	}
 
 	class SheetPanel extends JPanel implements LanguageChangeListener{
