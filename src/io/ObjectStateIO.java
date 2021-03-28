@@ -24,11 +24,19 @@ public class ObjectStateIO {
 
     public static void simulateStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
     {
-        int skip = 41;
-        if (state instanceof GameObjectToken.TokenState)      {skip += 1;}
+        int skip = 13 * 4 + 2;
+        if (state instanceof GameObjectToken.TokenState)
+        {
+            skip -= StreamUtil.skip(is, 12);
+            skip += is.readInt() * 4 + 1;
+        }
         else if (state instanceof GameObjectDice.DiceState)  {skip += 4;}
         else if (state instanceof GameObjectFigure.FigureState){skip += 1;}
-        StreamUtil.skip(is, skip);
+        long skipped = StreamUtil.skip(is, skip);
+        if (skip != skipped)
+        {
+            throw new IOException("Needed to scip " + skip + " bytes but got " + skipped);
+        }
     }
 
 
