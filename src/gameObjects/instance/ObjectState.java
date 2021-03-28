@@ -28,7 +28,7 @@ public abstract class ObjectState implements Serializable {
 	public int belowInstanceId = -1;
 
 	public int liesOnId = -1;
-	public IntegerArrayList aboveLyingObectIds = new IntegerArrayList();
+	public final IntegerArrayList aboveLyingObectIds = new IntegerArrayList();
 
 	public int value = 0;
 	public int sortValue = 0;

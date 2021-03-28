@@ -22,6 +22,7 @@ import logging.LockbackUtil;
 import net.AsynchronousGameConnection;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
+import util.JFrameUtils;
 
 
 public class Main {
@@ -101,9 +102,14 @@ public class Main {
     	}
     	try {
     		int port = 8000 + (int)(Math.random() * 100);
-    		ServerLobbyWindow slw = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection("127.0.0.1", port), lh);
-        	slw.setVisible(true);
-        	slw.setSize(300,100);
+    		JFrameUtils.runByDispatcherAndWait(new Runnable() {
+    		    @Override
+                public void run() {
+    	            ServerLobbyWindow slw = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection("127.0.0.1", port), lh);
+    	            slw.setVisible(true);
+    	            slw.setSize(300,100);
+    		    }
+    		});
         	test.SimpleNetworkServertest.localTwoInstanceTest(port, lh);
 		} catch (IOException | JDOMException e) {
 			// TODO Auto-generated catch block

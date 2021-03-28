@@ -7,7 +7,12 @@ import javax.swing.JPasswordField;
 
 public class PasswordDialog extends JOptionPane{
 	
-	public static int showOptionDialog(String message, String yes, String no, JPasswordField pass)
+	/**
+     * 
+     */
+    private static final long serialVersionUID = -3884312520153866856L;
+
+    public static int showOptionDialog(String message, String yes, String no, JPasswordField pass)
 	{
 		JPanel panel = new JPanel();
 		JLabel label = new JLabel(message);

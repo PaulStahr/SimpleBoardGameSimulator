@@ -286,37 +286,28 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
     {
         try
         {
+            objOut.writeUnshared(action);
             if (action instanceof GameObjectInstanceEditAction)
             {
-                objOut.writeUnshared(action);
                 ObjectStateIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).state);
-                ++outputEvents;
             }
             else if (action instanceof PlayerEditAction)
             {
-                objOut.writeUnshared(action);
                 if (!(action instanceof PlayerMousePositionUpdate || action instanceof PlayerCharacterPositionUpdate)) {
                     PlayerIO.writePlayerToStreamObject(objOut, ((PlayerEditAction)action).getEditedPlayer(gi));}
-                ++outputEvents;
             }
             else if (action instanceof UsertextMessageAction
                     || action instanceof UserFileMessage
                     || action instanceof UserSoundMessageAction
                     || action instanceof TetrisGameEvent)
-            {
-                objOut.writeUnshared(action);
-                ++outputEvents;
-               }
+            {}
             else if (action instanceof GameObjectEditAction)
             {
-                objOut.writeUnshared(action);
                 GameIO.writeObjectToStreamObject(objOut, ((GameObjectEditAction)action).getObject(gi));
-                ++outputEvents;
             }
             else if (action instanceof GameStructureEditAction)
             {
                 GameStructureEditAction gs = (GameStructureEditAction)action;
-                objOut.writeUnshared(gs);
                 if (gs instanceof PlayerAddAction)
                 {
                     PlayerIO.writePlayerToStreamObject(objOut, ((PlayerAddAction)action).getPlayer(gi));
@@ -347,12 +338,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                             break;
                     }
                 }
-                ++outputEvents;
             }
             else
             {
                 logger.warn("Unknown actiontype " + action.getClass());
+                return;
             }
+            ++outputEvents;
         }
         catch ( Exception e ) {
             logger.error("Error at emmiting Game Action", e);
@@ -556,7 +548,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                 }
                 if (inputObject instanceof CommandScip)
                 {
-                    StreamUtil.skip(objIn,((CommandScip)inputObject).bytes);
+                    long bytes = ((CommandScip)inputObject).bytes;
+                    long scipped = StreamUtil.skip(objIn, bytes);
+                    if (bytes != scipped)
+                    {
+                        logger.warn("Needed to scip " + bytes + " bytes but got " + scipped);
+                    }
                     continue;
                 }
                 if (inputObject instanceof CommandPingForward)

@@ -659,11 +659,7 @@ public class ObjectFunctions {
     }
 
     private static boolean isValidLieOnObject(GameInstance gameInstance, Player player, ObjectInstance oi){
-        if (!oi.state.isFixed && !oi.state.inPrivateArea && (oi.state.owner_id == -1 || oi.state.owner_id == player.id))
-        {
-            return true;
-        }
-        return  false;
+        return !oi.state.isFixed && !oi.state.inPrivateArea && (oi.state.owner_id == -1 || oi.state.owner_id == player.id);
     }
 
 
@@ -768,7 +764,7 @@ public class ObjectFunctions {
 
     public static ObjectInstance getNearestObjectByPosition(GamePanel gamePanel, GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, IntegerArrayList ignoredObjects) {
         ObjectInstance currentObject = getNearestObjectByPosition(gamePanel, gameInstance, player, xPos, yPos, zooming, 0, ignoredObjects);
-        if (haveSamePositions(getStackTop(gameInstance, currentObject), getStackBottom(gameInstance, currentObject)) && currentObject.state.inPrivateArea == false) {
+        if (haveSamePositions(getStackTop(gameInstance, currentObject), getStackBottom(gameInstance, currentObject)) && !currentObject.state.inPrivateArea) {
             return getStackTop(gameInstance, currentObject);
         } else {
             return currentObject;
@@ -1032,7 +1028,7 @@ public class ObjectFunctions {
                     diceState.unfold = false;
                 }
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, oi, state));
-                gamePanel.updateSelectedObjects(gamePanel, gameInstance,player);
+                GamePanel.updateSelectedObjects(gamePanel, gameInstance,player);
             }
         }
     }
@@ -1880,14 +1876,10 @@ public class ObjectFunctions {
 
     public static boolean isInTableMiddle(GamePanel gamePanel, int xi, int yi) {
         Shape shape = gamePanel.table.stackerShape;
-            Point2D transformedPoint = gamePanel.getBoardToScreenTransform().transform(new Point2D.Double(xi, yi), null);
-            if(shape != null){
-                if(transformedPoint != null && shape.contains(transformedPoint)){
-                    return true;
-                }
-            }
-            return false;
-        }
+        Point2D transformedPoint = new Point2D.Double(xi, yi);
+        transformedPoint = gamePanel.getBoardToScreenTransform().transform(transformedPoint, transformedPoint);
+        return shape != null && shape.contains(transformedPoint);
+    }
 
     public static void takeTrick(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial) {
         stackObjectsInTableMiddleToOneSide(gamePanel, gameInstance, player, objectInstance, ial, SIDE_TO_BACK);

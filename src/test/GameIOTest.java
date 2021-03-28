@@ -1,17 +1,16 @@
 package test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import io.PlayerIO;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 
-import io.GameIO;
+import io.PlayerIO;
 import main.Player;
 
 public class GameIOTest {
@@ -37,6 +36,6 @@ public class GameIOTest {
         } catch (JDOMException e) {
             throw new AssertionError(e);
         }
-        assertTrue(pl.toStringAdvanced() + "!=" + res.toStringAdvanced(), res.equals(pl));
+        assertEquals(pl.toStringAdvanced() + "!=" + res.toStringAdvanced(), res,pl);
     }
 }

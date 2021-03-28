@@ -105,9 +105,7 @@ public class SimpleNetworkServertest {
 
 			try {
 				Thread.sleep(800);
-			} catch (InterruptedException e) {
-			}
-
+			} catch (InterruptedException e) {}
 
 			Player player1 = new Player("Florian", 2);
 			GameWindow gw = connectAndJoinGame(address, port, player1, "Testsession", lh);
