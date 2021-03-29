@@ -604,7 +604,7 @@ public class ObjectFunctions {
         int distance = Integer.MAX_VALUE;
         for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
-            int dist = objectDist(xPos, yPos, oi);
+            int dist = getObjectDistanceTo(oi, xPos, yPos);
             if (dist < distance && isOnObject(xPos, yPos, oi, player.id, maxInaccuracy)) {
                 activeObject = getStackTop(gameInstance, oi);
                 distance = dist;
@@ -615,12 +615,6 @@ public class ObjectFunctions {
 
     public static ObjectInstance getTopActiveObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos) {
         return getTopActiveObjectByPosition(gameInstance, player, xPos, yPos, 0);
-    }
-
-    private static int objectDist(int xPos, int yPos, ObjectInstance oi){
-        int xDiff = xPos - oi.state.posX, yDiff = yPos - oi.state.posY;
-        int dist = xDiff * xDiff + yDiff * yDiff;
-        return dist;
     }
 
     private static void getRelativeObjectBorderPoints(int playerId, ObjectInstance oi, ArrayList<Point2D> BorderPoints){
@@ -1409,11 +1403,10 @@ public class ObjectFunctions {
     }
 
     public static int getObjectDistanceTo(ObjectInstance objectInstance, int posX, int posY) {
-        int diffX = (posX - (objectInstance.state.posX));
-        int diffY = (posY - (objectInstance.state.posY));
+        int diffX = posX - objectInstance.state.posX;
+        int diffY = posY - objectInstance.state.posY;
         return diffX * diffX + diffY * diffY;
     }
-
 
     public static void insertIntoStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance objectAbove, ObjectInstance objectBelow, int cardMargin) {
         if (objectInstance != null) {//TODO Florian check
@@ -1659,10 +1652,7 @@ public class ObjectFunctions {
     }
 
     public static boolean isInPrivateArea(GamePanel gamePanel, int posX, int posY) {
-        if(gamePanel.privateArea != null) {
-            return gamePanel.privateArea.containsBoardCoordinates(posX, posY);
-        }
-        return false;
+        return gamePanel.privateArea != null && gamePanel.privateArea.containsBoardCoordinates(posX, posY);
     }
 
 
@@ -1710,19 +1700,14 @@ public class ObjectFunctions {
     public static void getDrawOrder(GameInstance gameInstance, IntegerArrayList ial){
         ial.clear();
         ArrayList<ObjectInstance> drawValues = new ArrayList<>();
-        for (int idx = 0; idx<gameInstance.getObjectNumber(); ++idx){
-        	drawValues.add(gameInstance.getObjectInstanceByIndex(idx));
-        }
+        integerArrayListToObjectList(gameInstance, ial, drawValues);
         drawValues.sort(new Comparator<ObjectInstance>() {
             @Override
             public int compare(ObjectInstance o1, ObjectInstance o2) {
                 return o1.state.drawValue - o2.state.drawValue;
             }
         });
-        for (ObjectInstance instance:drawValues)
-        {
-            ial.add(instance.id);
-        }
+        objectListToIntegerArrayList(ial, drawValues);
     }
 
     public static void integerArrayListToObjectList(GameInstance gameInstance, IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
@@ -1732,7 +1717,7 @@ public class ObjectFunctions {
         }
     }
 
-    public static void objectListToIntegerArrayList(GameInstance gameInstance, IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
+    public static void objectListToIntegerArrayList(IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
         ial.clear();
         for (ObjectInstance oi : oiList){
             ial.add(oi.id);
@@ -1852,24 +1837,23 @@ public class ObjectFunctions {
 
         int counter = 0;
         int playerCounter = 0;
+        IntegerArrayList integerList = new IntegerArrayList();
         for(Player player : gameInstance.getPlayerList())
         {
             //Set trick num to zero
             player.trickNum = 0;
             gameInstance.update(new PlayerEditAction(gamePanel.id, player, player));
-            int currentElementIndex = 0;
-            while(currentElementIndex < numElements){
+            for (int currentElementIndex = 0; currentElementIndex < numElements; ++currentElementIndex){
                 int Pos = numElements*playerCounter + currentElementIndex;
                 takeObjects(gamePanel,gameInstance,player, gameInstance.getObjectInstanceById(ial.getI(Pos)));
-                currentElementIndex+=1;
             }
             if(counter < modElements){
                 int Pos = numElements*playerNum + counter;
                 takeObjects(gamePanel,gameInstance,player, gameInstance.getObjectInstanceById(ial.getI(Pos)));
                 counter+= 1;
             }
-            IntegerArrayList integerList = new IntegerArrayList();
             sortHandCardsByValue(gamePanel, gameInstance, player, integerList, oiList, false);
+            integerList.clear();
             ++playerCounter;
         }
     }
