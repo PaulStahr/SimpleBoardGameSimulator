@@ -118,4 +118,8 @@
     <load_game>Spiel Laden</load_game>
     <create_game>Spiel Erstellen</create_game>
     <debug>Testmodus</debug>
+    <cards>Karten</cards>
+    <figures>Figuren</figures>
+    <dices>Würfel</dices>
+    <books>Bücher</books>
 </xml>

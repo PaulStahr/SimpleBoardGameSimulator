@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import data.Texture;
-import gameObjects.GameObjectColumnType;
+import gameObjects.columnTypes.GameObjectColumnType;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 import util.ArrayTools;

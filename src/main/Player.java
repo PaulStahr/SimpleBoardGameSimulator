@@ -5,7 +5,7 @@ import java.awt.geom.AffineTransform;
 import java.util.List;
 import java.util.Random;
 
-import gameObjects.PlayerColumnType;
+import gameObjects.columnTypes.PlayerColumnType;
 import gameObjects.instance.GameInstance;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;

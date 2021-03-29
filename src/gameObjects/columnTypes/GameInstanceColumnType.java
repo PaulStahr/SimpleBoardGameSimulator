@@ -1,5 +1,6 @@
-package gameObjects;
+package gameObjects.columnTypes;
 
+import gameObjects.GameMetaInfo;
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
 import util.data.UniqueObjects;
