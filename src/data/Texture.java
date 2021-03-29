@@ -25,11 +25,12 @@ public class Texture {
         this.data = in == null ? null : StreamUtil.toByteArray(in);
         this.suffix = suffix;
     }
-    
+
     public Texture(byte[] data, String suffix) {
         this.data = data;
         img = null;
     }
+
     public Texture(BufferedImage img, String suffix) {
         this.img = img;
         this.suffix = suffix;

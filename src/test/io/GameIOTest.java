@@ -2,40 +2,30 @@ package test.io;
 
 import static org.junit.Assert.assertEquals;
 
-import java.awt.Color;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.awt.image.BufferedImage;
 
-import org.jdom2.JDOMException;
+import org.jdom2.Element;
 import org.junit.Test;
 
-import io.PlayerIO;
-import main.Player;
+import data.Texture;
+import gameObjects.definition.GameObject;
+import gameObjects.definition.GameObjectToken;
+import gameObjects.instance.Game;
+import io.GameIO;
 
 public class GameIOTest {
     @Test
-    public void testXmlPlayer()
+    public void testXmlObject()
     {
-        Player pl = new Player("Player", 42);
-        pl.color = Color.CYAN;
-        pl.mouseXPos = 43;
-        pl.mouseYPos = 44;
-        pl.playerAtTablePosition =4;
-        pl.playerAtTableRotation = 2;
-        pl.playerAtTableTransform.setTransform(1,2,3,4,5,6);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        Player res;
-        try {
-            PlayerIO.writePlayerToStream(pl, bos);
-            res = PlayerIO.readPlayerFromStream(new ByteArrayInputStream(bos.toByteArray()));
-            res.playerAtTablePosition =4; //TODO Florian is this supposed to be not send?
-            res.playerAtTableRotation = 2;
-        } catch (IOException e) {
-            throw new AssertionError(e);
-        } catch (JDOMException e) {
-            throw new AssertionError(e);
-        }
-        assertEquals(pl.toStringAdvanced() + "!=" + res.toStringAdvanced(), res,pl);
+        Game game = new Game();
+        Texture foo = new Texture(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "png");
+        Texture bar = new Texture(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "png");
+        game.images.put("foo.png",foo);
+        game.images.put("bar.png",bar);
+        GameObjectToken token = new GameObjectToken("baz", "card", 10, 2, foo, bar, 1, 2, 3, 4);
+        GameObject res;
+        Element elem = GameIO.createElementFromGameObject(token, game);
+        res = GameIO.createGameObjectFromElement(elem, game.images);
+        assertEquals(token.toStringAdvanced() + "!=" + res.toStringAdvanced(), res,token);
     }
 }
