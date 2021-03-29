@@ -1,4 +1,4 @@
-package gameObjects;
+package gameObjects.columnTypes;
 
 import gameObjects.instance.ObjectInstance;
 import util.ArrayTools;
@@ -11,6 +11,8 @@ import util.jframe.table.ValueColumnTypes;
 public enum GameObjectInstanceColumnType implements TableColumnType{
 	ID("id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
+	POSX("xpos", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
+	POSY("ypos", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	OWNER("owner", ValueColumnTypes.TYPE_COMBOBOX, "Unnamed", null),
 	ABOVE("above", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	BELOW("below", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
@@ -63,6 +65,8 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
 			case DELETE:	return "Delete";
 			case ID:		return gi.id;
 			case NAME:		return gi.go.uniqueObjectName;
+			case POSX:		return gi.state.posX;
+			case POSY:		return gi.state.posY;
 			case ABOVE:		return gi.state.aboveInstanceId;
 			case BELOW:		return gi.state.belowInstanceId;
 			case OWNER:		return gi.owner_id();

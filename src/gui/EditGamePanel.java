@@ -41,10 +41,10 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.Document;
 
 import data.Texture;
-import gameObjects.GameObjectColumnType;
-import gameObjects.GameObjectInstanceColumnType;
-import gameObjects.ImageColumnType;
-import gameObjects.PlayerColumnType;
+import gameObjects.columnTypes.GameObjectColumnType;
+import gameObjects.columnTypes.GameObjectInstanceColumnType;
+import gameObjects.columnTypes.ImageColumnType;
+import gameObjects.columnTypes.PlayerColumnType;
 import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
@@ -52,7 +52,7 @@ import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerRemoveAction;
-import gameObjects.definition.GameObject;
+import gameObjects.definition.*;
 import gameObjects.functions.CheckingFunctions;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
@@ -74,14 +74,28 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final GameInstance gi;
 	private final DefaultTableModel tableModelGameObjectInstances= new TableModel(ObjectInstance.TYPES);
 	private final DefaultTableModel tableModelGameObjects= new TableModel(GameObject.TYPES);
+
+	private final DefaultTableModel tableModelCards = new TableModel(GameObjectToken.TOKEN_ATTRIBUTES);
+	private final DefaultTableModel tableModelFigures = new TableModel(GameObjectFigure.FIGURE_ATTRIBUTES);
+	private final DefaultTableModel tableModelDices = new TableModel(GameObjectDice.DICE_ATTRIBUTES);
+	private final DefaultTableModel tableModelBooks = new TableModel(GameObjectBook.BOOK_ATTRIBUTES);
 	private final DefaultTableModel tableModelImages= new TableModel(IMAGE_TYPES);
 	private final DefaultTableModel tableModelPlayer = new TableModel(Player.TYPES);
 	private final JTable tableGameObjectInstances = new JTable(tableModelGameObjectInstances);
 	private final JTable tableGameObjects = new JTable(tableModelGameObjects);
+	//Tables for Objects and Images
+	private final JTable tableCards = new JTable(tableModelCards);
+	private final JTable tableFigures = new JTable(tableModelFigures);
+	private final JTable tableDices = new JTable(tableModelDices);
+	private final JTable tableBooks = new JTable(tableModelBooks);
 	private final JTable tableImages = new JTable(tableModelImages);
 	private final JTable tablePlayer = new JTable(tableModelPlayer);
 	private final JScrollPane scrollPaneGameObjectInstances = new JScrollPane(tableGameObjectInstances);
 	private final JScrollPane scrollPaneGameObjects = new JScrollPane(tableGameObjects);
+	private final JScrollPane scrollPaneCards = new JScrollPane(tableCards);
+	private final JScrollPane scrollPaneFigures = new JScrollPane(tableFigures);
+	private final JScrollPane scrollPaneDices = new JScrollPane(tableDices);
+	private final JScrollPane scrollPaneBooks = new JScrollPane(tableBooks);
 	private final JScrollPane scrollPaneImages = new JScrollPane(tableImages);
 	private final JScrollPane scrollPanePlayer = new JScrollPane(tablePlayer);
 	private final GeneralPanel panelGeneral;
@@ -106,6 +120,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		tabPane.addTab(language.getString(Words.general), panelGeneral);
 		tabPane.addTab(language.getString(Words.game_objects), scrollPaneGameObjects);
 		tabPane.addTab(language.getString(Words.game_object_instances), scrollPaneGameObjectInstances);
+		tabPane.addTab(language.getString(Words.cards), scrollPaneCards);
+		tabPane.addTab(language.getString(Words.figures), scrollPaneFigures);
+		tabPane.addTab(language.getString(Words.dices), scrollPaneDices);
+		tabPane.addTab(language.getString(Words.books), scrollPaneBooks);
 		tabPane.addTab(language.getString(Words.images), scrollPaneImages);
 		tabPane.addTab(language.getString(Words.player), scrollPanePlayer);
         languageChanged(lh.getCurrentLanguage());
@@ -219,6 +237,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			tableModelImages.addTableModelListener(EditGamePanel.this);
 			tableModelGameObjects.addTableModelListener(EditGamePanel.this);
 			tableModelGameObjectInstances.addTableModelListener(EditGamePanel.this);
+			tableModelCards.addTableModelListener(EditGamePanel.this);
 			languageChanged(lh.getCurrentLanguage());
 			lh.addLanguageChangeListener(this);
  		}
@@ -325,6 +344,13 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		isUpdating = true;
 		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, null, deleteObjectColumn);
 		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
+
+		JFrameUtils.updateTable(tableCards, scrollPaneCards, gi.getTokenList(), GameObjectToken.TOKEN_ATTRIBUTES, tableModelCards, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
+		JFrameUtils.updateTable(tableFigures, scrollPaneFigures, gi.getFigureList(), GameObjectFigure.FIGURE_ATTRIBUTES, tableModelCards, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
+		JFrameUtils.updateTable(tableDices, scrollPaneDices, gi.getDiceList(), GameObjectDice.DICE_ATTRIBUTES, tableModelCards, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
+		JFrameUtils.updateTable(tableBooks, scrollPaneBooks, gi.getBookList(), GameObjectBook.BOOK_ATTRIBUTES, tableModelCards, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
+
+
 		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.entrySet().toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, null, deleteImageColumn);
 		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(true), Player.TYPES, tableModelPlayer, null, deletePlayerColumn, repairPlayerColumn);
 		panelGeneral.update();
@@ -525,6 +551,14 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 							case BELOW:
 								int NewBelowId = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());
 								state.belowInstanceId = NewBelowId;
+							case POSX:
+								int NewXPos = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());
+								state.posX = NewXPos;
+								gi.update(new GameObjectInstanceEditAction(gamePanel.id, player, instance, state));
+							case POSY:
+								int NewYPos = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());
+								state.posY = NewYPos;
+								gi.update(new GameObjectInstanceEditAction(gamePanel.id, player, instance, state));
 							break;
 							default:break;
 						}

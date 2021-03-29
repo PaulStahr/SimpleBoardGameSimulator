@@ -1,4 +1,4 @@
-package gameObjects;
+package gameObjects.columnTypes;
 
 import java.awt.image.BufferedImage;
 import java.util.Map.Entry;

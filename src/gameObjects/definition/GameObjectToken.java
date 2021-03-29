@@ -1,15 +1,25 @@
 package gameObjects.definition;
 
 import data.Texture;
+import gameObjects.columnTypes.GameObjectColumnType;
+import gameObjects.columnTypes.GameObjectInstanceColumnType;
+import gameObjects.columnTypes.GameObjectTokenColumnType;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
+import util.ArrayTools;
+import util.jframe.table.TableColumnType;
+
+import java.util.List;
 
 public class GameObjectToken extends GameObject{
 	private String downsideLookId;
 	private String upsideLookId;
 	private Texture downsideLook;
     private Texture upsideLook;
-	
+
+	public static final List<TableColumnType> TOKEN_ATTRIBUTES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectTokenColumnType.ID, GameObjectTokenColumnType.NAME, GameObjectTokenColumnType.POSX, GameObjectTokenColumnType.POSY, GameObjectTokenColumnType.OWNER, GameObjectTokenColumnType.ABOVE, GameObjectTokenColumnType.BELOW, GameObjectTokenColumnType.RESET, GameObjectTokenColumnType.DELETE});
+
+
 	public String getDownsideLookId(){return downsideLookId;}
 	
 	public String getUpsideLookId(){return upsideLookId;}

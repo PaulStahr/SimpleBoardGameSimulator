@@ -1,6 +1,6 @@
-package gameObjects;
+package gameObjects.columnTypes;
 
-import gameObjects.definition.GameObject;
+import main.Player;
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
 import util.ArrayUtil;
@@ -8,23 +8,18 @@ import util.data.UniqueObjects;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.ValueColumnTypes;
 
-public enum GameObjectColumnType implements TableColumnType{
+public enum PlayerColumnType implements TableColumnType{
 	ID("id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
-	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
+	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null),
+	REPAIR("Repair", ValueColumnTypes.TYPE_BUTTON, "Repair", null);
 	
-    private static final GameObjectColumnType ct[] = GameObjectColumnType.values();
+    private static final PlayerColumnType ct[] = PlayerColumnType.values();
     private static final String[] columnNames = TableColumnType.getColumnNames(ct);
     
-    public static final int size()
-    {
-    	return ct.length;
-    }
+    public static final int size(){return ct.length;}
     
-    public static final GameObjectColumnType get(int index)
-    {
-    	return ct[index];
-    }
+    public static final PlayerColumnType get(int index){return ct[index];}
     
 	public final String name;
 	public final Class<?> cl;
@@ -32,7 +27,7 @@ public enum GameObjectColumnType implements TableColumnType{
 	public final Object defaultValue;
 	public final UnmodifiableArrayList<String> possibleValues;
 	
-	private GameObjectColumnType(String name, byte optionType, Object defaultValue, String possibleValues[]) {
+	private PlayerColumnType(String name, byte optionType, Object defaultValue, String possibleValues[]) {
 		this.name = name;
 		this.optionType = optionType;
 		this.cl = TableColumnType.getColumnClass(optionType);
@@ -40,7 +35,7 @@ public enum GameObjectColumnType implements TableColumnType{
 		this.defaultValue = defaultValue;
 	}
 	
-	public static GameObjectColumnType getByName(String name) {
+	public static PlayerColumnType getByName(String name) {
 		int index = ArrayUtil.firstEqualIndex(columnNames, name);
 		return index < 0 ? null : ct[index];
 	}
@@ -67,12 +62,13 @@ public enum GameObjectColumnType implements TableColumnType{
 	
 	@Override
 	public Object getValue(Object obj) {
-		GameObject gi = (GameObject)obj;
+		Player gi = (Player)obj;
 		switch (this)
 		{
 			case DELETE:	return "Delete";
-			case ID:		return gi.uniqueObjectName;
-			case NAME:		return gi.uniqueObjectName;
+			case REPAIR:	return "Repair";
+			case ID:		return gi.id;
+			case NAME:		return gi.getName();
 			default:throw new IllegalArgumentException(getName());
 		}
 	}

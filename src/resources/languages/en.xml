@@ -125,4 +125,8 @@
     <load_game>Load Game</load_game>
     <create_game>Create Game</create_game>
     <debug>Debug</debug>
+    <cards>Cards</cards>
+    <figures>Figures</figures>
+    <dices>Dices</dices>
+    <books>Books</books>
 </xml>

@@ -3,7 +3,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import data.Texture;
-import gameObjects.GameObjectInstanceColumnType;
+import gameObjects.columnTypes.GameObjectInstanceColumnType;
 import gameObjects.definition.GameObject;
 import gui.GamePanel;
 import main.Player;
@@ -12,7 +12,7 @@ import util.ArrayTools.ObjectToIntTransform;
 import util.jframe.table.TableColumnType;
 
 public class ObjectInstance {
-	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectInstanceColumnType.ID, GameObjectInstanceColumnType.NAME, GameObjectInstanceColumnType.OWNER, GameObjectInstanceColumnType.ABOVE, GameObjectInstanceColumnType.BELOW, GameObjectInstanceColumnType.RESET, GameObjectInstanceColumnType.DELETE});
+	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectInstanceColumnType.ID, GameObjectInstanceColumnType.NAME, GameObjectInstanceColumnType.POSX, GameObjectInstanceColumnType.POSY, GameObjectInstanceColumnType.OWNER, GameObjectInstanceColumnType.ABOVE, GameObjectInstanceColumnType.BELOW, GameObjectInstanceColumnType.RESET, GameObjectInstanceColumnType.DELETE});
 	public static final Comparator<? super ObjectInstance> ID_COMPARATOR = new Comparator<ObjectInstance>() {
 		@Override
 		public int compare(ObjectInstance o1, ObjectInstance o2) {

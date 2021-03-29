@@ -37,7 +37,7 @@ import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
 import data.Options;
 import data.Options.OptionTreeNode;
-import gameObjects.GameInstanceColumnType;
+import gameObjects.columnTypes.GameInstanceColumnType;
 import gameObjects.GameMetaInfo;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;

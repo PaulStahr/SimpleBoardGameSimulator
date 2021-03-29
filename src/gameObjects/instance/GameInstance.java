@@ -8,10 +8,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.StampedLock;
 
+import gameObjects.definition.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.GameInstanceColumnType;
+import gameObjects.columnTypes.GameInstanceColumnType;
 import gameObjects.action.DestroyInstance;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
@@ -23,7 +24,6 @@ import gameObjects.action.player.PlayerCharacterPositionUpdate;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerMousePositionUpdate;
 import gameObjects.action.player.PlayerRemoveAction;
-import gameObjects.definition.GameObject;
 import gameObjects.functions.CheckingFunctions;
 import main.Player;
 import util.ArrayTools;
@@ -53,7 +53,9 @@ public class GameInstance {
 	private long maxDrawValue = 0;
 	public int tableRadius = 1200;
 	private final StampedLock lock = new StampedLock();
-	
+
+
+
 	public static interface GameChangeListener
 	{
 		public void changeUpdate(GameAction action);
@@ -363,6 +365,46 @@ public class GameInstance {
 	}
 
 	public List<ObjectInstance> getObjectInstanceList() {return unmodifiableObjectInstanceList;}
+
+	public List<ObjectInstance> getTokenList() {
+		List<ObjectInstance> oiList = new ArrayList<>();
+		for (ObjectInstance oi : unmodifiableObjectInstanceList){
+			if (oi.go instanceof GameObjectToken){
+				oiList.add(oi);
+			}
+		}
+		return Collections.unmodifiableList(oiList);
+	}
+
+	public List<ObjectInstance> getFigureList() {
+		List<ObjectInstance> oiList = new ArrayList<>();
+		for (ObjectInstance oi : unmodifiableObjectInstanceList){
+			if (oi.go instanceof GameObjectFigure){
+				oiList.add(oi);
+			}
+		}
+		return Collections.unmodifiableList(oiList);
+	}
+
+	public List<ObjectInstance> getDiceList() {
+		List<ObjectInstance> oiList = new ArrayList<>();
+		for (ObjectInstance oi : unmodifiableObjectInstanceList){
+			if (oi.go instanceof GameObjectDice){
+				oiList.add(oi);
+			}
+		}
+		return Collections.unmodifiableList(oiList);
+	}
+
+	public List<ObjectInstance> getBookList() {
+		List<ObjectInstance> oiList = new ArrayList<>();
+		for (ObjectInstance oi : unmodifiableObjectInstanceList){
+			if (oi.go instanceof GameObjectBook){
+				oiList.add(oi);
+			}
+		}
+		return Collections.unmodifiableList(oiList);
+	}
 
 	public List<Player> getPlayerList() {
 		List<Player> playerList = new ArrayList<>();
