@@ -82,6 +82,17 @@ public class Game {
 		return images.keySet().toArray(new String[images.size()]);
 	}
 
+	public Map.Entry<String, Texture> getImage(int hash) {
+		for (Map.Entry<String, Texture> mapEntry : images.entrySet())
+		{
+			if(mapEntry.getKey().hashCode() == hash)
+			{
+				return mapEntry;
+			}
+		}
+		return null;
+	}
+
 	public GameObject getObjectByIndex(int index) {
 		return objects.get(index);
 	}
