@@ -5,6 +5,7 @@ import static java.lang.Math.max;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.StampedLock;
 
@@ -53,6 +54,13 @@ public class GameInstance {
 	private long maxDrawValue = 0;
 	public int tableRadius = 1200;
 	private final StampedLock lock = new StampedLock();
+	
+    public final Comparator<Integer> idObjectInstanceDrawValueComparator = new Comparator<Integer>() {
+        @Override
+        public int compare(Integer o1, Integer o2) {
+            return GameInstance.this.getObjectInstanceById(o1).state.drawValue - GameInstance.this.getObjectInstanceById(o2).state.drawValue;
+        }
+    };
 	
 	public static interface GameChangeListener
 	{

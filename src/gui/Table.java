@@ -116,7 +116,7 @@ public class Table {
                 RenderingHints.VALUE_ANTIALIAS_ON);
         AffineTransform tmp = graphics2D.getTransform();
         int counter = 0;
-        for (Shape shape : playerShapes){
+        for (int i = 0; i < playerShapes.size(); ++i){
             // set background color
             int place = 0;
             if (counter < gameInstance.getPlayerNumber())

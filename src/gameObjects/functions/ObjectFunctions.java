@@ -1093,12 +1093,7 @@ public class ObjectFunctions {
     }
 
     public static void selectObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList objectInstances){
-        objectInstances.sort(new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return gameInstance.getObjectInstanceById(o1).state.drawValue - gameInstance.getObjectInstanceById(o2).state.drawValue;
-            }
-        });
+        objectInstances.sort(gameInstance.idObjectInstanceDrawValueComparator);
         for (int id: objectInstances)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceById(id);
@@ -1322,7 +1317,7 @@ public class ObjectFunctions {
             for (int i = 0; i < oiList.size(); ++i) {
                 ObjectInstance currentObject = oiList.get(i);
                 if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1 && !ObjectFunctions.objectIsSelectedByOtherPlayer(gameInstance, player, currentObject.id)) {
-                    if (side != 0){flipTokenToSide(gamePanel.id, gameInstance, player, currentObject, side == 1);}
+                    if (side != SIDE_UNCHANGED){flipTokenToSide(gamePanel.id, gameInstance, player, currentObject, side == SIDE_TO_FRONT);}
                     ObjectState state = currentObject.state.copy();
                     state.rotation = currentObject.state.originalRotation;
                     if (i == 0 && oiList.size() > 1) {
@@ -1701,12 +1696,7 @@ public class ObjectFunctions {
         ial.clear();
         ArrayList<ObjectInstance> drawValues = new ArrayList<>();
         integerArrayListToObjectList(gameInstance, ial, drawValues);
-        drawValues.sort(new Comparator<ObjectInstance>() {
-            @Override
-            public int compare(ObjectInstance o1, ObjectInstance o2) {
-                return o1.state.drawValue - o2.state.drawValue;
-            }
-        });
+        drawValues.sort(objectInstanceDrawValueComparator);
         objectListToIntegerArrayList(ial, drawValues);
     }
 
@@ -1723,23 +1713,24 @@ public class ObjectFunctions {
             ial.add(oi.id);
         }
     }
-
-    public static void sortByValue(GameInstance gameInstance, ArrayList<ObjectInstance> oiList, boolean reverse) {
-        if (reverse) {
-            oiList.sort(new Comparator<ObjectInstance>() {
-                @Override
-                public int compare(ObjectInstance o1, ObjectInstance o2) {
-                    return o1.state.sortValue - o2.state.sortValue;
-                }
-            });
-        } else {
-            oiList.sort(new Comparator<ObjectInstance>() {
-                @Override
-                public int compare(ObjectInstance o1, ObjectInstance o2) {
-                    return o2.state.sortValue - o1.state.sortValue;
-                }
-            });
+    
+    private static final Comparator<ObjectInstance> sortValueComparator = new Comparator<ObjectInstance>() {
+        @Override
+        public int compare(ObjectInstance o1, ObjectInstance o2) {
+            return o2.state.sortValue - o1.state.sortValue;
         }
+    };
+
+    private static final Comparator<ObjectInstance> objectInstanceDrawValueComparator = new Comparator<ObjectInstance>() {
+        @Override
+        public int compare(ObjectInstance o1, ObjectInstance o2) {
+            return o1.state.drawValue - o2.state.drawValue;
+        }
+    };
+    
+    public static void sortByValue(GameInstance gameInstance, ArrayList<ObjectInstance> oiList, boolean reverse) {
+        oiList.sort(sortValueComparator);
+        if (reverse) {Collections.reverse(oiList);}
     }
 
     public static void sortHandCardsByValue(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList ial, ArrayList<ObjectInstance> oiList, boolean reverse){
@@ -1753,30 +1744,15 @@ public class ObjectFunctions {
     }
 
     public static void sortByDrawValue(GameInstance gameInstance, IntegerArrayList ial){
-        ial.sort(new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return gameInstance.getObjectInstanceById(o1).state.drawValue - gameInstance.getObjectInstanceById(o2).state.drawValue;
-            }
-        });
+        ial.sort(gameInstance.idObjectInstanceDrawValueComparator);
     }
 
     public static void sortByDrawValue(GameInstance gameInstance, ArrayList<ObjectInstance> oiList){
-        oiList.sort(new Comparator<ObjectInstance>() {
-            @Override
-            public int compare(ObjectInstance o1, ObjectInstance o2) {
-                return o1.state.drawValue - o2.state.drawValue;
-            }
-        });
+        oiList.sort(objectInstanceDrawValueComparator);
     }
 
     public static void setNewDrawValue(GamePanel gamePanel, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList){
-        oiList.sort(new Comparator<ObjectInstance>() {
-            @Override
-            public int compare(ObjectInstance o1, ObjectInstance o2) {
-                return o1.state.drawValue - o2.state.drawValue;
-            }
-        });
+        oiList.sort(objectInstanceDrawValueComparator);
         for (ObjectInstance oi : oiList){
             setNewDrawValue(gamePanel, gameInstance, player, oi);
         }
