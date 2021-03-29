@@ -74,17 +74,12 @@ public class GameObjectToken extends GameObject{
 		private static final long serialVersionUID = -5833198843575301636L;
 		public boolean side = true;
 		
-		public TokenState(TokenState tokenState) {
-			set(tokenState);
-		}
+		public TokenState(TokenState tokenState) {set(tokenState);}
 
 		public TokenState() {}
 
 		@Override
-		public int hashCode()
-		{
-			return super.hashCode() ^ (side ? 0xF00BA : 0);
-		}
+		public int hashCode(){return super.hashCode() ^ (side ? 0xF00BA : 0);}
 		
 		@Override
 		public void set(ObjectState state)
@@ -94,9 +89,7 @@ public class GameObjectToken extends GameObject{
 		}
 
 		@Override
-		public ObjectState copy() {
-			return new TokenState(this);
-		}
+		public ObjectState copy() {return new TokenState(this);}
 
 		@Override
 		public void reset() {

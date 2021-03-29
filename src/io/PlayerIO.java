@@ -1,18 +1,25 @@
 package io;
 
-import main.Player;
+import java.awt.Color;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import util.io.StreamUtil;
 
-import java.awt.*;
-import java.io.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+import main.Player;
+import util.io.StreamUtil;
 
 public class PlayerIO {
 
@@ -51,13 +58,22 @@ public class PlayerIO {
         return player;
     }
 
+    public static void simulateEditPlayerFromObject(ObjectInputStream is) throws IOException, ClassNotFoundException
+    {
+        is.readObject();
+        long toScip = 5 * 4 + 6 * 8 + 1;
+        long skipped = StreamUtil.skip(is, toScip);
+        if (toScip != skipped)
+        {
+            throw new IOException("Needed to scip " + toScip + " bytes but got " + skipped);
+        }
+    }
 
     public static void editPlayerFromStreamObject(ObjectInputStream is, Player player) throws ClassNotFoundException, IOException
     {
         if (player == null)
         {
-            is.readObject();
-            StreamUtil.skip(is, 68);
+            simulateEditPlayerFromObject(is);
             throw new NullPointerException();
         }
         player.setName((String)is.readObject());

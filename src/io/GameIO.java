@@ -2,7 +2,6 @@ package io;
 
 import static java.lang.Integer.max;
 
-import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,18 +36,13 @@ import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectBook;
 import gameObjects.definition.GameObjectBook.BookSide;
-import gameObjects.definition.GameObjectBook.BookState;
 import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectDice.DiceSide;
-import gameObjects.definition.GameObjectDice.DiceState;
 import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectFigure.FigureState;
 import gameObjects.definition.GameObjectToken;
-import gameObjects.definition.GameObjectToken.TokenState;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import gameObjects.instance.ObjectState;
 import main.Player;
 import net.AsynchronousGameConnection;
 import util.ArrayUtil;
@@ -224,7 +218,7 @@ public class GameIO {
 	 * @param images a HashMap of all images saved in the game
 	 * @return the created GameInstance
 	 */
-	private static GameObject createGameObjectFromElement(Element elem, HashMap<String, Texture> images, Integer uniqueId)
+	public static GameObject createGameObjectFromElement(Element elem, HashMap<String, Texture> images)
 	{
 		String objectName = elem.getAttributeValue(IOString.UNIQUE_NAME);
 		String type = elem.getAttributeValue(IOString.TYPE);
@@ -315,7 +309,7 @@ public class GameIO {
 	 * @param game the game which contains the HashMap of all images in the game
 	 * @return the created Element
 	 */
-	private static Element createElementFromGameObject(GameObject gameObject, Game game)
+	public static Element createElementFromGameObject(GameObject gameObject, Game game)
 	{
 		Element elem = new Element(IOString.OBJECT);
 		elem.setAttribute(IOString.TYPE, gameObject.objectType);
@@ -518,14 +512,10 @@ public class GameIO {
 	    	String key = pair.getKey();
 		    ZipEntry imageZipOutput = new ZipEntry(key);
 		    zipOutputStream.putNextEntry(imageZipOutput);
-		    int idx = key.lastIndexOf('.');
-		    if (idx != -1)
+		    String filetype = StringUtils.getFileType(key);
+		    if (filetype != null && ArrayUtil.firstEqualIndex(ImageIO.getWriterFileSuffixes(), filetype) != -1)
 		    {
-		    	String suffix = key.substring(idx + 1);
-		    	if (ArrayUtil.firstEqualIndex(ImageIO.getWriterFileSuffixes(), suffix) != -1)
-		    	{
-		    		writeImageToStream(pair.getValue(), suffix, zipOutputStream);
-		    	}
+	    		writeImageToStream(pair.getValue(), filetype, zipOutputStream);
 		    }
 		    zipOutputStream.closeEntry();
 	    }
@@ -647,19 +637,20 @@ public class GameIO {
 			Element root = doc.getRootElement();
 
 			//Control the xml version, downward compatible current version 2.0
-			Integer uniqueId = 0;
+			int uniqueId = 0;
 			for (Element elem : root.getChildren()) {
 				final String name = elem.getName();
 				if (name.equals(IOString.OBJECT)) {
 					if (elem.getAttribute(IOString.NUMBER) != null)
 					{
-						for (int i=0; i<Integer.parseInt(elem.getAttributeValue(IOString.NUMBER));++i) {
-							result.game.objects.add(createGameObjectFromElement(elem, result.game.images, uniqueId));
+					    int count = Integer.parseInt(elem.getAttributeValue(IOString.NUMBER));
+						for (int i=0; i<count;++i) {
+							result.game.objects.add(createGameObjectFromElement(elem, result.game.images));
 							++uniqueId;
 						}
 					}
 					else {
-						result.game.objects.add(createGameObjectFromElement(elem, result.game.images, uniqueId));
+						result.game.objects.add(createGameObjectFromElement(elem, result.game.images));
 						++uniqueId;
 					}
 				} else if (name.equals(IOString.BACKGROUND)) {
@@ -850,7 +841,4 @@ public class GameIO {
 		out.writeInt(action.player);
 		out.writeInt(action.object);
 	}
-
-
-	
 }

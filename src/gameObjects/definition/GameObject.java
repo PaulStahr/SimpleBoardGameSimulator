@@ -2,6 +2,7 @@ package gameObjects.definition;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import data.Texture;
@@ -84,4 +85,21 @@ public abstract class GameObject {
 	public abstract void updateImages(GameInstance gi);
 
     public abstract GameObject copy();
+    
+    public String toStringAdvanced() {return widthInMM + " " + heightInMM + " " + value + " " + sortValue + " " + rotationStep + " " + isFixed;}
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (!(obj instanceof GameObject)) {return false;}
+        GameObject other = (GameObject)obj;
+        return this.widthInMM == other.widthInMM
+                && this.heightInMM == other.heightInMM
+                && this.uniqueObjectName.equals(other.uniqueObjectName)
+                && this.objectType.equals(other.objectType)
+                && this.value == other.value
+                && this.rotationStep == other.rotationStep
+                && this.isFixed == other.isFixed
+                && Arrays.equals(this.groups, other.groups);
+    }
 }

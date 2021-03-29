@@ -208,15 +208,18 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 
 	public void write(int[] out, int begin) {System.arraycopy(data, 0, out, begin, size());}
 
-	public String toString(){
-		String str = "";
-		for (int i = 0; i < size(); ++i){
-			if (i > 0) {
-				str += ",";
-			}
-			str += String.valueOf(i);
-		}
-		return str;
+	public StringBuilder toString(StringBuilder strB) {
+	    if (size() == 0){return strB;}
+	    strB.append(getI(0));
+	    for (int i = 1; i < size(); ++i) {
+	        strB.append(',').append(getI(i));
+	    }
+	    return strB;
+	}
+	
+	@Override
+    public String toString(){
+	    return toString(new StringBuilder()).toString();
 	}
 
     @Override
@@ -232,5 +235,11 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
         }
         length = write;
         return write != read;
+    }
+
+    @Override
+    public void removeRange(int begin, int end) {
+        System.arraycopy(data, end, data, begin, length - end);
+        length = end;
     }
 }

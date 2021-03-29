@@ -1,30 +1,42 @@
 package io;
 
-import gameObjects.definition.GameObjectBook;
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
-import gameObjects.instance.ObjectState;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-import util.data.IntegerArrayList;
-import util.io.StreamUtil;
 
-import java.io.*;
+import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
+import gameObjects.instance.ObjectState;
+import util.io.StreamUtil;
 
 public class ObjectStateIO {
 
     public static void simulateStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
     {
-        int skip = 41;
-        if (state instanceof GameObjectToken.TokenState)      {skip += 1;}
+        int skip = 13 * 4 + 2;
+        if (state instanceof GameObjectToken.TokenState)
+        {
+            skip -= StreamUtil.skip(is, 12);
+            skip += is.readInt() * 4 + 1;
+        }
         else if (state instanceof GameObjectDice.DiceState)  {skip += 4;}
         else if (state instanceof GameObjectFigure.FigureState){skip += 1;}
-        StreamUtil.skip(is, skip);
+        long skipped = StreamUtil.skip(is, skip);
+        if (skip != skipped)
+        {
+            throw new IOException("Needed to scip " + skip + " bytes but got " + skipped);
+        }
     }
 
 
@@ -77,9 +89,8 @@ public class ObjectStateIO {
         state.aboveInstanceId = is.readInt();
         state.belowInstanceId = is.readInt();
         state.liesOnId = is.readInt();
-        int aboveLength = is.readInt();
         state.aboveLyingObectIds.clear();
-        for (int i = 0; i < aboveLength; ++i){
+        for (int i = is.readInt(); i > 0; --i){
             state.aboveLyingObectIds.add(is.readInt());
         }
         state.inPrivateArea = is.readBoolean();

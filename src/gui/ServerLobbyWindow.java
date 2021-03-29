@@ -23,6 +23,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
@@ -78,6 +79,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private final JTable tableOpenGames = new JTable(tableModelOpenGames);
 	private final JScrollPane scrollPaneOpenGames = new JScrollPane(tableOpenGames);
     private final JButton buttonPoll = new JButton();
+    private final JToggleButton buttonAutoPoll = new JToggleButton();
     private final JButton buttonLoadGame = new JButton();
     private final JButton buttonStartServer = new JButton();
 	private final JButton buttonCreateGame = new JButton();
@@ -108,9 +110,8 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	@Override
 	public void actionPerformed(ActionEvent e)
     {
-		updateCurrentGames();
 		Object source = e.getSource();
-		if (source == buttonPoll)
+		if (source == buttonPoll || source == buttonAutoPoll)
 		{
 			updateCurrentGames();
 		}
@@ -323,6 +324,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private RunnableObject updateGamesRunnable = new RunnableObject("Update Games", null) {
 	    @Override
         public void run() {
+	        buttonPoll.setEnabled(false);
             try {
                 client.setAdress(textFieldAddress.getText());
                 client.setPort(Integer.parseInt(textFieldPort.getText()));
@@ -335,12 +337,26 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
                     }
                 });
             } catch (IOException | ClassNotFoundException e1) {
-                JFrameUtils.runByDispatcher(new Runnable() {
+                if (!buttonAutoPoll.isSelected())
+                {
+                    JFrameUtils.runByDispatcher(new Runnable() {
+                        @Override
+                        public void run() {
+                            JFrameUtils.logErrorAndShow("Can't update information", e1, logger);
+                        }
+                    });
+                }
+            }
+            buttonPoll.setEnabled(true);
+            if (buttonAutoPoll.isSelected()) {
+                DataHandler.hs.enqueue(new Runnable() {
                     @Override
                     public void run() {
-                        JFrameUtils.logErrorAndShow("Can't update information", e1, logger);
+                            System.out.println("update");
+                        updateCurrentGames();         
+                        System.out.println("updated");
                     }
-                });
+                }, System.nanoTime() + 500000000);
             }
         }
 	};
@@ -367,6 +383,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				.addComponent(scrollPaneOpenGames)
 				.addGroup(layout.createSequentialGroup()
 						.addComponent(buttonPoll)
+						.addComponent(buttonAutoPoll)
 						.addComponent(buttonLoadGame)
 						.addComponent(buttonStartServer)
 						.addComponent(buttonCreateGame)));
@@ -385,11 +402,13 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				.addGroup(layout
 						.createParallelGroup()
 						.addComponent(buttonPoll)
+						.addComponent(buttonAutoPoll)
 						.addComponent(buttonLoadGame)
 						.addComponent(buttonStartServer)
 						.addComponent(buttonCreateGame)));
 		setLayout(layout);
 		buttonPoll.addActionListener(this);
+		buttonAutoPoll.addActionListener(this);
 		tableOpenGames.getSelectionModel().addListSelectionListener(this);
 		tableOpenGames.getModel().addTableModelListener(this);
 		this.client = client;
@@ -434,6 +453,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	@Override
 	public void languageChanged(Language language) {
 		buttonPoll.setText(language.getString(Words.refresh));
+		buttonAutoPoll.setText(language.getString(Words.autorefresh));
 		buttonLoadGame.setText(language.getString(Words.load_game));
 		buttonStartServer.setText(language.getString(Words.start_server));
 		buttonCreateGame.setText(language.getString(Words.create_game));

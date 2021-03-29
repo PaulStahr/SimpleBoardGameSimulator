@@ -193,14 +193,13 @@ public class SynchronousGameClientLobbyConnection {
 	    	strB.append(' ').append(password);
     	}
 	    output = writeCommand(strB, output);
-	    
+
 	    if (password != null && password.length() != 0)
 	    {
 			try {
 				final KeyGenerator kg = KeyGenerator.getInstance("AES");
 	            kg.init(new SecureRandom(password.getBytes()));
 	            final SecretKey key = kg.generateKey();
-	
 	            final Cipher c = Cipher.getInstance("AES");
 	            c.init(Cipher.ENCRYPT_MODE, key);
 	            CipherInputStream input = new CipherInputStream(server.getInputStream(), c);

@@ -89,14 +89,10 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		private final ArrayList<ObjectInstance> tmp2 = new ArrayList<>();
 
 		@Override
-		public int getUpdateInterval() {
-			return 1000;
-		}
+		public int getUpdateInterval() {return 1000;}
 
 		@Override
-		public synchronized void update() {
-			JFrameUtils.runByDispatcher(this);
-		}
+		public synchronized void update() {JFrameUtils.runByDispatcher(this);}
 
 		@Override
 		public void run() {

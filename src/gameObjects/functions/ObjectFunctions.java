@@ -14,7 +14,10 @@ import javax.swing.SwingUtilities;
 
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.player.PlayerEditAction;
-import gameObjects.definition.*;
+import gameObjects.definition.GameObject;
+import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
@@ -275,7 +278,6 @@ public class ObjectFunctions {
     public static void getStack(GameInstance gameInstance, ObjectInstance objectInstance, IntegerArrayList objectStack) {
         getStackFromTop(gameInstance, objectInstance, objectStack);
     }
-
 
     private static void makeStack(GameInstance gameInstance, IntegerArrayList objectStack, IntegerArrayList oldPos, int actionSource, Player player){
         for (int i = 0; i < objectStack.size(); i++) {
@@ -602,7 +604,7 @@ public class ObjectFunctions {
         int distance = Integer.MAX_VALUE;
         for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
-            int dist = objectDist(xPos, yPos, oi);
+            int dist = getObjectDistanceTo(oi, xPos, yPos);
             if (dist < distance && isOnObject(xPos, yPos, oi, player.id, maxInaccuracy)) {
                 activeObject = getStackTop(gameInstance, oi);
                 distance = dist;
@@ -613,12 +615,6 @@ public class ObjectFunctions {
 
     public static ObjectInstance getTopActiveObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos) {
         return getTopActiveObjectByPosition(gameInstance, player, xPos, yPos, 0);
-    }
-
-    private static int objectDist(int xPos, int yPos, ObjectInstance oi){
-        int xDiff = xPos - oi.state.posX, yDiff = yPos - oi.state.posY;
-        int dist = xDiff * xDiff + yDiff * yDiff;
-        return dist;
     }
 
     private static void getRelativeObjectBorderPoints(int playerId, ObjectInstance oi, ArrayList<Point2D> BorderPoints){
@@ -657,11 +653,7 @@ public class ObjectFunctions {
     }
 
     private static boolean isValidLieOnObject(GameInstance gameInstance, Player player, ObjectInstance oi){
-        if (!oi.state.isFixed && !oi.state.inPrivateArea && (oi.state.owner_id == -1 || oi.state.owner_id == player.id))
-        {
-            return true;
-        }
-        return  false;
+        return !oi.state.isFixed && !oi.state.inPrivateArea && (oi.state.owner_id == -1 || oi.state.owner_id == player.id);
     }
 
 
@@ -766,7 +758,7 @@ public class ObjectFunctions {
 
     public static ObjectInstance getNearestObjectByPosition(GamePanel gamePanel, GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, IntegerArrayList ignoredObjects) {
         ObjectInstance currentObject = getNearestObjectByPosition(gamePanel, gameInstance, player, xPos, yPos, zooming, 0, ignoredObjects);
-        if (haveSamePositions(getStackTop(gameInstance, currentObject), getStackBottom(gameInstance, currentObject)) && currentObject.state.inPrivateArea == false) {
+        if (haveSamePositions(getStackTop(gameInstance, currentObject), getStackBottom(gameInstance, currentObject)) && !currentObject.state.inPrivateArea) {
             return getStackTop(gameInstance, currentObject);
         } else {
             return currentObject;
@@ -939,9 +931,9 @@ public class ObjectFunctions {
         ial.removeIf(new Predicate<Integer>() {
             @Override
             public boolean test(Integer id) {
-                ObjectInstance oi = gameInstance.getObjectInstanceById(id);
-                p.setLocation(oi.state.posX, oi.state.posY);
-                gamePanel.getBoardToScreenTransform().transform(p, p);
+                ObjectState state = gameInstance.getObjectInstanceById(id).state;
+                p.setLocation(state.posX, state.posY);
+                gamePanel.boardToScreenPos(p, p);
                 return !shape.contains(p);
             }
         });
@@ -1030,7 +1022,7 @@ public class ObjectFunctions {
                     diceState.unfold = false;
                 }
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, oi, state));
-                gamePanel.updateSelectedObjects(gamePanel, gameInstance,player);
+                GamePanel.updateSelectedObjects(gamePanel, gameInstance,player);
             }
         }
     }
@@ -1361,7 +1353,7 @@ public class ObjectFunctions {
             for (int i = 0; i < stackElements.size(); ++i) {
                 ObjectInstance currentObject = gameInstance.getObjectInstanceById(stackElements.getI(i));
                 if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1 && !ObjectFunctions.objectIsSelectedByOtherPlayer(gameInstance, player, currentObject.id)) {
-                    if (side != 0){flipTokenToSide(gamePanel.id, gameInstance, player, currentObject, side == 1);}
+                    if (side != SIDE_UNCHANGED){flipTokenToSide(gamePanel.id, gameInstance, player, currentObject, side == SIDE_TO_FRONT);}
                     ObjectState state = currentObject.state.copy();
                     state.rotation = currentObject.state.originalRotation;
                     if (i == 0 && stackElements.size() > 1) {
@@ -1411,11 +1403,10 @@ public class ObjectFunctions {
     }
 
     public static int getObjectDistanceTo(ObjectInstance objectInstance, int posX, int posY) {
-        int diffX = (posX - (objectInstance.state.posX));
-        int diffY = (posY - (objectInstance.state.posY));
+        int diffX = posX - objectInstance.state.posX;
+        int diffY = posY - objectInstance.state.posY;
         return diffX * diffX + diffY * diffY;
     }
-
 
     public static void insertIntoStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance objectAbove, ObjectInstance objectBelow, int cardMargin) {
         if (objectInstance != null) {//TODO Florian check
@@ -1661,10 +1652,7 @@ public class ObjectFunctions {
     }
 
     public static boolean isInPrivateArea(GamePanel gamePanel, int posX, int posY) {
-        if(gamePanel.privateArea != null) {
-            return gamePanel.privateArea.containsBoardCoordinates(posX, posY);
-        }
-        return false;
+        return gamePanel.privateArea != null && gamePanel.privateArea.containsBoardCoordinates(posX, posY);
     }
 
 
@@ -1712,19 +1700,14 @@ public class ObjectFunctions {
     public static void getDrawOrder(GameInstance gameInstance, IntegerArrayList ial){
         ial.clear();
         ArrayList<ObjectInstance> drawValues = new ArrayList<>();
-        for (int idx = 0; idx<gameInstance.getObjectNumber(); ++idx){
-        	drawValues.add(gameInstance.getObjectInstanceByIndex(idx));
-        }
+        integerArrayListToObjectList(gameInstance, ial, drawValues);
         drawValues.sort(new Comparator<ObjectInstance>() {
             @Override
             public int compare(ObjectInstance o1, ObjectInstance o2) {
                 return o1.state.drawValue - o2.state.drawValue;
             }
         });
-        for (ObjectInstance instance:drawValues)
-        {
-            ial.add(instance.id);
-        }
+        objectListToIntegerArrayList(ial, drawValues);
     }
 
     public static void integerArrayListToObjectList(GameInstance gameInstance, IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
@@ -1734,7 +1717,7 @@ public class ObjectFunctions {
         }
     }
 
-    public static void objectListToIntegerArrayList(GameInstance gameInstance, IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
+    public static void objectListToIntegerArrayList(IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
         ial.clear();
         for (ObjectInstance oi : oiList){
             ial.add(oi.id);
@@ -1854,38 +1837,33 @@ public class ObjectFunctions {
 
         int counter = 0;
         int playerCounter = 0;
+        IntegerArrayList integerList = new IntegerArrayList();
         for(Player player : gameInstance.getPlayerList())
         {
             //Set trick num to zero
             player.trickNum = 0;
             gameInstance.update(new PlayerEditAction(gamePanel.id, player, player));
-            int currentElementIndex = 0;
-            while(currentElementIndex < numElements){
+            for (int currentElementIndex = 0; currentElementIndex < numElements; ++currentElementIndex){
                 int Pos = numElements*playerCounter + currentElementIndex;
                 takeObjects(gamePanel,gameInstance,player, gameInstance.getObjectInstanceById(ial.getI(Pos)));
-                currentElementIndex+=1;
             }
             if(counter < modElements){
                 int Pos = numElements*playerNum + counter;
                 takeObjects(gamePanel,gameInstance,player, gameInstance.getObjectInstanceById(ial.getI(Pos)));
                 counter+= 1;
             }
-            IntegerArrayList integerList = new IntegerArrayList();
             sortHandCardsByValue(gamePanel, gameInstance, player, integerList, oiList, false);
+            integerList.clear();
             ++playerCounter;
         }
     }
 
     public static boolean isInTableMiddle(GamePanel gamePanel, int xi, int yi) {
         Shape shape = gamePanel.table.stackerShape;
-            Point2D transformedPoint = gamePanel.getBoardToScreenTransform().transform(new Point2D.Double(xi, yi), null);
-            if(shape != null){
-                if(transformedPoint != null && shape.contains(transformedPoint)){
-                    return true;
-                }
-            }
-            return false;
-        }
+        Point2D transformedPoint = new Point2D.Double(xi, yi);
+        transformedPoint = gamePanel.getBoardToScreenTransform().transform(transformedPoint, transformedPoint);
+        return shape != null && shape.contains(transformedPoint);
+    }
 
     public static void takeTrick(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial) {
         stackObjectsInTableMiddleToOneSide(gamePanel, gameInstance, player, objectInstance, ial, SIDE_TO_BACK);

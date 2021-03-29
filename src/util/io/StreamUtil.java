@@ -68,8 +68,15 @@ public class StreamUtil {
 		return input instanceof ObjectInputStream ? (ObjectInputStream)input : new ObjectInputStream(input);
 	}
 
-	public static void skip(ObjectInputStream is, int i) throws IOException {
-		while ((i -= is.skip(i)) != 0);
+	public static long skip(ObjectInputStream is, long bytes) throws IOException {
+	    long remaining = bytes;
+	    while(true) {
+	        long s = is.skip(remaining);
+	        if ((remaining -= s) == 0 || s == 0)
+            {
+	            return bytes - remaining;
+            }
+	    }
 	}
 	
 	public static final void copy(InputStream in, OutputStream out) throws IOException{

@@ -17,14 +17,13 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
 
-import io.ObjectStateIO;
-import io.PlayerIO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.DataHandler;
 import data.Texture;
 import gameObjects.action.AddObjectAction;
+import gameObjects.action.AtomicAction;
 import gameObjects.action.DestroyInstance;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
@@ -44,6 +43,8 @@ import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
 import gui.minigames.TetrisGameInstance.TetrisGameEvent;
 import io.GameIO;
+import io.ObjectStateIO;
+import io.PlayerIO;
 import main.Player;
 import util.ArrayUtil;
 import util.StringUtils;
@@ -238,10 +239,10 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                     pc.timeouted = true;
                     pc.run();
                 }
-                pings.remove(pc);
+                synchronized(pings){pings.remove(pc);}
             }
         }, timeout);
-        pings.add(pc);
+        synchronized(pings) {pings.add(pc);}
         queueOutput(cpf);
         return pc;
     }
@@ -276,6 +277,75 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
         private static final long serialVersionUID = -8508545232652768659L;
         public final long offset;
         public TimingOffsetChanged(long offset){this.offset = offset;}
+    }
+    
+    void send(GameAction action, ObjectOutputStream objOut, ByteArrayOutputStream byteStream)
+    {
+        try
+        {
+            objOut.writeUnshared(action);
+            if (action instanceof GameObjectInstanceEditAction)
+            {
+                ObjectStateIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).state);
+            }
+            else if (action instanceof PlayerEditAction)
+            {
+                if (!(action instanceof PlayerMousePositionUpdate || action instanceof PlayerCharacterPositionUpdate)) {
+                    PlayerIO.writePlayerToStreamObject(objOut, ((PlayerEditAction)action).getEditedPlayer(gi));}
+            }
+            else if (action instanceof UsertextMessageAction
+                    || action instanceof UserFileMessage
+                    || action instanceof UserSoundMessageAction
+                    || action instanceof TetrisGameEvent)
+            {}
+            else if (action instanceof GameObjectEditAction)
+            {
+                GameIO.writeObjectToStreamObject(objOut, ((GameObjectEditAction)action).getObject(gi));
+            }
+            else if (action instanceof GameStructureEditAction)
+            {
+                GameStructureEditAction gs = (GameStructureEditAction)action;
+                if (gs instanceof PlayerAddAction)
+                {
+                    PlayerIO.writePlayerToStreamObject(objOut, ((PlayerAddAction)action).getPlayer(gi));
+                }
+                else
+                {
+                    switch(gs.type)
+                    {
+                        case GameStructureEditAction.EDIT_BACKGROUND:       objOut.writeUnshared(gi.game.getImageKey(gi.game.background));break;
+                        case GameStructureEditAction.EDIT_TABLE_RADIUS:     objOut.writeInt(gi.tableRadius);break;
+                        case GameStructureEditAction.EDIT_GAME_NAME:        objOut.writeUnshared(gi.game.name);break;
+                        case GameStructureEditAction.EDIT_SESSION_NAME:     objOut.writeUnshared(gi.name);break;
+                        case GameStructureEditAction.EDIT_SESSION_PASSWORD: objOut.writeUnshared(gi.password);break;
+                        case AddObjectAction.ADD_IMAGE:
+                        {
+                            Map.Entry<String, Texture> entry = gi.game.getImage(((AddObjectAction)gs).objectId);
+                            objOut.writeObject(entry.getKey());
+                            GameIO.writeImageToStream(entry.getValue(), StringUtils.getFileType(entry.getKey()), byteStream);
+                            objOut.writeInt(byteStream.size());
+                            byteStream.writeTo(objOut);
+                            byteStream.reset();
+                            break;
+                        }
+                        case GameStructureEditAction.REMOVE_OBJECT:
+                        case GameStructureEditAction.REMOVE_OBJECT_INSTANCE:
+                        default:
+                            logger.warn("Structure edit action " + gs.type + " is unknown");
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                logger.warn("Unknown actiontype " + action.getClass());
+                return;
+            }
+            ++outputEvents;
+        }
+        catch ( Exception e ) {
+            logger.error("Error at emmiting Game Action", e);
+        }
     }
     
     private void outputLoop()
@@ -433,79 +503,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                 else if (outputObject instanceof GameAction)
                 {
                     GameAction action = (GameAction)outputObject;
-                    try
-                    {
-                        if (action instanceof GameObjectInstanceEditAction)
-                        {
-                            objOut.writeUnshared(action);
-                            ObjectStateIO.writeStateToStreamObject(objOut, ((GameObjectInstanceEditAction)action).state);
-                            ++outputEvents;
-                        }
-                        else if (action instanceof PlayerEditAction)
-                        {
-                            objOut.writeUnshared(action);
-                            if (!(action instanceof PlayerMousePositionUpdate || action instanceof PlayerCharacterPositionUpdate)) {
-                                PlayerIO.writePlayerToStreamObject(objOut, ((PlayerEditAction)action).getEditedPlayer(gi));}
-                            ++outputEvents;
-                        }
-                        else if (action instanceof UsertextMessageAction 
-                                || action instanceof UserFileMessage
-                                || action instanceof UserSoundMessageAction
-                                || action instanceof TetrisGameEvent)
-                        {
-                            objOut.writeUnshared(action);
-                            ++outputEvents;
-                           }
-                        else if (action instanceof GameObjectEditAction)
-                        {
-                            objOut.writeUnshared(action);
-                            GameIO.writeObjectToStreamObject(objOut, ((GameObjectEditAction)action).getObject(gi));
-                            ++outputEvents;
-                        }
-                        else if (action instanceof GameStructureEditAction)
-                        { 
-                            GameStructureEditAction gs = (GameStructureEditAction)action;
-                            objOut.writeUnshared(gs);
-                            if (gs instanceof PlayerAddAction)
-                            {
-                                PlayerIO.writePlayerToStreamObject(objOut, ((PlayerAddAction)action).getPlayer(gi));
-                            }
-                            else
-                            {
-                                switch(gs.type)
-                                {
-                                    case GameStructureEditAction.EDIT_BACKGROUND:       objOut.writeUnshared(gi.game.getImageKey(gi.game.background));break;
-                                    case GameStructureEditAction.EDIT_TABLE_RADIUS:     objOut.writeInt(gi.tableRadius);break;
-                                    case GameStructureEditAction.EDIT_GAME_NAME:        objOut.writeUnshared(gi.game.name);break;
-                                    case GameStructureEditAction.EDIT_SESSION_NAME:     objOut.writeUnshared(gi.name);break;
-                                    case GameStructureEditAction.EDIT_SESSION_PASSWORD: objOut.writeUnshared(gi.password);break;
-                                    case AddObjectAction.ADD_IMAGE:
-                                    {
-                                        Map.Entry<String, Texture> entry = gi.game.getImage(((AddObjectAction)gs).objectId);
-                                        objOut.writeObject(entry.getKey());
-                                        GameIO.writeImageToStream(entry.getValue(), StringUtils.getFileType(entry.getKey()), byteStream);
-                                        objOut.writeInt(byteStream.size());
-                                        byteStream.writeTo(objOut);
-                                        byteStream.reset();
-                                        break;
-                                    }
-                                    case GameStructureEditAction.REMOVE_OBJECT:
-                                    case GameStructureEditAction.REMOVE_OBJECT_INSTANCE:
-                                    default:
-                                        logger.warn("Structure edit action " + gs.type + " is unknown");
-                                        break;
-                                }
-                            }
-                            ++outputEvents;
-                        }
-                        else
-                        {
-                            logger.warn("Unknown actiontype " + action.getClass());
-                        }
-                    }
-                    catch ( Exception e ) {
-                        logger.error("Error at emmiting Game Action", e);
-                    }
+                    send(action, objOut, byteStream);
                 }
             }catch(IOException e)
             {
@@ -547,7 +545,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                 }
                 if (inputObject instanceof CommandScip)
                 {
-                    StreamUtil.skip(objIn,((CommandScip)inputObject).bytes);
+                    long bytes = ((CommandScip)inputObject).bytes;
+                    long scipped = StreamUtil.skip(objIn, bytes);
+                    if (bytes != scipped)
+                    {
+                        logger.warn("Needed to scip " + bytes + " bytes but got " + scipped);
+                    }
                     continue;
                 }
                 if (inputObject instanceof CommandPingForward)
@@ -559,10 +562,12 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                 if (inputObject instanceof CommandPingBack)
                 {
                     CommandPingBack cpb = (CommandPingBack)inputObject;
-                    for (int read = 0; read < pings.size(); ++read)
-                    {
-                        PingInformation current = pings.get(read);
-                        if (current.id == cpb.id){DataHandler.tp.run(current, "Ping Callback");}
+                    synchronized (pings) {
+                        for (int read = 0; read < pings.size(); ++read)
+                        {
+                            PingInformation current = pings.get(read);
+                            if (current.id == cpb.id){DataHandler.tp.run(current, "Ping Callback");}
+                        }                        
                     }
                     continue;
                 }
@@ -595,6 +600,18 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                         }
                         gi.update(action);
                         ++inputEvents;
+                        continue;
+                    }
+                    if (action instanceof AtomicAction)
+                    {
+                        AtomicAction atomic = (AtomicAction)action;
+                        GameAction actions[] = new GameAction[objIn.readInt()];
+                        for (int i = 0; i < actions.length; ++i)
+                        {
+                            actions[i] = (AtomicAction)objIn.readObject();
+                        }
+                        atomic.set(actions);
+                        gi.update(atomic);
                         continue;
                     }
                     if (action instanceof GameObjectEditAction)
