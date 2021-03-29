@@ -41,10 +41,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.Document;
 
 import data.Texture;
-import gameObjects.columnTypes.GameObjectColumnType;
-import gameObjects.columnTypes.GameObjectInstanceColumnType;
-import gameObjects.columnTypes.ImageColumnType;
-import gameObjects.columnTypes.PlayerColumnType;
 import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
@@ -52,9 +48,16 @@ import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerRemoveAction;
-import gameObjects.definition.*;
+import gameObjects.columnTypes.GameObjectColumnType;
+import gameObjects.columnTypes.GameObjectInstanceColumnType;
+import gameObjects.columnTypes.ImageColumnType;
+import gameObjects.columnTypes.PlayerColumnType;
+import gameObjects.definition.GameObject;
+import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.functions.CheckingFunctions;
-import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
@@ -70,7 +73,6 @@ import util.jframe.table.TableModel;
 
 public class EditGamePanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener{
 	public static final List<TableColumnType> IMAGE_TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{ImageColumnType.ID, ImageColumnType.WIDTH, ImageColumnType.HEIGHT, ImageColumnType.DELETE});
-	private final GamePanel gamePanel;
 	private final GameInstance gi;
 	private final DefaultTableModel tableModelGameObjectInstances= new TableModel(ObjectInstance.TYPES);
 	private final DefaultTableModel tableModelGameObjects= new TableModel(GameObject.TYPES);
@@ -106,8 +108,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final LanguageHandler lh;
 	private final Player player;
 
-	public EditGamePanel(GamePanel gamePanel, GameInstance gi, LanguageHandler lh, Player player) {
-		this.gamePanel = gamePanel;
+	public EditGamePanel(GameInstance gi, LanguageHandler lh, Player player) {
 		this.gi = gi;
 		this.lh = lh;
 		panelGeneral = new GeneralPanel(lh);
@@ -536,12 +537,12 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 								int NewOwerId = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());
 								if (state.owner_id != -1){
 									Player owner = gi.getPlayerById(state.owner_id);
-									ObjectFunctions.dropObject(gamePanel, gi, owner, instance);
+									//ObjectFunctions.dropObject(gamePanel, gi, owner, instance);
 								}
 								if (NewOwerId != -1){
 									Player newOwner = gi.getPlayerById(NewOwerId);
-									ObjectFunctions.removeObject(gamePanel, gi, newOwner, instance);
-									ObjectFunctions.takeObjects(gamePanel, gi, newOwner, instance);
+									//ObjectFunctions.removeObject(gamePanel, gi, newOwner, instance);
+									//ObjectFunctions.takeObjects(gamePanel, gi, newOwner, instance);
 								}
 								break;
 							case ABOVE:
@@ -554,11 +555,11 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 							case POSX:
 								int NewXPos = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());
 								state.posX = NewXPos;
-								gi.update(new GameObjectInstanceEditAction(gamePanel.id, player, instance, state));
+								gi.update(new GameObjectInstanceEditAction(this.id, player, instance, state));
 							case POSY:
 								int NewYPos = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());
 								state.posY = NewYPos;
-								gi.update(new GameObjectInstanceEditAction(gamePanel.id, player, instance, state));
+								gi.update(new GameObjectInstanceEditAction(this.id, player, instance, state));
 							break;
 							default:break;
 						}

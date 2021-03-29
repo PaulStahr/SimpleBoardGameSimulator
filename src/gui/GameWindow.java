@@ -215,7 +215,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	public void actionPerformed(ActionEvent arg0) {
 		Object source = arg0.getSource();
 		if(source == menuItemExit)			{this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));}
-		else if (source == menuItemEditGame){new EditGameWindow(gamePanel, gi, lh, gamePanel.getPlayer()).setVisible(true);}
+		else if (source == menuItemEditGame){new EditGameWindow(gi, lh, gamePanel.getPlayer()).setVisible(true);}
 		else if (source == menuItemSaveGame)
 		{
 			JFileChooser fileChooser = new JFileChooser();
