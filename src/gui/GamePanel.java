@@ -479,7 +479,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		updateGameTransform();
 		if (player != null && gameInstance.seatColors.size() > pos)
 		{
-			player.color = Color.decode(gameInstance.seatColors.get(pos));
+			player.color = gameInstance.seatColors.get(pos);
 			player.playerAtTableRotation = (int) PlayerFunctions.GetCurrentPlayerRotation(this, gameInstance,player);
 			player.playerAtTablePosition = pos;
 			ObjectFunctions.moveOwnStackToBoardPosition(this, gameInstance, player, ial);

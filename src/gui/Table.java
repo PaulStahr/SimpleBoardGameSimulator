@@ -97,7 +97,7 @@ public class Table {
 
             if (gameInstance.seatColors.size() > i)
             {
-                graphics2D.setColor(Color.decode(gameInstance.seatColors.get(i % 10)));
+                graphics2D.setColor(gameInstance.seatColors.get(i % 10));
             }
 
             Stroke stroke = new BasicStroke(20.0f);
@@ -192,13 +192,11 @@ public class Table {
     }
 
     public void updatePlayers(GameInstance gameInstance){
-        for (int i = 0; i<gameInstance.getPlayerList().size(); ++i){
-            if (i >= this.playerShapes.size()){
-                Shape playerShape = new Arc2D.Double(tableScreenOrigin.getX() + this.diameter, tableScreenOrigin.getY() + this.diameter, playerDiameter, playerDiameter, 0, 180,Arc2D.OPEN);
+        for (int i =this.playerShapes.size(); i<gameInstance.getPlayerList().size(); ++i){
+            Shape playerShape = new Arc2D.Double(tableScreenOrigin.getX() + this.diameter, tableScreenOrigin.getY() + this.diameter, playerDiameter, playerDiameter, 0, 180,Arc2D.OPEN);
 
-                //Shape playerShape = new Ellipse2D.Double(tableScreenOrigin.getX() + this.diameter, tableScreenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
-                playerShapes.add(playerShape);
-            }
+            //Shape playerShape = new Ellipse2D.Double(tableScreenOrigin.getX() + this.diameter, tableScreenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
+            playerShapes.add(playerShape);
         }
     }
 
