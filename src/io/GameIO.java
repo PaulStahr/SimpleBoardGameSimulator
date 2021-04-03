@@ -2,6 +2,7 @@ package io;
 
 import static java.lang.Integer.max;
 
+import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -149,7 +150,7 @@ public class GameIO {
 									if (seatElementName.equals(IOString.SEAT)) {
 										++gi.seats;
 										if (seatElement.getAttribute(IOString.COLOR) != null) {
-											gi.seatColors.add(seatElement.getAttributeValue(IOString.COLOR));
+											gi.seatColors.add(Color.decode(seatElement.getAttributeValue(IOString.COLOR)));
 										}
 									}
 								}
@@ -446,7 +447,9 @@ public class GameIO {
 				Element seat = new Element(IOString.SEAT);
 				if (gi.seatColors.size() > i)
 				{
-					seat.setAttribute(IOString.COLOR, gi.seatColors.get(i % 10));
+				    String buf = Integer.toHexString(gi.seatColors.get(i % 10).getRGB());
+				    String hex = "#"+buf.substring(buf.length()-6);
+					seat.setAttribute(IOString.COLOR, hex);
 				}
 				seats.addContent(seat);
 			}

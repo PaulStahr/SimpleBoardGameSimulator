@@ -1,5 +1,4 @@
 package gameObjects.instance;
-import java.awt.Image;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,30 +60,11 @@ public class Game {
         return null;
     }
 
-	
-	/**
-	 * Gets the initial image name from the images HashMap.
-	 * The names function as keys in this array.
-	 * @param image image for which the name is needed
-	 * @return name of the image or null if image not found
-	 * @throws IOException 
-	 */
-	public String getImageKey(Image image) throws IOException
-	{
-		for (Map.Entry<String, Texture> mapEntry : images.entrySet())
-		{
-			if(mapEntry.getValue().getImage() == image)
-			{
-				return mapEntry.getKey();
-			}
-		}
-		return null;
-	}
-	
 	@Override
 	public int hashCode()
 	{
 		int result = 0;
+		result += name.hashCode();
 		for (int i = 0; i < objects.size(); ++i)
 		{
 			result += objects.get(i).hashCode();

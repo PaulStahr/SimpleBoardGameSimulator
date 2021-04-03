@@ -2,17 +2,16 @@ package gameObjects.instance;
 
 import static java.lang.Math.max;
 
+import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.StampedLock;
 
-import gameObjects.definition.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gameObjects.columnTypes.GameInstanceColumnType;
 import gameObjects.action.DestroyInstance;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
@@ -24,6 +23,12 @@ import gameObjects.action.player.PlayerCharacterPositionUpdate;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerMousePositionUpdate;
 import gameObjects.action.player.PlayerRemoveAction;
+import gameObjects.columnTypes.GameInstanceColumnType;
+import gameObjects.definition.GameObject;
+import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.functions.CheckingFunctions;
 import main.Player;
 import util.ArrayTools;
@@ -46,16 +51,21 @@ public class GameInstance {
 	public boolean table = true;
     public boolean put_down_area = true;
     public int seats = -1;
-	public ArrayList<String> seatColors = new ArrayList(Arrays.asList("#e81123", "#00188f", "#009e49", "#ff8c00", "#68217a", "#00bcf2", "#ec008c", "#fff100", "#00b294", "#bad80a"));
+    public final ArrayList<Color> seatColors = new ArrayList<>();
 	public String tableColor = "";
 	public int admin = -1;
 	public boolean debug_mode = false;
 	private long maxDrawValue = 0;
 	public int tableRadius = 1200;
 	private final StampedLock lock = new StampedLock();
-
-
-
+	
+    public final Comparator<Integer> idObjectInstanceDrawValueComparator = new Comparator<Integer>() {
+        @Override
+        public int compare(Integer o1, Integer o2) {
+            return GameInstance.this.getObjectInstanceById(o1).state.drawValue - GameInstance.this.getObjectInstanceById(o2).state.drawValue;
+        }
+    };
+	
 	public static interface GameChangeListener
 	{
 		public void changeUpdate(GameAction action);
@@ -63,8 +73,8 @@ public class GameInstance {
 	
 	public GameInstance(GameInstance other)
 	{
-	    this.game = new Game(other.game);
-        this.password = other.password;
+	    this(new Game(other.game), other.name);
+	     this.password = other.password;
 	    this.name = other.name;
 	    this.hidden =other.hidden;
 	    for (ObjectInstance oi : other.objects){objects.add(oi.copy());}
@@ -73,6 +83,11 @@ public class GameInstance {
 
 	public GameInstance(Game game, String name)
 	{
+	    String colors[] =  {"#e81123", "#00188f", "#009e49", "#ff8c00", "#68217a", "#00bcf2", "#ec008c", "#fff100", "#00b294", "#bad80a"};
+	    for (int i = 0; i < colors.length; ++i)
+	    {
+	        seatColors.add(Color.decode(colors[i]));
+	    }
 		this.game = game;
 		this.name = name;
 	}

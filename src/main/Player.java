@@ -105,7 +105,7 @@ public class Player implements Comparable<Object> {
 		}
 		if (posPlayer != -1 && posPlayer < gameInstance.seatColors.size())
 		{
-			this.color = Color.decode(gameInstance.seatColors.get(posPlayer));
+			this.color = gameInstance.seatColors.get(posPlayer);
 		}
 		else {
 			Random rand = new Random();

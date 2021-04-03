@@ -170,7 +170,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public Color dragColor = Color.red;
 	public Color stackColor = Color.green;
 	public String infoText = "";
-
+	private final ArrayList<ObjectInstance> oiList = new ArrayList<>();
 
 
 
@@ -311,6 +311,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
         //Draw all objects not in some private area
 		ObjectFunctions.getDrawOrder(gameInstance, ial);
+		oiList.clear();
+		gameInstance.getObjects(oiList);
+		oiList.sort(ObjectFunctions.objectInstanceDrawValueComparator);
+		ObjectFunctions.objectListToIntegerArrayList(ial, oiList);
 		drawObjectsFromList(this,g,gameInstance,player, ial);
 
 		//Draw selection rectangle
@@ -479,7 +483,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		updateGameTransform();
 		if (player != null && gameInstance.seatColors.size() > pos)
 		{
-			player.color = Color.decode(gameInstance.seatColors.get(pos));
+			player.color = gameInstance.seatColors.get(pos);
 			player.playerAtTableRotation = (int) PlayerFunctions.GetCurrentPlayerRotation(this, gameInstance,player);
 			player.playerAtTablePosition = pos;
 			ObjectFunctions.moveOwnStackToBoardPosition(this, gameInstance, player, ial);

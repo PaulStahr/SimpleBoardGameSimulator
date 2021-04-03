@@ -31,19 +31,16 @@ public class CheckingFunctions {
 	
 	public static GameInconsistency checkStack(ArrayList<ObjectInstance> tmp, int begin, int end)
 	{
-		if (begin != end)
+		if (begin == end){return null;}
+		ObjectInstance last = tmp.get(begin);
+		if (last.state.belowInstanceId != -1){return new InconsistencyMultistackBottom(last.id, last.state.belowInstanceId);}
+		for (int i = begin + 1; i < end; ++i)
 		{
-			ObjectInstance last = tmp.get(begin);
-			if (last.state.belowInstanceId != -1){return new InconsistencyMultistackBottom(last.id, last.state.belowInstanceId);}
-			for (int i = begin + 1; i < end; ++i)
-			{
-				ObjectInstance current = tmp.get(i);
-				if (last.state.aboveInstanceId != current.id || current.state.belowInstanceId != last.id){return new InconsistencyNotLinkedViceVersa(current.id, last.id);}
-				last = current;
-			}
-			return last.state.aboveInstanceId == -1 ? null : new InconsistencyMultistackTop(last.id, last.state.aboveInstanceId);
+			ObjectInstance current = tmp.get(i);
+			if (last.state.aboveInstanceId != current.id || current.state.belowInstanceId != last.id){return new InconsistencyNotLinkedViceVersa(current.id, last.id);}
+			last = current;
 		}
-		return null;
+		return last.state.aboveInstanceId == -1 ? null : new InconsistencyMultistackTop(last.id, last.state.aboveInstanceId);
 	}
 	
 	public static void packBelongingObjects(int incoming[], int nextIdx, ArrayList<ObjectInstance> sorted, ArrayList<ObjectInstance> output)
@@ -55,10 +52,7 @@ public class CheckingFunctions {
 			int aboveId = current.state.aboveInstanceId;
 			if (aboveId == -1){return;}
 			nextIdx = ArrayTools.binarySearch(sorted, current.state.aboveInstanceId, ObjectInstance.OBJECT_TO_ID);
-			if (nextIdx < 0)
-			{
-				return;
-			}
+			if (nextIdx < 0){return;}
 			--incoming[nextIdx];
 		}
 	}

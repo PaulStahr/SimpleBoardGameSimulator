@@ -63,7 +63,7 @@ public class MoveFunctions {
 
 
     /**
-     * Moves stack to x, y position
+     * Moves stack to x, y position, remaining the relative positions of cards inside the stack
      *
      * @param gamePanel    Game Panel object
      * @param gameInstance Instance of Game
@@ -73,13 +73,16 @@ public class MoveFunctions {
      * @param posY         Target y position
      */
     public static void moveStackTo(GamePanel gamePanel, GameInstance gameInstance, Player player, IntegerArrayList idList, int posX, int posY) {
-        IntegerArrayList relativeX = new IntegerArrayList();
-        IntegerArrayList relativeY = new IntegerArrayList();
+        IntegerArrayList relativeX = new IntegerArrayList(idList.size());
+        IntegerArrayList relativeY = new IntegerArrayList(idList.size());
         relativeX.add(0);
         relativeY.add(0);
-        for (int i = 1; i < idList.size(); i++) {
-            relativeX.add(gameInstance.getObjectInstanceById(idList.getI(i)).state.posX - gameInstance.getObjectInstanceById(idList.getI(0)).state.posX);
-            relativeY.add(gameInstance.getObjectInstanceById(idList.getI(i)).state.posY - gameInstance.getObjectInstanceById(idList.getI(0)).state.posY);
+        int firstPosX = gameInstance.getObjectInstanceById(idList.getI(0)).state.posX;
+        int firstPosY = gameInstance.getObjectInstanceById(idList.getI(0)).state.posY;
+        for (int i = 1; i < idList.size(); i++) {//TODO Why is this done in two loops?
+            ObjectInstance currentObject = gameInstance.getObjectInstanceById(idList.getI(i));            
+            relativeX.add(currentObject.state.posX - firstPosX);
+            relativeY.add(currentObject.state.posY - firstPosY);
         }
         for (int i = 0; i < idList.size(); i++) {
             ObjectInstance currentObject = gameInstance.getObjectInstanceById(idList.getI(i));
