@@ -187,6 +187,12 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 
  	private final ButtonColumn deleteObjectColumn = new ButtonColumn(tableGameObjects,tableAction, GameObject.TYPES.indexOf(GameObjectColumnType.DELETE));
  	private final ButtonColumn resetObjectInstanceColumn = new ButtonColumn(tableGameObjectInstances,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.RESET));
+
+ 	private final ButtonColumn resetCardColumn = new ButtonColumn(tableCards,tableAction, GameObjectToken.TOKEN_ATTRIBUTES.indexOf(GameObjectTokenColumnType.RESET));
+	private final ButtonColumn resetFiguresColumn = new ButtonColumn(tableFigures,tableAction, GameObjectFigure.FIGURE_ATTRIBUTES.indexOf(GameObjectFiguresColumnType.RESET));
+	private final ButtonColumn resetDiceColumn = new ButtonColumn(tableDices,tableAction, GameObjectDice.DICE_ATTRIBUTES.indexOf(GameObjectDicesColumnType.RESET));
+	private final ButtonColumn resetBookColumn = new ButtonColumn(tableBooks,tableAction, GameObjectBook.BOOK_ATTRIBUTES.indexOf(GameObjectBooksColumnType.RESET));
+
  	private final ButtonColumn deleteObjectInstanceColumn = new ButtonColumn(tableGameObjectInstances,tableAction, ObjectInstance.TYPES.indexOf(GameObjectInstanceColumnType.DELETE));
 
  	private final ButtonColumn deleteCardColumn = new ButtonColumn(tableCards, tableAction, GameObjectToken.TOKEN_ATTRIBUTES.indexOf(GameObjectTokenColumnType.DELETE));
@@ -365,10 +371,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
 
 
-		JFrameUtils.updateTable(tableCards, scrollPaneCards, gi.getTokenList(), GameObjectToken.TOKEN_ATTRIBUTES, tableModelCards, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
-		JFrameUtils.updateTable(tableFigures, scrollPaneFigures, gi.getFigureList(), GameObjectFigure.FIGURE_ATTRIBUTES, tableModelFigures, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
-		JFrameUtils.updateTable(tableDices, scrollPaneDices, gi.getDiceList(), GameObjectDice.DICE_ATTRIBUTES, tableModelDices, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
-		JFrameUtils.updateTable(tableBooks, scrollPaneBooks, gi.getBookList(), GameObjectBook.BOOK_ATTRIBUTES, tableModelBooks, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
+		JFrameUtils.updateTable(tableCards, scrollPaneCards, gi.getTokenList(), GameObjectToken.TOKEN_ATTRIBUTES, tableModelCards, comboBoxOverrides, resetCardColumn, deleteCardColumn);
+		JFrameUtils.updateTable(tableFigures, scrollPaneFigures, gi.getFigureList(), GameObjectFigure.FIGURE_ATTRIBUTES, tableModelFigures, null, resetFiguresColumn, deleteFigureColumn);
+		JFrameUtils.updateTable(tableDices, scrollPaneDices, gi.getDiceList(), GameObjectDice.DICE_ATTRIBUTES, tableModelDices, null, resetDiceColumn, deleteDiceColumn);
+		JFrameUtils.updateTable(tableBooks, scrollPaneBooks, gi.getBookList(), GameObjectBook.BOOK_ATTRIBUTES, tableModelBooks, null, resetBookColumn, deleteBookColumn);
 
 
 		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.entrySet().toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, null, deleteImageColumn);

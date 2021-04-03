@@ -3,6 +3,7 @@ package gameObjects.definition;
 import data.Texture;
 import gameObjects.columnTypes.GameObjectBooksColumnType;
 import gameObjects.columnTypes.GameObjectColumnType;
+import gameObjects.columnTypes.GameObjectTokenColumnType;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 import util.ArrayTools;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class GameObjectBook extends GameObject{
 
-    public static final List<TableColumnType> BOOK_ATTRIBUTES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectBooksColumnType.ID, GameObjectBooksColumnType.NAME, GameObjectBooksColumnType.DELETE});
+    public static final List<TableColumnType> BOOK_ATTRIBUTES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectBooksColumnType.ID, GameObjectBooksColumnType.NAME, GameObjectBooksColumnType.POSX, GameObjectBooksColumnType.POSY, GameObjectBooksColumnType.RESET, GameObjectBooksColumnType.DELETE});
 
     public static class BookSide{
         public final int value;

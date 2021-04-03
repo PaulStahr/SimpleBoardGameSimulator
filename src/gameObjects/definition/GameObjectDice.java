@@ -13,7 +13,7 @@ import util.jframe.table.TableColumnType;
 
 public class GameObjectDice extends GameObject{
 
-	public static final List<TableColumnType> DICE_ATTRIBUTES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectDicesColumnType.ID, GameObjectDicesColumnType.NAME, GameObjectDicesColumnType.DELETE});
+	public static final List<TableColumnType> DICE_ATTRIBUTES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectDicesColumnType.ID, GameObjectDicesColumnType.NAME, GameObjectDicesColumnType.POSX, GameObjectDicesColumnType.POSY, GameObjectDicesColumnType.RESET, GameObjectDicesColumnType.DELETE});
 	public static class DiceSide
 	{
 		public final int value;
