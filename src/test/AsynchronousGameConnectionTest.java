@@ -20,7 +20,7 @@ import gameObjects.instance.ObjectState;
 import net.AsynchronousGameConnection;
 
 public class AsynchronousGameConnectionTest {
-    Game game = new Game();
+    Game game = new Game("Testgame");
     GameInstance gi0, gi1;
     Object block0 = new Object(), block1 = new Object();
 

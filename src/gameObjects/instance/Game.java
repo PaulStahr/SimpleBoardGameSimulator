@@ -28,6 +28,8 @@ public class Game {
 	
 	public Game copy() {return new Game(this);}
 
+    public Game(String name) {this.name = name;}
+
     public Game() {}
 
     public GameObject getObject(String uniqueObjectName) {
