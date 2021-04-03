@@ -1693,7 +1693,6 @@ public class ObjectFunctions {
     }
 
     public static void getDrawOrder(GameInstance gameInstance, IntegerArrayList ial){
-        ial.clear();
         ArrayList<ObjectInstance> drawValues = new ArrayList<>();
         integerArrayListToObjectList(gameInstance, ial, drawValues);
         drawValues.sort(objectInstanceDrawValueComparator);
@@ -1721,7 +1720,7 @@ public class ObjectFunctions {
         }
     };
 
-    private static final Comparator<ObjectInstance> objectInstanceDrawValueComparator = new Comparator<ObjectInstance>() {
+    public static final Comparator<ObjectInstance> objectInstanceDrawValueComparator = new Comparator<ObjectInstance>() {
         @Override
         public int compare(ObjectInstance o1, ObjectInstance o2) {
             return o1.state.drawValue - o2.state.drawValue;

@@ -517,4 +517,5 @@ public class GameInstance {
 	public GameChangeListener getChangeListener(int index){return changeListener.get(index);}
 	public int getChangeListenerCount() {return changeListener.size();}
 	public void removeChangeListener(GameChangeListener listener) {changeListener.remove(listener);}
+    public void getObjects(ArrayList<ObjectInstance> oiList) {oiList.addAll(objects);}
 }
