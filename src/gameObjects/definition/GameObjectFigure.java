@@ -7,6 +7,8 @@ import java.util.List;
 
 import data.Texture;
 import gameObjects.columnTypes.GameObjectColumnType;
+import gameObjects.columnTypes.GameObjectFiguresColumnType;
+import gameObjects.columnTypes.GameObjectTokenColumnType;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 import util.ArrayTools;
@@ -18,9 +20,7 @@ public class GameObjectFigure extends GameObject{
 	private String standingLookStr;
 	private String lyingLookStr;
 
-	public static final List<TableColumnType> FIGURE_ATTRIBUTES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectColumnType.ID, GameObjectColumnType.NAME, GameObjectColumnType.DELETE});
-
-
+	public static final List<TableColumnType> FIGURE_ATTRIBUTES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectFiguresColumnType.ID, GameObjectFiguresColumnType.NAME, GameObjectFiguresColumnType.POSX, GameObjectFiguresColumnType.POSY, GameObjectFiguresColumnType.RESET, GameObjectFiguresColumnType.DELETE});
 	public GameObjectFigure(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, Texture standingLook, int value, int sortValue, int rotationStep, int isFixed) {
 		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, sortValue, rotationStep,isFixed);
 		this.standingLook = standingLook;

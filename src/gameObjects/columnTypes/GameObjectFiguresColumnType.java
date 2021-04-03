@@ -12,9 +12,6 @@ public enum GameObjectFiguresColumnType implements TableColumnType {
     NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
     POSX("xpos", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
     POSY("ypos", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
-    OWNER("owner", ValueColumnTypes.TYPE_COMBOBOX, "Unnamed", null),
-    ABOVE("above", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
-    BELOW("below", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
     RESET("Reset", ValueColumnTypes.TYPE_TEXTFIELD, "Delete", null),
     DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null);
 
@@ -66,9 +63,6 @@ public enum GameObjectFiguresColumnType implements TableColumnType {
             case NAME:		return gi.go.uniqueObjectName;
             case POSX:		return gi.state.posX;
             case POSY:		return gi.state.posY;
-            case ABOVE:		return gi.state.aboveInstanceId;
-            case BELOW:		return gi.state.belowInstanceId;
-            case OWNER:		return gi.owner_id();
             case RESET:		return "Reset";
             default:throw new IllegalArgumentException(getName());
         }

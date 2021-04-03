@@ -5,6 +5,7 @@ import java.util.Random;
 
 import data.Texture;
 import gameObjects.columnTypes.GameObjectColumnType;
+import gameObjects.columnTypes.GameObjectDicesColumnType;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 import util.ArrayTools;
@@ -12,9 +13,7 @@ import util.jframe.table.TableColumnType;
 
 public class GameObjectDice extends GameObject{
 
-	public static final List<TableColumnType> DICE_ATTRIBUTES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectColumnType.ID, GameObjectColumnType.NAME, GameObjectColumnType.DELETE});
-
-
+	public static final List<TableColumnType> DICE_ATTRIBUTES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectDicesColumnType.ID, GameObjectDicesColumnType.NAME, GameObjectDicesColumnType.DELETE});
 	public static class DiceSide
 	{
 		public final int value;
