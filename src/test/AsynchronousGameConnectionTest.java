@@ -25,7 +25,7 @@ public class AsynchronousGameConnectionTest {
     Object block0 = new Object(), block1 = new Object();
 
     public AsynchronousGameConnectionTest() throws IOException {
-        game.objects.add(new GameObjectToken("token", "card", 10, 10, null, null, 5, 5, 90, 0));
+        game.objects.add(new GameObjectToken("token", "card", 10, 10, null, null, 5, 5, 90, 0, false, -1));
         gi0 = new GameInstance(game, "Foobar");
         gi0.addObjectInstance(new ObjectInstance(game.objects.get(0), 4));
         gi1 = new GameInstance(gi0);

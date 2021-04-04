@@ -20,14 +20,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import gameObjects.definition.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.Texture;
-import gameObjects.definition.GameObjectBook;
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import geometry.Vector2d;
@@ -85,12 +82,19 @@ public class DrawFunctions {
                     else if (oi.go instanceof GameObjectBook){
                         drawBookObjects(gamePanel, g, gameInstance, oi, player, 1);
                     }
+                    else if (oi.go instanceof GameObjectBox){
+                        drawBoxObjects(gamePanel, g, gameInstance, oi, player, 1);
+                    }
                 }catch(Exception e)
                 {
                     logger.error("Error in drawing Tokens", e);
                 }
             }
         }
+    }
+
+    private static void drawBoxObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming) {
+        drawObject(gamePanel, g, gameInstance, gameInstance.getObjectInstanceById(oi.id), player, zooming, 5);
     }
 
     public static void drawBookObjects(GamePanel gamePanel, Graphics g, GameInstance gameInstance, ObjectInstance oi, Player player, int zooming) {
@@ -499,12 +503,17 @@ public class DrawFunctions {
         IntegerArrayList ial = new IntegerArrayList();
         int hoverId = (hoveredObject== null) ? -1 : hoveredObject.id;
         int drawValue = (hoveredObject== null) ? -1 : hoveredObject.state.drawValue;
+
         StringBuilder stringSelectedObjects = new StringBuilder();
         StringBuilder stringHandCards = new StringBuilder();
         StringBuilder stringActiveObjects = new StringBuilder();
         StringBuilder stringHoveredStack = new StringBuilder();
         StringBuilder stringPrivateAreaCards = new StringBuilder();
 
+        StringBuilder stringAboveIds = new StringBuilder();
+        StringBuilder stringBelowId = new StringBuilder();
+        StringBuilder stringBoxId = new StringBuilder();
+        StringBuilder stringInBox = new StringBuilder();
 
         for (int i = 0; i < selectedObjects.size(); ++i)
         {
@@ -559,6 +568,21 @@ public class DrawFunctions {
             }
         }
 
+        if (hoverId != -1){
+            ObjectInstance objectInstance = gameInstance.getObjectInstanceById(hoverId);
+            for (int i= 0; i < objectInstance.state.aboveLyingObectIds.size(); ++i){
+                if (i==0){
+                    stringAboveIds.append(objectInstance.state.aboveLyingObectIds.get(i));
+                }
+                else{
+                    stringAboveIds.append("; ").append(objectInstance.state.aboveLyingObectIds.get(i));
+                }
+            }
+            stringBelowId.append(objectInstance.state.liesOnId);
+            stringBoxId.append(objectInstance.state.boxId);
+            stringInBox.append(objectInstance.state.inBox);
+        }
+
         int yPos = 20;
         int yStep = 20;
         g2.setColor(player.color);
@@ -583,6 +607,14 @@ public class DrawFunctions {
         g2.drawString("Hovered Draw Value: " + Long.toString(drawValue), 50, yPos);
         yPos+=yStep;
         g2.drawString("Hovered Stack: " + stringHoveredStack, 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Above  Lying: " + stringAboveIds, 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Below Id: " + stringBelowId, 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Box Id: " + stringBoxId, 50, yPos);
+        yPos+=yStep;
+        g2.drawString("In Box: " + stringInBox, 50, yPos);
         yPos+=yStep;
         g2.drawString("Selected Objects: " + stringSelectedObjects, 50, yPos);
         yPos+=yStep;

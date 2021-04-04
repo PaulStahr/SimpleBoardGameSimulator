@@ -40,8 +40,8 @@ public class GameObjectDice extends GameObject{
 	}
 	public DiceSide dss[];
 	
-	public GameObjectDice(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, DiceSide sides[], int value, int sortValue, int rotationStep) {
-		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, sortValue, rotationStep, 0);
+	public GameObjectDice(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, DiceSide sides[], int value, int sortValue, int rotationStep, boolean inBox, int boxId) {
+		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, sortValue, rotationStep, 0, inBox, boxId);
 		this.dss = sides;
 	}
 

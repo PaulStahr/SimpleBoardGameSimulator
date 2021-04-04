@@ -35,8 +35,8 @@ public class GameObjectBook extends GameObject{
     }
     public BookSide bss[];
 
-    public GameObjectBook(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, GameObjectBook.BookSide sides[], int value, int sortValue, int rotationStep){
-        super(uniqueObjectName, objectType, widthInMM, heightInMM, value, sortValue, rotationStep, 0);
+    public GameObjectBook(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, GameObjectBook.BookSide sides[], int value, int sortValue, int rotationStep, boolean inBox, int boxId){
+        super(uniqueObjectName, objectType, widthInMM, heightInMM, value, sortValue, rotationStep, 0, inBox, boxId);
         this.bss = sides;
     }
 

@@ -59,6 +59,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import gameObjects.definition.*;
+import gameObjects.functions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,14 +77,6 @@ import gameObjects.action.player.PlayerCharacterPositionUpdate;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerMousePositionUpdate;
 import gameObjects.action.player.PlayerRemoveAction;
-import gameObjects.definition.GameObjectBook;
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
-import gameObjects.functions.DrawFunctions;
-import gameObjects.functions.MoveFunctions;
-import gameObjects.functions.ObjectFunctions;
-import gameObjects.functions.PlayerFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
@@ -313,8 +307,10 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		ObjectFunctions.getDrawOrder(gameInstance, ial);
 		oiList.clear();
 		gameInstance.getObjects(oiList);
-		oiList.sort(ObjectFunctions.objectInstanceDrawValueComparator);
-		ObjectFunctions.objectListToIntegerArrayList(ial, oiList);
+		ArrayList<ObjectInstance> drawableObjects = new ArrayList<>();
+		CheckFunctions.drawableObjectsOnTable(oiList, drawableObjects);
+		drawableObjects.sort(ObjectFunctions.objectInstanceDrawValueComparator);
+		ObjectFunctions.objectListToIntegerArrayList(ial, drawableObjects);
 		drawObjectsFromList(this,g,gameInstance,player, ial);
 
 		//Draw selection rectangle
@@ -433,11 +429,19 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (!player.visitor) {
 			if (arg0.getClickCount() == 2) {
 				//Play object with double click
-				if (hoveredObject != null && !ObjectFunctions.IsObjectInTableMiddle(this,hoveredObject) && !(hoveredObject.go instanceof GameObjectBook)){
-					ObjectFunctions.playObject(this,gameInstance,player,hoveredObject);
-				}
-				else if(hoveredObject != null && ObjectFunctions.IsObjectInTableMiddle(this,hoveredObject) && !(hoveredObject.go instanceof GameObjectBook)){
-					ObjectFunctions.takeTrick(this, gameInstance, player, hoveredObject, ial);
+				if (hoveredObject != null) {
+					if (!ObjectFunctions.IsObjectInTableMiddle(this, hoveredObject) && hoveredObject.go instanceof GameObjectToken) {
+						ObjectFunctions.playObject(this, gameInstance, player, hoveredObject);
+					} else if (ObjectFunctions.IsObjectInTableMiddle(this, hoveredObject) && hoveredObject.go instanceof GameObjectToken) {
+						ObjectFunctions.takeTrick(this, gameInstance, player, hoveredObject, ial);
+					} else if (hoveredObject.go instanceof GameObjectBox){
+						if (!arg0.isShiftDown()) {
+							ObjectFunctions.unpackBox(this, gameInstance, player, hoveredObject);
+						}
+						else{
+							ObjectFunctions.packBox(this, gameInstance, player, hoveredObject);
+						}
+					}
 				}
 				else{
 					//Sit down on double click on seat

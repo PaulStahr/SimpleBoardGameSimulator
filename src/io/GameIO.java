@@ -22,6 +22,7 @@ import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
+import gameObjects.definition.*;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -34,13 +35,8 @@ import org.slf4j.LoggerFactory;
 
 import data.Texture;
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.definition.GameObject;
-import gameObjects.definition.GameObjectBook;
 import gameObjects.definition.GameObjectBook.BookSide;
-import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectDice.DiceSide;
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -163,9 +159,12 @@ public class GameIO {
 								else {
 									gi.admin = -1;
 								}
-
+								break;
 							case IOString.DEBUG_MODE:
 								gi.debug_mode = Boolean.parseBoolean(elemSettings.getValue());
+								break;
+							case IOString.INITIAL_MODE:
+								gi.initial_mode = Boolean.parseBoolean(elemSettings.getValue());
 						}
 					}
 					break;
@@ -175,27 +174,30 @@ public class GameIO {
 						throw new IOException("Object must have a unique name");
 					}
 					uniqueName = elem.getAttributeValue(IOString.UNIQUE_NAME);
+					int objectNumber = 1;
 					if (elem.getAttributeValue(IOString.NUMBER) != null) {
-						for (int i = 0; i < Integer.parseInt(elem.getAttributeValue(IOString.NUMBER)); ++i) {
-							ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), uniqueId);
-							ObjectStateIO.editStateFromElement(oi.state, elem);
-							if (oi.state.isFixed){
-								oi.state.drawValue = 0;
-							}
-							else {
-								oi.state.drawValue = max(max(oi.state.drawValue, uniqueId), 1);
-							}
-							gi.addObjectInstance(oi);
-							++uniqueId;
+						objectNumber = Integer.parseInt(elem.getAttributeValue(IOString.NUMBER));
+					}
+					for (int i = 0; i < objectNumber; ++i) {
+						if (gi.game.getObject(uniqueName) == null) {
+							throw new IOException("Unique name" + uniqueName + " not defined");
 						}
-					} else {
 						ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), uniqueId);
 						ObjectStateIO.editStateFromElement(oi.state, elem);
-						if (oi.state.isFixed){
+						if (oi.state.isFixed) {
 							oi.state.drawValue = 0;
-						}
-						else {
+						} else {
 							oi.state.drawValue = max(max(oi.state.drawValue, uniqueId), 1);
+						}
+
+						if (elem.getAttributeValue(IOString.ORIGINAL_X) == null) {
+							oi.state.originalX = oi.state.posX;
+						}
+						if (elem.getAttributeValue(IOString.ORIGINAL_Y) == null) {
+							oi.state.originalY = oi.state.posY;
+						}
+						if (elem.getAttributeValue(IOString.ORIGINAL_ROTATION) == null) {
+							oi.state.originalRotation = oi.state.rotation;
 						}
 						gi.addObjectInstance(oi);
 						++uniqueId;
@@ -229,17 +231,19 @@ public class GameIO {
 		int value = readAttribute(elem, IOString.VALUE, 0);
 		int sortValue = readAttribute(elem, IOString.SORT_VALUE, 0);
 		int rotationStep = readAttribute(elem, IOString.ROTATION_STEP, 90);
+		int boxId = readAttribute(elem, IOString.BOX_ID, -1);
+		boolean inBox = readAttribute(elem, IOString.IN_BOX, false);
 		int isFixed = readAttribute(elem, IOString.IS_FIXED, 0);
 		switch(type)
 		{
 			case IOString.CARD:
 			{
-				result = new GameObjectToken(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value, sortValue, rotationStep, isFixed);
+				result = new GameObjectToken(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value, sortValue, rotationStep, isFixed, inBox, boxId);
 				break;
 			}
 			case IOString.FIGURE:
 			{
-				result = new GameObjectFigure(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.STANDING)), value, sortValue, rotationStep, isFixed);
+				result = new GameObjectFigure(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.STANDING)), value, sortValue, rotationStep, isFixed, inBox, boxId);
 				break;
 			}
 			case IOString.DICE:
@@ -254,7 +258,7 @@ public class GameIO {
 						dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img, side.getValue()));
 					}
 				}
-				result = new GameObjectDice(objectName, type, width, height, dss.toArray(new DiceSide[dss.size()]), value, sortValue, rotationStep);
+				result = new GameObjectDice(objectName, type, width, height, dss.toArray(new DiceSide[dss.size()]), value, sortValue, rotationStep, inBox, boxId);
 				break;
 			}
 			case IOString.BOOK:
@@ -269,7 +273,12 @@ public class GameIO {
 						bss.add(new BookSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img, side.getValue()));
 					}
 				}
-				result = new GameObjectBook(objectName, type, width, height, bss.toArray(new BookSide[bss.size()]), value, sortValue, rotationStep);
+				result = new GameObjectBook(objectName, type, width, height, bss.toArray(new BookSide[bss.size()]), value, sortValue, rotationStep, inBox, boxId);
+				break;
+			}
+			case IOString.BOX:
+			{
+				result = new GameObjectBox(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), rotationStep, inBox, boxId);
 				break;
 			}
 		}
@@ -331,7 +340,6 @@ public class GameIO {
 			{
 				elem.setAttribute(IOString.BACK, game.getImageKey(token.getDownsideLook()));
 			}
-
 		}
 		else if (gameObject instanceof GameObjectFigure)
 		{
@@ -357,6 +365,14 @@ public class GameIO {
 				sideElem.setAttribute(IOString.VALUE, Integer.toString(side.value));
 				sideElem.setText(game.getImageKey(side.img));
 				elem.addContent(sideElem);
+			}
+		}
+		else if (gameObject instanceof GameObjectBox){
+			GameObjectBox box = (GameObjectBox) gameObject;
+			elem.setAttribute(IOString.FRONT, game.getImageKey(box.getUpsideLook()));
+			if (box.getDownsideLook() != null)
+			{
+				elem.setAttribute(IOString.BACK, game.getImageKey(box.getDownsideLook()));
 			}
 		}
 		return elem;
@@ -441,6 +457,9 @@ public class GameIO {
 			Element debugMode = new Element(IOString.DEBUG_MODE);
 			debugMode.setText(Boolean.toString(gi.debug_mode));
 
+			Element initialMode = new Element(IOString.INITIAL_MODE);
+			initialMode.setText(Boolean.toString(gi.initial_mode));
+
 			Element seats = new Element(IOString.SEATS);
 			for (int i=0; i<gi.seats;++i)
 			{
@@ -462,6 +481,7 @@ public class GameIO {
 			}
 			settings.addContent(admin);
 			settings.addContent(debugMode);
+			settings.addContent(initialMode);
 			settings.setAttribute(IOString.HIDDEN,Boolean.toString(gi.hidden));
 			root_inst.addContent(settings);
 
@@ -813,12 +833,20 @@ public class GameIO {
 		objOut.writeInt(editedObject.value);
 		objOut.writeInt(editedObject.sortValue);
 		objOut.writeObject(editedObject.objectType);
-		objOut.writeObject(editedObject.isFixed);
+		objOut.writeInt(editedObject.boxId);
+		objOut.writeBoolean(editedObject.inBox);
+		objOut.writeInt(editedObject.isFixed);
 		if (editedObject instanceof GameObjectToken)
 		{
 			GameObjectToken token = (GameObjectToken)editedObject;
 			objOut.writeObject(token.getDownsideLookId());
 			objOut.writeObject(token.getUpsideLookId());
+		}
+		else if (editedObject instanceof GameObjectBox)
+		{
+			GameObjectBox box = (GameObjectBox) editedObject;
+			objOut.writeObject(box.getDownsideLookId());
+			objOut.writeObject(box.getUpsideLookId());
 		}
 	}
 	
@@ -829,6 +857,8 @@ public class GameIO {
 		object.value = objIn.readInt();
 		object.sortValue = objIn.readInt();
 		object.objectType = (String)objIn.readObject();
+		object.boxId = objIn.readInt();
+		object.inBox = objIn.readBoolean();
 		object.isFixed = objIn.readInt();
 		if (object instanceof GameObjectToken)
 		{
@@ -836,7 +866,12 @@ public class GameIO {
 			token.setDownsideLook((String)objIn.readObject());
 			token.setUpsideLook((String)objIn.readObject());
 		}
-	}
+		else if (object instanceof GameObjectBox)
+		{
+			GameObjectBox box = (GameObjectBox)object;
+			box.setDownsideLook((String)objIn.readObject());
+			box.setUpsideLook((String)objIn.readObject());
+		}	}
 	
 	public static void writeGameObjectInstanceEditActionToStreamObject(ObjectOutputStream out, GameObjectInstanceEditAction action) throws IOException
 	{

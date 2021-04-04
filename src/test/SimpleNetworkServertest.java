@@ -99,6 +99,7 @@ public class SimpleNetworkServertest {
 			GameInstance gi = new GameInstance(new Game(), null);
 			GameIO.readSnapshotFromZip(fis, gi);
 			gi.name = "Testsession";
+			gi.begin_play();
 			gi.addPlayer(null, player);
 			fis.close();
 			connectAndStartGame(address, port, player, gi, lh);

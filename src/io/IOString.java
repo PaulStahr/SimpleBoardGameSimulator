@@ -68,4 +68,11 @@ public class IOString {
 	public static final String SORT_VALUE = "sort_value";
     public static final String LYING_ON = "lying_on";
 	public static final String LYING_ABOVE = "lying_above";
+	public static final String INITIAL_MODE = "initial_mode";
+    public static final String IN_BOX = "in_box";
+	public static final String ORIGINAL_X = "original_x";
+	public static final String ORIGINAL_Y = "original_y";
+    public static final String BOX = "box";
+	public static final String BOX_NAME = "box_name";
+    public static final String BOX_ID = "box_id";
 }

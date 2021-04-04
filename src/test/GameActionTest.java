@@ -16,7 +16,7 @@ public class GameActionTest {
     public void ObjectStateEvent()
     {
         Game game = new Game();
-        game.objects.add(new GameObjectToken("token", "card", 10, 10, null, null, 5, 5, 90, 0));
+        game.objects.add(new GameObjectToken("token", "card", 10, 10, null, null, 5, 5, 90, 0, false, -1));
         GameInstance gi = new GameInstance(game, "Foobar");
         gi.addObjectInstance(new ObjectInstance(game.objects.get(0), 4));
         ObjectState state = gi.getObjectInstanceById(4).copyState();

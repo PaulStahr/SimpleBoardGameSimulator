@@ -3,12 +3,11 @@ package gameObjects.instance;
 import static java.lang.Math.max;
 
 import java.awt.Color;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.awt.geom.Point2D;
+import java.util.*;
 import java.util.concurrent.locks.StampedLock;
 
+import gameObjects.functions.ObjectFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +31,8 @@ import gameObjects.definition.GameObjectToken;
 import gameObjects.functions.CheckingFunctions;
 import main.Player;
 import util.ArrayTools;
+import util.Pair;
+import util.data.IntegerArrayList;
 import util.jframe.table.TableColumnType;
 
 public class GameInstance {
@@ -55,7 +56,8 @@ public class GameInstance {
 	public String tableColor = "";
 	public int admin = -1;
 	public boolean debug_mode = false;
-	private long maxDrawValue = 0;
+    public boolean initial_mode = true;
+    private long maxDrawValue = 0;
 	public int tableRadius = 1200;
 	private final StampedLock lock = new StampedLock();
 	
@@ -65,7 +67,8 @@ public class GameInstance {
             return GameInstance.this.getObjectInstanceById(o1).state.drawValue - GameInstance.this.getObjectInstanceById(o2).state.drawValue;
         }
     };
-	
+
+
 	public static interface GameChangeListener
 	{
 		public void changeUpdate(GameAction action);
@@ -98,7 +101,16 @@ public class GameInstance {
 		players.clear();
 		game.clear();
 	}
-	
+
+	public void begin_play() {
+		//Stack all card objects with same position and group
+		if (this.initial_mode == true) {
+			ObjectFunctions.loadInitialState(this);
+		}
+		this.initial_mode = false;
+	}
+
+
 	public int getMaxDrawValue()
 	{
 		//return maxDrawValue;

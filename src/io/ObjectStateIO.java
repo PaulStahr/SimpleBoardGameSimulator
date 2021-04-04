@@ -56,16 +56,20 @@ public class ObjectStateIO {
         state.belowInstanceId 	= GameIO.readAttribute(elem, IOString.BELOW, state.belowInstanceId);
         state.liesOnId 			= GameIO.readAttribute(elem, IOString.LYING_ON, state.liesOnId);
                                   GameIO.readAttribute(elem, IOString.LYING_ABOVE, state.aboveLyingObectIds);
+        state.inPrivateArea       = GameIO.readAttribute(elem, IOString.IN_PRIVATE_AREA, state.inPrivateArea);
         state.owner_id 			= GameIO.readAttribute(elem, IOString.OWNER_ID, state.owner_id);
         state.isSelected 		= GameIO.readAttribute(elem, IOString.IS_SELECTED, state.isSelected);
         state.drawValue			= GameIO.readAttribute(elem, IOString.DRAW_VALUE, state.drawValue);
         state.posX 				= GameIO.readAttribute(elem, IOString.X, state.posX);
+        state.originalX         = GameIO.readAttribute(elem, IOString.ORIGINAL_X, state.originalX);
         state.posY 				= GameIO.readAttribute(elem, IOString.Y, state.posY);
+        state.originalY         = GameIO.readAttribute(elem, IOString.ORIGINAL_Y, state.originalY);
         state.value				= GameIO.readAttribute(elem, IOString.VALUE, state.value);
         state.sortValue         = GameIO.readAttribute(elem, IOString.SORT_VALUE, state.sortValue);
         state.rotationStep		= GameIO.readAttribute(elem, IOString.ROTATION_STEP, state.rotationStep);
+        state.boxId             = GameIO.readAttribute(elem, IOString.BOX_ID, state.boxId);
+        state.inBox             = GameIO.readAttribute(elem, IOString.IN_BOX, state.inBox);
         state.isFixed			= GameIO.readAttribute(elem, IOString.IS_FIXED, state.isFixed);
-        state.inPrivateArea       = GameIO.readAttribute(elem, IOString.IN_PRIVATE_AREA, state.inPrivateArea);
         if (state instanceof GameObjectToken.TokenState)
         {
             ((GameObjectToken.TokenState)state).side = GameIO.readAttribute(elem, IOString.SIDE, ((GameObjectToken.TokenState)state).side);
@@ -98,12 +102,16 @@ public class ObjectStateIO {
         state.isSelected = is.readInt();
         state.drawValue = is.readInt();
         state.posX = is.readInt();
+        state.originalX = is.readInt();
         state.posY = is.readInt();
+        state.originalY = is.readInt();
         state.rotation = is.readInt();
         state.scale = is.readInt();
         state.value = is.readInt();
         state.sortValue = is.readInt();
         state.rotationStep = is.readInt();
+        state.boxId = is.readInt();
+        state.inBox = is.readBoolean();
         state.isFixed = is.readBoolean();
         if (state instanceof GameObjectToken.TokenState)
         {
@@ -133,12 +141,16 @@ public class ObjectStateIO {
         out.writeInt(state.isSelected);
         out.writeInt(state.drawValue);
         out.writeInt(state.posX);
+        out.writeInt(state.originalX);
         out.writeInt(state.posY);
+        out.writeInt(state.originalY);
         out.writeInt(state.rotation);
         out.writeInt(state.scale);
         out.writeInt(state.value);
         out.writeInt(state.sortValue);
         out.writeInt(state.rotationStep);
+        out.writeInt(state.boxId);
+        out.writeBoolean(state.inBox);
         out.writeBoolean(state.isFixed);
         if (state instanceof GameObjectToken.TokenState)
         {
@@ -165,10 +177,13 @@ public class ObjectStateIO {
     static void writeStateToElement(ObjectState state, Element elem)
     {
         elem.setAttribute(IOString.X, 				Integer.toString(state.posX));
+        elem.setAttribute(IOString.ORIGINAL_X,      Integer.toString(state.originalX));
         elem.setAttribute(IOString.Y, 				Integer.toString(state.posY));
+        elem.setAttribute(IOString.ORIGINAL_Y,      Integer.toString(state.originalY));
         elem.setAttribute(IOString.R, 				Integer.toString(state.rotation));
         elem.setAttribute(IOString.ORIGINAL_ROTATION, 				Integer.toString(state.originalRotation));
         elem.setAttribute(IOString.S, 				Integer.toString(state.scale));
+        elem.setAttribute(IOString.IN_PRIVATE_AREA, Boolean.toString(state.inPrivateArea));
         elem.setAttribute(IOString.OWNER_ID, 		Integer.toString(state.owner_id));
         elem.setAttribute(IOString.IS_SELECTED, 		Integer.toString(state.isSelected));
         elem.setAttribute(IOString.DRAW_VALUE, 		Integer.toString(state.drawValue));
@@ -179,8 +194,9 @@ public class ObjectStateIO {
         elem.setAttribute(IOString.VALUE, 			Integer.toString(state.value));
         elem.setAttribute(IOString.SORT_VALUE,		Integer.toString(state.sortValue));
         elem.setAttribute(IOString.ROTATION_STEP, 	Integer.toString(state.rotationStep));
+        elem.setAttribute(IOString.BOX_ID,          Integer.toString(state.boxId));
+        elem.setAttribute(IOString.IN_BOX,          Boolean.toString(state.inBox));
         elem.setAttribute(IOString.IS_FIXED, 		Boolean.toString(state.isFixed));
-        elem.setAttribute(IOString.IN_PRIVATE_AREA, Boolean.toString(state.inPrivateArea));
         if (state instanceof GameObjectToken.TokenState) 					{elem.setAttribute(IOString.SIDE, Boolean.toString(((GameObjectToken.TokenState) state).side));}
         if (state instanceof GameObjectFigure.FigureState)	{elem.setAttribute(IOString.STANDING, Boolean.toString(((GameObjectFigure.FigureState) state).standing));}
         if (state instanceof GameObjectDice.DiceState)		{elem.setAttribute(IOString.SIDE, Integer.toString(((GameObjectDice.DiceState)state).side));}

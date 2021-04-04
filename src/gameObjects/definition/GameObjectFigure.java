@@ -21,8 +21,8 @@ public class GameObjectFigure extends GameObject{
 	private String lyingLookStr;
 
 	public static final List<TableColumnType> FIGURE_ATTRIBUTES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectFiguresColumnType.ID, GameObjectFiguresColumnType.NAME, GameObjectFiguresColumnType.POSX, GameObjectFiguresColumnType.POSY, GameObjectFiguresColumnType.RESET, GameObjectFiguresColumnType.DELETE});
-	public GameObjectFigure(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, Texture standingLook, int value, int sortValue, int rotationStep, int isFixed) {
-		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, sortValue, rotationStep,isFixed);
+	public GameObjectFigure(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, Texture standingLook, int value, int sortValue, int rotationStep, int isFixed, boolean inBox, int boxId) {
+		super(uniqueObjectName, objectType, widthInMM, heightInMM, value, sortValue, rotationStep,isFixed, inBox, boxId);
 		this.standingLook = standingLook;
 		// calc a rotated figure from standing figure
 		try {

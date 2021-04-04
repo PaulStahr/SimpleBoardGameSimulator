@@ -21,12 +21,15 @@ public abstract class GameObject {
 	public int value;
 	public int sortValue;
 	public int rotationStep;
+	public int boxId;
+	public boolean inBox;
 	public int isFixed;
 	public String groups[] = UniqueObjects.EMPTY_STRING_ARRAY;
 
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{GameObjectColumnType.ID, GameObjectColumnType.NAME, GameObjectColumnType.DELETE});
 
-	public GameObject(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, int value, int sortValue, int rotationStep, int isFixed)
+
+    public GameObject(String uniqueObjectName, String objectType, int widthInMM, int heightInMM, int value, int sortValue, int rotationStep, int isFixed, boolean inBox, int boxId)
 	{
 		this.uniqueObjectName = uniqueObjectName;
 		this.objectType = objectType;
@@ -35,6 +38,8 @@ public abstract class GameObject {
 		this.value = value;
 		this.sortValue = sortValue;
 		this.rotationStep = rotationStep;
+		this.boxId = boxId;
+		this.inBox = inBox;
 		this.isFixed = isFixed;
 	}
 
@@ -47,6 +52,8 @@ public abstract class GameObject {
         this.objectType = other.objectType;
         this.value = other.value;
         this.rotationStep = other.rotationStep;
+        this.boxId = other.boxId;
+        this.inBox = other.inBox;
         this.isFixed = other.isFixed;
         this.groups = other.groups.clone();
     }
@@ -99,6 +106,8 @@ public abstract class GameObject {
                 && this.objectType.equals(other.objectType)
                 && this.value == other.value
                 && this.rotationStep == other.rotationStep
+				&& this.boxId == other.boxId
+				&& this.inBox == other.inBox
                 && this.isFixed == other.isFixed
                 && Arrays.equals(this.groups, other.groups);
     }

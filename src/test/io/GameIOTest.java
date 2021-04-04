@@ -22,7 +22,7 @@ public class GameIOTest {
         Texture bar = new Texture(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "png");
         game.images.put("foo.png",foo);
         game.images.put("bar.png",bar);
-        GameObjectToken token = new GameObjectToken("baz", "card", 10, 2, foo, bar, 1, 2, 3, 4);
+        GameObjectToken token = new GameObjectToken("baz", "card", 10, 2, foo, bar, 1, 2, 3, 4, false, -1);
         GameObject res;
         Element elem = GameIO.createElementFromGameObject(token, game);
         res = GameIO.createGameObjectFromElement(elem, game.images);
