@@ -108,22 +108,13 @@ public class Player implements Comparable<Object> {
 			this.color = gameInstance.seatColors.get(posPlayer);
 		}
 		else {
-			Random rand = new Random();
-			float r = rand.nextFloat();
-			float g = rand.nextFloat();
-			float b = rand.nextFloat();
-
-			this.color = new Color(r, g, b);
-		}
+            this.color = new Color(new Random().nextInt() & 0xFFFFFF);
+        }
 	}
 
 	public void setPlayerColor(){
 		if (this.color == null) {
-			Random rand = new Random();
-			float r = rand.nextFloat();
-			float g = rand.nextFloat();
-			float b = rand.nextFloat();
-			this.color = new Color(r, g, b);
+            this.color = new Color(new Random().nextInt() & 0xFFFFFF);
 		}
 	}
 
@@ -137,7 +128,6 @@ public class Player implements Comparable<Object> {
 		this.color = player.color;
 		this.mouseXPos = player.mouseXPos;
 		this.mouseYPos = player.mouseYPos;
-		System.out.println(this.mouseXPos);
 	}
 
 	@Override

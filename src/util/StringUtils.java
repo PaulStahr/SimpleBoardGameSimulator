@@ -549,7 +549,6 @@ public class StringUtils {
    			do
    			{
 	   			lhs = rhs;
-	   			//System.out.println(str + " " + rhs + " "+ to);
 	   			rhs = indexOf(str, rhs +1, to, c);
 	   			if (rhs == -1)
 	   			{
