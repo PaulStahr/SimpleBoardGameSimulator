@@ -12,7 +12,8 @@ public enum PlayerColumnType implements TableColumnType{
 	ID("id", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	NAME("name", ValueColumnTypes.TYPE_TEXTFIELD, "Unnamed", null),
 	DELETE("Delete", ValueColumnTypes.TYPE_BUTTON, "Delete", null),
-	REPAIR("Repair", ValueColumnTypes.TYPE_BUTTON, "Repair", null);
+	REPAIR("Repair", ValueColumnTypes.TYPE_BUTTON, "Repair", null),
+	COLOR("", ValueColumnTypes.TYPE_BUTTON, "Color", null);
 	
     private static final PlayerColumnType ct[] = PlayerColumnType.values();
     private static final String[] columnNames = TableColumnType.getColumnNames(ct);
@@ -69,6 +70,7 @@ public enum PlayerColumnType implements TableColumnType{
 			case REPAIR:	return "Repair";
 			case ID:		return gi.id;
 			case NAME:		return gi.getName();
+			case COLOR:     return "";
 			default:throw new IllegalArgumentException(getName());
 		}
 	}

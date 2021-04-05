@@ -25,6 +25,7 @@ import java.util.function.Function;
 import javax.swing.AbstractAction;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
+import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -41,7 +42,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.text.Document;
 
 import data.Texture;
-import gameObjects.columnTypes.*;
 import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
@@ -49,8 +49,12 @@ import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerRemoveAction;
+import gameObjects.columnTypes.GameObjectBooksColumnType;
 import gameObjects.columnTypes.GameObjectColumnType;
+import gameObjects.columnTypes.GameObjectDicesColumnType;
+import gameObjects.columnTypes.GameObjectFiguresColumnType;
 import gameObjects.columnTypes.GameObjectInstanceColumnType;
+import gameObjects.columnTypes.GameObjectTokenColumnType;
 import gameObjects.columnTypes.ImageColumnType;
 import gameObjects.columnTypes.PlayerColumnType;
 import gameObjects.definition.GameObject;
@@ -171,7 +175,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPaneDices), 				language.getString(Words.dices));
 		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPaneBooks), 				language.getString(Words.books));
 
-
 		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPaneImages), 				language.getString(Words.images));
 		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPanePlayer), 				language.getString(Words.player));
 	}
@@ -201,6 +204,19 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final ButtonColumn deleteBookColumn = new ButtonColumn(tableBooks, tableAction, GameObjectBook.BOOK_ATTRIBUTES.indexOf(GameObjectBooksColumnType.DELETE));
 
  	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableImages,tableAction, IMAGE_TYPES.indexOf(ImageColumnType.DELETE));
+    private final ButtonColumn playerSelectColorColumn = new ButtonColumn(tablePlayer, tableAction, Player.TYPES.indexOf(PlayerColumnType.COLOR)) {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = -6972127406930221792L;
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            comp.setBackground(gi.getPlayerByIndex(row).color);
+            return comp;
+        }        
+    };
  	private final ButtonColumn deletePlayerColumn = new ButtonColumn(tablePlayer,tableAction, Player.TYPES.indexOf(PlayerColumnType.DELETE));
 	private final ButtonColumn repairPlayerColumn = new ButtonColumn(tablePlayer, tableAction, Player.TYPES.indexOf(PlayerColumnType.REPAIR)) {
 	    /**
@@ -378,7 +394,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 
 
 		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.entrySet().toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, null, deleteImageColumn);
-		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(true), Player.TYPES, tableModelPlayer, null, deletePlayerColumn, repairPlayerColumn);
+		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(true), Player.TYPES, tableModelPlayer, null, playerSelectColorColumn, deletePlayerColumn, repairPlayerColumn);
 		panelGeneral.update();
 		isUpdating = false;
 	}
@@ -425,7 +441,15 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			else if (tableSource == tableModelPlayer)
 			{
-				if (button == deletePlayerColumn)       {gi.update(new PlayerRemoveAction(id, player, gi.getPlayerByIndex(row)));}
+			    if (button == playerSelectColorColumn)  {
+			        final Color c = JColorChooser.showDialog(null, "Farbe w\u00E4hlen", getBackground());
+			        if (c == null)
+			            return;
+			        Player pl = gi.getPlayerByIndex(row);
+			        pl.color = c;
+			        gi.update(new PlayerEditAction(id, player, pl));
+			     }
+			    else if (button == deletePlayerColumn)  {gi.update(new PlayerRemoveAction(id, player, gi.getPlayerByIndex(row)));}
 				else if (button == repairPlayerColumn)	{gi.repairPlayerConsistency(gi.getPlayerByIndex(row).id, player, new ArrayList<>());}
 			}
 		}
