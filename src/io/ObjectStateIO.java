@@ -24,7 +24,7 @@ public class ObjectStateIO {
 
     public static void simulateStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
     {
-        int skip = 13 * 4 + 2;
+        int skip = 16 * 4 + 3;
         if (state instanceof GameObjectToken.TokenState)
         {
             skip -= StreamUtil.skip(is, 12);
@@ -32,6 +32,7 @@ public class ObjectStateIO {
         }
         else if (state instanceof GameObjectDice.DiceState)  {skip += 4;}
         else if (state instanceof GameObjectFigure.FigureState){skip += 1;}
+        else if (state instanceof GameObjectBook.BookState) {skip += 4;}
         long skipped = StreamUtil.skip(is, skip);
         if (skip != skipped)
         {
