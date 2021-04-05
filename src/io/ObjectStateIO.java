@@ -24,15 +24,15 @@ public class ObjectStateIO {
 
     public static void simulateStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
     {
-        int skip = 16 * Integer.SIZE + 3;
+        int skip = 16 * Integer.SIZE / 8 + 3;
         if (state instanceof GameObjectToken.TokenState)
         {
-            skip -= StreamUtil.skip(is, 3 * Integer.SIZE);
-            skip += is.readInt() * Integer.SIZE + 1;
+            skip -= StreamUtil.skip(is, 3 * Integer.SIZE / 8);
+            skip += is.readInt() * Integer.SIZE / 8 + 1;
         }
-        else if (state instanceof GameObjectDice.DiceState)  {skip += Integer.SIZE;}
+        else if (state instanceof GameObjectDice.DiceState)  {skip += Integer.SIZE / 8;}
         else if (state instanceof GameObjectFigure.FigureState){skip += 1;}
-        else if (state instanceof GameObjectBook.BookState) {skip += Integer.SIZE;}
+        else if (state instanceof GameObjectBook.BookState) {skip += Integer.SIZE / 8;}
         long skipped = StreamUtil.skip(is, skip);
         if (skip != skipped)
         {
