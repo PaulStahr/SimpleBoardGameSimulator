@@ -140,6 +140,14 @@ public abstract class ObjectState implements Serializable {
 		}
 		return bos.toString();
 	}
+
+	public String toOutputString(){
+		StringBuilder outputString = new StringBuilder();
+
+		outputString.append("");
+
+		return outputString.toString();
+	}
 	
 	@Override
     public boolean equals(Object other)

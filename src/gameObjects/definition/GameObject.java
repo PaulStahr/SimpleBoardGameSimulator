@@ -51,6 +51,7 @@ public abstract class GameObject {
         this.uniqueObjectName = other.uniqueObjectName;
         this.objectType = other.objectType;
         this.value = other.value;
+        this.sortValue = other.sortValue;
         this.rotationStep = other.rotationStep;
         this.boxId = other.boxId;
         this.inBox = other.inBox;
@@ -93,7 +94,7 @@ public abstract class GameObject {
 
     public abstract GameObject copy();
     
-    public String toStringAdvanced() {return widthInMM + " " + heightInMM + " " + value + " " + sortValue + " " + rotationStep + " " + isFixed;}
+    public String toStringAdvanced() {return widthInMM + " " + heightInMM + " " + value + " " + sortValue + " " + rotationStep + " " + inBox  + " " + boxId + " " + isFixed;}
 
     @Override
     public boolean equals(Object obj)
@@ -105,6 +106,7 @@ public abstract class GameObject {
                 && this.uniqueObjectName.equals(other.uniqueObjectName)
                 && this.objectType.equals(other.objectType)
                 && this.value == other.value
+				&& this.sortValue == other.sortValue
                 && this.rotationStep == other.rotationStep
 				&& this.boxId == other.boxId
 				&& this.inBox == other.inBox

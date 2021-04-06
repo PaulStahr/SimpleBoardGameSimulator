@@ -3,9 +3,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -82,6 +80,8 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	private final LanguageHandler lh;
 	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
+	private boolean hasStarted = false;
+
 	private class GameWindowUpdater implements TimedUpdateHandler, Runnable
 	{
 		
@@ -97,6 +97,10 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		@Override
 		public void run() {
 		    GameInconsistency gic = CheckingFunctions.checkPlayerConsistency(gamePanel.getPlayerId(), tmp, tmp2, gi);
+		    if (!hasStarted && gamePanel.getWidth() > 0 && gamePanel.getHeight() > 0){
+		    	hasStarted = true;
+		    	gamePanel.beginPlay();
+			}
             boolean playerConsistent = gic == null;
             menuItemStatusPlayerConsistency.setEnabled(!playerConsistent);
             menuItemStatusPlayerConsistency.setText("Correct Card-Consistency" + (gic == null ? "" : (" (" + gic.toString() + ")")));
@@ -176,8 +180,10 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuItemSyncPull.addActionListener(this);
 		menuItemReconnect.addActionListener(this);
 		gamePanel = new GamePanel(gi, lh);
+
 		gamePanel.setPlayer(player);
 		chatPanel = new IngameChatPanel(gi, player);
+
 
 		sliderRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,chatPanel, gamePanel);
 		sliderRight.setOneTouchExpandable(true);

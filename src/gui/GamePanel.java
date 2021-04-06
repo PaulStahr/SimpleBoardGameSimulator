@@ -37,14 +37,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
@@ -218,7 +211,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 	};
 
-	public GamePanel(GameInstance gameInstance, LanguageHandler lh)
+		public GamePanel(GameInstance gameInstance, LanguageHandler lh)
 	{
 		this.setLayout(new FlowLayout(FlowLayout.LEFT));
 		int tableRadius = gameInstance.tableRadius;
@@ -476,7 +469,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}*/
 	}
 
-	private void sitDown(Player player, int pos){
+	public void beginPlay(){
+		player.beginPlay(this, gameInstance);
+	}
+
+	public void sitDown(Player player, int pos, boolean swap){
 		translateX = 0;
 		translateY = 0;
 		zooming = getHeight()/ ((float) this.table.getDiameter() + 200);
@@ -485,13 +482,23 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		updateGameTransform();
 		rotation = Math.toRadians(- 360/Math.max(1,this.table.playerShapes.size()) * pos);
 		updateGameTransform();
+
+		int currentPosition = gameInstance.playerSeatList.indexOf(player.id);
+		if (currentPosition != pos && swap){
+			Player player1 = gameInstance.getPlayerById(gameInstance.playerSeatList.get(pos));
+			Collections.swap(gameInstance.playerSeatList, pos, currentPosition);
+			sitDown(player1, currentPosition, false);
+		}
 		if (player != null && gameInstance.seatColors.size() > pos)
 		{
 			player.color = gameInstance.seatColors.get(pos);
-			player.playerAtTableRotation = (int) PlayerFunctions.GetCurrentPlayerRotation(this, gameInstance,player);
-			player.playerAtTablePosition = pos;
 			ObjectFunctions.moveOwnStackToBoardPosition(this, gameInstance, player, ial);
 		}
+		gameInstance.update(new PlayerEditAction(this.id, player, player));
+	}
+
+	public void sitDown(Player player, int pos){
+		sitDown(player, pos, true);
 	}
 
 	private boolean checkFirstMouseClick(MouseEvent arg0) {
@@ -881,14 +888,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						ObjectFunctions.playObject(this, gameInstance, player, hoveredObject);
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-
-					int place = 0;
-					for (int i = 0; i < gameInstance.getPlayerNumber(); ++i) {
-						if (gameInstance.getPlayerByIndex(i).id < player.id) {
-							++place;
-						}
-					}
-					sitDown(player, place);
+					sitDown(player, PlayerFunctions.GetTablePlayerPosition(gameInstance, player));
 				}
 
 

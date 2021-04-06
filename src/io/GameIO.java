@@ -326,6 +326,12 @@ public class GameIO {
 		elem.setAttribute(IOString.UNIQUE_NAME, gameObject.uniqueObjectName);
 		elem.setAttribute(IOString.WIDTH, Integer.toString(gameObject.widthInMM));
 		elem.setAttribute(IOString.HEIGHT, Integer.toString(gameObject.heightInMM));
+		elem.setAttribute(IOString.VALUE, Integer.toString(gameObject.value));
+		elem.setAttribute(IOString.SORT_VALUE, Integer.toString(gameObject.sortValue));
+		elem.setAttribute(IOString.ROTATION_STEP, Integer.toString(gameObject.rotationStep));
+		elem.setAttribute(IOString.BOX_ID, Integer.toString(gameObject.boxId));
+		elem.setAttribute(IOString.IN_BOX, Boolean.toString(gameObject.inBox));
+		elem.setAttribute(IOString.IS_FIXED, Integer.toString(gameObject.isFixed));
 		for (String group : gameObject.groups)
 		{
 			elem.addContent(new Element(IOString.GROUP).setText(group));
@@ -333,8 +339,6 @@ public class GameIO {
 		if (gameObject instanceof GameObjectToken)
 		{
 			GameObjectToken token = (GameObjectToken) gameObject;
-			elem.setAttribute(IOString.VALUE, Integer.toString(token.value));
-			elem.setAttribute(IOString.SORT_VALUE, Integer.toString(token.sortValue));
 			elem.setAttribute(IOString.FRONT, game.getImageKey(token.getUpsideLook()));
 			if (token.getDownsideLook() != null)
 			{

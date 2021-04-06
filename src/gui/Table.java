@@ -86,7 +86,6 @@ public class Table {
             player.playerAtTableTransform.setToIdentity();
             player.playerAtTableTransform.rotate(Math.toRadians(angle));
             player.playerAtTableTransform.translate(originPlayerBottom.getX(), originPlayerBottom.getY()-2*playerDiameter);
-            player.playerAtTableRotation = (int) angle;
           
             //Set screen transform
             this.playerShapes.set(i, gamePanel.getBoardToScreenTransform().createTransformedShape(this.playerShapes.get(i)));

@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
+import gameObjects.definition.*;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -13,10 +14,6 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
-import gameObjects.definition.GameObjectBook;
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.ObjectState;
 import util.io.StreamUtil;
 
@@ -35,7 +32,7 @@ public class ObjectStateIO {
         long skipped = StreamUtil.skip(is, skip);
         if (skip != skipped)
         {
-            throw new IOException("Needed to scip " + skip + " bytes but got " + skipped);
+            throw new IOException("Needed to skip " + skip + " bytes but got " + skipped);
         }
     }
 
@@ -106,10 +103,11 @@ public class ObjectStateIO {
         state.posY = is.readInt();
         state.originalY = is.readInt();
         state.rotation = is.readInt();
+        state.rotationStep = is.readInt();
+        state.originalRotation = is.readInt();
         state.scale = is.readInt();
         state.value = is.readInt();
         state.sortValue = is.readInt();
-        state.rotationStep = is.readInt();
         state.boxId = is.readInt();
         state.inBox = is.readBoolean();
         state.isFixed = is.readBoolean();
@@ -121,9 +119,16 @@ public class ObjectStateIO {
         {
             ((GameObjectDice.DiceState)state).side = is.readInt();
         }
+        else if (state instanceof GameObjectBook.BookState)
+        {
+            ((GameObjectBook.BookState)state).side = is.readInt();
+        }
         else if (state instanceof GameObjectFigure.FigureState)
         {
             ((GameObjectFigure.FigureState) state).standing = is.readBoolean();
+        }
+        else if (state instanceof GameObjectBox.BoxState){
+            ((GameObjectBox.BoxState)state).side = is.readBoolean();
         }
     }
 
@@ -145,10 +150,11 @@ public class ObjectStateIO {
         out.writeInt(state.posY);
         out.writeInt(state.originalY);
         out.writeInt(state.rotation);
+        out.writeInt(state.originalRotation);
+        out.writeInt(state.rotationStep);
         out.writeInt(state.scale);
         out.writeInt(state.value);
         out.writeInt(state.sortValue);
-        out.writeInt(state.rotationStep);
         out.writeInt(state.boxId);
         out.writeBoolean(state.inBox);
         out.writeBoolean(state.isFixed);
@@ -160,9 +166,16 @@ public class ObjectStateIO {
         {
             out.writeInt(((GameObjectDice.DiceState)state).side);
         }
+        else if (state instanceof GameObjectBook.BookState)
+        {
+            out.writeInt(((GameObjectBook.BookState)state).side);
+        }
         else if (state instanceof GameObjectFigure.FigureState)
         {
             out.writeBoolean(((GameObjectFigure.FigureState) state).standing);
+        }
+        else if (state instanceof GameObjectBox.BoxState){
+            out.writeBoolean(((GameObjectBox.BoxState)state).side);
         }
     }
 

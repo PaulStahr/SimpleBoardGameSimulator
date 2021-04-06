@@ -29,6 +29,6 @@ public class ObjectStateIOTest {
         ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
         ObjectInputStream objIn = new ObjectInputStream(in);
         ObjectStateIO.simulateStateFromStreamObject(objIn, state);
-        assertEquals("Stream has still bytes which were not scipped", 0, objIn.available());
+        assertEquals("Stream has still bytes which were not skipped", 0, objIn.available());
     }
 }

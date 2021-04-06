@@ -48,7 +48,8 @@ public class GameInstance {
 	private final List<Player> unmodifiablePlayer = Collections.unmodifiableList(players);
 	private final ArrayList<GameAction> actions = new ArrayList<>();
 	private final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
-    public boolean private_area = true;
+	public ArrayList<Integer> playerSeatList = new ArrayList<>();
+	public boolean private_area = true;
 	public boolean table = true;
     public boolean put_down_area = true;
     public int seats = -1;
@@ -81,7 +82,7 @@ public class GameInstance {
 	    this.name = other.name;
 	    this.hidden =other.hidden;
 	    for (ObjectInstance oi : other.objects){objects.add(oi.copy());}
-	    for (Player pl : other.players)        {players.add(pl.copy());}
+	    for (Player pl : other.players)        {players.add(pl.copy()); playerSeatList.add(pl.id);}
 	}
 
 	public GameInstance(Game game, String name)
@@ -128,15 +129,14 @@ public class GameInstance {
 		if (pl != null)
 		{
 			pl.set(player);
-			player.setPlayerColor(this);
 			update(new PlayerEditAction(action == null ? 0 : action.source, pl, pl));
 			return pl;
 		}else {
 			players.add(player);
+			playerSeatList.add(player.id);
 			if (this.admin == -1){
 				this.admin = player.id;
 			}
-			player.setPlayerColor(this);
 			update(action == null ? new PlayerAddAction(0, player) : action);
 			return player;
 		}

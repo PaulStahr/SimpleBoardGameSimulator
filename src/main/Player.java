@@ -5,8 +5,13 @@ import java.awt.geom.AffineTransform;
 import java.util.List;
 import java.util.Random;
 
+import gameObjects.action.player.PlayerEditAction;
 import gameObjects.columnTypes.PlayerColumnType;
+import gameObjects.functions.MoveFunctions;
+import gameObjects.functions.ObjectFunctions;
+import gameObjects.functions.PlayerFunctions;
 import gameObjects.instance.GameInstance;
+import gui.GamePanel;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 
@@ -21,8 +26,6 @@ public class Player implements Comparable<Object> {
 	public int screenWidth = 0, screenHeight = 0;
 	public final AffineTransform screenToBoardTransformation = new AffineTransform();
 	public final AffineTransform playerAtTableTransform = new AffineTransform();
-	public int playerAtTableRotation = 0;
-	public int playerAtTablePosition = -1;
 
 	public String actionString = "";
 	private transient int nameModCount = 0;
@@ -82,39 +85,11 @@ public class Player implements Comparable<Object> {
         this.screenHeight = other.screenHeight;
         this.screenToBoardTransformation.setTransform(other.screenToBoardTransformation);
         this.playerAtTableTransform.setTransform(other.playerAtTableTransform);
-        this.playerAtTableRotation = other.playerAtTableRotation;
-        this.playerAtTablePosition = other.playerAtTablePosition;
     }
 
     @Override
 	public String toString() {
 		return "(" + name + " " + id + ")";
-	}
-
-
-
-	public void setPlayerColor(GameInstance gameInstance){
-		int posPlayer = -1;
-		if (gameInstance != null) {
-			++posPlayer;
-			for (int i = 0; i < gameInstance.getPlayerNumber(); ++i) {
-				if (gameInstance.getPlayerByIndex(i).id < this.id) {
-					++posPlayer;
-				}
-			}
-		}
-		if (posPlayer != -1 && posPlayer < gameInstance.seatColors.size())
-		{
-			this.color = gameInstance.seatColors.get(posPlayer);
-		}
-		else {
-			Random rand = new Random();
-			float r = rand.nextFloat();
-			float g = rand.nextFloat();
-			float b = rand.nextFloat();
-
-			this.color = new Color(r, g, b);
-		}
 	}
 
 	public void setPlayerColor(){
@@ -140,6 +115,15 @@ public class Player implements Comparable<Object> {
 		System.out.println(this.mouseXPos);
 	}
 
+	public void beginPlay(GamePanel gamePanel, GameInstance gameInstance){
+		if (gamePanel != null && gameInstance != null){
+			int playerSeat = gameInstance.playerSeatList.indexOf(this.id);
+			this.color = gameInstance.seatColors.get(playerSeat % gameInstance.seatColors.size());
+			gamePanel.sitDown(this, playerSeat);
+			gameInstance.update(new PlayerEditAction(gamePanel.id, this, this));
+		}
+	}
+
 	@Override
 	public int compareTo(Object o) {
 		int compareId = ((Player)o).id;
@@ -148,7 +132,7 @@ public class Player implements Comparable<Object> {
 
 	public String toStringAdvanced()
 	{
-	    return name + " " + id + " " + color + " " + mouseXPos + " " + mouseYPos + " " + screenToBoardTransformation + " " + playerAtTableRotation + " " + playerAtTablePosition;
+	    return name + " " + id + " " + color + " " + mouseXPos + " " + mouseYPos + " " + screenToBoardTransformation;
 	}
 
 	@Override
@@ -163,9 +147,7 @@ public class Player implements Comparable<Object> {
 	                && color.equals(other.color)
 	                && mouseXPos == other.mouseXPos
 	                && mouseYPos == other.mouseYPos
-	                && screenToBoardTransformation.equals(other.screenToBoardTransformation)
-	                && playerAtTableRotation == other.playerAtTableRotation
-	                && playerAtTablePosition == other.playerAtTablePosition;
+	                && screenToBoardTransformation.equals(other.screenToBoardTransformation);
 	    }
 	    return false;
 	}

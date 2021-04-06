@@ -20,32 +20,12 @@ public class PlayerFunctions {
         return player;
     }
 
-    public static int GetTablePositionFromPlayer(GameInstance gameInstance, Player player){
-        int playerPosition = 0;
-        if (player != null) {
-            for (int j = 0; j < gameInstance.getPlayerNumber(); ++j) {
-                if (gameInstance.getPlayerByIndex(j).id < player.id) {
-                    ++playerPosition;
-                }
-            }
-        }
-        return playerPosition;
-    }
-
-    public static int GetCurrentPlayerPosition(GameInstance gameInstance, Player player){
-        int playerPosition = 0;
-        if (player != null) {
-            if (player.playerAtTablePosition == -1) {
-                playerPosition = PlayerFunctions.GetTablePositionFromPlayer(gameInstance, player);
-            } else {
-                playerPosition = player.playerAtTablePosition;
-            }
-        }
-        return playerPosition;
+    public static int GetTablePlayerPosition(GameInstance gameInstance, Player player){
+        return gameInstance.playerSeatList.indexOf(player.id);
     }
 
     public static double GetCurrentPlayerRotation(GamePanel gamePanel, GameInstance gameInstance, Player player){
-        int playerPosition = GetCurrentPlayerPosition(gameInstance, player);
+        int playerPosition = GetTablePlayerPosition(gameInstance, player);
         return 360. / gamePanel.table.playerShapes.size() * playerPosition;
     }
 }

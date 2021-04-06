@@ -511,9 +511,9 @@ public class ObjectFunctions {
             getBelowStack(gameInstance, stackObject, include, stackIds);
             int counter = 0;
             for (int id : stackIds) {
-                GameObject currentObject = gameInstance.getObjectInstanceById(id).go;
-                if (currentObject instanceof GameObjectToken && (id != stackObject.id || include)) {
-                    counter += ((GameObjectToken) currentObject).value;
+                ObjectInstance currentObject = gameInstance.getObjectInstanceById(id);
+                if (currentObject.go instanceof GameObjectToken && (id != stackObject.id || include)) {
+                    counter += currentObject.state.value;
                 }
             }
             return counter;
@@ -1852,8 +1852,7 @@ public class ObjectFunctions {
         double angle = PlayerFunctions.GetCurrentPlayerRotation(gamePanel, gameInstance, player);
 
         //TODO change the trick angle according to the number of tricks
-        //double trickAngle = angle - 2*(player.trickNum + 5);
-        double trickAngle = angle;
+        double trickAngle = angle - (5*player.trickNum - 15);
         ObjectState objectState = objectInstance.state.copy();
         objectState.rotation = (int) trickAngle;
         gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance, objectState));

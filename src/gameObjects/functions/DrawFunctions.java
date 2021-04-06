@@ -515,6 +515,10 @@ public class DrawFunctions {
         StringBuilder stringBoxId = new StringBuilder();
         StringBuilder stringInBox = new StringBuilder();
 
+        StringBuilder stringValue = new StringBuilder();
+
+        StringBuilder stringSortValue = new StringBuilder();
+
         for (int i = 0; i < selectedObjects.size(); ++i)
         {
             if (i==0) {
@@ -581,6 +585,8 @@ public class DrawFunctions {
             stringBelowId.append(objectInstance.state.liesOnId);
             stringBoxId.append(objectInstance.state.boxId);
             stringInBox.append(objectInstance.state.inBox);
+            stringValue.append(objectInstance.state.value);
+            stringSortValue.append(objectInstance.state.sortValue);
         }
 
         int yPos = 20;
@@ -611,6 +617,10 @@ public class DrawFunctions {
         g2.drawString("Above  Lying: " + stringAboveIds, 50, yPos);
         yPos+=yStep;
         g2.drawString("Below Id: " + stringBelowId, 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Value: " + stringValue, 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Sort Value: " + stringSortValue, 50, yPos);
         yPos+=yStep;
         g2.drawString("Box Id: " + stringBoxId, 50, yPos);
         yPos+=yStep;
