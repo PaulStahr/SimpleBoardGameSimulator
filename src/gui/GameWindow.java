@@ -1,5 +1,6 @@
 package gui;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -7,6 +8,7 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -42,6 +44,7 @@ import io.GameIO;
 import main.Player;
 import net.AsynchronousGameConnection;
 import net.AsynchronousGameConnection.PingCallback;
+import net.AsynchronousGameConnection.PingInformation;
 import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
 import util.TimedUpdateHandler;
@@ -75,18 +78,107 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	private final JMenuItem menuItemStatusGaiaConsistency = new JMenuItem("Correct Free-Object-Consistency");
 	private final JMenuItem menuItemSyncPull = new JMenuItem();
 	private final JMenuItem menuItemReconnect = new JMenuItem();
-
+	
+	private final JMenu menuConnection = new JMenu();
 
 	private final LanguageHandler lh;
 	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	private static int windowUpdates = 0;
 
-	private boolean hasStarted = false;
+	private class GameConnectionMenuItem extends JMenu implements ActionListener{
+	    /**
+         * 
+         */
+        private static final long serialVersionUID = -4342452358873847467L;
+        public final int id;
+	    public int lastUpdate = -1;
+        private JMenuItem menuItemDisconnect = new JMenuItem("Disconnect");
+	    private JMenuItem menuItemReconnect = new JMenuItem("Reconnect");
+	    private JMenuItem menuItemPull = new JMenuItem("Pull");
+	    private JMenuItem menuItemPush = new JMenuItem("Push");
+	    private final WeakReference<AsynchronousGameConnection> ref;
+	    private String address;
+	    private long ping;
+	    private boolean timeouted = false;
 
+	    public GameConnectionMenuItem(AsynchronousGameConnection agc) {
+	        ref = new WeakReference<AsynchronousGameConnection>(agc);
+	        this.id = agc.id;
+	        this.add(menuItemDisconnect);
+	        this.add(menuItemReconnect);
+	        this.add(menuItemPull);
+	        this.add(menuItemPush);
+            Socket socket = agc.getSocket();
+            if (socket != null) {
+                address = socket.getRemoteSocketAddress().toString();
+                updateText();
+            }
+	    }
+
+	    private final void updateText() {
+	        setText(address + " " + ping/1000000);
+	        setForeground(timeouted ? Color.RED : Color.BLACK);
+	    }
+	    
+	    public void update(AsynchronousGameConnection agc) {
+	        lastUpdate = windowUpdates;
+	        agc.ping(new PingCallback() {
+                
+                @Override
+                public void run(PingInformation pi) {
+                    ping = System.nanoTime() - pi.timeout + 1000000000l;
+                    timeouted = pi.isTimeouted();
+                    updateText();
+                }
+            }, System.nanoTime() + 1000000000);
+	    }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            Object source = arg0.getSource();
+            if (source == menuItemDisconnect) {
+                
+            }else if (source == menuItemReconnect) {
+                AsynchronousGameConnection agc = ref.get();
+                agc.destroy();
+                try {
+                    AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
+                    connection.syncPull();
+                    connection.start();
+                } catch (IOException e) {
+                }
+            }else if (source == menuItemPull) {
+                AsynchronousGameConnection agc = ref.get();
+                if (agc != null) {
+                    agc.syncPull();
+                }
+            }else if (source == menuItemPush) {
+                AsynchronousGameConnection agc = ref.get();
+                if (agc != null) {
+                    agc.syncPush();
+                }                
+            }
+        }
+	}
+
+	private GameConnectionMenuItem getMenuItem(int id)
+	{
+	    for (int i = 0; i < menuConnection.getMenuComponentCount(); ++i)
+	    {
+	        Component c = menuConnection.getItem(i);
+	        if (c instanceof GameConnectionMenuItem && ((GameConnectionMenuItem)c).id == id)
+            {
+	            return (GameConnectionMenuItem)c;
+            }
+	    }
+	    return null;
+	}
+	
 	private class GameWindowUpdater implements TimedUpdateHandler, Runnable
 	{
-		
 		private final ArrayList<ObjectInstance> tmp = new ArrayList<>();
 		private final ArrayList<ObjectInstance> tmp2 = new ArrayList<>();
+		private boolean hasStarted;
 
 		@Override
 		public int getUpdateInterval() {return 1000;}
@@ -115,9 +207,22 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
                 if (gcl instanceof AsynchronousGameConnection)
                 {
                     AsynchronousGameConnection agc = (AsynchronousGameConnection)gcl;
+                    GameConnectionMenuItem menuItem = getMenuItem(agc.id);
+                    if (menuItem == null) {menuConnection.add(menuItem = new GameConnectionMenuItem(agc));}
+                    menuItem.update(agc);
                     agc.ping(pingCallback, System.nanoTime() + 1000000000);
                 }
             }
+
+            for (int i = menuConnection.getMenuComponentCount() - 1; i >= 0; --i)
+            {
+                Component c = menuConnection.getItem(i);
+                if (c instanceof GameConnectionMenuItem && ((GameConnectionMenuItem)c).lastUpdate != windowUpdates)
+                {
+                    menuConnection.remove(i);
+                }
+            }
+            ++windowUpdates;
         }
 	}
 	
@@ -155,6 +260,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuBar.add(menuFile);
 		menuBar.add(menuExtras);
 		menuBar.add(menuControls);
+		menuBar.add(menuConnection);
 		menuBar.add(menuStatus);
 		setJMenuBar(menuBar);
 		menuItemExit.addActionListener(this);
@@ -334,6 +440,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		menuItemReconnect.setText(    language.getString(Words.reconnect));
 		menuItemSyncPull.setText(     language.getString(Words.sync_pull));
 		menuStatus.setText(           language.getString(Words.status));
+		menuConnection.setText(       language.getString(Words.connection));
 		//Set Title of the window
 		StringBuilder strB = new StringBuilder();
 		strB.append(language.getString(Words.game) + ": " + gi.name);

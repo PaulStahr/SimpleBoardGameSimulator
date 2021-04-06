@@ -16,7 +16,7 @@ import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 
 public class Player implements Comparable<Object> {
-	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{PlayerColumnType.ID, PlayerColumnType.NAME, PlayerColumnType.REPAIR, PlayerColumnType.DELETE});
+	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{PlayerColumnType.ID, PlayerColumnType.NAME, PlayerColumnType.COLOR, PlayerColumnType.REPAIR, PlayerColumnType.DELETE});
     public int trickNum = 0;
     private String name;
 	public final int id;
@@ -94,11 +94,7 @@ public class Player implements Comparable<Object> {
 
 	public void setPlayerColor(){
 		if (this.color == null) {
-			Random rand = new Random();
-			float r = rand.nextFloat();
-			float g = rand.nextFloat();
-			float b = rand.nextFloat();
-			this.color = new Color(r, g, b);
+            this.color = new Color(new Random().nextInt() & 0xFFFFFF);
 		}
 	}
 
@@ -112,7 +108,6 @@ public class Player implements Comparable<Object> {
 		this.color = player.color;
 		this.mouseXPos = player.mouseXPos;
 		this.mouseYPos = player.mouseYPos;
-		System.out.println(this.mouseXPos);
 	}
 
 	public void beginPlay(GamePanel gamePanel, GameInstance gameInstance){

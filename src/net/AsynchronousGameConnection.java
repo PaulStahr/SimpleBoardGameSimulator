@@ -60,7 +60,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
     private InputStream input;
     private final OutputStream output;
     private final ArrayDeque<Object> queuedOutputs = new ArrayDeque<>();
-    private final int connectionId = (int)(Math.random() * Integer.MAX_VALUE);
+    public final int id = (int)(Math.random() * Integer.MAX_VALUE);
     private ObjectInputStream objIn;
     private boolean stopOnError = true;
     private int outputEvents = 0;
@@ -93,7 +93,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 
     private void queueOutput(Object output)
     {
-        if (logger.isDebugEnabled()){logger.debug("Addd queue " + connectionId);}
+        if (logger.isDebugEnabled()){logger.debug("Addd queue " + id);}
         synchronized(queuedOutputs)
         {
             queuedOutputs.add(output);
@@ -140,9 +140,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
     {
         if (outputThread == null && inputThread == null)
         {
-            outputThread = new Thread(this, "Output " + connectionId);
+            outputThread = new Thread(this, "Output " + id);
             outputThread.start();
-            inputThread = new Thread(this, "Input " +connectionId);
+            inputThread = new Thread(this, "Input " +id);
             inputThread.start();
         }
         else
@@ -764,7 +764,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                         if (split.get(1).equals(NetworkString.EDIT) && split.get(2).equals(NetworkString.STATE))
                         {
                             int sourceId = Integer.parseInt(split.get(4));
-                            if (sourceId != connectionId)
+                            if (sourceId != id)
                             {
                                 int playerId = Integer.parseInt(split.get(5));
                                 int objectId = Integer.parseInt(split.get(6));
@@ -782,7 +782,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                         else if (split.get(1).equals(NetworkString.EDIT) && split.get(2).equals(NetworkString.PLAYER))
                         {
                             int sourceConnectionId = Integer.parseInt(split.get(4));
-                            if (sourceConnectionId != connectionId)
+                            if (sourceConnectionId != id)
                             {
                                 int sourcePlayerId = Integer.parseInt(split.get(5));
                                 int editPlayerId = Integer.parseInt(split.get(6));
@@ -810,7 +810,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                             int sourceConnection = Integer.parseInt(split.get(2));
                             int sourcePlayer = Integer.parseInt(split.get(3));
                             int destinationPlayer = Integer.parseInt(split.get(4));
-                            if (this.connectionId != sourceConnection)
+                            if (this.id != sourceConnection)
                             {
                                 int playerId = Integer.parseInt(split.get(4));
                                 gi.update(new UsertextMessageAction(sourcePlayer, playerId, destinationPlayer, (String)objIn.readObject()));

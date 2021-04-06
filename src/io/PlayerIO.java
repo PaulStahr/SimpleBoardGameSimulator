@@ -61,7 +61,7 @@ public class PlayerIO {
     public static void simulateEditPlayerFromObject(ObjectInputStream is) throws IOException, ClassNotFoundException
     {
         is.readObject();
-        long toScip = 5 * 4 + 6 * 8 + 1;
+        long toScip = 5 * Integer.SIZE / 8 + 6 * Double.SIZE / 8 + 1;
         long skipped = StreamUtil.skip(is, toScip);
         if (toScip != skipped)
         {
