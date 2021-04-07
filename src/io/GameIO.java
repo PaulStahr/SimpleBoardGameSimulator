@@ -136,7 +136,6 @@ public class GameIO {
 								gi.put_down_area = readAttribute(elemSettings, IOString.PUT_DOWN_AREA, gi.put_down_area);
 								gi.tableRadius = readAttribute(elemSettings, IOString.TABLE_RADIUS, gi.tableRadius);
 								gi.tableColor = readAttribute(elemSettings, IOString.COLOR, gi.tableColor);
-								
 								break;
 							case IOString.SEATS:
 								gi.seatColors.clear();

@@ -51,7 +51,6 @@ public class ObjectStateIO {
     static void editStateFromElement(ObjectState state, Element elem)
     {
         state.rotation        = GameIO.readAttribute(elem, IOString.R, state.rotation);
-        state.originalRotation = GameIO.readAttribute(elem, IOString.R, state.originalRotation);
         state.originalRotation = GameIO.readAttribute(elem, IOString.ORIGINAL_ROTATION, state.originalRotation);
         state.scale 			= GameIO.readAttribute(elem, IOString.S, state.scale);
         state.aboveInstanceId 	= GameIO.readAttribute(elem, IOString.ABOVE, state.aboveInstanceId);
@@ -108,8 +107,8 @@ public class ObjectStateIO {
         state.posY = is.readInt();
         state.originalY = is.readInt();
         state.rotation = is.readInt();
-        state.rotationStep = is.readInt();
         state.originalRotation = is.readInt();
+        state.rotationStep = is.readInt();
         state.scale = is.readInt();
         state.value = is.readInt();
         state.sortValue = is.readInt();
