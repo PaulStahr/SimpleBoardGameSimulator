@@ -6,7 +6,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 
-import gameObjects.definition.*;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -14,6 +13,11 @@ import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
+import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectBox;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.ObjectState;
 import util.io.StreamUtil;
 
@@ -21,15 +25,15 @@ public class ObjectStateIO {
 
     public static void simulateStateFromStreamObject(ObjectInputStream is, ObjectState state) throws IOException
     {
-        int skip = 16 * Integer.SIZE / 8 + 3;
+        int skip = 17 * Integer.SIZE / 8 + 3;
         if (state instanceof GameObjectToken.TokenState)
         {
             skip -= StreamUtil.skip(is, 3 * Integer.SIZE / 8);
             skip += is.readInt() * Integer.SIZE / 8 + 1;
         }
-        else if (state instanceof GameObjectDice.DiceState)  {skip += Integer.SIZE / 8;}
-        else if (state instanceof GameObjectFigure.FigureState){skip += 1;}
-        else if (state instanceof GameObjectBook.BookState) {skip += Integer.SIZE / 8;}
+        else if (state instanceof GameObjectDice.DiceState)  {skip += 2 * Integer.SIZE / 8;}
+        else if (state instanceof GameObjectFigure.FigureState){skip += Integer.SIZE / 8 + 1;}
+        else if (state instanceof GameObjectBook.BookState) {skip += 2 * Integer.SIZE / 8;}
         long skipped = StreamUtil.skip(is, skip);
         if (skip != skipped)
         {

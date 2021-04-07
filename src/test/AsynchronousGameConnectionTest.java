@@ -75,6 +75,6 @@ public class AsynchronousGameConnectionTest {
         try {
             synchronized(block1){block1.wait(1000);}
         } catch (InterruptedException e) {}
-        assertTrue(state.equals(gi1.getObjectInstanceById(4).state));
+        assertTrue(state + "!=" + gi1.getObjectInstanceById(4).state, state.equals(gi1.getObjectInstanceById(4).state));
     }
 }
