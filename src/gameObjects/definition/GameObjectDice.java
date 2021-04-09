@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Random;
 
 import data.Texture;
-import gameObjects.columnTypes.GameObjectColumnType;
 import gameObjects.columnTypes.GameObjectDicesColumnType;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
@@ -108,6 +107,13 @@ public class GameObjectDice extends GameObject{
 			unfold = ((DiceState)state).unfold;
 		}
 
+
+        @Override
+        public boolean equals(Object state) {
+            if (!(state instanceof DiceState)) {return false;}
+            DiceState ts = (DiceState)state;
+            return ts.side == this.side && super.equals(state);
+        }
 
 		@Override
 		public ObjectState copy() {

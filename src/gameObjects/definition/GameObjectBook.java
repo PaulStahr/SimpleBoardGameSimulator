@@ -1,15 +1,13 @@
 package gameObjects.definition;
 
+import java.util.List;
+
 import data.Texture;
 import gameObjects.columnTypes.GameObjectBooksColumnType;
-import gameObjects.columnTypes.GameObjectColumnType;
-import gameObjects.columnTypes.GameObjectTokenColumnType;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
-
-import java.util.List;
 
 public class GameObjectBook extends GameObject{
 
@@ -96,6 +94,14 @@ public class GameObjectBook extends GameObject{
             super.set(state);
             side = ((GameObjectBook.BookState)state).side;
             unfold = ((GameObjectBook.BookState)state).unfold;
+        }
+
+
+        @Override
+        public boolean equals(Object state) {
+            if (!(state instanceof BookState)) {return false;}
+            BookState ts = (BookState)state;
+            return ts.side == this.side && super.equals(state);
         }
 
 

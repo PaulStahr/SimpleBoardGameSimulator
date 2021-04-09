@@ -6,9 +6,7 @@ import java.io.IOException;
 import java.util.List;
 
 import data.Texture;
-import gameObjects.columnTypes.GameObjectColumnType;
 import gameObjects.columnTypes.GameObjectFiguresColumnType;
-import gameObjects.columnTypes.GameObjectTokenColumnType;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 import util.ArrayTools;
@@ -101,7 +99,14 @@ public class GameObjectFigure extends GameObject{
 			return new FigureState(this);
 		}
 
-		@Override
+        @Override
+        public boolean equals(Object state) {
+            if (!(state instanceof FigureState)) {return false;}
+            FigureState fs = (FigureState)state;
+            return fs.standing == this.standing && super.equals(state);
+        }
+
+        @Override
 		public void reset() {
 			super.reset();
 			standing = true;
