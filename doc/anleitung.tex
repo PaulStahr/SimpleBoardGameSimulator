@@ -15,6 +15,7 @@
 \newcommand{\gamefigure}{\textcolor{red}{figure}\xspace}
 \newcommand{\dice}{\textcolor{red}{dice}\xspace}
 \newcommand{\book}{\textcolor{red}{book}\xspace}
+\newcommand{\boxtype}{\textcolor{red}{box}\xspace}
 \newcommand{\xmlattribute}[1]{\textcolor{green}{#1}}
 
 
@@ -170,6 +171,11 @@
 			r & Rotation\\
 			s & Skalierung\\
 			number & Anzahl der Objekte des Typs\\
+			value & Wert des Objekts\\
+			sortValue & Sortierwert des Objekts, die Handkarten werden anhand dieses Werts sortiert\\
+			number & Anzahl der Objekte des Typs\\
+			boxId & Id der Box in der das Objekt zum Spielbeginn liegen soll\\
+			inBox & true/false, falls true liegt das Objekt in der Box mit boxId sonst nicht\\
 			is\_fixed & true/false, falls true kann Objekt im Spiel nicht bewegt werden\\
 		\end{tabularx}
 	\end{table}
@@ -179,7 +185,7 @@
 	\lstset{language=XML}
 	\begin{lstlisting}
 	<object unique_name="objekt1" x="0" y="0" r="0" s="1" 
-	number="3" is_fixed="false"/>
+	 number="3" boxId="1" is_fixed="false"/>
 	\end{lstlisting}
 	
 	In diesem Beispiel werden $3$ Instanzen vom Objekt mit dem Namen \textit{objekt1} an der Position $0,0$ mit der Rotation $0$ und ohne Skalierung erzeugt.
@@ -270,6 +276,18 @@
 		<side value="5">side5.jpg</side>
 		<side value="6">side6.jpg</side>
 	</object>
+	\end{lstlisting}
+	
+	Objekte vom Typ \book haben als Werte Seitenobjekte mit Tag \textit{side}, mit einem Attribut \xmlattribute{value} und als Wert das Bild der Seite.
+	
+		\subsection{Der Typ \boxtype}
+	Objekte vom Typ \boxtype können wie eine Spielbox verwendet werden. Objekte mit dem Attribut \xmlattribute{boxId}$="x"$ befinden sich zum Spielstart in der Box mit \xmlattribute{boxId}$="x"$
+	
+	Beispiel eines \boxtype Objekts:
+	
+	\lstset{language=XML}
+	\begin{lstlisting}	
+		<object type="box" unique_name="game_box" width="30" height="30" front="front.jpg" back="back.jpg"></object>
 	\end{lstlisting}
 	
 	Objekte vom Typ \book haben als Werte Seitenobjekte mit Tag \textit{side}, mit einem Attribut \xmlattribute{value} und als Wert das Bild der Seite.

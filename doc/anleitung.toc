@@ -8,5 +8,6 @@
 \contentsline {subsection}{\numberline {2.3.2}Der Typ \textcolor {red}{figure}\xspace }{10}{subsection.2.3.2}%
 \contentsline {subsection}{\numberline {2.3.3}Der Typ \textcolor {red}{dice}\xspace }{11}{subsection.2.3.3}%
 \contentsline {subsection}{\numberline {2.3.4}Der Typ \textcolor {red}{book}\xspace }{11}{subsection.2.3.4}%
+\contentsline {subsection}{\numberline {2.3.5}Der Typ \textcolor {red}{box}\xspace }{11}{subsection.2.3.5}%
 \contentsline {chapter}{\numberline {3}Spielsteuerung}{13}{chapter.3}%
 \providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 
