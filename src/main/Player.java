@@ -21,6 +21,7 @@ public class Player implements Comparable<Object> {
     private String name;
 	public final int id;
 	public Color color;
+	public int seatNum = -1;
 	public int mouseXPos = 0;
 	public int mouseYPos = 0;
 	public int screenWidth = 0, screenHeight = 0;
@@ -56,29 +57,30 @@ public class Player implements Comparable<Object> {
 	{
 		this.name = name;
 		this.id = id;
-		setPlayerColor();
+		setPlayerColor(null);
 	}
 	public Player(String name, int id, boolean visitor)
 	{
 		this.name = name;
 		this.id = id;
 		this.visitor = visitor;
-		setPlayerColor();
+		setPlayerColor(null);
 	}
 	
-	public Player(String name, int id, Color color, int mouseX, int mouseY) {
+	public Player(String name, int id, Color color, int seatNum, int mouseX, int mouseY) {
 		this.name = name;
 		this.id = id;
 		this.color = color;
+		this.seatNum = seatNum;
 		this.mouseXPos = mouseX;
 		this.mouseYPos = mouseY;
-		setPlayerColor();
 	}
 
 	public Player(Player other) {
         this.name = other.name;
         this.id = other.id;
         this.color = other.color;
+        this.seatNum = other.seatNum;
         this.mouseXPos = other.mouseXPos;
         this.mouseYPos = other.mouseYPos;
         this.screenWidth = other.screenWidth;
@@ -92,7 +94,8 @@ public class Player implements Comparable<Object> {
 		return "(" + name + " " + id + ")";
 	}
 
-	public void setPlayerColor(){
+	public void setPlayerColor(Color color){
+		this.color = color;
 		if (this.color == null) {
             this.color = new Color(new Random().nextInt() & 0xFFFFFF);
 		}
@@ -106,16 +109,17 @@ public class Player implements Comparable<Object> {
 	public void set(Player player) {
 		this.name = player.name;
 		this.color = player.color;
+		this.seatNum = player.seatNum;
 		this.mouseXPos = player.mouseXPos;
 		this.mouseYPos = player.mouseYPos;
 	}
 
 	public void beginPlay(GamePanel gamePanel, GameInstance gameInstance){
 		if (gamePanel != null && gameInstance != null){
-			int playerSeat = gameInstance.playerSeatList.indexOf(this.id);
-			this.color = gameInstance.seatColors.get(playerSeat % gameInstance.seatColors.size());
-			gamePanel.sitDown(this, playerSeat);
-			gameInstance.update(new PlayerEditAction(gamePanel.id, this, this));
+			if (this.seatNum == -1 && !this.visitor){
+				this.seatNum = gameInstance.getPlayerList().indexOf(this);
+			}
+			gamePanel.sitDown(this, this.seatNum);
 		}
 	}
 
@@ -127,7 +131,7 @@ public class Player implements Comparable<Object> {
 
 	public String toStringAdvanced()
 	{
-	    return name + " " + id + " " + color + " " + mouseXPos + " " + mouseYPos + " " + screenToBoardTransformation;
+	    return name + " " + id + " " + color + " " + seatNum + " " + mouseXPos + " " + mouseYPos + " " + screenToBoardTransformation;
 	}
 
 	@Override
@@ -138,8 +142,9 @@ public class Player implements Comparable<Object> {
 	    {
 	        Player other = (Player)oth;
 	        return name.equals(other.name)
-	                && id== other.id
+	                && id == other.id
 	                && color.equals(other.color)
+					&& seatNum == other.seatNum
 	                && mouseXPos == other.mouseXPos
 	                && mouseYPos == other.mouseYPos
 	                && screenToBoardTransformation.equals(other.screenToBoardTransformation);

@@ -471,31 +471,46 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public void beginPlay(){
 		player.beginPlay(this, gameInstance);
+		repaint();
 	}
 
-	public void sitDown(Player player, int pos, boolean swap){
-		translateX = 0;
-		translateY = 0;
-		zooming = getHeight()/ ((float) this.table.getDiameter() + 200);
-		zoomFactor = (int)(-10*Math.log(zooming));
-		rotation = 0;
-		updateGameTransform();
-		rotation = Math.toRadians(- 360/Math.max(1,this.table.playerShapes.size()) * pos);
-		updateGameTransform();
+	public void sitDown(Player player, int pos, boolean swap) {
+		if (player != null && pos >= 0 && pos < this.table.playerShapes.size()) {
+			translateX = 0;
+			translateY = 0;
+			zooming = getHeight() / ((float) this.table.getDiameter() + 200);
+			zoomFactor = (int) (-10 * Math.log(zooming));
+			rotation = 0;
+			updateGameTransform();
+			rotation = Math.toRadians(-360 / Math.max(1, this.table.playerShapes.size()) * pos);
+			updateGameTransform();
 
-		int currentPosition = gameInstance.playerSeatList.indexOf(player.id);
-		if (currentPosition != pos && swap){
-			Player player1 = gameInstance.getPlayerById(gameInstance.playerSeatList.get(pos));
-			Collections.swap(gameInstance.playerSeatList, pos, currentPosition);
-			sitDown(player1, currentPosition, false);
+			int currentPosition = player.seatNum;
+			if (currentPosition != pos && swap) {
+				for (Player player1 : gameInstance.getPlayerList()) {
+					if (player1.seatNum == pos) {
+						player1.seatNum = currentPosition;
+
+						player.seatNum = pos;
+						player.setPlayerColor(gameInstance.seatColors.get(pos));
+
+						gameInstance.update(new PlayerEditAction(id, player1, player1));
+						gameInstance.update(new PlayerEditAction(id, player, player));
+						ObjectFunctions.moveOwnStackToBoardPosition(this, gameInstance, player, ial);
+						break;
+					}
+				}
+			} else {
+				player.seatNum = pos;
+				if (gameInstance.seatColors.size() > pos) {
+					player.setPlayerColor(gameInstance.seatColors.get(pos));
+				}
+				gameInstance.update(new PlayerEditAction(id, player, player));
+				ObjectFunctions.moveOwnStackToBoardPosition(this, gameInstance, player, ial);
+			}
 		}
-		if (player != null && gameInstance.seatColors.size() > pos)
-		{
-			player.color = gameInstance.seatColors.get(pos);
-			ObjectFunctions.moveOwnStackToBoardPosition(this, gameInstance, player, ial);
-		}
-		gameInstance.update(new PlayerEditAction(this.id, player, player));
 	}
+
 
 	public void sitDown(Player player, int pos){
 		sitDown(player, pos, true);
@@ -888,7 +903,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						ObjectFunctions.playObject(this, gameInstance, player, hoveredObject);
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-					sitDown(player, PlayerFunctions.GetTablePlayerPosition(gameInstance, player));
+					sitDown(player, PlayerFunctions.GetTablePlayerPosition(player));
 				}
 
 

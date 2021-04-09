@@ -36,6 +36,7 @@ public class PlayerIO {
                 elem.getAttributeValue(IOString.NAME),
                 Integer.parseInt(elem.getAttributeValue(IOString.ID)),
                 new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR))),
+                Integer.parseInt(elem.getAttributeValue(IOString.SEAT_NUM)),
                 Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X)),
                 Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y)));
         result.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
@@ -49,6 +50,7 @@ public class PlayerIO {
     {
         player.setName(elem.getAttributeValue(IOString.NAME));
         player.color = new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR)));
+        player.seatNum = Integer.parseInt(elem.getAttributeValue(IOString.SEAT_NUM));
         player.mouseXPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X));
         player.mouseYPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y));
         player.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
@@ -61,7 +63,7 @@ public class PlayerIO {
     public static void simulateEditPlayerFromObject(ObjectInputStream is) throws IOException, ClassNotFoundException
     {
         is.readObject();
-        long toScip = 5 * Integer.SIZE / 8 + 6 * Double.SIZE / 8 + 1;
+        long toScip = 6 * Integer.SIZE / 8 + 6 * Double.SIZE / 8 + 1;
         long skipped = StreamUtil.skip(is, toScip);
         if (toScip != skipped)
         {
@@ -79,6 +81,7 @@ public class PlayerIO {
         player.setName((String)is.readObject());
         //read player color
         player.color = new Color(is.readInt());
+        player.seatNum = is.readInt();
         //read player mouse position
         player.mouseXPos = is.readInt();
         player.mouseYPos = is.readInt();
@@ -94,6 +97,7 @@ public class PlayerIO {
         out.writeObject(player.getName());
         //write player color
         out.writeInt(player.color.getRGB());
+        out.writeInt(player.seatNum);
         //write player mouse position
         out.writeInt(player.mouseXPos);
         out.writeInt(player.mouseYPos);
@@ -169,6 +173,7 @@ public class PlayerIO {
         elem.setAttribute(IOString.NAME, player.getName());
         elem.setAttribute(IOString.ID, Integer.toString(player.id));
         elem.setAttribute(IOString.COLOR, Integer.toString(player.color.getRGB()));
+        elem.setAttribute(IOString.SEAT_NUM, Integer.toString(player.seatNum));
         elem.setAttribute(IOString.MOUSE_X, Integer.toString(player.mouseXPos));
         elem.setAttribute(IOString.MOUSE_Y, Integer.toString(player.mouseYPos));
         elem.setAttribute(IOString.SCREEN_W, Integer.toString(player.screenWidth));

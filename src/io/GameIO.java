@@ -446,7 +446,6 @@ public class GameIO {
 			settingsName.setText(gi.name);
 			Element table = new Element(IOString.TABLE);
 			table.setText(Boolean.toString(gi.table));
-
 			table.setAttribute(IOString.PUT_DOWN_AREA, Boolean.toString(gi.put_down_area));
 			table.setAttribute(IOString.TABLE_RADIUS, Integer.toString(gi.tableRadius));
 			table.setAttribute(IOString.COLOR, gi.tableColor);

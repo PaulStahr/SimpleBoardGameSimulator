@@ -20,12 +20,15 @@ public class PlayerFunctions {
         return player;
     }
 
-    public static int GetTablePlayerPosition(GameInstance gameInstance, Player player){
-        return gameInstance.playerSeatList.indexOf(player.id);
+    public static int GetTablePlayerPosition(Player player){
+        return player.seatNum;
     }
 
     public static double GetCurrentPlayerRotation(GamePanel gamePanel, GameInstance gameInstance, Player player){
-        int playerPosition = GetTablePlayerPosition(gameInstance, player);
+        int playerPosition = GetTablePlayerPosition(player);
+        if (playerPosition == -1){
+            return 0;
+        }
         return 360. / gamePanel.table.playerShapes.size() * playerPosition;
     }
 }

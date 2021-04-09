@@ -1,7 +1,12 @@
-\documentclass{scrbook}
+\documentclass[ngerman]{scrbook}
 \usepackage{color}
 \usepackage{xspace}
-\usepackage{listings, tabularx}
+\usepackage{enumitem}
+\usepackage{listings, tabularx, graphicx, subcaption}
+\usepackage[german]{babel}
+
+\usepackage{hyperref}
+\usepackage{cleveref}
 \newcommand{\gamefile}[1]{\textit{\textcolor{blue}{#1}}\xspace}
 \newcommand{\game}{\gamefile{game.xml}}
 \newcommand{\gameinstance}{\gamefile{game\_instance.xml}}
@@ -33,7 +38,57 @@
 \begin{document}
 	\maketitle
 	\tableofcontents
-	\chapter{Spiel erstellen}
+	\chapter{Kurzanleitung}
+	
+	Dies ist eine kurze Schritt-für-Schritt Anleitung um einen Server zu starten und vorhandene Spiele zu laden. Möchte man nur zu einem vorhandenen Server verbinden und ein neues Spiel laden, können die Punkte \ref{item:DynDns}-\ref{item:StartServer} übersprungen werden. Wie man neue Spiele erstellt, wird in \Cref{chap:createGames} erklärt.
+	
+	\begin{enumerate}[label=\arabic*)]
+		\item \textbf{Java installieren:} Für das Programm wird Java benötigt. Java kann unter folgendem Link \href{https://www.java.com/de/download/}{https://www.java.com/de/download/} heruntergeladen werden und installiert werden.
+		
+		\item \label{item:DynDns} \textbf{DynDNS Adresse erstellen und mit Router verbinden:} Mithilfe einer festen Adresse Adresse kann Verbindung zum Spiel vereinfacht werden. Solche Adressen können zum Beispiel auf der Seite \href{https://www.noip.com}{https://www.noip.com} kostenlos erstellt werden und sehen wie folgt aus \textit{meinspieleserver.ddns.net}. Diese Adresse muss im jeweiligen Router hinterlegt werden. Je nach Routermodell kann das etwas unterschiedlich funktionieren!
+		\begin{enumerate}
+			\item \textbf{Fritz-Box:} \href{https://avm.de/service/fritzbox/fritzbox-7590/wissensdatenbank/publication/show/30_Dynamic-DNS-in-FRITZ-Box-einrichten/}{Link zum Tutorial} 
+			\item \textbf{Telekom:} \href{https://www.netzwelt.de/news/95517-anleitung-dyndns-speedport-routern-einrichten.html}{Link zum Tutorial}
+		\end{enumerate}
+		
+		\item \textbf{Port freischalten:} Auf dem Router muss nun noch der Port freigeschaltet werden über den der Server läuft, damit die Mitspieler von außerhalb des lokalen Netzes auf den Server zugreifen können.
+		
+		\item \label{item:StartServer} \textbf{Server starten:} 
+			Zuerst zum Programmpfad navigieren  in dem die Datei SimpleBoardGameSimulator.jar liegt.
+		\begin{enumerate}
+			\item \textbf{Windows:} Die Datei StartServer.bat, die im selben Verzeichnis liegt mit einem Texteditor öffnen und $<$port$>$ durch den freigeschalteten Port ersetzen.
+			\item \textbf{Linux:} Im Terminal den Befehl 
+			$$\mbox{java -jar SimpleBoardGameSimulator.jar --server $<$port$>$}$$ ausführen. $<$port$>$ muss durch den freigeschalteten Port ersetzt werden!
+		\end{enumerate}
+		
+		\item \label{item:StartGame} \textbf{Programm starten:} Das Programm SimpleBoardGameSimulator.jar ausführen. Nun sollte sich folgendes Fenster öffnen:
+		\begin{figure}[!h]
+			\centering
+			     \begin{subfigure}[b]{0.45\textwidth}
+				\centering
+				\includegraphics[width=\textwidth]{ServerLobbyWindow.jpg}
+				\caption{Startfenster des Spiels}
+				\label{fig:Start}
+			\end{subfigure}
+			\hfill
+			\begin{subfigure}[b]{0.45\textwidth}
+				\centering
+				\includegraphics[width=\textwidth]{ServerLobbyWindowStartedGame.jpg}
+				\caption{Startfenster mit geladenem Spiel}
+				\label{fig:StartLoaded}
+			\end{subfigure}
+			\caption{Startfenster des Spiels}
+		\end{figure}
+	
+		Als Serveradresse muss nun die Adresse des Servers eingegeben werden (entweder die oben erstellte Adresse oder die Adresse eines vorhandenen Servers mit dem man verbinden möchte). Als Port muss der zuvor freigeschaltete Port eingegeben werden oder der Port des vorhandenen Servers mit dem man verbinden möchte. Jeder Spieler kann sich einen Namen geben und sollte eine eindeutige Spieler Id wählen. Falls schon ein Spiel auf dem Server läuft kann ``Aktualisieren'' gedrückt werden um das Spiel anzuzeigen. Dann erscheint wie im Bild rechts das laufende Spiel und die Spieler können mit dem ``Connect'' Button verbinden.
+		
+		\item \textbf{Spiel laden:} Wenn sich das Programmfenster geöffnet hat kann über den Button ``Spiel Laden'' ein neues Spiel, das man schon erstellt hat, geladen werden. Dazu navigiert man im Fenster, das sich öffnet zum Spiel (z.B. Spiel.zip) und klickt auf ``Öffnen''. Das Spiel sollte nun für alle Spieler, die die richtige Adresse und den richtigen Port angegeben haben erscheinen, wenn sie auf ``Aktualisieren'' klicken. Klicken auf ``Connect'' lässt die Spieler mit dem Spiel verbinden.
+	\end{enumerate}
+	
+	
+	\chapter{Spiel erstellen}\label{chap:createGames}
+	In diesem Abschnitt wird beschrieben, wie ein neues Spiel für den Brettspielsimulator erzeugt werden kann. 
+	
 	Jedes Spiel besteht aus Spielobjekten (Bildern im jpg oder png Format) und den XML-Dateien \game und \gameinstance. Spielobjekte können drei verschiedene Typen haben \card, \gamefigure und \dice.
 	\section{Die Datei \game}
 	In der \game werden die Spielobjekte definiert. Das Grundgerüst der Datei sieht wie folgt aus. 
@@ -82,7 +137,7 @@
 			name & -- & String & Name des Spiels\\
 			table & \xmlattribute{color}, \xmlattribute{put\_down\_area}, \xmlattribute{table\_radius} & true/false & Anzeige des Tisches auf dem Spielfeld, falls False wird der Tisch nicht angezeigt, \xmlattribute{color} definiert die Farbe des Tisches, \xmlattribute{put\_down\_area} ist ein boolsches Attribut und gibt an, ob ein Ablagebereich in der Mitte des Tisches erscheinen soll, \xmlattribute{table\_radius} gibt den Radius des Tisches an.\\
 			private\_area & -- & true/false & gibt an, ob der Handkartenbereich zum Spielstart eingeblendet sein soll\\
-			seats & -- & <seat color="\#0000ff"/> & Feste Liste von farbigen Stühlen um den Tisch\\
+			seats & -- & $<$seat color="\#0000ff"/$>$ & Feste Liste von farbigen Stühlen um den Tisch\\
 			debug\_mode & -- & true/false & Falls true, werden zusätzliche Informationen angezeigt, die hilfreich beim debuggen sind\\
 		\end{tabularx}
 	\caption{Mögliche Spiel Settings}

@@ -35,6 +35,7 @@ public class PlayerIOTest {
     {
         Player pl = new Player("Player", 42);
         pl.color = Color.CYAN;
+        pl.seatNum = -1;
         pl.mouseXPos = 43;
         pl.mouseYPos = 44;
         pl.playerAtTableTransform.setTransform(1,2,3,4,5,6);

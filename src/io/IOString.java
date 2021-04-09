@@ -75,4 +75,6 @@ public class IOString {
     public static final String BOX = "box";
 	public static final String BOX_NAME = "box_name";
     public static final String BOX_ID = "box_id";
+    public static final String PLAYER_SEAT_LIST = "player_seat_list";
+	public static final String SEAT_NUM = "seat_num";
 }
