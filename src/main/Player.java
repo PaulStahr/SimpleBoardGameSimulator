@@ -4,12 +4,9 @@ import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Predicate;
 
-import gameObjects.action.player.PlayerEditAction;
 import gameObjects.columnTypes.PlayerColumnType;
-import gameObjects.functions.MoveFunctions;
-import gameObjects.functions.ObjectFunctions;
-import gameObjects.functions.PlayerFunctions;
 import gameObjects.instance.GameInstance;
 import gui.GamePanel;
 import util.ArrayTools;
@@ -34,6 +31,21 @@ public class Player implements Comparable<Object> {
 	public boolean visitor = false;
     public volatile long lastReceivedSignal;
 	
+    public final Predicate<Player> sameSeatPredicate = new Predicate<Player>() {
+        @Override
+        public boolean test(Player arg0) {return arg0.seatNum == Player.this.seatNum;}
+    };
+
+    public final Predicate<Player> sameIdPredicate = new Predicate<Player>() {
+        @Override
+        public boolean test(Player arg0) {return arg0.id == Player.this.id;}
+    };
+
+    public final Predicate<Player> sameNamePredicate = new Predicate<Player>() {
+        @Override
+        public boolean test(Player arg0) {return arg0.name.equals(Player.this);}
+    };
+
 	public String getName()
 	{
 		return name;
@@ -95,10 +107,10 @@ public class Player implements Comparable<Object> {
 	}
 
 	public void setPlayerColor(Color color){
+        if (color == null) {
+            color = new Color(new Random().nextInt() & 0xFFFFFF);
+        }
 		this.color = color;
-		if (this.color == null) {
-            this.color = new Color(new Random().nextInt() & 0xFFFFFF);
-		}
 	}
 
 	public void setMousePos(int posX, int posY){

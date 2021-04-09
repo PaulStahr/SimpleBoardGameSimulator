@@ -37,7 +37,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
@@ -52,8 +59,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import gameObjects.definition.*;
-import gameObjects.functions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +75,16 @@ import gameObjects.action.player.PlayerCharacterPositionUpdate;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerMousePositionUpdate;
 import gameObjects.action.player.PlayerRemoveAction;
+import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectBox;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
+import gameObjects.functions.CheckFunctions;
+import gameObjects.functions.DrawFunctions;
+import gameObjects.functions.MoveFunctions;
+import gameObjects.functions.ObjectFunctions;
+import gameObjects.functions.PlayerFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
@@ -487,27 +502,25 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 			int currentPosition = player.seatNum;
 			if (currentPosition != pos && swap) {
-				for (Player player1 : gameInstance.getPlayerList()) {
-					if (player1.seatNum == pos) {
-						player1.seatNum = currentPosition;
+			    Player player1 = gameInstance.getPlayer(player.sameSeatPredicate);
+				if (player1 != null) {
+					player1.seatNum = currentPosition;
 
-						player.seatNum = pos;
-						player.setPlayerColor(gameInstance.seatColors.get(pos));
-
-						gameInstance.update(new PlayerEditAction(id, player1, player1));
-						gameInstance.update(new PlayerEditAction(id, player, player));
-						ObjectFunctions.moveOwnStackToBoardPosition(this, gameInstance, player, ial);
-						break;
-					}
-				}
-			} else {
-				player.seatNum = pos;
-				if (gameInstance.seatColors.size() > pos) {
+					player.seatNum = pos;
 					player.setPlayerColor(gameInstance.seatColors.get(pos));
-				}
-				gameInstance.update(new PlayerEditAction(id, player, player));
-				ObjectFunctions.moveOwnStackToBoardPosition(this, gameInstance, player, ial);
-			}
+
+					gameInstance.update(new PlayerEditAction(id, player1, player1));
+					gameInstance.update(new PlayerEditAction(id, player, player));
+					ObjectFunctions.moveOwnStackToBoardPosition(this, gameInstance, player, ial);
+				} else {
+    				player.seatNum = pos;
+    				if (gameInstance.seatColors.size() > pos) {
+    					player.setPlayerColor(gameInstance.seatColors.get(pos));
+    				}
+    				gameInstance.update(new PlayerEditAction(id, player, player));
+    				ObjectFunctions.moveOwnStackToBoardPosition(this, gameInstance, player, ial);
+    			}
+		    }
 		}
 	}
 

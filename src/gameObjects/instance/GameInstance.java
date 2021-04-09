@@ -3,11 +3,13 @@ package gameObjects.instance;
 import static java.lang.Math.max;
 
 import java.awt.Color;
-import java.awt.geom.Point2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.locks.StampedLock;
+import java.util.function.Predicate;
 
-import gameObjects.functions.ObjectFunctions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,10 +31,10 @@ import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.functions.CheckingFunctions;
+import gameObjects.functions.ObjectFunctions;
 import main.Player;
 import util.ArrayTools;
-import util.Pair;
-import util.data.IntegerArrayList;
+import util.ListTools;
 import util.jframe.table.TableColumnType;
 
 public class GameInstance {
@@ -77,7 +79,7 @@ public class GameInstance {
 	public GameInstance(GameInstance other)
 	{
 	    this(new Game(other.game), other.name);
-	     this.password = other.password;
+	    this.password = other.password;
 	    this.name = other.name;
 	    this.hidden =other.hidden;
 	    for (ObjectInstance oi : other.objects){objects.add(oi.copy());}
@@ -309,8 +311,9 @@ public class GameInstance {
 			{
 			    logger.error("Can't find edited object " + editAction.object);
 			}else {
-			    maxDrawValue = max(maxDrawValue , oi.state.drawValue);
-			    oi.state.set(editAction.state);
+			    if (oi.state.equals(editAction.state)) {return;}
+                maxDrawValue = max(maxDrawValue , oi.state.drawValue);
+		        oi.state.set(editAction.state);
 			}
 		}
 		else if (action instanceof PlayerRemoveAction)
@@ -528,4 +531,6 @@ public class GameInstance {
 	public int getChangeListenerCount() {return changeListener.size();}
 	public void removeChangeListener(GameChangeListener listener) {changeListener.remove(listener);}
     public void getObjects(ArrayList<ObjectInstance> oiList) {oiList.addAll(objects);}
+
+    public Player getPlayer(Predicate<Player> sameSeatPredicate) {return ListTools.get(sameSeatPredicate, players);}
 }

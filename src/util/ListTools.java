@@ -24,6 +24,7 @@ package util;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 import util.keyfunction.KeyFunctionInt;
 import util.keyfunction.KeyFunctionLong;
@@ -146,4 +147,14 @@ public class ListTools {
         }
         removeRange(list, write, list.size());
 	}
+
+    public static <E> E get(Predicate<E> pred, ArrayList<E> list) {
+        for (int i = 0; i < list.size(); ++i)
+        {
+            if (pred.test(list.get(i))) {
+                return list.get(i);
+            }
+        }
+        return null;
+    }
 }

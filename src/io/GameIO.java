@@ -22,7 +22,6 @@ import java.util.zip.ZipOutputStream;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 
-import gameObjects.definition.*;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -35,8 +34,14 @@ import org.slf4j.LoggerFactory;
 
 import data.Texture;
 import gameObjects.action.GameObjectInstanceEditAction;
+import gameObjects.definition.GameObject;
+import gameObjects.definition.GameObjectBook;
 import gameObjects.definition.GameObjectBook.BookSide;
+import gameObjects.definition.GameObjectBox;
+import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectDice.DiceSide;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -65,25 +70,25 @@ public class GameIO {
 		} return Integer.parseInt(version);
 	}
 
-	static final int readAttribute(Element elem, String key, int def)
+	public static final int readAttribute(Element elem, String key, int def)
 	{
 		Attribute attribute = elem.getAttribute(key);
 		return attribute != null ? Integer.parseInt(attribute.getValue()) : def;
 	}
 
-	static final long readAttribute(Element elem, String key, long def)
+	public static final long readAttribute(Element elem, String key, long def)
 	{
 		Attribute attribute = elem.getAttribute(key);
 		return attribute != null ? Long.parseLong(attribute.getValue()) : def;
 	}
 
-	static final boolean readAttribute(Element elem, String key, boolean def)
+	public static final boolean readAttribute(Element elem, String key, boolean def)
 	{
 		Attribute attribute = elem.getAttribute(key);
 		return attribute != null ? Boolean.parseBoolean(attribute.getValue()) : def;
 	}
 
-	static final String readAttribute(Element elem, String key, String def) {
+	public static final String readAttribute(Element elem, String key, String def) {
 		Attribute attribute = elem.getAttribute(key);
 		return attribute != null ? attribute.getValue() : def;
 	}

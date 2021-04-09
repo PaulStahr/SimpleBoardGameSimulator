@@ -36,7 +36,7 @@ public class PlayerIO {
                 elem.getAttributeValue(IOString.NAME),
                 Integer.parseInt(elem.getAttributeValue(IOString.ID)),
                 new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR))),
-                Integer.parseInt(elem.getAttributeValue(IOString.SEAT_NUM)),
+                GameIO.readAttribute(elem, IOString.SEAT_NUM, -1),
                 Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X)),
                 Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y)));
         result.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
@@ -80,7 +80,8 @@ public class PlayerIO {
         }
         player.setName((String)is.readObject());
         //read player color
-        player.color = new Color(is.readInt());
+        int col = is.readInt();
+        if (player.color.getRGB() != col) {player.color = new Color(col);}
         player.seatNum = is.readInt();
         //read player mouse position
         player.mouseXPos = is.readInt();
