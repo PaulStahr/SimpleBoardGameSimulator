@@ -1,15 +1,13 @@
 package gameObjects.definition;
 
+import java.util.List;
+
 import data.Texture;
-import gameObjects.columnTypes.GameObjectColumnType;
-import gameObjects.columnTypes.GameObjectInstanceColumnType;
 import gameObjects.columnTypes.GameObjectTokenColumnType;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectState;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
-
-import java.util.List;
 
 public class GameObjectToken extends GameObject{
 	private String downsideLookId;
@@ -91,6 +89,13 @@ public class GameObjectToken extends GameObject{
 		@Override
 		public ObjectState copy() {return new TokenState(this);}
 
+		@Override
+        public boolean equals(Object state) {
+		    if (!(state instanceof TokenState)) {return false;}
+		    TokenState ts = (TokenState)state;
+		    return ts.side == this.side && super.equals(state);
+		}
+		
 		@Override
 		public void reset() {
 			super.reset();
