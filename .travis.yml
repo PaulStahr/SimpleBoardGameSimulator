@@ -1,8 +1,7 @@
+services:
+  - xvfb
 before_script:
-  - "export DISPAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3
-
+  - export DISPAY=:99.0
 language: java
 jdk:
   - oraclejdk9
