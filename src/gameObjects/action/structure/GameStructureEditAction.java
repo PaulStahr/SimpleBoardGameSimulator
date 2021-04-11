@@ -1,4 +1,6 @@
-package gameObjects.action;
+package gameObjects.action.structure;
+
+import gameObjects.action.GameAction;
 
 public class GameStructureEditAction extends GameAction {
 

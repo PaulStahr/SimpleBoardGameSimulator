@@ -46,9 +46,10 @@ import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerRemoveAction;
+import gameObjects.action.structure.GameStructureEditAction;
+import gameObjects.action.structure.GameTextureRemoveAction;
 import gameObjects.columnTypes.GameObjectBooksColumnType;
 import gameObjects.columnTypes.GameObjectColumnType;
 import gameObjects.columnTypes.GameObjectDicesColumnType;
@@ -436,7 +437,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				Set<Entry<String, Texture>> entrySet = gi.game.images.entrySet();
 				@SuppressWarnings("unchecked")
 				Entry<String, Texture> entry = entrySet.toArray(new Entry[entrySet.size()])[row];
-				gi.game.images.remove(entry.getKey(), entry.getValue());
+				gi.update(new GameTextureRemoveAction(id, entry.getKey()));
 			}
 			else if (tableSource == tableModelGameObjects)
 			{

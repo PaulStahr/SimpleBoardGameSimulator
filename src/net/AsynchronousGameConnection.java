@@ -28,7 +28,6 @@ import gameObjects.action.DestroyInstance;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.message.UserFileMessage;
 import gameObjects.action.message.UserSoundMessageAction;
 import gameObjects.action.message.UsertextMessageAction;
@@ -37,6 +36,8 @@ import gameObjects.action.player.PlayerCharacterPositionUpdate;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerMousePositionUpdate;
 import gameObjects.action.player.PlayerRemoveAction;
+import gameObjects.action.structure.GameStructureEditAction;
+import gameObjects.action.structure.GameTextureRemoveAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
@@ -296,7 +297,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
             else if (action instanceof UsertextMessageAction
                     || action instanceof UserFileMessage
                     || action instanceof UserSoundMessageAction
-                    || action instanceof TetrisGameEvent)
+                    || action instanceof TetrisGameEvent
+                    || action instanceof GameTextureRemoveAction)
             {}
             else if (action instanceof GameObjectEditAction)
             {
@@ -641,7 +643,8 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                         || action instanceof UserSoundMessageAction
                         || action instanceof UserFileMessage
                         || action instanceof TetrisGameEvent
-                        || action instanceof PlayerRemoveAction)
+                        || action instanceof PlayerRemoveAction
+                        || action instanceof GameTextureRemoveAction)
                     {
                         gi.update(action);
                         ++inputEvents;

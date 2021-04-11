@@ -158,7 +158,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 		            	game.update(new UserFileMessage(id, player, receiverPlayer, file.getName(), Files.readAllBytes(file.toPath())));
 		            }
 		        } catch (Exception ex) {
-		            ex.printStackTrace();
+		            JFrameUtils.logErrorAndShow("Couldn't drop element", ex, logger);
 		        }
 		    }
 		});
