@@ -178,7 +178,7 @@ public class GameServer implements Runnable {
 			    				PrintWriter out = new PrintWriter(output, true);
 			    				String gameinstanceName = split.get(2);
 			    				GameInstance gi = getGameInstance(gameinstanceName);
-			    				for (int i = 0; i < gi.getPlayerNumber(); ++i)
+			    				for (int i = 0; i < gi.getPlayerCount(); ++i)
 			    				{
 			    					out.write(gi.getPlayerByIndex(i).getName());
 			    				}

@@ -363,7 +363,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 		if (show_ping) {
             g2.drawString("Last Signal", getWidth() - 100, 80);		    
-		    for (int i = 0; i < gameInstance.getPlayerNumber(); ++i)
+		    for (int i = 0; i < gameInstance.getPlayerCount(); ++i)
 		    {
 		        Player pl = gameInstance.getPlayerByIndex(i);
 		        g2.drawString(pl.getName() + " " + ((System.nanoTime() - pl.lastReceivedSignal) / 100000000) / 10f, getWidth() - 100, 100 + 20 * i);

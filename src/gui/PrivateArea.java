@@ -114,7 +114,6 @@ public class PrivateArea {
     public int getPrivateObjectIndexByPosition(int posX, int posY, int originX, int originY){
         if (privateObjects.size() > 0) {
             int section = getSectionByPosition(posX, posY, originX, originY);
-            System.out.println(section);
             return Calculate.clip(section, 0, privateObjects.size() - 1);
         } else {
             return -1;
@@ -124,7 +123,6 @@ public class PrivateArea {
     public int getObjectIdByPosition(int posX, int posY, int originX, int originY) {
         if (privateObjects.size() > 0) {
             int section = getSectionByPosition(posX, posY, originX, originY);
-            System.out.println(section);
             return privateObjects.getI(Calculate.clip(section, 0, privateObjects.size() - 1));
         } else {
             return -1;

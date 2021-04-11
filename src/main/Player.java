@@ -150,18 +150,15 @@ public class Player implements Comparable<Object> {
 	public boolean equals(Object oth)
 	{
 	    if (oth == this) {return true;}
-	    if (oth instanceof Player)
-	    {
-	        Player other = (Player)oth;
-	        return name.equals(other.name)
-	                && id == other.id
-	                && color.equals(other.color)
-					&& seatNum == other.seatNum
-	                && mouseXPos == other.mouseXPos
-	                && mouseYPos == other.mouseYPos
-	                && screenToBoardTransformation.equals(other.screenToBoardTransformation);
-	    }
-	    return false;
+	    if (!(oth instanceof Player)){return false;}
+        Player other = (Player)oth;
+        return name.equals(other.name)
+                && id == other.id
+                && color.equals(other.color)
+				&& seatNum == other.seatNum
+                && mouseXPos == other.mouseXPos
+                && mouseYPos == other.mouseYPos
+                && screenToBoardTransformation.equals(other.screenToBoardTransformation);
 	}
 
     public Player copy() {return new Player(this);}

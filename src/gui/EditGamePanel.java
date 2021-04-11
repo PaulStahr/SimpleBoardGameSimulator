@@ -141,7 +141,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		tableModelPlayer.addTableModelListener(this);
 		scrollPaneImages.setDropTarget(new DropTarget() {
 		    /**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 8601119174600655506L;
 
@@ -213,7 +213,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            comp.setBackground(gi.getPlayerByIndex(row).color);
+            if (row < gi.getPlayerCount())
+            {
+                comp.setBackground(gi.getPlayerByIndex(row).color);
+            }
             return comp;
         }        
     };
@@ -289,7 +292,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			isUpdating = true;
 			textFieldName.setText(gi.name);
 			textFieldTableRadius.setText(Integer.toString(gi.tableRadius));
-			JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
+		    JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
 			comboBoxBackground.setSelectedItem(gi.game.getImageKey(gi.game.background));
             textFieldPassword.setText(gi.password);
 			textFieldSeats.setText(Integer.toString(gi.seats));
@@ -364,7 +367,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
         public String[] apply(TableColumnType t) {
             if (t == GameObjectInstanceColumnType.OWNER)
             {
-                int count = gi.getPlayerNumber();
+                int count = gi.getPlayerCount();
                 String[] result = new String[count + 1];
                 result[0] = "-1";
                 for (int i = 0; i < count; ++i)

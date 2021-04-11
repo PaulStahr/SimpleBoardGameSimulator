@@ -170,9 +170,9 @@ public class GameInstance {
 
 	public Player getPlayerByIndex(int idx){return players.get(idx);}
 
-	public int getPlayerNumber(){return getPlayerNumber(false);}
+	public int getPlayerCount(){return getPlayerCount(false);}
 
-	public int getPlayerNumber(boolean with_visitors)
+	public int getPlayerCount(boolean with_visitors)
 	{
 		if (with_visitors)
 		{

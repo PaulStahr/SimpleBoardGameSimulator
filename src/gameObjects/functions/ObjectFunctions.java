@@ -1813,7 +1813,7 @@ public class ObjectFunctions {
 
     public static void giveObjects(GamePanel gamePanel, GameInstance gameInstance, IntegerArrayList ial, ArrayList<ObjectInstance> oiList) {
         Collections.shuffle(ial);
-        int playerNum = gameInstance.getPlayerNumber();
+        int playerNum = gameInstance.getPlayerCount();
         int numElements = ial.size()/playerNum;
         int modElements = ial.size() & playerNum;
 
