@@ -10,6 +10,8 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -238,7 +240,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
         }
 	};
 
- 	private class GeneralPanel extends JPanel implements ItemListener, DocumentListener, LanguageChangeListener
+ 	private class GeneralPanel extends JPanel implements ItemListener, DocumentListener, LanguageChangeListener, ComponentListener
  	{
  		/**
 		 * 
@@ -285,11 +287,12 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			tableModelBooks.addTableModelListener(EditGamePanel.this);
 			languageChanged(lh.getCurrentLanguage());
 			lh.addLanguageChangeListener(this);
+			addComponentListener(this);
  		}
 
 		public void update() {
 	    	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");}
-			if (isUpdating)  {return;}
+			if (!isVisible() || isUpdating)  {return;}
 			isUpdating = true;
 			textFieldName.setText(gi.name);
 			textFieldTableRadius.setText(Integer.toString(gi.tableRadius));
@@ -355,6 +358,20 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		    labelPassword.setText(language.getString(Words.password));
 		    labelSeats.setText(language.getString(Words.seats));
 		}
+
+        @Override
+        public void componentHidden(ComponentEvent e) {}
+
+        @Override
+        public void componentMoved(ComponentEvent e) {}
+
+        @Override
+        public void componentResized(ComponentEvent e) {}
+
+        @Override
+        public void componentShown(ComponentEvent e) {
+            update();
+        }
  	}
  	
 	/**
