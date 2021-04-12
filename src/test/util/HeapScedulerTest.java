@@ -19,7 +19,7 @@ public class HeapScedulerTest {
         long time = System.nanoTime();
         final AtomicInteger counter = new AtomicInteger();
         
-        int order[] = new int[] {2,0,1};
+        int order[] = new int[] {2,0,1,3,5,4};
         for (int i = 0; i < order.length; ++i)
         {
             final int current = order[i];
@@ -31,6 +31,7 @@ public class HeapScedulerTest {
                     counter.incrementAndGet();
                 }
             }, time + current, true);
+            hs.checkHeapOrder();
         }
         hs.start();
         try {
@@ -39,6 +40,6 @@ public class HeapScedulerTest {
             logger.error("Unexpected interrupt", e);
         }
         hs.stop();
-        assertEquals("Value was " + counter.get() + " times incremented. expected 3; Heap: " + hs, counter.get(), 3);
+        assertEquals("Value was " + counter.get() + " times incremented. expected " + order.length + "; Heap: " + hs, counter.get(), order.length);
     }
 }

@@ -76,12 +76,10 @@ public class HeapSceduler implements Runnable{
         Runnable r= rHeap[index];
         while (true)
         {
-           int next = index * 2 + (index * 2 + 2 < length && tHeap[index * 2 + 1] < tHeap[index * 2 + 2] ? 1 : 2);
+           int next = index * 2 + 1;
+           next += (next + 1 < length && tHeap[next] > tHeap[next + 1] ? 1 : 0);
 
-           if (next >= length || time >= tHeap[next])
-           {
-              break;
-           }
+           if (next >= length || time <= tHeap[next]){break;}
            rHeap[index] = rHeap[next];
            tHeap[index] = tHeap[next];
            index = next;
@@ -138,7 +136,7 @@ public class HeapSceduler implements Runnable{
         th = null;
     }
 
-    public void checkHeapOrder() {
+    public synchronized void checkHeapOrder() {
         for (int i = 1; i < length; ++i)
         {
             if (tHeap[i] < tHeap[(i - 1) / 2])
