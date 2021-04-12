@@ -43,6 +43,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.Document;
 
+import data.DataHandler;
 import data.Texture;
 import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
@@ -314,8 +315,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			isUpdating = false;
 		}
-		
-		
+
 		public void update(DocumentEvent event)
 		{
 	    	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");}
@@ -397,7 +397,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
             return null;
         }
     };
-	
+
     @SuppressWarnings("unchecked")
     private void updateTables()
 	{
@@ -419,7 +419,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		panelGeneral.update();
 		isUpdating = false;
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		if (isUpdating){return;}
@@ -477,7 +477,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		updateTables();
 		isUpdating = false;
 	}
-	
+
 	@Override
 	public void run()
 	{
@@ -485,11 +485,18 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		panelGeneral.update();
 	}
 
+	private final Runnable triggerUpdateRunnable = new Runnable(){
+	    @Override
+        public void run() {
+	        JFrameUtils.runByDispatcher(EditGamePanel.this);
+	    }
+	};
+
 	@Override
 	public void changeUpdate(GameAction action) {
 		if (action instanceof GameObjectInstanceEditAction || action instanceof GameStructureEditAction)
 		{
-			JFrameUtils.runByDispatcher(this);
+		    DataHandler.hs.enqueue(triggerUpdateRunnable, System.nanoTime() + 100000000, false);
 		}
 	}
 	

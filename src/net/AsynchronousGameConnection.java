@@ -242,7 +242,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                 }
                 synchronized(pings){pings.remove(pc);}
             }
-        }, timeout);
+        }, timeout, true);
         synchronized(pings) {pings.add(pc);}
         queueOutput(cpf);
         return pc;

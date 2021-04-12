@@ -30,7 +30,7 @@ public class HeapScedulerTest {
                     assertEquals(hs.toString(), counter.get(), current);
                     counter.incrementAndGet();
                 }
-            }, time + current);    
+            }, time + current, true);
         }
         hs.start();
         try {
