@@ -1,4 +1,4 @@
-package gui;
+package gui.GameWindow;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -67,6 +67,10 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
+import gui.Language.Language;
+import gui.Language.LanguageChangeListener;
+import gui.Language.LanguageHandler;
+import gui.Language.Words;
 import gui.game.edit.ObjectEditPanel;
 import main.Player;
 import util.ArrayTools;
@@ -76,7 +80,7 @@ import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.TableModel;
 
-public class EditGamePanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener{
+public class EditGamePanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener {
 	public static final List<TableColumnType> IMAGE_TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{ImageColumnType.ID, ImageColumnType.WIDTH, ImageColumnType.HEIGHT, ImageColumnType.DELETE});
 	private final GameInstance gi;
 	private final DefaultTableModel tableModelGameObjectInstances= new TableModel(ObjectInstance.TYPES);
@@ -385,14 +389,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		isUpdating = true;
 		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, null, deleteObjectColumn);
 		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
-
-
 		JFrameUtils.updateTable(tableCards, scrollPaneCards, gi.getTokenList(), GameObjectToken.TOKEN_ATTRIBUTES, tableModelCards, comboBoxOverrides, resetCardColumn, deleteCardColumn);
 		JFrameUtils.updateTable(tableFigures, scrollPaneFigures, gi.getFigureList(), GameObjectFigure.FIGURE_ATTRIBUTES, tableModelFigures, null, resetFiguresColumn, deleteFigureColumn);
 		JFrameUtils.updateTable(tableDices, scrollPaneDices, gi.getDiceList(), GameObjectDice.DICE_ATTRIBUTES, tableModelDices, null, resetDiceColumn, deleteDiceColumn);
 		JFrameUtils.updateTable(tableBooks, scrollPaneBooks, gi.getBookList(), GameObjectBook.BOOK_ATTRIBUTES, tableModelBooks, null, resetBookColumn, deleteBookColumn);
-
-
 		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.entrySet().toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, null, deleteImageColumn);
 		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(true), Player.TYPES, tableModelPlayer, null, playerSelectColorColumn, deletePlayerColumn, repairPlayerColumn);
 		panelGeneral.update();

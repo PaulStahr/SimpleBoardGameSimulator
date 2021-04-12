@@ -1,4 +1,4 @@
-package gui;
+package gui.GameWindow;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -29,7 +29,7 @@ public class Table {
     public Shape stackerShape = null;
     public ArrayList<Shape> playerShapes = new ArrayList<>();
 
-    public Table(GameInstance gameInstance, int diameter, Point2D tableOrigin){
+    public Table(GamePanel gamePanel, GameInstance gameInstance, int diameter, Point2D tableOrigin){
         this.diameter = diameter;
         this.playerDiameter = diameter/5;
         this.stackerWidth = diameter/4;

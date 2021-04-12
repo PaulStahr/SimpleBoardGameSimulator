@@ -5,7 +5,7 @@ import java.util.List;
 import data.Texture;
 import gameObjects.columnTypes.GameObjectInstanceColumnType;
 import gameObjects.definition.GameObject;
-import gui.GamePanel;
+import gui.GameWindow.GamePanel;
 import main.Player;
 import util.ArrayTools;
 import util.ArrayTools.ObjectToIntTransform;

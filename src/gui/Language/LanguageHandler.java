@@ -1,4 +1,4 @@
-package gui;
+package gui.Language;
 
 import java.awt.Component;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.DataHandler;
-import gui.Language.LanguageSummary;
+import gui.Language.Language.LanguageSummary;
 import util.ListTools;
 
 public class LanguageHandler {
@@ -80,7 +80,7 @@ public class LanguageHandler {
     	updateComponents.add(new ComponentUpdater(component, word));
     }
 
-    void setCurrentLanguage(LanguageSummary summary){
+    public void setCurrentLanguage(LanguageSummary summary){
         SAXBuilder saxBuilder = new SAXBuilder();
         try {
             currentLanguage = new Language(saxBuilder.build(DataHandler.getResourceAsStream("languages/" + summary + ".xml")), summary);

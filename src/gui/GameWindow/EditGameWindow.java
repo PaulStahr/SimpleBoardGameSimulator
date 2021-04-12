@@ -1,12 +1,18 @@
-package gui;
+package gui.GameWindow;
 
 import javax.swing.JFrame;
 
 import data.JFrameLookAndFeelUtil;
 import gameObjects.instance.GameInstance;
+import gui.Language.Language;
+import gui.Language.LanguageChangeListener;
+import gui.Language.LanguageHandler;
+import gui.Language.Words;
 import main.Player;
 
-public class EditGameWindow extends JFrame implements LanguageChangeListener{
+import java.awt.event.WindowEvent;
+
+public class EditGameWindow extends JFrame implements LanguageChangeListener {
 	/**
 	 * 
 	 */
@@ -19,10 +25,13 @@ public class EditGameWindow extends JFrame implements LanguageChangeListener{
 		setContentPane(new EditGamePanel(gi, lh, player));
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		setSize(500, 400);
+		this.dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSED));
 	}
 
 	@Override
 	public void languageChanged(Language language) {
 		this.setTitle(language.getString(Words.edit_game));
 	}
+
+
 }

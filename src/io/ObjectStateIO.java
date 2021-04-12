@@ -50,42 +50,42 @@ public class ObjectStateIO {
      */
     static void editStateFromElement(ObjectState state, Element elem)
     {
-        state.rotation        = GameIO.readAttribute(elem, IOString.R, state.rotation);
-        state.originalRotation = GameIO.readAttribute(elem, IOString.ORIGINAL_ROTATION, state.originalRotation);
-        state.scale 			= GameIO.readAttribute(elem, IOString.S, state.scale);
-        state.aboveInstanceId 	= GameIO.readAttribute(elem, IOString.ABOVE, state.aboveInstanceId);
-        state.belowInstanceId 	= GameIO.readAttribute(elem, IOString.BELOW, state.belowInstanceId);
-        state.liesOnId 			= GameIO.readAttribute(elem, IOString.LYING_ON, state.liesOnId);
-                                  GameIO.readAttribute(elem, IOString.LYING_ABOVE, state.aboveLyingObectIds);
-        state.inPrivateArea       = GameIO.readAttribute(elem, IOString.IN_PRIVATE_AREA, state.inPrivateArea);
-        state.owner_id 			= GameIO.readAttribute(elem, IOString.OWNER_ID, state.owner_id);
-        state.isSelected 		= GameIO.readAttribute(elem, IOString.IS_SELECTED, state.isSelected);
-        state.drawValue			= GameIO.readAttribute(elem, IOString.DRAW_VALUE, state.drawValue);
-        state.posX 				= GameIO.readAttribute(elem, IOString.X, state.posX);
-        state.originalX         = GameIO.readAttribute(elem, IOString.ORIGINAL_X, state.originalX);
-        state.posY 				= GameIO.readAttribute(elem, IOString.Y, state.posY);
-        state.originalY         = GameIO.readAttribute(elem, IOString.ORIGINAL_Y, state.originalY);
-        state.value				= GameIO.readAttribute(elem, IOString.VALUE, state.value);
-        state.sortValue         = GameIO.readAttribute(elem, IOString.SORT_VALUE, state.sortValue);
-        state.rotationStep		= GameIO.readAttribute(elem, IOString.ROTATION_STEP, state.rotationStep);
-        state.boxId             = GameIO.readAttribute(elem, IOString.BOX_ID, state.boxId);
-        state.inBox             = GameIO.readAttribute(elem, IOString.IN_BOX, state.inBox);
-        state.isFixed			= GameIO.readAttribute(elem, IOString.IS_FIXED, state.isFixed);
+        state.rotation        = GameIO.readAttribute(elem, StringIO.R, state.rotation);
+        state.originalRotation = GameIO.readAttribute(elem, StringIO.ORIGINAL_ROTATION, state.originalRotation);
+        state.scale 			= GameIO.readAttribute(elem, StringIO.S, state.scale);
+        state.aboveInstanceId 	= GameIO.readAttribute(elem, StringIO.ABOVE, state.aboveInstanceId);
+        state.belowInstanceId 	= GameIO.readAttribute(elem, StringIO.BELOW, state.belowInstanceId);
+        state.liesOnId 			= GameIO.readAttribute(elem, StringIO.LYING_ON, state.liesOnId);
+                                  GameIO.readAttribute(elem, StringIO.LYING_ABOVE, state.aboveLyingObectIds);
+        state.inPrivateArea       = GameIO.readAttribute(elem, StringIO.IN_PRIVATE_AREA, state.inPrivateArea);
+        state.owner_id 			= GameIO.readAttribute(elem, StringIO.OWNER_ID, state.owner_id);
+        state.isSelected 		= GameIO.readAttribute(elem, StringIO.IS_SELECTED, state.isSelected);
+        state.drawValue			= GameIO.readAttribute(elem, StringIO.DRAW_VALUE, state.drawValue);
+        state.posX 				= GameIO.readAttribute(elem, StringIO.X, state.posX);
+        state.originalX         = GameIO.readAttribute(elem, StringIO.ORIGINAL_X, state.originalX);
+        state.posY 				= GameIO.readAttribute(elem, StringIO.Y, state.posY);
+        state.originalY         = GameIO.readAttribute(elem, StringIO.ORIGINAL_Y, state.originalY);
+        state.value				= GameIO.readAttribute(elem, StringIO.VALUE, state.value);
+        state.sortValue         = GameIO.readAttribute(elem, StringIO.SORT_VALUE, state.sortValue);
+        state.rotationStep		= GameIO.readAttribute(elem, StringIO.ROTATION_STEP, state.rotationStep);
+        state.boxId             = GameIO.readAttribute(elem, StringIO.BOX_ID, state.boxId);
+        state.inBox             = GameIO.readAttribute(elem, StringIO.IN_BOX, state.inBox);
+        state.isFixed			= GameIO.readAttribute(elem, StringIO.IS_FIXED, state.isFixed);
         if (state instanceof GameObjectToken.TokenState)
         {
-            ((GameObjectToken.TokenState)state).side = GameIO.readAttribute(elem, IOString.SIDE, ((GameObjectToken.TokenState)state).side);
+            ((GameObjectToken.TokenState)state).side = GameIO.readAttribute(elem, StringIO.SIDE, ((GameObjectToken.TokenState)state).side);
         }
-        if (state instanceof GameObjectFigure.FigureState && elem.getAttribute(IOString.STANDING) != null)
+        if (state instanceof GameObjectFigure.FigureState && elem.getAttribute(StringIO.STANDING) != null)
         {
-            ((GameObjectFigure.FigureState)state).standing = Boolean.parseBoolean(elem.getAttributeValue(IOString.STANDING));
+            ((GameObjectFigure.FigureState)state).standing = Boolean.parseBoolean(elem.getAttributeValue(StringIO.STANDING));
         }
-        if (state instanceof GameObjectDice.DiceState && elem.getAttributeValue(IOString.SIDE) != null)
+        if (state instanceof GameObjectDice.DiceState && elem.getAttributeValue(StringIO.SIDE) != null)
         {
-            ((GameObjectDice.DiceState)state).side = Integer.parseInt(elem.getAttributeValue(IOString.SIDE));
+            ((GameObjectDice.DiceState)state).side = Integer.parseInt(elem.getAttributeValue(StringIO.SIDE));
         }
-        if (state instanceof GameObjectBook.BookState && elem.getAttributeValue(IOString.SIDE) != null)
+        if (state instanceof GameObjectBook.BookState && elem.getAttributeValue(StringIO.SIDE) != null)
         {
-            ((GameObjectBook.BookState)state).side = Integer.parseInt(elem.getAttributeValue(IOString.SIDE));
+            ((GameObjectBook.BookState)state).side = Integer.parseInt(elem.getAttributeValue(StringIO.SIDE));
         }
     }
 
@@ -193,31 +193,31 @@ public class ObjectStateIO {
      */
     static void writeStateToElement(ObjectState state, Element elem)
     {
-        elem.setAttribute(IOString.X, 				Integer.toString(state.posX));
-        elem.setAttribute(IOString.ORIGINAL_X,      Integer.toString(state.originalX));
-        elem.setAttribute(IOString.Y, 				Integer.toString(state.posY));
-        elem.setAttribute(IOString.ORIGINAL_Y,      Integer.toString(state.originalY));
-        elem.setAttribute(IOString.R, 				Integer.toString(state.rotation));
-        elem.setAttribute(IOString.ORIGINAL_ROTATION, 				Integer.toString(state.originalRotation));
-        elem.setAttribute(IOString.S, 				Integer.toString(state.scale));
-        elem.setAttribute(IOString.IN_PRIVATE_AREA, Boolean.toString(state.inPrivateArea));
-        elem.setAttribute(IOString.OWNER_ID, 		Integer.toString(state.owner_id));
-        elem.setAttribute(IOString.IS_SELECTED, 		Integer.toString(state.isSelected));
-        elem.setAttribute(IOString.DRAW_VALUE, 		Integer.toString(state.drawValue));
-        elem.setAttribute(IOString.ABOVE, 			Integer.toString(state.aboveInstanceId));
-        elem.setAttribute(IOString.BELOW,			Integer.toString(state.belowInstanceId));
-        elem.setAttribute(IOString.LYING_ON,        Integer.toString(state.liesOnId));
-        elem.setAttribute(IOString.LYING_ABOVE,     state.aboveLyingObectIds.toString());
-        elem.setAttribute(IOString.VALUE, 			Integer.toString(state.value));
-        elem.setAttribute(IOString.SORT_VALUE,		Integer.toString(state.sortValue));
-        elem.setAttribute(IOString.ROTATION_STEP, 	Integer.toString(state.rotationStep));
-        elem.setAttribute(IOString.BOX_ID,          Integer.toString(state.boxId));
-        elem.setAttribute(IOString.IN_BOX,          Boolean.toString(state.inBox));
-        elem.setAttribute(IOString.IS_FIXED, 		Boolean.toString(state.isFixed));
-        if (state instanceof GameObjectToken.TokenState) 					{elem.setAttribute(IOString.SIDE, Boolean.toString(((GameObjectToken.TokenState) state).side));}
-        if (state instanceof GameObjectFigure.FigureState)	{elem.setAttribute(IOString.STANDING, Boolean.toString(((GameObjectFigure.FigureState) state).standing));}
-        if (state instanceof GameObjectDice.DiceState)		{elem.setAttribute(IOString.SIDE, Integer.toString(((GameObjectDice.DiceState)state).side));}
-        if (state instanceof GameObjectBook.BookState)		{elem.setAttribute(IOString.SIDE, Integer.toString(((GameObjectBook.BookState)state).side));}
+        elem.setAttribute(StringIO.X, 				Integer.toString(state.posX));
+        elem.setAttribute(StringIO.ORIGINAL_X,      Integer.toString(state.originalX));
+        elem.setAttribute(StringIO.Y, 				Integer.toString(state.posY));
+        elem.setAttribute(StringIO.ORIGINAL_Y,      Integer.toString(state.originalY));
+        elem.setAttribute(StringIO.R, 				Integer.toString(state.rotation));
+        elem.setAttribute(StringIO.ORIGINAL_ROTATION, 				Integer.toString(state.originalRotation));
+        elem.setAttribute(StringIO.S, 				Integer.toString(state.scale));
+        elem.setAttribute(StringIO.IN_PRIVATE_AREA, Boolean.toString(state.inPrivateArea));
+        elem.setAttribute(StringIO.OWNER_ID, 		Integer.toString(state.owner_id));
+        elem.setAttribute(StringIO.IS_SELECTED, 		Integer.toString(state.isSelected));
+        elem.setAttribute(StringIO.DRAW_VALUE, 		Integer.toString(state.drawValue));
+        elem.setAttribute(StringIO.ABOVE, 			Integer.toString(state.aboveInstanceId));
+        elem.setAttribute(StringIO.BELOW,			Integer.toString(state.belowInstanceId));
+        elem.setAttribute(StringIO.LYING_ON,        Integer.toString(state.liesOnId));
+        elem.setAttribute(StringIO.LYING_ABOVE,     state.aboveLyingObectIds.toString());
+        elem.setAttribute(StringIO.VALUE, 			Integer.toString(state.value));
+        elem.setAttribute(StringIO.SORT_VALUE,		Integer.toString(state.sortValue));
+        elem.setAttribute(StringIO.ROTATION_STEP, 	Integer.toString(state.rotationStep));
+        elem.setAttribute(StringIO.BOX_ID,          Integer.toString(state.boxId));
+        elem.setAttribute(StringIO.IN_BOX,          Boolean.toString(state.inBox));
+        elem.setAttribute(StringIO.IS_FIXED, 		Boolean.toString(state.isFixed));
+        if (state instanceof GameObjectToken.TokenState) 					{elem.setAttribute(StringIO.SIDE, Boolean.toString(((GameObjectToken.TokenState) state).side));}
+        if (state instanceof GameObjectFigure.FigureState)	{elem.setAttribute(StringIO.STANDING, Boolean.toString(((GameObjectFigure.FigureState) state).standing));}
+        if (state instanceof GameObjectDice.DiceState)		{elem.setAttribute(StringIO.SIDE, Integer.toString(((GameObjectDice.DiceState)state).side));}
+        if (state instanceof GameObjectBook.BookState)		{elem.setAttribute(StringIO.SIDE, Integer.toString(((GameObjectBook.BookState)state).side));}
     }
 
     /**
@@ -229,7 +229,7 @@ public class ObjectStateIO {
     public static void writeObjectStateToStreamXml(ObjectState object, OutputStream output) throws IOException
     {
         Document doc = new Document();
-        Element elem = new Element(IOString.OBJECT_STATE);
+        Element elem = new Element(StringIO.OBJECT_STATE);
         writeStateToElement(object, elem);
         doc.addContent(elem);
         new XMLOutputter(Format.getPrettyFormat()).output(doc, output);

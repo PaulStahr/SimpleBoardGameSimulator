@@ -1,8 +1,5 @@
 package gameObjects.instance;
 
-import gui.GamePanel;
-import main.Player;
-
 import javax.swing.*;
 import java.awt.event.MouseEvent;
 

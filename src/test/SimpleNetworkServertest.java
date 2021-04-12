@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
-import gui.GameWindow;
-import gui.LanguageHandler;
+import gui.GameWindow.GameWindow;
+import gui.Language.LanguageHandler;
 import io.GameIO;
 import main.Player;
 import net.AsynchronousGameConnection;

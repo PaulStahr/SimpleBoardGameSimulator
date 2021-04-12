@@ -17,10 +17,10 @@ import javax.swing.text.Document;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
-import gui.Language;
-import gui.LanguageChangeListener;
-import gui.LanguageHandler;
-import gui.Words;
+import gui.Language.Language;
+import gui.Language.LanguageChangeListener;
+import gui.Language.LanguageHandler;
+import gui.Language.Words;
 import util.JFrameUtils;
 
 public class ObjectEditPanel extends JPanel implements DocumentListener, ItemListener, LanguageChangeListener{

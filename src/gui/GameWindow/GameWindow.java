@@ -1,4 +1,4 @@
-package gui;
+package gui.GameWindow;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -23,6 +23,11 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
+import gui.*;
+import gui.Language.Language;
+import gui.Language.LanguageChangeListener;
+import gui.Language.LanguageHandler;
+import gui.Language.Words;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +54,7 @@ import net.SynchronousGameClientLobbyConnection;
 import util.JFrameUtils;
 import util.TimedUpdateHandler;
 
-public class GameWindow extends JFrame implements ActionListener, LanguageChangeListener{
+public class GameWindow extends JFrame implements ActionListener, LanguageChangeListener {
 	/**
 	 * 
 	 */

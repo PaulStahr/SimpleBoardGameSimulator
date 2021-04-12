@@ -1,4 +1,4 @@
-package gui;
+package gui.GameWindow;
 
 
 import java.awt.Color;

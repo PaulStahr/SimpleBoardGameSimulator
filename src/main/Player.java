@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 import gameObjects.columnTypes.PlayerColumnType;
 import gameObjects.instance.GameInstance;
-import gui.GamePanel;
+import gui.GameWindow.GamePanel;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 
@@ -131,7 +131,7 @@ public class Player implements Comparable<Object> {
 			if (this.seatNum == -1 && !this.visitor){
 				this.seatNum = gameInstance.getPlayerList().indexOf(this);
 			}
-			gamePanel.sitDown(this, this.seatNum);
+			gamePanel.sitDown(this, this.seatNum, false);
 		}
 	}
 

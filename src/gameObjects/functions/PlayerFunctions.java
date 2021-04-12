@@ -1,8 +1,6 @@
 package gameObjects.functions;
 
-import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
-import gui.GamePanel;
 import main.Player;
 
 public class PlayerFunctions {
@@ -24,11 +22,11 @@ public class PlayerFunctions {
         return player.seatNum;
     }
 
-    public static double GetCurrentPlayerRotation(GamePanel gamePanel, GameInstance gameInstance, Player player){
+    public static double GetCurrentPlayerRotation(GameInstance gameInstance, Player player){
         int playerPosition = GetTablePlayerPosition(player);
         if (playerPosition == -1){
             return 0;
         }
-        return 360. / gamePanel.table.playerShapes.size() * playerPosition;
+        return 360. / gameInstance.getPlayerList(false).size() * playerPosition;
     }
 }

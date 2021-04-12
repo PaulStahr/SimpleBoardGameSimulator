@@ -320,7 +320,7 @@ public class JFrameUtils{
      			rowData[i][j] = JFrameUtils.toTableEntry(types.get(j).getValue(obj));
      		}
      	}
-			JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, possibleValueOverride, buttonColumn);
+     	JFrameUtils.updateTable(table, scrollPane, rowData, ColumnTypes.getColumnNames(types), types, tm, possibleValueOverride, buttonColumn);
  	}
 	
     public static final void updateTable(

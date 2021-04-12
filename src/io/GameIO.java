@@ -1,6 +1,7 @@
 package io;
 
 import static java.lang.Integer.max;
+import static java.lang.Integer.min;
 
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
@@ -21,6 +22,7 @@ import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
+import javax.swing.*;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -114,49 +116,49 @@ public class GameIO {
 	 */
 	private static void editGameInstanceFromElement(Element root, GameInstance gi) throws JDOMException, IOException {
 		//Control the xml version, downward compatible current version 2.0
-		//String xmlVersion = root.getAttributeValue(IOString.VERSION);
+		//String xmlVersion = root.getAttributeValue(StringIO.VERSION);
 		Integer uniqueId = 0;
 		for (Element elem : root.getChildren()) {
 			String name = elem.getName();
 			switch (name) {
-				case IOString.PLAYER:
+				case StringIO.PLAYER:
 					Player player = PlayerIO.createPlayerFromElement(elem);
 					gi.addPlayer(null, player);
 					break;
-				case IOString.NAME:
+				case StringIO.NAME:
 					gi.name = elem.getValue();
 					break;
-				case IOString.SETTINGS:
+				case StringIO.SETTINGS:
 					for (Element elemSettings : elem.getChildren()) {
 						String settingsName = elemSettings.getName();
 						switch (settingsName) {
-							case IOString.NAME:
+							case StringIO.NAME:
 								gi.name = elemSettings.getValue();
 								break;
-							case IOString.PRIVATE_AREA:
+							case StringIO.PRIVATE_AREA:
 								gi.private_area = Boolean.parseBoolean(elemSettings.getValue());
 								break;
-							case IOString.TABLE:
-								gi.table = Boolean.parseBoolean(elemSettings.getValue());
-								gi.put_down_area = readAttribute(elemSettings, IOString.PUT_DOWN_AREA, gi.put_down_area);
-								gi.tableRadius = readAttribute(elemSettings, IOString.TABLE_RADIUS, gi.tableRadius);
-								gi.tableColor = readAttribute(elemSettings, IOString.COLOR, gi.tableColor);
+							case StringIO.TABLE:
+								gi.drawTable = Boolean.parseBoolean(elemSettings.getValue());
+								gi.put_down_area = readAttribute(elemSettings, StringIO.PUT_DOWN_AREA, gi.put_down_area);
+								gi.tableRadius = readAttribute(elemSettings, StringIO.TABLE_RADIUS, gi.tableRadius);
+								gi.tableColor = readAttribute(elemSettings, StringIO.COLOR, gi.tableColor);
 								break;
-							case IOString.SEATS:
+							case StringIO.SEATS:
 								gi.seatColors.clear();
 								gi.seats = -1;
 								for (Element seatElement : elemSettings.getChildren()) {
 									String seatElementName = seatElement.getName();
-									if (seatElementName.equals(IOString.SEAT)) {
+									if (seatElementName.equals(StringIO.SEAT)) {
 										++gi.seats;
-										if (seatElement.getAttribute(IOString.COLOR) != null) {
-											gi.seatColors.add(Color.decode(seatElement.getAttributeValue(IOString.COLOR)));
+										if (seatElement.getAttribute(StringIO.COLOR) != null) {
+											gi.seatColors.add(Color.decode(seatElement.getAttributeValue(StringIO.COLOR)));
 										}
 									}
 								}
 								gi.seats = max(-1, gi.seats + 1);
 								break;
-							case IOString.ADMIN:
+							case StringIO.ADMIN:
 								if (!elemSettings.getValue().equals("") && Integer.parseInt(elemSettings.getValue()) > -1) {
 									gi.admin = Integer.parseInt(elemSettings.getValue());
 								}
@@ -164,23 +166,23 @@ public class GameIO {
 									gi.admin = -1;
 								}
 								break;
-							case IOString.DEBUG_MODE:
+							case StringIO.DEBUG_MODE:
 								gi.debug_mode = Boolean.parseBoolean(elemSettings.getValue());
 								break;
-							case IOString.INITIAL_MODE:
+							case StringIO.INITIAL_MODE:
 								gi.initial_mode = Boolean.parseBoolean(elemSettings.getValue());
 						}
 					}
 					break;
-				case IOString.OBJECT:
+				case StringIO.OBJECT:
 					String uniqueName = "";
-					if (elem.getAttributeValue(IOString.UNIQUE_NAME) == null) {
+					if (elem.getAttributeValue(StringIO.UNIQUE_NAME) == null) {
 						throw new IOException("Object must have a unique name");
 					}
-					uniqueName = elem.getAttributeValue(IOString.UNIQUE_NAME);
+					uniqueName = elem.getAttributeValue(StringIO.UNIQUE_NAME);
 					int objectNumber = 1;
-					if (elem.getAttributeValue(IOString.NUMBER) != null) {
-						objectNumber = Integer.parseInt(elem.getAttributeValue(IOString.NUMBER));
+					if (elem.getAttributeValue(StringIO.NUMBER) != null) {
+						objectNumber = Integer.parseInt(elem.getAttributeValue(StringIO.NUMBER));
 					}
 					for (int i = 0; i < objectNumber; ++i) {
 						if (gi.game.getObject(uniqueName) == null) {
@@ -194,23 +196,23 @@ public class GameIO {
 							oi.state.drawValue = max(max(oi.state.drawValue, uniqueId), 1);
 						}
 
-						if (elem.getAttributeValue(IOString.ORIGINAL_X) == null) {
+						if (elem.getAttributeValue(StringIO.ORIGINAL_X) == null) {
 							oi.state.originalX = oi.state.posX;
 						}
-						if (elem.getAttributeValue(IOString.ORIGINAL_Y) == null) {
+						if (elem.getAttributeValue(StringIO.ORIGINAL_Y) == null) {
 							oi.state.originalY = oi.state.posY;
 						}
-						if (elem.getAttributeValue(IOString.ORIGINAL_ROTATION) == null) {
+						if (elem.getAttributeValue(StringIO.ORIGINAL_ROTATION) == null) {
 							oi.state.originalRotation = oi.state.rotation;
 						}
 						gi.addObjectInstance(oi);
 						++uniqueId;
 					}
 					break;
-				case IOString.PASSWORD:
+				case StringIO.PASSWORD:
 					gi.password = elem.getValue();
 					break;
-				case IOString.HIDDEN:
+				case StringIO.HIDDEN:
 					gi.hidden = Boolean.parseBoolean(elem.getValue());
 					break;
 			}
@@ -227,69 +229,69 @@ public class GameIO {
 	 */
 	public static GameObject createGameObjectFromElement(Element elem, HashMap<String, Texture> images)
 	{
-		String objectName = elem.getAttributeValue(IOString.UNIQUE_NAME);
-		String type = elem.getAttributeValue(IOString.TYPE);
+		String objectName = elem.getAttributeValue(StringIO.UNIQUE_NAME);
+		String type = elem.getAttributeValue(StringIO.TYPE);
 		GameObject result = null;
-		int width = readAttribute(elem, IOString.WIDTH, 66);
-		int height = readAttribute(elem, IOString.HEIGHT, 88);
-		int value = readAttribute(elem, IOString.VALUE, 0);
-		int sortValue = readAttribute(elem, IOString.SORT_VALUE, 0);
-		int rotationStep = readAttribute(elem, IOString.ROTATION_STEP, 90);
-		int boxId = readAttribute(elem, IOString.BOX_ID, -1);
-		boolean inBox = readAttribute(elem, IOString.IN_BOX, false);
-		int isFixed = readAttribute(elem, IOString.IS_FIXED, 0);
+		int width = readAttribute(elem, StringIO.WIDTH, 66);
+		int height = readAttribute(elem, StringIO.HEIGHT, 88);
+		int value = readAttribute(elem, StringIO.VALUE, 0);
+		int sortValue = readAttribute(elem, StringIO.SORT_VALUE, 0);
+		int rotationStep = readAttribute(elem, StringIO.ROTATION_STEP, 90);
+		int boxId = readAttribute(elem, StringIO.BOX_ID, -1);
+		boolean inBox = readAttribute(elem, StringIO.IN_BOX, false);
+		int isFixed = readAttribute(elem, StringIO.IS_FIXED, 0);
 		switch(type)
 		{
-			case IOString.CARD:
+			case StringIO.CARD:
 			{
-				result = new GameObjectToken(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), value, sortValue, rotationStep, isFixed, inBox, boxId);
+				result = new GameObjectToken(objectName, type, width, height, images.get(elem.getAttributeValue(StringIO.FRONT)), images.get(elem.getAttributeValue(StringIO.BACK)), value, sortValue, rotationStep, isFixed, inBox, boxId);
 				break;
 			}
-			case IOString.FIGURE:
+			case StringIO.FIGURE:
 			{
-				result = new GameObjectFigure(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.STANDING)), value, sortValue, rotationStep, isFixed, inBox, boxId);
+				result = new GameObjectFigure(objectName, type, width, height, images.get(elem.getAttributeValue(StringIO.STANDING)), value, sortValue, rotationStep, isFixed, inBox, boxId);
 				break;
 			}
-			case IOString.DICE:
+			case StringIO.DICE:
 			{
 				ArrayList<DiceSide> dss = new ArrayList<>();
 				for (Element side : elem.getChildren())
 				{
-					if (side.getName().equals(IOString.SIDE))
+					if (side.getName().equals(StringIO.SIDE))
 					{
 						Texture img = images.get(side.getValue());
 						if (img == null){logger.warn("Image not found: ", side.getValue());}
-						dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img, side.getValue()));
+						dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(StringIO.VALUE)), img, side.getValue()));
 					}
 				}
 				result = new GameObjectDice(objectName, type, width, height, dss.toArray(new DiceSide[dss.size()]), value, sortValue, rotationStep, inBox, boxId);
 				break;
 			}
-			case IOString.BOOK:
+			case StringIO.BOOK:
 			{
 				ArrayList<BookSide> bss = new ArrayList<>();
 				for (Element side : elem.getChildren())
 				{
-					if (side.getName().equals(IOString.SIDE))
+					if (side.getName().equals(StringIO.SIDE))
 					{
 						Texture img = images.get(side.getValue());
 						if (img == null){logger.warn("Image not found: ", side.getValue());}
-						bss.add(new BookSide(Integer.parseInt(side.getAttributeValue(IOString.VALUE)), img, side.getValue()));
+						bss.add(new BookSide(Integer.parseInt(side.getAttributeValue(StringIO.VALUE)), img, side.getValue()));
 					}
 				}
 				result = new GameObjectBook(objectName, type, width, height, bss.toArray(new BookSide[bss.size()]), value, sortValue, rotationStep, inBox, boxId);
 				break;
 			}
-			case IOString.BOX:
+			case StringIO.BOX:
 			{
-				result = new GameObjectBox(objectName, type, width, height, images.get(elem.getAttributeValue(IOString.FRONT)), images.get(elem.getAttributeValue(IOString.BACK)), rotationStep, inBox, boxId);
+				result = new GameObjectBox(objectName, type, width, height, images.get(elem.getAttributeValue(StringIO.FRONT)), images.get(elem.getAttributeValue(StringIO.BACK)), rotationStep, inBox, boxId);
 				break;
 			}
 		}
 		ArrayList<String> groups = new ArrayList<String>();
 		for (Element child : elem.getChildren())
 		{
-			if (child.getName().equals(IOString.GROUP))
+			if (child.getName().equals(StringIO.GROUP))
 			{
 				groups.add(child.getText());
 			}
@@ -308,8 +310,8 @@ public class GameIO {
 	 */
 	private static Element createElementFromObjectInstance(ObjectInstance objectInstance)
 	{
-		Element elem = new Element(IOString.OBJECT);
-		elem.setAttribute(IOString.UNIQUE_NAME, objectInstance.go.uniqueObjectName);
+		Element elem = new Element(StringIO.OBJECT);
+		elem.setAttribute(StringIO.UNIQUE_NAME, objectInstance.go.uniqueObjectName);
 		ObjectStateIO.writeStateToElement(objectInstance.state, elem);
 		return elem;
 	}
@@ -325,42 +327,42 @@ public class GameIO {
 	 */
 	public static Element createElementFromGameObject(GameObject gameObject, Game game)
 	{
-		Element elem = new Element(IOString.OBJECT);
-		elem.setAttribute(IOString.TYPE, gameObject.objectType);
-		elem.setAttribute(IOString.UNIQUE_NAME, gameObject.uniqueObjectName);
-		elem.setAttribute(IOString.WIDTH, Integer.toString(gameObject.widthInMM));
-		elem.setAttribute(IOString.HEIGHT, Integer.toString(gameObject.heightInMM));
-		elem.setAttribute(IOString.VALUE, Integer.toString(gameObject.value));
-		elem.setAttribute(IOString.SORT_VALUE, Integer.toString(gameObject.sortValue));
-		elem.setAttribute(IOString.ROTATION_STEP, Integer.toString(gameObject.rotationStep));
-		elem.setAttribute(IOString.BOX_ID, Integer.toString(gameObject.boxId));
-		elem.setAttribute(IOString.IN_BOX, Boolean.toString(gameObject.inBox));
-		elem.setAttribute(IOString.IS_FIXED, Integer.toString(gameObject.isFixed));
+		Element elem = new Element(StringIO.OBJECT);
+		elem.setAttribute(StringIO.TYPE, gameObject.objectType);
+		elem.setAttribute(StringIO.UNIQUE_NAME, gameObject.uniqueObjectName);
+		elem.setAttribute(StringIO.WIDTH, Integer.toString(gameObject.widthInMM));
+		elem.setAttribute(StringIO.HEIGHT, Integer.toString(gameObject.heightInMM));
+		elem.setAttribute(StringIO.VALUE, Integer.toString(gameObject.value));
+		elem.setAttribute(StringIO.SORT_VALUE, Integer.toString(gameObject.sortValue));
+		elem.setAttribute(StringIO.ROTATION_STEP, Integer.toString(gameObject.rotationStep));
+		elem.setAttribute(StringIO.BOX_ID, Integer.toString(gameObject.boxId));
+		elem.setAttribute(StringIO.IN_BOX, Boolean.toString(gameObject.inBox));
+		elem.setAttribute(StringIO.IS_FIXED, Integer.toString(gameObject.isFixed));
 		for (String group : gameObject.groups)
 		{
-			elem.addContent(new Element(IOString.GROUP).setText(group));
+			elem.addContent(new Element(StringIO.GROUP).setText(group));
 		}
 		if (gameObject instanceof GameObjectToken)
 		{
 			GameObjectToken token = (GameObjectToken) gameObject;
-			elem.setAttribute(IOString.FRONT, game.getImageKey(token.getUpsideLook()));
+			elem.setAttribute(StringIO.FRONT, game.getImageKey(token.getUpsideLook()));
 			if (token.getDownsideLook() != null)
 			{
-				elem.setAttribute(IOString.BACK, game.getImageKey(token.getDownsideLook()));
+				elem.setAttribute(StringIO.BACK, game.getImageKey(token.getDownsideLook()));
 			}
 		}
 		else if (gameObject instanceof GameObjectFigure)
 		{
 			GameObjectFigure figure = (GameObjectFigure) gameObject;
-			elem.setAttribute(IOString.STANDING, game.getImageKey(figure.getStandingLook()));
+			elem.setAttribute(StringIO.STANDING, game.getImageKey(figure.getStandingLook()));
 		}
 		else if (gameObject instanceof GameObjectDice)
 		{
 			GameObjectDice dice = (GameObjectDice) gameObject;
 			for (DiceSide side : dice.dss)
 			{
-				Element sideElem = new Element(IOString.SIDE);
-				sideElem.setAttribute(IOString.VALUE, Integer.toString(side.value));
+				Element sideElem = new Element(StringIO.SIDE);
+				sideElem.setAttribute(StringIO.VALUE, Integer.toString(side.value));
 				sideElem.setText(game.getImageKey(side.img));
 				elem.addContent(sideElem);
 			}
@@ -369,18 +371,18 @@ public class GameIO {
 			GameObjectBook book = (GameObjectBook) gameObject;
 			for (BookSide side : book.bss)
 			{
-				Element sideElem = new Element(IOString.SIDE);
-				sideElem.setAttribute(IOString.VALUE, Integer.toString(side.value));
+				Element sideElem = new Element(StringIO.SIDE);
+				sideElem.setAttribute(StringIO.VALUE, Integer.toString(side.value));
 				sideElem.setText(game.getImageKey(side.img));
 				elem.addContent(sideElem);
 			}
 		}
 		else if (gameObject instanceof GameObjectBox){
 			GameObjectBox box = (GameObjectBox) gameObject;
-			elem.setAttribute(IOString.FRONT, game.getImageKey(box.getUpsideLook()));
+			elem.setAttribute(StringIO.FRONT, game.getImageKey(box.getUpsideLook()));
 			if (box.getDownsideLook() != null)
 			{
-				elem.setAttribute(IOString.BACK, game.getImageKey(box.getDownsideLook()));
+				elem.setAttribute(StringIO.BACK, game.getImageKey(box.getDownsideLook()));
 			}
 		}
 		return elem;
@@ -388,22 +390,22 @@ public class GameIO {
 	
 	static Element createElementFromAffineTransform(AffineTransform at)
 	{
-		Element elem = new Element(IOString.AFFINE_TRANSFORM);
-		elem.setAttribute(IOString.SCALE_X, Double.toString(at.getScaleX()));
-		elem.setAttribute(IOString.SCALE_Y, Double.toString(at.getScaleY()));
-		elem.setAttribute(IOString.SHEAR_X, Double.toString(at.getShearX()));
-		elem.setAttribute(IOString.SHEAR_Y, Double.toString(at.getShearY()));
-		elem.setAttribute(IOString.TRANSLATE_X, Double.toString(at.getTranslateX()));
-		elem.setAttribute(IOString.TRANSLATE_Y, Double.toString(at.getTranslateY()));
+		Element elem = new Element(StringIO.AFFINE_TRANSFORM);
+		elem.setAttribute(StringIO.SCALE_X, Double.toString(at.getScaleX()));
+		elem.setAttribute(StringIO.SCALE_Y, Double.toString(at.getScaleY()));
+		elem.setAttribute(StringIO.SHEAR_X, Double.toString(at.getShearX()));
+		elem.setAttribute(StringIO.SHEAR_Y, Double.toString(at.getShearY()));
+		elem.setAttribute(StringIO.TRANSLATE_X, Double.toString(at.getTranslateX()));
+		elem.setAttribute(StringIO.TRANSLATE_Y, Double.toString(at.getTranslateY()));
 		return elem;
 	}
 	
 	static Element editAffineTransformFromElement(Element elem, AffineTransform at)
 	{
 		at.setTransform(
-				Double.parseDouble(elem.getAttributeValue(IOString.SCALE_X)), Double.parseDouble(elem.getAttributeValue(IOString.SHEAR_Y)),
-				Double.parseDouble(elem.getAttributeValue(IOString.SHEAR_X)), Double.parseDouble(elem.getAttributeValue(IOString.SCALE_Y)),
-				Double.parseDouble(elem.getAttributeValue(IOString.TRANSLATE_X)), Double.parseDouble(elem.getAttributeValue(IOString.TRANSLATE_Y)));
+				Double.parseDouble(elem.getAttributeValue(StringIO.SCALE_X)), Double.parseDouble(elem.getAttributeValue(StringIO.SHEAR_Y)),
+				Double.parseDouble(elem.getAttributeValue(StringIO.SHEAR_X)), Double.parseDouble(elem.getAttributeValue(StringIO.SCALE_Y)),
+				Double.parseDouble(elem.getAttributeValue(StringIO.TRANSLATE_X)), Double.parseDouble(elem.getAttributeValue(StringIO.TRANSLATE_Y)));
 		return elem;
 	}
 
@@ -430,7 +432,7 @@ public class GameIO {
 			writeGameToZip(gi.game, zipOutputStream);
 		    // save game_instance.xml
 	    	Document doc_inst = new Document();
-	    	Element root_inst = new Element(IOString.XML);
+	    	Element root_inst = new Element(StringIO.XML);
 
 			for (int idx = 0; idx < gi.getObjectNumber(); idx++) {
 	        	ObjectInstance ObjectInstance = gi.getObjectInstanceByIndex(idx);
@@ -441,41 +443,41 @@ public class GameIO {
 				root_inst.addContent(PlayerIO.createElementFromPlayer(player));
 			}
 
-	        Element sessionName = new Element(IOString.NAME);
+	        Element sessionName = new Element(StringIO.NAME);
 	        sessionName.setText(gi.name);
 	        root_inst.addContent(sessionName);
 
-			Element settings = new Element(IOString.SETTINGS);
+			Element settings = new Element(StringIO.SETTINGS);
 
-			Element settingsName = new Element(IOString.NAME);
+			Element settingsName = new Element(StringIO.NAME);
 			settingsName.setText(gi.name);
-			Element table = new Element(IOString.TABLE);
-			table.setText(Boolean.toString(gi.table));
-			table.setAttribute(IOString.PUT_DOWN_AREA, Boolean.toString(gi.put_down_area));
-			table.setAttribute(IOString.TABLE_RADIUS, Integer.toString(gi.tableRadius));
-			table.setAttribute(IOString.COLOR, gi.tableColor);
+			Element table = new Element(StringIO.TABLE);
+			table.setText(Boolean.toString(gi.drawTable));
+			table.setAttribute(StringIO.PUT_DOWN_AREA, Boolean.toString(gi.put_down_area));
+			table.setAttribute(StringIO.TABLE_RADIUS, Integer.toString(gi.tableRadius));
+			table.setAttribute(StringIO.COLOR, gi.tableColor);
 
-			Element privateArea = new Element(IOString.PRIVATE_AREA);
+			Element privateArea = new Element(StringIO.PRIVATE_AREA);
 			privateArea.setText(Boolean.toString(gi.private_area));
 
-			Element admin = new Element(IOString.ADMIN);
+			Element admin = new Element(StringIO.ADMIN);
 			admin.setText(Integer.toString(gi.admin));
 
-			Element debugMode = new Element(IOString.DEBUG_MODE);
+			Element debugMode = new Element(StringIO.DEBUG_MODE);
 			debugMode.setText(Boolean.toString(gi.debug_mode));
 
-			Element initialMode = new Element(IOString.INITIAL_MODE);
+			Element initialMode = new Element(StringIO.INITIAL_MODE);
 			initialMode.setText(Boolean.toString(gi.initial_mode));
 
-			Element seats = new Element(IOString.SEATS);
+			Element seats = new Element(StringIO.SEATS);
 			for (int i=0; i<gi.seats;++i)
 			{
-				Element seat = new Element(IOString.SEAT);
+				Element seat = new Element(StringIO.SEAT);
 				if (gi.seatColors.size() > i)
 				{
 				    String buf = Integer.toHexString(gi.seatColors.get(i % 10).getRGB());
 				    String hex = "#"+buf.substring(buf.length()-6);
-					seat.setAttribute(IOString.COLOR, hex);
+					seat.setAttribute(StringIO.COLOR, hex);
 				}
 				seats.addContent(seat);
 			}
@@ -489,10 +491,10 @@ public class GameIO {
 			settings.addContent(admin);
 			settings.addContent(debugMode);
 			settings.addContent(initialMode);
-			settings.setAttribute(IOString.HIDDEN,Boolean.toString(gi.hidden));
+			settings.setAttribute(StringIO.HIDDEN,Boolean.toString(gi.hidden));
 			root_inst.addContent(settings);
 
-			Element password = new Element(IOString.PASSWORD);
+			Element password = new Element(StringIO.PASSWORD);
 			if (gi.password != null)
 			{
 				password.setText(String.valueOf(gi.password));
@@ -500,7 +502,7 @@ public class GameIO {
 			root_inst.addContent(password);
 	    	
 	        doc_inst.addContent(root_inst);
-	    	ZipEntry xmlZipOutput = new ZipEntry(IOString.GAME_INSTANCE_XML);
+	    	ZipEntry xmlZipOutput = new ZipEntry(StringIO.GAME_INSTANCE_XML);
 	    	zipOutputStream.putNextEntry(xmlZipOutput);
 	    	new XMLOutputter(Format.getPrettyFormat()).output(doc_inst, zipOutputStream);
 	    	zipOutputStream.closeEntry();
@@ -551,7 +553,7 @@ public class GameIO {
 	    }
 	    
 		Document doc_game = new Document();
-    	Element root_game = new Element(IOString.XML);
+    	Element root_game = new Element(StringIO.XML);
     	doc_game.addContent(root_game);
 
         for (int idx = 0; idx < game.objects.size(); idx++) {
@@ -559,11 +561,11 @@ public class GameIO {
         	root_game.addContent(createElementFromGameObject(entry, game));
         }
         
-        Element elem_back = new Element(IOString.BACKGROUND);
+        Element elem_back = new Element(StringIO.BACKGROUND);
         elem_back.setText(game.getImageKey(game.background));
         root_game.addContent(elem_back);
 
-        ZipEntry gameZipOutput = new ZipEntry(IOString.GAME_XML);
+        ZipEntry gameZipOutput = new ZipEntry(StringIO.GAME_XML);
     	zipOutputStream.putNextEntry(gameZipOutput);
     	new XMLOutputter(Format.getPrettyFormat()).output(doc_game, zipOutputStream);
     	zipOutputStream.closeEntry();
@@ -607,6 +609,7 @@ public class GameIO {
 
 	}
 
+
 	/**
 	 * Reads a snapshot of a GameInstance encoded into @param in incl. the
 	 * GameObject gi.game itself.
@@ -614,7 +617,27 @@ public class GameIO {
 	 * used to create a ZipInputStream via ZipInputStream(in).
 	 * ATTENTION 2: It is expected, that all images used in the game are in the stream.
 	 * Possible image formats are .png and .jpg.
-	 * Besides, two files IOString.GAME_XML and IOString.GAME_INSTANCE_XML are expected, that encode
+	 * Besides, two files StringIO.GAME_XML and StringIO.GAME_INSTANCE_XML are expected, that encode
+	 * the game itself and the specific instance respectively.
+	 * @param in the InputStream that encodes the snapshot
+	 * @return the GameInstance encodes in @param stream
+	 */
+	public static GameInstance readSnapshotFromZip(InputStream in, GameInstance gi, JProgressBar progressBar) throws IOException, JDOMException
+	{
+		ZipInputStream stream = new ZipInputStream(in);
+		GameInstance result = readSnapshotFromZip(stream, gi, progressBar);
+		in.close();
+		return result;
+	}
+
+	/**
+	 * Reads a snapshot of a GameInstance encoded into @param in incl. the
+	 * GameObject gi.game itself.
+	 * ATTENTION 1: Even though the @param in is an abstract InputStream, it will
+	 * used to create a ZipInputStream via ZipInputStream(in).
+	 * ATTENTION 2: It is expected, that all images used in the game are in the stream.
+	 * Possible image formats are .png and .jpg.
+	 * Besides, two files StringIO.GAME_XML and StringIO.GAME_INSTANCE_XML are expected, that encode
 	 * the game itself and the specific instance respectively.
 	 * @param in the InputStream that encodes the snapshot
 	 * @return the GameInstance encodes in @param stream
@@ -642,11 +665,11 @@ public class GameIO {
 		
 		void put (String name, InputStream content) throws IOException
 		{
-			if (name.equals(IOString.GAME_XML))
+			if (name.equals(StringIO.GAME_XML))
 			{
 				StreamUtil.copy(content, gameBuffer);
 			}
-			else if (name.equals(IOString.GAME_INSTANCE_XML))
+			else if (name.equals(StringIO.GAME_INSTANCE_XML))
 			{
 			    StreamUtil.copy(content, gameInstanceBuffer);
 			}
@@ -670,10 +693,10 @@ public class GameIO {
 			int uniqueId = 0;
 			for (Element elem : root.getChildren()) {
 				final String name = elem.getName();
-				if (name.equals(IOString.OBJECT)) {
-					if (elem.getAttribute(IOString.NUMBER) != null)
+				if (name.equals(StringIO.OBJECT)) {
+					if (elem.getAttribute(StringIO.NUMBER) != null)
 					{
-					    int count = Integer.parseInt(elem.getAttributeValue(IOString.NUMBER));
+					    int count = Integer.parseInt(elem.getAttributeValue(StringIO.NUMBER));
 						for (int i=0; i<count;++i) {
 							result.game.objects.add(createGameObjectFromElement(elem, result.game.images));
 							++uniqueId;
@@ -683,7 +706,7 @@ public class GameIO {
 						result.game.objects.add(createGameObjectFromElement(elem, result.game.images));
 						++uniqueId;
 					}
-				} else if (name.equals(IOString.BACKGROUND)) {
+				} else if (name.equals(StringIO.BACKGROUND)) {
 					result.game.background = result.game.images.get(elem.getValue());
 				}
 			}
@@ -696,6 +719,19 @@ public class GameIO {
 			editGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
 			
 		}
+	}
+
+	public static GameInstance readSnapshotFromFolder(File folder, GameInstance result, JProgressBar progressBar) throws IOException, JDOMException
+	{
+		GameSnapshotreader gsr = new GameSnapshotreader(result);
+		for (File subfile : folder.listFiles())
+		{
+			FileInputStream input = new FileInputStream(subfile);
+			gsr.put(subfile.getName(), input);
+			input.close();
+		}
+		gsr.run();
+		return gsr.result;
 	}
 	
 	public static GameInstance readSnapshotFromFolder(File folder, GameInstance result) throws IOException, JDOMException
@@ -716,7 +752,7 @@ public class GameIO {
 	 * GameObject gi.game itself.
 	 * ATTENTION: It is expected, that all images used in the game are in the stream.
 	 * Possible image formats are .png and .jpg.
-	 * Besides, two files IOString.GAME_XML and IOString.GAME_INSTANCE_XML are expected, that encode
+	 * Besides, two files StringIO.GAME_XML and StringIO.GAME_INSTANCE_XML are expected, that encode
 	 * the game itself and the specific instance respectively.
 	 * @param stream the ZipInputStream that encodes the snapshot
 	 * @return the GameInstance encodes in @param stream
@@ -731,6 +767,29 @@ public class GameIO {
 			{
 				String name = entry.getName();
 				gsr.put(name, stream);
+			}
+		}
+		finally
+		{
+			stream.close();
+		}
+		gsr.run();
+		return gsr.result;
+	}
+
+	public static GameInstance readSnapshotFromZip(ZipInputStream stream, GameInstance gi, JProgressBar progressBar) throws IOException, JDOMException
+	{
+		GameSnapshotreader gsr = new GameSnapshotreader(gi);
+		try
+		{
+			ZipEntry entry;
+			int counter = 0;
+			while((entry = stream.getNextEntry())!=null)
+			{
+				String name = entry.getName();
+				gsr.put(name, stream);
+				++counter;
+				progressBar.setValue(min(99, counter));
 			}
 		}
 		finally
@@ -810,7 +869,7 @@ public class GameIO {
 		while ((entry = stream.getNextEntry()) != null)
 		{
 		    StreamUtil.copy(stream, byteStream);
-			if (entry.getName().equals(IOString.GAME_INSTANCE_XML))
+			if (entry.getName().equals(StringIO.GAME_INSTANCE_XML))
 			{
 				editGameInstanceFromStream(new ByteArrayInputStream(byteStream.toByteArray()), gi);
 			}

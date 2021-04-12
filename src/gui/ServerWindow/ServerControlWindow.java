@@ -1,4 +1,4 @@
-package gui;
+package gui.ServerWindow;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -7,9 +7,12 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+import gui.Language.Language;
+import gui.Language.LanguageChangeListener;
+import gui.Language.LanguageHandler;
 import net.GameServer;
 
-public class ServerControlWindow extends JFrame implements ActionListener, LanguageChangeListener{
+public class ServerControlWindow extends JFrame implements ActionListener, LanguageChangeListener {
 	/**
 	 * 
 	 */

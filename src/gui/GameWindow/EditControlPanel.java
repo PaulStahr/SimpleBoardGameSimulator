@@ -1,4 +1,4 @@
-package gui;
+package gui.GameWindow;
 
 
 import java.awt.event.ActionEvent;
@@ -19,8 +19,12 @@ import javax.swing.event.TableModelListener;
 import data.ControlCombination;
 import gameObjects.action.GameAction;
 import gameObjects.instance.GameInstance.GameChangeListener;
+import gui.Language.Language;
+import gui.Language.LanguageChangeListener;
+import gui.Language.LanguageHandler;
+import gui.Language.Words;
 
-public class EditControlPanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener{
+public class EditControlPanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener {
 
 
     /**

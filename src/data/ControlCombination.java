@@ -3,8 +3,8 @@ package data;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
-import gui.Language;
-import gui.Words;
+import gui.Language.Language;
+import gui.Language.Words;
 
 public class ControlCombination
 {

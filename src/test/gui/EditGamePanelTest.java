@@ -4,9 +4,9 @@ import org.junit.Test;
 
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
-import gui.EditGamePanel;
-import gui.Language.LanguageSummary;
-import gui.LanguageHandler;
+import gui.GameWindow.EditGamePanel;
+import gui.Language.Language.LanguageSummary;
+import gui.Language.LanguageHandler;
 import main.Player;
 
 public class EditGamePanelTest {

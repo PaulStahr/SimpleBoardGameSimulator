@@ -1,4 +1,4 @@
-package gui;
+package gui.ServerWindow;
 
 import static test.SimpleNetworkServertest.connectAndStartGame;
 import static test.SimpleNetworkServertest.startNewServer;
@@ -12,24 +12,19 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.AbstractAction;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
+import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
+import gui.CreateGames.CreateNewGameWindow;
+import gui.GameWindow.GameWindow;
+import gui.Language.Language;
+import gui.Language.LanguageChangeListener;
+import gui.Language.LanguageHandler;
+import gui.Language.Words;
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,13 +49,15 @@ import util.jframe.PasswordDialog;
 import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableModel;
 
-public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener, LanguageChangeListener{
+public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener, LanguageChangeListener {
 	/**
 	 * 
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(ServerLobbyWindow.class);
 	private static final long serialVersionUID = 6569919447688866509L;
 	public final SynchronousGameClientLobbyConnection client;
+	private final JProgressBar loadProgressBar = new JProgressBar(0, 100);
+	private final JLabel progressBarTitle = new JLabel();
 
 	String Id = String.valueOf(Options.getInteger("last_connection.id"));
 	String Address = Options.getString("last_connection.address");
@@ -106,7 +103,11 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
  	private final ButtonColumn connectColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.CONNECT));
 	private final ButtonColumn visitColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.VISIT));
  	private final ButtonColumn deleteColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.DELETE));
- 	
+
+
+
+
+
 	@Override
 	public void actionPerformed(ActionEvent e)
     {
@@ -128,11 +129,19 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 					GameInstance gi = new GameInstance(new Game(), null);
 					if (file.isDirectory())
 					{
-						GameIO.readSnapshotFromFolder(file, gi);
+						progressBarTitle.setVisible(true);
+						loadProgressBar.setVisible(true);
+						repaint();
+						GameIO.readSnapshotFromFolder(file, gi, loadProgressBar);
+						//showProgressBar(false);
 					}
 					else if(file.getName().endsWith(".zip"))
 					{
-						GameIO.readSnapshotFromZip(new FileInputStream(file), gi);
+						progressBarTitle.setVisible(true);
+						loadProgressBar.setVisible(true);
+						repaint();
+						GameIO.readSnapshotFromZip(new FileInputStream(file), gi, loadProgressBar);
+						//showProgressBar(false);
 					}
 					else
 					{//TODO
@@ -371,6 +380,9 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		languageChanged(lh.getCurrentLanguage());
 		Container content = getContentPane();
 		GroupLayout layout = new GroupLayout(content);
+		loadProgressBar.setStringPainted(true);
+		loadProgressBar.setVisible(false);
+		progressBarTitle.setVisible(false);
 		layout.setHorizontalGroup(layout.createParallelGroup()
 				.addGroup(layout.createSequentialGroup()
 						.addComponent(labelAddress)
@@ -382,6 +394,8 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						.addComponent(labelId)
 						.addComponent(textFieldId))
 				.addComponent(scrollPaneOpenGames)
+				.addComponent(progressBarTitle)
+				.addComponent(loadProgressBar)
 				.addGroup(layout.createSequentialGroup()
 						.addComponent(buttonPoll)
 						.addComponent(buttonAutoPoll)
@@ -400,6 +414,8 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						.addComponent(labelId)
 						.addComponent(textFieldId))
 				.addComponent(scrollPaneOpenGames)
+				.addComponent(progressBarTitle)
+				.addComponent(loadProgressBar)
 				.addGroup(layout
 						.createParallelGroup()
 						.addComponent(buttonPoll)
@@ -462,6 +478,13 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		labelPort.setText(language.getString(Words.port));
 		labelName.setText(language.getString(Words.player_name));
 		labelId.setText(language.getString(Words.player_id));
+		progressBarTitle.setText(language.getString(Words.load_game));
 		this.setTitle(language.getString(Words.game_list));
+	}
+
+	public void showProgressBar(boolean show){
+
+		SwingUtilities.updateComponentTreeUI(progressBarTitle);
+		SwingUtilities.updateComponentTreeUI(loadProgressBar);
 	}
 }

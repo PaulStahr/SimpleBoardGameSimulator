@@ -33,30 +33,30 @@ public class PlayerIO {
     static Player createPlayerFromElement(Element elem)
     {
         Player result = new Player(
-                elem.getAttributeValue(IOString.NAME),
-                Integer.parseInt(elem.getAttributeValue(IOString.ID)),
-                new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR))),
-                GameIO.readAttribute(elem, IOString.SEAT_NUM, -1),
-                Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X)),
-                Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y)));
-        result.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
-        result.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
-        result.visitor = Boolean.parseBoolean(elem.getAttributeValue(IOString.VISITOR));
-        GameIO.editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), result.screenToBoardTransformation);
+                elem.getAttributeValue(StringIO.NAME),
+                Integer.parseInt(elem.getAttributeValue(StringIO.ID)),
+                new Color(Integer.parseInt(elem.getAttributeValue(StringIO.COLOR))),
+                GameIO.readAttribute(elem, StringIO.SEAT_NUM, -1),
+                Integer.parseInt(elem.getAttributeValue(StringIO.MOUSE_X)),
+                Integer.parseInt(elem.getAttributeValue(StringIO.MOUSE_Y)));
+        result.screenWidth = Integer.parseInt(elem.getAttributeValue(StringIO.SCREEN_W));
+        result.screenHeight = Integer.parseInt(elem.getAttributeValue(StringIO.SCREEN_H));
+        result.visitor = Boolean.parseBoolean(elem.getAttributeValue(StringIO.VISITOR));
+        GameIO.editAffineTransformFromElement(elem.getChild(StringIO.AFFINE_TRANSFORM), result.screenToBoardTransformation);
         return result;
     }
 
     private static Player editPlayerFromElement(Element elem, Player player)
     {
-        player.setName(elem.getAttributeValue(IOString.NAME));
-        player.color = new Color(Integer.parseInt(elem.getAttributeValue(IOString.COLOR)));
-        player.seatNum = Integer.parseInt(elem.getAttributeValue(IOString.SEAT_NUM));
-        player.mouseXPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_X));
-        player.mouseYPos = Integer.parseInt(elem.getAttributeValue(IOString.MOUSE_Y));
-        player.screenWidth = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_W));
-        player.screenHeight = Integer.parseInt(elem.getAttributeValue(IOString.SCREEN_H));
-        player.visitor = Boolean.parseBoolean(elem.getAttributeValue(IOString.VISITOR));
-        GameIO.editAffineTransformFromElement(elem.getChild(IOString.AFFINE_TRANSFORM), player.screenToBoardTransformation);
+        player.setName(elem.getAttributeValue(StringIO.NAME));
+        player.color = new Color(Integer.parseInt(elem.getAttributeValue(StringIO.COLOR)));
+        player.seatNum = Integer.parseInt(elem.getAttributeValue(StringIO.SEAT_NUM));
+        player.mouseXPos = Integer.parseInt(elem.getAttributeValue(StringIO.MOUSE_X));
+        player.mouseYPos = Integer.parseInt(elem.getAttributeValue(StringIO.MOUSE_Y));
+        player.screenWidth = Integer.parseInt(elem.getAttributeValue(StringIO.SCREEN_W));
+        player.screenHeight = Integer.parseInt(elem.getAttributeValue(StringIO.SCREEN_H));
+        player.visitor = Boolean.parseBoolean(elem.getAttributeValue(StringIO.VISITOR));
+        GameIO.editAffineTransformFromElement(elem.getChild(StringIO.AFFINE_TRANSFORM), player.screenToBoardTransformation);
         return player;
     }
 
@@ -137,7 +137,7 @@ public class PlayerIO {
         while ((entry = stream.getNextEntry()) != null)
         {
             StreamUtil.copy(stream, byteStream);
-            if (entry.getName().equals(IOString.PLAYER_XML))
+            if (entry.getName().equals(StringIO.PLAYER_XML))
             {
                 editPlayerFromStreamZip(new ByteArrayInputStream(byteStream.toByteArray()), player);
             }
@@ -154,7 +154,7 @@ public class PlayerIO {
         while ((entry = stream.getNextEntry()) != null)
         {
             StreamUtil.copy(stream, byteStream);
-            if (entry.getName().equals(IOString.PLAYER_XML))
+            if (entry.getName().equals(StringIO.PLAYER_XML))
             {
                 pl = readPlayerFromStream(new ByteArrayInputStream(byteStream.toByteArray()));
             }
@@ -170,16 +170,16 @@ public class PlayerIO {
      * @return the created Element
      */
     static Element createElementFromPlayer(Player player) {
-        Element elem = new Element(IOString.PLAYER);
-        elem.setAttribute(IOString.NAME, player.getName());
-        elem.setAttribute(IOString.ID, Integer.toString(player.id));
-        elem.setAttribute(IOString.COLOR, Integer.toString(player.color.getRGB()));
-        elem.setAttribute(IOString.SEAT_NUM, Integer.toString(player.seatNum));
-        elem.setAttribute(IOString.MOUSE_X, Integer.toString(player.mouseXPos));
-        elem.setAttribute(IOString.MOUSE_Y, Integer.toString(player.mouseYPos));
-        elem.setAttribute(IOString.SCREEN_W, Integer.toString(player.screenWidth));
-        elem.setAttribute(IOString.SCREEN_H, Integer.toString(player.screenHeight));
-        elem.setAttribute(IOString.VISITOR, Boolean.toString(player.visitor));
+        Element elem = new Element(StringIO.PLAYER);
+        elem.setAttribute(StringIO.NAME, player.getName());
+        elem.setAttribute(StringIO.ID, Integer.toString(player.id));
+        elem.setAttribute(StringIO.COLOR, Integer.toString(player.color.getRGB()));
+        elem.setAttribute(StringIO.SEAT_NUM, Integer.toString(player.seatNum));
+        elem.setAttribute(StringIO.MOUSE_X, Integer.toString(player.mouseXPos));
+        elem.setAttribute(StringIO.MOUSE_Y, Integer.toString(player.mouseYPos));
+        elem.setAttribute(StringIO.SCREEN_W, Integer.toString(player.screenWidth));
+        elem.setAttribute(StringIO.SCREEN_H, Integer.toString(player.screenHeight));
+        elem.setAttribute(StringIO.VISITOR, Boolean.toString(player.visitor));
         elem.addContent(GameIO.createElementFromAffineTransform(player.screenToBoardTransformation));
         return elem;
     }

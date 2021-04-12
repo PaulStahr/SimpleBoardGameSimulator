@@ -28,7 +28,7 @@ import data.Texture;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import geometry.Vector2d;
-import gui.GamePanel;
+import gui.GameWindow.GamePanel;
 import main.Player;
 import util.data.IntegerArrayList;
 

@@ -51,7 +51,7 @@ public class GameInstance {
 	private final ArrayList<GameAction> actions = new ArrayList<>();
 	private final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
 	public boolean private_area = true;
-	public boolean table = true;
+	public boolean drawTable = true;
     public boolean put_down_area = true;
     public int seats = -1;
     public final ArrayList<Color> seatColors = new ArrayList<>();
@@ -59,7 +59,8 @@ public class GameInstance {
 	public int admin = -1;
 	public boolean debug_mode = false;
     public boolean initial_mode = true;
-    private long maxDrawValue = 0;
+	public float cardOverlap = (float) (2/3.0);
+	private long maxDrawValue = 0;
 	public int tableRadius = 1200;
 	private final StampedLock lock = new StampedLock();
 	

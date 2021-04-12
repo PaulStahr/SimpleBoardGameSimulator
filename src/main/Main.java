@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
 
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
-import gui.GameWindow;
-import gui.Language.LanguageSummary;
-import gui.LanguageHandler;
-import gui.ServerLobbyWindow;
+import gui.GameWindow.GameWindow;
+import gui.Language.Language.LanguageSummary;
+import gui.Language.LanguageHandler;
+import gui.ServerWindow.ServerLobbyWindow;
 import io.GameIO;
 import logging.LockbackUtil;
 import net.AsynchronousGameConnection;

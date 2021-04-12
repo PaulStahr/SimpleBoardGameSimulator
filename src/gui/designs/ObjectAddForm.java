@@ -1,8 +1,8 @@
 package gui.designs;
 
-import gui.Language;
-import gui.LanguageChangeListener;
-import gui.LanguageHandler;
+import gui.Language.Language;
+import gui.Language.LanguageChangeListener;
+import gui.Language.LanguageHandler;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;

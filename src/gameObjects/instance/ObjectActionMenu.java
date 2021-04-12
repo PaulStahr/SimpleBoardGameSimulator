@@ -10,7 +10,7 @@ import javax.swing.SwingUtilities;
 
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.functions.ObjectFunctions;
-import gui.GamePanel;
+import gui.GameWindow.GamePanel;
 import main.Player;
 
 public class ObjectActionMenu {
@@ -68,7 +68,9 @@ public class ObjectActionMenu {
             @Override
 			public void actionPerformed(ActionEvent e) {
                 /*Shuffle objects on a stack*/
-                ObjectFunctions.shuffleStack(gamePanel, gameInstance, player, objectInstance);
+                ObjectFunctions.shuffleStack(gamePanel.id, gameInstance, player, objectInstance);
+                gamePanel.audioClips.get("shuffle").setFramePosition(0);
+                gamePanel.audioClips.get("shuffle").start();
             }
         });
 
