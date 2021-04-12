@@ -438,7 +438,7 @@ public class GameIO {
 	        	ObjectInstance ObjectInstance = gi.getObjectInstanceByIndex(idx);
         		root_inst.addContent(createElementFromObjectInstance(ObjectInstance));
         	}
-			for (int idx = 0; idx < gi.getPlayerNumber(); idx++) {
+			for (int idx = 0; idx < gi.getPlayerCount(); idx++) {
 				Player player = gi.getPlayerByIndex(idx);
 				root_inst.addContent(PlayerIO.createElementFromPlayer(player));
 			}

@@ -10,6 +10,8 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -41,14 +43,16 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.Document;
 
+import data.DataHandler;
 import data.Texture;
 import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.GameStructureEditAction;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerRemoveAction;
+import gameObjects.action.structure.GameStructureEditAction;
+import gameObjects.action.structure.GameTextureRemoveAction;
 import gameObjects.columnTypes.GameObjectBooksColumnType;
 import gameObjects.columnTypes.GameObjectColumnType;
 import gameObjects.columnTypes.GameObjectDicesColumnType;
@@ -145,7 +149,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		tableModelPlayer.addTableModelListener(this);
 		scrollPaneImages.setDropTarget(new DropTarget() {
 		    /**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 8601119174600655506L;
 
@@ -217,7 +221,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            comp.setBackground(gi.getPlayerByIndex(row).color);
+            if (row < gi.getPlayerCount())
+            {
+                comp.setBackground(gi.getPlayerByIndex(row).color);
+            }
             return comp;
         }        
     };
@@ -238,7 +245,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
         }
 	};
 
- 	private class GeneralPanel extends JPanel implements ItemListener, DocumentListener, LanguageChangeListener
+ 	private class GeneralPanel extends JPanel implements ItemListener, DocumentListener, LanguageChangeListener, ComponentListener
  	{
  		/**
 		 * 
@@ -285,15 +292,16 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			tableModelBooks.addTableModelListener(EditGamePanel.this);
 			languageChanged(lh.getCurrentLanguage());
 			lh.addLanguageChangeListener(this);
+			addComponentListener(this);
  		}
 
 		public void update() {
 	    	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");}
-			if (isUpdating)  {return;}
+			if (!isVisible() || isUpdating)  {return;}
 			isUpdating = true;
 			textFieldName.setText(gi.name);
 			textFieldTableRadius.setText(Integer.toString(gi.tableRadius));
-			JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
+		    JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
 			comboBoxBackground.setSelectedItem(gi.game.getImageKey(gi.game.background));
             textFieldPassword.setText(gi.password);
 			textFieldSeats.setText(Integer.toString(gi.seats));
@@ -311,8 +319,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			isUpdating = false;
 		}
-		
-		
+
 		public void update(DocumentEvent event)
 		{
 	    	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");}
@@ -355,6 +362,20 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		    labelPassword.setText(language.getString(Words.password));
 		    labelSeats.setText(language.getString(Words.seats));
 		}
+
+        @Override
+        public void componentHidden(ComponentEvent e) {}
+
+        @Override
+        public void componentMoved(ComponentEvent e) {}
+
+        @Override
+        public void componentResized(ComponentEvent e) {}
+
+        @Override
+        public void componentShown(ComponentEvent e) {
+            update();
+        }
  	}
  	
 	/**
@@ -368,7 +389,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
         public String[] apply(TableColumnType t) {
             if (t == GameObjectInstanceColumnType.OWNER)
             {
-                int count = gi.getPlayerNumber();
+                int count = gi.getPlayerCount();
                 String[] result = new String[count + 1];
                 result[0] = "-1";
                 for (int i = 0; i < count; ++i)
@@ -380,7 +401,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
             return null;
         }
     };
-	
+
     @SuppressWarnings("unchecked")
     private void updateTables()
 	{
@@ -398,7 +419,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		panelGeneral.update();
 		isUpdating = false;
 	}
-	
+
 	@Override
 	public void actionPerformed(ActionEvent ae) {
 		if (isUpdating){return;}
@@ -433,7 +454,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				Set<Entry<String, Texture>> entrySet = gi.game.images.entrySet();
 				@SuppressWarnings("unchecked")
 				Entry<String, Texture> entry = entrySet.toArray(new Entry[entrySet.size()])[row];
-				gi.game.images.remove(entry.getKey(), entry.getValue());
+				gi.update(new GameTextureRemoveAction(id, entry.getKey()));
 			}
 			else if (tableSource == tableModelGameObjects)
 			{
@@ -456,7 +477,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		updateTables();
 		isUpdating = false;
 	}
-	
+
 	@Override
 	public void run()
 	{
@@ -464,11 +485,18 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		panelGeneral.update();
 	}
 
+	private final Runnable triggerUpdateRunnable = new Runnable(){
+	    @Override
+        public void run() {
+	        JFrameUtils.runByDispatcher(EditGamePanel.this);
+	    }
+	};
+
 	@Override
 	public void changeUpdate(GameAction action) {
 		if (action instanceof GameObjectInstanceEditAction || action instanceof GameStructureEditAction)
 		{
-			JFrameUtils.runByDispatcher(this);
+		    DataHandler.hs.enqueue(triggerUpdateRunnable, System.nanoTime() + 100000000, false);
 		}
 	}
 	

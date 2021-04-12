@@ -118,9 +118,9 @@ public class Table {
         for (int i = 0; i < playerShapes.size(); ++i){
             // set background color
             int place = 0;
-            if (counter < gameInstance.getPlayerNumber())
+            if (counter < gameInstance.getPlayerCount())
             {
-                for (int j = 0; j < gameInstance.getPlayerNumber(); ++j)
+                for (int j = 0; j < gameInstance.getPlayerCount(); ++j)
                 {
                     if (gameInstance.getPlayerByIndex(j).id < gameInstance.getPlayerByIndex(counter).id) {
                         ++place;

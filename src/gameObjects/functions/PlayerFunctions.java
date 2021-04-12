@@ -6,9 +6,9 @@ import main.Player;
 public class PlayerFunctions {
     public static Player GetPlayerFromTablePlace(GameInstance gameInstance, int tablePlace){
         int playerIndex = 0;
-        for (int j = 0; j < gameInstance.getPlayerNumber(); ++j)
+        for (int j = 0; j < gameInstance.getPlayerCount(); ++j)
         {
-            if (tablePlace < gameInstance.getPlayerNumber()) {
+            if (tablePlace < gameInstance.getPlayerCount()) {
                 if (gameInstance.getPlayerByIndex(j).id < gameInstance.getPlayerByIndex(tablePlace).id) {
                     ++playerIndex;
                 }

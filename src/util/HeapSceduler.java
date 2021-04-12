@@ -13,8 +13,15 @@ public class HeapSceduler implements Runnable{
     private boolean stop;
     private static final Logger logger = LoggerFactory.getLogger(HeapSceduler.class);
     
-    public synchronized void enqueue(Runnable r, long nanoTime)
+    public synchronized boolean isEnqueued(Runnable r) {
+        return ArrayUtil.firstEqualIndex(rHeap, 0,length, r) >= 0;
+    }
+
+    public synchronized boolean enqueue(Runnable r, long nanoTime, boolean multipleAllowed)
     {
+        if (!multipleAllowed && isEnqueued(r)) {
+            return false;
+        }
         if (length == rHeap.length){
             rHeap = Arrays.copyOf(rHeap, Math.max(rHeap.length + 1, rHeap.length * 2));
             tHeap = Arrays.copyOf(tHeap, Math.max(tHeap.length + 1, tHeap.length * 2));
@@ -23,6 +30,7 @@ public class HeapSceduler implements Runnable{
         tHeap[length] = nanoTime;
         shiftUp(length);
         ++length;
+        return true;
     }
     
     private void shiftUp(int position)
@@ -87,6 +95,7 @@ public class HeapSceduler implements Runnable{
         while(!stop)
         {
             Runnable r;
+            long t;
             synchronized(this) {
                 while(true)
                 {
@@ -106,6 +115,7 @@ public class HeapSceduler implements Runnable{
                         }
                     } catch (InterruptedException e) {}
                 }
+                t = tHeap[0];
                 r = rHeap[0];
                 --length;
                 rHeap[0] = rHeap[length];
@@ -114,7 +124,11 @@ public class HeapSceduler implements Runnable{
                 shiftDown(0);
             }
             try{
+                long beginTime = System.nanoTime();
+                if (beginTime - t > 100000000){logger.warn("Delayed method call (" + (beginTime - t) / 1000000 + "ms possibly high system load");}
                 r.run();
+                long finishTime = System.nanoTime();
+                if (finishTime - beginTime > 10000000) {logger.warn("Method computation took very long (" + (finishTime - beginTime) / 1000000 + "ms consider using a seperate thread for computation if this happens frequently");}
             }
             catch(Throwable e)
             {

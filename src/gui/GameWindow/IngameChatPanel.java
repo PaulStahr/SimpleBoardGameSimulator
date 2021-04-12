@@ -90,15 +90,15 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 	
 	void updatePlayerList()
 	{
-		int modCount = game.getPlayerNumber();
-		for (int i = 0; i < game.getPlayerNumber(); ++i){modCount += game.getPlayerByIndex(i).getNameModCount();}
+		int modCount = game.getPlayerCount();
+		for (int i = 0; i < game.getPlayerCount(); ++i){modCount += game.getPlayerByIndex(i).getNameModCount();}
 		if (modCount == playerModCount){return;}
 		playerModCount = modCount;
-		String[] sendToNames = new String[game.getPlayerNumber()];
+		String[] sendToNames = new String[game.getPlayerCount()];
 		// The first option in the sendTo combobox is to send the message to everybody "all"
 		sendToNames[0] = "all";
 
-		for(int playerIndex=0, writeIndex = 0; playerIndex<game.getPlayerNumber(); playerIndex++) {
+		for(int playerIndex=0, writeIndex = 0; playerIndex<game.getPlayerCount(); playerIndex++) {
 			Player current = game.getPlayerByIndex(playerIndex);
 			// copy all player names to the combobox. 
 			// Omit the own name, since you don't want to send messages to yourself.
@@ -158,7 +158,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 		            	game.update(new UserFileMessage(id, player, receiverPlayer, file.getName(), Files.readAllBytes(file.toPath())));
 		            }
 		        } catch (Exception ex) {
-		            ex.printStackTrace();
+		            JFrameUtils.logErrorAndShow("Couldn't drop element", ex, logger);
 		        }
 		    }
 		});

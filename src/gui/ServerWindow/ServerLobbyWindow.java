@@ -33,8 +33,8 @@ import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
 import data.Options;
 import data.Options.OptionTreeNode;
-import gameObjects.columnTypes.GameInstanceColumnType;
 import gameObjects.GameMetaInfo;
+import gameObjects.columnTypes.GameInstanceColumnType;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import io.GameIO;
@@ -126,7 +126,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				try
 				{
 					File file = fileChooser.getSelectedFile();
-					GameInstance gi = new GameInstance(new Game(), null);
+					GameInstance gi = new GameInstance(new Game("foo"), null);
 					if (file.isDirectory())
 					{
 						progressBarTitle.setVisible(true);
@@ -200,7 +200,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 			} catch (IOException fileNotFoundException) {
 				logger.error("File not Found", fileNotFoundException);
 			}
-			GameInstance gi = new GameInstance(new Game(), null);
+			GameInstance gi = new GameInstance(new Game("foo"), null);
 			try {
 				GameIO.readSnapshotFromZip(fis, gi);
 			} catch (IOException ioException) {
@@ -359,18 +359,18 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
             }
             buttonPoll.setEnabled(true);
             if (buttonAutoPoll.isSelected()) {
-                DataHandler.hs.enqueue(new Runnable() {
-                    @Override
-                    public void run() {
-                            System.out.println("update");
-                        updateCurrentGames();         
-                        System.out.println("updated");
-                    }
-                }, System.nanoTime() + 500000000);
+                DataHandler.hs.enqueue(updateCurrentGamesRunnable, System.nanoTime() + 500000000, false);
             }
         }
 	};
 	
+	private final Runnable updateCurrentGamesRunnable = new Runnable() {
+        @Override
+        public void run() {
+            updateCurrentGames();
+        }
+    };
+
 	private void updateCurrentGames() {DataHandler.tp.run(updateGamesRunnable, false);}
 
 	public ServerLobbyWindow(SynchronousGameClientLobbyConnection client, LanguageHandler lh)

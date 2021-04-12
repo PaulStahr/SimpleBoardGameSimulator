@@ -1,5 +1,7 @@
 package gameObjects.action;
 
+import gameObjects.action.structure.GameStructureEditAction;
+
 public class AddObjectAction extends GameStructureEditAction{
 	public static final byte ADD_IMAGE = 4;
 	public static final byte ADD_PLAYER = 5;

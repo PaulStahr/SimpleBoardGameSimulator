@@ -19,8 +19,8 @@ public class GameMetaInfo implements Serializable
 	public GameMetaInfo(GameInstance gameInstance) {
 		this.id = gameInstance.name;
 		this.name = gameInstance.name;
-		this.connectedPlayerCount = gameInstance.getPlayerNumber();
-		this.visitorPlayerCount = gameInstance.getPlayerNumber(true) - gameInstance.getPlayerNumber();
+		this.connectedPlayerCount = gameInstance.getPlayerCount();
+		this.visitorPlayerCount = gameInstance.getPlayerCount(true) - gameInstance.getPlayerCount();
 		this.passwordRequired = !"".equals(gameInstance.password);
 	}
 	

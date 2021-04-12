@@ -17,13 +17,14 @@ import gameObjects.action.DestroyInstance;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.GameStructureEditAction;
-import gameObjects.action.GameStructureObjectEditAction;
 import gameObjects.action.player.PlayerAddAction;
 import gameObjects.action.player.PlayerCharacterPositionUpdate;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerMousePositionUpdate;
 import gameObjects.action.player.PlayerRemoveAction;
+import gameObjects.action.structure.GameStructureEditAction;
+import gameObjects.action.structure.GameStructureObjectEditAction;
+import gameObjects.action.structure.GameTextureRemoveAction;
 import gameObjects.columnTypes.GameInstanceColumnType;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectBook;
@@ -171,9 +172,9 @@ public class GameInstance {
 
 	public Player getPlayerByIndex(int idx){return players.get(idx);}
 
-	public int getPlayerNumber(){return getPlayerNumber(false);}
+	public int getPlayerCount(){return getPlayerCount(false);}
 
-	public int getPlayerNumber(boolean with_visitors)
+	public int getPlayerCount(boolean with_visitors)
 	{
 		if (with_visitors)
 		{
@@ -298,6 +299,26 @@ public class GameInstance {
 	        edited.screenWidth = pcpu.screenWidth;
 	        edited.screenHeight = pcpu.screenHeight;
 	        edited.screenToBoardTransformation.setTransform(pcpu.scaleX, pcpu.shearY, pcpu.shearX, pcpu.scaleY, pcpu.translateX, pcpu.translateY);
+        }
+	    else if (action instanceof GameTextureRemoveAction)
+        {
+	        String textureName = ((GameTextureRemoveAction)action).textureName;
+	        game.images.remove(textureName);
+	        for (int i = 0; i < game.objects.size(); ++i)
+	        {
+	            GameObject go = game.objects.get(i);
+	            if (go instanceof GameObjectToken) {
+	                GameObjectToken token = (GameObjectToken)go;
+                    if (textureName.equals(token.getUpsideLookId()))
+                    {
+                        token.setUpsideLook(null);
+                    }
+                    if (textureName.equals(token.getDownsideLookId()))
+                    {
+                        token.setDownsideLook(null);
+                    }
+	            }
+	        }
         }
 	    else if (action instanceof GameObjectEditAction)
 		{

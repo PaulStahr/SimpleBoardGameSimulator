@@ -84,7 +84,7 @@ public class GameObjectBook extends GameObject{
         @Override
         public int hashCode()
         {
-            return super.hashCode() ^ side;
+            return super.hashCode() ^ side ^ Boolean.hashCode(unfold);
         }
 
 
@@ -101,7 +101,9 @@ public class GameObjectBook extends GameObject{
         public boolean equals(Object state) {
             if (!(state instanceof BookState)) {return false;}
             BookState ts = (BookState)state;
-            return ts.side == this.side && super.equals(state);
+            return ts.side == this.side 
+                    && ts.unfold == this.unfold
+                    && super.equals(state);
         }
 
 
