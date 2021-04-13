@@ -77,7 +77,7 @@ public class ObjectActionMenu {
         flipStackItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ObjectFunctions.flipTokenStack(gamePanel, gameInstance, player, objectInstance);
+                ObjectFunctions.flipTokenStack(gamePanel.id, gameInstance, player, objectInstance, gamePanel.hoveredObject, gamePanel.getSelectedObjects());
             }
         });
 
