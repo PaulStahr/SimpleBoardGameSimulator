@@ -79,11 +79,12 @@ public class Player implements Comparable<Object> {
 		setPlayerColor(null);
 	}
 	
-	public Player(String name, int id, Color color, int seatNum, int mouseX, int mouseY) {
+	public Player(String name, int id, Color color, int seatNum, int trickNum, int mouseX, int mouseY) {
 		this.name = name;
 		this.id = id;
 		this.color = color;
 		this.seatNum = seatNum;
+		this.trickNum = trickNum;
 		this.mouseXPos = mouseX;
 		this.mouseYPos = mouseY;
 	}
@@ -93,6 +94,7 @@ public class Player implements Comparable<Object> {
         this.id = other.id;
         this.color = other.color;
         this.seatNum = other.seatNum;
+        this.trickNum = other.trickNum;
         this.mouseXPos = other.mouseXPos;
         this.mouseYPos = other.mouseYPos;
         this.screenWidth = other.screenWidth;
@@ -122,6 +124,7 @@ public class Player implements Comparable<Object> {
 		this.name = player.name;
 		this.color = player.color;
 		this.seatNum = player.seatNum;
+		this.trickNum = player.trickNum;
 		this.mouseXPos = player.mouseXPos;
 		this.mouseYPos = player.mouseYPos;
 	}
@@ -143,7 +146,7 @@ public class Player implements Comparable<Object> {
 
 	public String toStringAdvanced()
 	{
-	    return name + " " + id + " " + color + " " + seatNum + " " + mouseXPos + " " + mouseYPos + " " + screenToBoardTransformation;
+	    return name + " " + id + " " + color + " " + seatNum + " " + trickNum + " " + mouseXPos + " " + mouseYPos + " " + screenToBoardTransformation;
 	}
 
 	@Override
@@ -156,6 +159,7 @@ public class Player implements Comparable<Object> {
                 && id == other.id
                 && color.equals(other.color)
 				&& seatNum == other.seatNum
+				&& trickNum == other.trickNum
                 && mouseXPos == other.mouseXPos
                 && mouseYPos == other.mouseYPos
                 && screenToBoardTransformation.equals(other.screenToBoardTransformation);

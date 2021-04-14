@@ -168,8 +168,8 @@ public class DrawFunctions {
                 gamePanel.screenToBoardPos(gamePanel.mouseScreenX, gamePanel.mouseScreenY, mouseBoardPos);
                 Point2D transformedPoint = new Point2D.Double(mouseBoardPos.getXI(), mouseBoardPos.getYI());
                 gamePanel.privateArea.transformPoint(transformedPoint, transformedPoint);
-                int index = gamePanel.privateArea.getPrivateObjectIndexByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY(), gamePanel.getWidth()/2, gamePanel.getHeight());
-                int oId = gamePanel.privateArea.getObjectIdByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY(), gamePanel.getWidth()/2, gamePanel.getHeight());
+                int index = gamePanel.privateArea.getPrivateObjectIndexByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY());
+                int oId = gamePanel.privateArea.getObjectIdByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY());
                 //ObjectInstance objectInstance = gameInstance.getObjectInstanceById(oId);
                 if (gamePanel.privateArea.privateObjectsPositions.size() > index && index != -1) {
                     AffineTransform temp = g2.getTransform();
@@ -376,7 +376,7 @@ public class DrawFunctions {
             }
             //draw object above private area
             else if (gamePanel.mouseInPrivateArea && objectInstance.state.isActive){
-                int insertPosition = gamePanel.privateArea.getInsertPosition(gamePanel.mouseScreenX, gamePanel.mouseScreenY, gamePanel.getWidth()/2, gamePanel.getHeight());
+                int insertPosition = gamePanel.privateArea.getInsertPosition(gamePanel.mouseScreenX, gamePanel.mouseScreenY);
                 //g2.rotate(player.screenToBoardTransformation.getDeterminant());
                 //g2.rotate(Math.toRadians(objectInstance.state.originalRotation));
                 g2.rotate(-Math.PI * 0.5 + Math.PI / ((gamePanel.privateArea.objects.size() + 1) * 2));
@@ -412,7 +412,7 @@ public class DrawFunctions {
                     g2.setColor(player.color);
                 }
                 //draw hover border
-                else if (ObjectFunctions.isObjecthovered(gamePanel, objectInstance)) {
+                else if (ObjectFunctions.isObjectHovered(objectInstance, gamePanel.hoveredObject)) {
                     g2.setStroke(hoverStroke);
                     g2.setColor(player.color);
                 }
@@ -428,7 +428,7 @@ public class DrawFunctions {
                 g2.setColor(gameInstance.getPlayerById(objectSelector).color);
             }
             if (objectInstance.go instanceof GameObjectToken) {
-                if (ObjectFunctions.isObjecthovered(gamePanel, objectInstance) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id) != -1 || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
+                if (ObjectFunctions.isObjectHovered(objectInstance, gamePanel.hoveredObject) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id) != -1 || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
                     if (isStackCollected(gameInstance, objectInstance)) {
                         g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth / 2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth / 2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth / 2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
                     }
@@ -442,7 +442,7 @@ public class DrawFunctions {
                 }
             }
             else{
-                if (ObjectFunctions.isObjecthovered(gamePanel, objectInstance) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id) != -1) {
+                if (ObjectFunctions.isObjectHovered(objectInstance, gamePanel.hoveredObject) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id) != -1) {
                     g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth/2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth/2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth/2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
                 }
             }

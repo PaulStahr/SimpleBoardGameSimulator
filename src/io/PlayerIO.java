@@ -37,6 +37,7 @@ public class PlayerIO {
                 Integer.parseInt(elem.getAttributeValue(StringIO.ID)),
                 new Color(Integer.parseInt(elem.getAttributeValue(StringIO.COLOR))),
                 GameIO.readAttribute(elem, StringIO.SEAT_NUM, -1),
+                GameIO.readAttribute(elem, StringIO.TRICK_NUM, 0),
                 Integer.parseInt(elem.getAttributeValue(StringIO.MOUSE_X)),
                 Integer.parseInt(elem.getAttributeValue(StringIO.MOUSE_Y)));
         result.screenWidth = Integer.parseInt(elem.getAttributeValue(StringIO.SCREEN_W));
@@ -51,6 +52,7 @@ public class PlayerIO {
         player.setName(elem.getAttributeValue(StringIO.NAME));
         player.color = new Color(Integer.parseInt(elem.getAttributeValue(StringIO.COLOR)));
         player.seatNum = Integer.parseInt(elem.getAttributeValue(StringIO.SEAT_NUM));
+        player.trickNum = Integer.parseInt(elem.getAttributeValue(StringIO.TRICK_NUM));
         player.mouseXPos = Integer.parseInt(elem.getAttributeValue(StringIO.MOUSE_X));
         player.mouseYPos = Integer.parseInt(elem.getAttributeValue(StringIO.MOUSE_Y));
         player.screenWidth = Integer.parseInt(elem.getAttributeValue(StringIO.SCREEN_W));
@@ -63,7 +65,7 @@ public class PlayerIO {
     public static void simulateEditPlayerFromObject(ObjectInputStream is) throws IOException, ClassNotFoundException
     {
         is.readObject();
-        long toScip = 6 * Integer.SIZE / 8 + 6 * Double.SIZE / 8 + 1;
+        long toScip = 7 * Integer.SIZE / 8 + 6 * Double.SIZE / 8 + 1;
         long skipped = StreamUtil.skip(is, toScip);
         if (toScip != skipped)
         {
@@ -83,6 +85,7 @@ public class PlayerIO {
         int col = is.readInt();
         if (player.color.getRGB() != col) {player.color = new Color(col);}
         player.seatNum = is.readInt();
+        player.trickNum = is.readInt();
         //read player mouse position
         player.mouseXPos = is.readInt();
         player.mouseYPos = is.readInt();
@@ -99,6 +102,7 @@ public class PlayerIO {
         //write player color
         out.writeInt(player.color.getRGB());
         out.writeInt(player.seatNum);
+        out.writeInt(player.trickNum);
         //write player mouse position
         out.writeInt(player.mouseXPos);
         out.writeInt(player.mouseYPos);
@@ -175,6 +179,7 @@ public class PlayerIO {
         elem.setAttribute(StringIO.ID, Integer.toString(player.id));
         elem.setAttribute(StringIO.COLOR, Integer.toString(player.color.getRGB()));
         elem.setAttribute(StringIO.SEAT_NUM, Integer.toString(player.seatNum));
+        elem.setAttribute(StringIO.TRICK_NUM, Integer.toString(player.trickNum));
         elem.setAttribute(StringIO.MOUSE_X, Integer.toString(player.mouseXPos));
         elem.setAttribute(StringIO.MOUSE_Y, Integer.toString(player.mouseYPos));
         elem.setAttribute(StringIO.SCREEN_W, Integer.toString(player.screenWidth));

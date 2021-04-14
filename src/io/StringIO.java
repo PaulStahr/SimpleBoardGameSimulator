@@ -77,4 +77,5 @@ public class StringIO {
     public static final String BOX_ID = "box_id";
     public static final String PLAYER_SEAT_LIST = "player_seat_list";
 	public static final String SEAT_NUM = "seat_num";
+    public static final String TRICK_NUM = "trick_num";
 }

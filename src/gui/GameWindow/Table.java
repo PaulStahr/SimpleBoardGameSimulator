@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 import gameObjects.functions.PlayerFunctions;
 import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectInstance;
 import main.Player;
 
 public class Table {
@@ -206,6 +207,10 @@ public class Table {
     public Point2D getTableCenter(Point2D tableCenter){
         tableCenter.setLocation(this.tableOrigin.getX() + diameter/2, this.tableOrigin.getY() + diameter/2);
         return tableCenter;
+    }
+
+    public double getTableOffset(Player player, ObjectInstance objectInstance){
+        return getDiameter()/2 + objectInstance.getHeight(player.id)/2;
     }
 
     public Point2D getTableScreenOrigin(){
