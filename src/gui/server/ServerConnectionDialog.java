@@ -1,4 +1,4 @@
-package gui.ServerWindow;
+package gui.server;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,9 +9,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 
-import gui.Language.Language;
-import gui.Language.LanguageChangeListener;
-import gui.Language.LanguageHandler;
+import gui.language.Language;
+import gui.language.LanguageChangeListener;
+import gui.language.LanguageHandler;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
 

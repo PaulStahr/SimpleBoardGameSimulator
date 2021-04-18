@@ -1,13 +1,13 @@
-package gui.GameWindow;
+package gui.game;
 
 import javax.swing.JFrame;
 
 import data.JFrameLookAndFeelUtil;
 import gameObjects.instance.GameInstance;
-import gui.Language.Language;
-import gui.Language.LanguageChangeListener;
-import gui.Language.LanguageHandler;
-import gui.Language.Words;
+import gui.language.Language;
+import gui.language.LanguageChangeListener;
+import gui.language.LanguageHandler;
+import gui.language.Words;
 import main.Player;
 
 import java.awt.event.WindowEvent;

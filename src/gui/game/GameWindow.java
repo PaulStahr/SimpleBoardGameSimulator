@@ -1,10 +1,12 @@
-package gui.GameWindow;
+package gui.game;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -23,11 +25,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
-import gui.*;
-import gui.Language.Language;
-import gui.Language.LanguageChangeListener;
-import gui.Language.LanguageHandler;
-import gui.Language.Words;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +38,11 @@ import gameObjects.functions.CheckingFunctions.GameInconsistency;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
+import gui.Credits;
+import gui.language.Language;
+import gui.language.LanguageChangeListener;
+import gui.language.LanguageHandler;
+import gui.language.Words;
 import gui.minigames.TetrisGameInstance;
 import gui.minigames.TetrisGameInstance.TetrisGameEvent;
 import gui.minigames.TetrisGameInstance.TetrisGameListener;

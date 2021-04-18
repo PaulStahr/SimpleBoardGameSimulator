@@ -10,7 +10,7 @@ import javax.swing.SwingUtilities;
 
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.functions.ObjectFunctions;
-import gui.GameWindow.GamePanel;
+import gui.game.GamePanel;
 import main.Player;
 
 public class ObjectActionMenu {

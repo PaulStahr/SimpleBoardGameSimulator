@@ -1,9 +1,9 @@
-package gui.CreateGames;
+package gui.create;
 
-import gui.Language.Language;
-import gui.Language.LanguageChangeListener;
-import gui.Language.LanguageHandler;
 import gui.designs.ObjectAddForm;
+import gui.language.Language;
+import gui.language.LanguageChangeListener;
+import gui.language.LanguageHandler;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;

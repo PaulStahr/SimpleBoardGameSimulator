@@ -1,4 +1,4 @@
-package gui.GameWindow;
+package gui.game;
 
 import static gameObjects.functions.DrawFunctions.drawBackground;
 import static gameObjects.functions.DrawFunctions.drawObjectsFromList;
@@ -52,10 +52,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import gui.Language.Language;
-import gui.Language.LanguageChangeListener;
-import gui.Language.LanguageHandler;
-import gui.Language.Words;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +84,10 @@ import gameObjects.instance.ObjectState;
 import geometry.Matrix3d;
 import geometry.TransformConversion;
 import geometry.Vector2d;
+import gui.language.Language;
+import gui.language.LanguageChangeListener;
+import gui.language.LanguageHandler;
+import gui.language.Words;
 import io.GameIO;
 import main.Player;
 import util.StringUtils;

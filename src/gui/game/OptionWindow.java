@@ -1,4 +1,4 @@
-package gui.GameWindow;
+package gui.game;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -16,11 +16,11 @@ import javax.swing.UIManager.LookAndFeelInfo;
 
 import data.JFrameLookAndFeelUtil;
 import data.Options;
-import gui.Language.Language;
-import gui.Language.Language.LanguageSummary;
-import gui.Language.LanguageChangeListener;
-import gui.Language.LanguageHandler;
-import gui.Language.Words;
+import gui.language.Language;
+import gui.language.LanguageChangeListener;
+import gui.language.LanguageHandler;
+import gui.language.Words;
+import gui.language.Language.LanguageSummary;
 import util.JFrameUtils;
 
 public class OptionWindow extends JFrame implements LanguageChangeListener, ActionListener {

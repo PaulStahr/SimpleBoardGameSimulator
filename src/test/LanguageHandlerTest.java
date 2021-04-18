@@ -4,8 +4,8 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 
-import gui.Language.Language.LanguageSummary;
-import gui.Language.LanguageHandler;
+import gui.language.LanguageHandler;
+import gui.language.Language.LanguageSummary;
 
 public class LanguageHandlerTest {
     @Test
