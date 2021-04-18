@@ -479,30 +479,30 @@ public abstract class Calculate
     	}
     	if (x == 0)
     		return 0l;
-    	long erg = 1;
+    	long res = 1;
     	if (x < 0){
 			x =-x;
     		if ((exp & 1) == 1)
-        		erg = -1;
+        		res = -1;
     	}
     	
     	while (true){
     		long nextErg;
     		if ((exp & 1) == 1){
-    			if(erg != (nextErg = erg * x)/x)
+    			if(res != (nextErg = res * x)/x)
     				break;
     		}else{
-    			nextErg = erg;
+    			nextErg = res;
     		}
     		if ((exp >>= 1) == 0)
     			return nextErg;
     		if (x > Integer.MAX_VALUE)
     			break;
     		x *= x;
-    		erg = nextErg;
+    		res = nextErg;
     	}
 
-    	double ergd = erg;
+    	double ergd = res;
     	double xd = x;
     	while (exp != 0){
     		if ((exp & 1) == 1)
@@ -700,13 +700,9 @@ public abstract class Calculate
     	return erg;
     }
 
-    public static final double abs(double x){
-        return x > 0 ? x : -x;
-    }
+    public static final double abs(double x){return x > 0 ? x : -x;}
 
-    public static final long abs(long x){
-        return x > 0 ? x : -x;
-    }
+    public static final long abs(long x){return x > 0 ? x : -x;}
     
     public static final long[] primeFactors(long n){
     	long erg[] = new long[1];
@@ -796,8 +792,6 @@ public abstract class Calculate
 		return val < low ? low : val > high ? high : val;
 	}
 
-	public static final int signum(double d) {
-		return d > 0 ? 1 : d < 0 ? -1 : 0;
-	}
+	public static final int signum(double d) {return d > 0 ? 1 : d < 0 ? -1 : 0;}
 
 }

@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Spliterator;
 
 public class SortedIntegerArrayList extends AbstractList<Integer> implements SortedIntegerList{
+	public static final	SortedIntegerArrayList EMPTY_SORTED_INTEGER_ARRAY_LIST_ARRAY[] = new SortedIntegerArrayList[0];
     public static final ReadOnlySortedIntegerArrayList EMPTY_LIST = new SortedIntegerArrayList().readOnly();
 	private int data[];
 	private int length;
