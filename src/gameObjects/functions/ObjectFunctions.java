@@ -14,7 +14,10 @@ import javax.swing.SwingUtilities;
 
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.player.PlayerEditAction;
-import gameObjects.definition.*;
+import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectBox;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
@@ -52,7 +55,7 @@ public class ObjectFunctions {
                 if (objectInstance == currentTop) {
                     throw new RuntimeException();
                 }
-                if (++i > gameInstance.getObjectNumber()) {
+                if (++i > gameInstance.getObjectCount()) {
                     throw new RuntimeException("Circle in Card Stack");
                 }
             }
@@ -76,10 +79,10 @@ public class ObjectFunctions {
             while (currentBottom.state.belowInstanceId != -1) {
                 currentBottom = gameInstance.getObjectInstanceById(currentBottom.state.belowInstanceId);
                 if (objectInstance == currentBottom) {
-                    throw new RuntimeException();
+                    throw new RuntimeException("Reached first card again " + currentBottom.id + " below " + objectInstance.state.belowInstanceId);
                 }
-                if (++i > gameInstance.getObjectNumber()) {
-                    throw new RuntimeException("Circle in Card Stack");
+                if (++i > gameInstance.getObjectCount()) {
+                    throw new RuntimeException("Circle in Card Stack " + currentBottom.id);
                 }
             }
             return currentBottom;
@@ -182,8 +185,8 @@ public class ObjectFunctions {
             while (currentObjectInstance.state.aboveInstanceId != -1) {
                 objectStack.add(currentObjectInstance.state.aboveInstanceId);
                 currentObjectInstance = gameInstance.getObjectInstanceById(currentObjectInstance.state.aboveInstanceId);
-                if (gameInstance.getObjectNumber() < objectStack.size()) {
-                    throw new RuntimeException("Circle in stack" + gameInstance.getObjectNumber() + objectStack.size());
+                if (gameInstance.getObjectCount() < objectStack.size()) {
+                    throw new RuntimeException("Circle in stack" + gameInstance.getObjectCount() + objectStack.size());
                 }
             }
         }
@@ -199,8 +202,8 @@ public class ObjectFunctions {
             while (currentObjectInstance.state.aboveInstanceId != -1) {
                 oiList.add(gameInstance.getObjectInstanceById(currentObjectInstance.state.aboveInstanceId));
                 currentObjectInstance = gameInstance.getObjectInstanceById(currentObjectInstance.state.aboveInstanceId);
-                if (gameInstance.getObjectNumber() < oiList.size()) {
-                    throw new RuntimeException("Circle in stack" + gameInstance.getObjectNumber() + oiList.size());
+                if (gameInstance.getObjectCount() < oiList.size()) {
+                    throw new RuntimeException("Circle in stack" + gameInstance.getObjectCount() + oiList.size());
                 }
             }
         }
@@ -599,7 +602,7 @@ public class ObjectFunctions {
     public static ObjectInstance getTopActiveObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos, int maxInaccuracy) {
         ObjectInstance activeObject = null;
         int distance = Integer.MAX_VALUE;
-        for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
+        for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
             int dist = getObjectDistanceTo(oi, xPos, yPos);
             if (dist < distance && isOnObject(xPos, yPos, oi, player.id, maxInaccuracy)) {
@@ -656,11 +659,11 @@ public class ObjectFunctions {
 
 
     private static ObjectInstance getGroundObject(GameInstance gameInstance, Player player, ObjectInstance oi, int playerId, int maxInaccuracy) {
-        for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
+        for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
             ObjectInstance currentObject = gameInstance.getObjectInstanceByIndex(idx);
             if (oi.id != currentObject.id && isValidLieOnObject(player, currentObject) && liesOnObject(currentObject, oi, player.id, maxInaccuracy)){
                 int Counter = 0;
-                while (currentObject.state.aboveLyingObectIds.size() > 0 && Counter < gameInstance.getObjectNumber()){
+                while (currentObject.state.aboveLyingObectIds.size() > 0 && Counter < gameInstance.getObjectCount()){
                     for (int id : currentObject.state.aboveLyingObectIds){
                         if (liesOnObject(gameInstance.getObjectInstanceById(id), oi, playerId, maxInaccuracy)){
                             currentObject = gameInstance.getObjectInstanceByIndex(id);
@@ -746,7 +749,7 @@ public class ObjectFunctions {
             activeObject = gameInstance.getObjectInstanceById(id);
         }
         else {
-            for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
+            for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
                 ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
                 if (CheckFunctions.isValidNearestObject(oi, player, ignoredObjects)) {
                     if (isOnObject(xPos, yPos, oi, player.id, maxInaccuracy) && (activeObject == null || (oi.state.drawValue > activeObject.state.drawValue))) {
@@ -870,7 +873,7 @@ public class ObjectFunctions {
             for (int id : stackIds) {
                 ObjectInstance currentInstance = gameInstance.getObjectInstanceById(id);
                 if (player.id != currentInstance.state.owner_id && currentInstance.state.owner_id == -1) {
-                    insertIntoOwnStack(gamePanel, gameInstance, player, point, offset, currentInstance, hoveredObject, selectedObjects, 0, (int) (currentInstance.getWidth(player.id) * gameInstance.cardOverlap));
+                    insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, currentInstance, hoveredObject, selectedObjects, 0, (int) (currentInstance.getWidth(player.id) * gameInstance.cardOverlap));
                 }
             }
             //ObjectFunctions.displayStack(gamePanel, gameInstance, player, objectInstance, (int) (objectInstance.getWidth(player.id) * gamePanel.cardOverlap));
@@ -881,7 +884,7 @@ public class ObjectFunctions {
     public static void dropObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance hoveredObject, IntegerArrayList selectedObjects) {
         ArrayList<ObjectInstance> oiList = new ArrayList<>();
         getOwnedStack(gameInstance, player, oiList);
-        ObjectFunctions.removeFromOwnStack(gamePanel, gameInstance, player, oiList);
+        ObjectFunctions.removeFromOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, oiList);
         ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, oiList);
         //stack all dropped objects
         makeStack(gamePanel.id, gameInstance, player, oiList, hoveredObject, selectedObjects, SIDE_UNCHANGED);
@@ -889,7 +892,7 @@ public class ObjectFunctions {
 
     public static void dropObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
-            removeFromOwnStack(gamePanel, gameInstance, player, objectInstance.id);
+            removeFromOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, objectInstance);
             ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, objectInstance);
         }
     }
@@ -900,7 +903,7 @@ public class ObjectFunctions {
 
     public static void playObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, boolean front){
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
-            removeFromOwnStack(gamePanel, gameInstance, player, objectInstance.id);
+            removeFromOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, objectInstance);
             ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, objectInstance);
         }
         double angle = PlayerFunctions.GetCurrentPlayerRotation(gameInstance, player);
@@ -973,7 +976,7 @@ public class ObjectFunctions {
     //TODO can only handle one stack
     public static void getOwnedStack(GameInstance gameInstance, Player player, IntegerArrayList idList, boolean ignoreActiveObject) {
         idList.clear();
-        for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
+        for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
             if (oi.state.owner_id == player.id && (!ignoreActiveObject || !oi.state.isActive)) {
                 getStackFromBottom(gameInstance, oi, idList);
@@ -983,7 +986,7 @@ public class ObjectFunctions {
     }
     public static void getOwnedStack(GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList, boolean ignoreActiveObject) {
         oiList.clear();
-        for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
+        for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
             if (oi.state.owner_id == player.id && (!ignoreActiveObject || !oi.state.isActive)) {
                 getStackFromBottom(gameInstance, oi, oiList);
@@ -1097,7 +1100,7 @@ public class ObjectFunctions {
     }
 
     public static void deactivateAllObjects(GameInstance gameInstance){
-        for (int i = 0; i < gameInstance.getObjectNumber(); ++i)
+        for (int i = 0; i < gameInstance.getObjectCount(); ++i)
         {
             deactivateObject(gameInstance, gameInstance.getObjectInstanceByIndex(i).id);
         }
@@ -1150,7 +1153,7 @@ public class ObjectFunctions {
                         if (SwingUtilities.isRightMouseButton(arg0)){
                             flipTokenObject(gamePanel.id,gameInstance,player,currentObject);
                         }
-                        insertIntoOwnStack(gamePanel, gameInstance, player, point, offset, currentObject, hoveredObject, selectedObjects, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
+                        insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, currentObject, hoveredObject, selectedObjects, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
                     }
                     stackIds.clear();
                     getAllAboveLyingObjects(gameInstance, player, activeObject, stackIds);
@@ -1158,19 +1161,19 @@ public class ObjectFunctions {
                         ObjectInstance currentObject = gameInstance.getObjectInstanceById(id);
                         removeLieOnRelation(gamePanel.id, gameInstance, player, currentObject);
                         if (currentObject.go instanceof GameObjectToken) {
-                            insertIntoOwnStack(gamePanel, gameInstance, player, point, offset, currentObject, hoveredObject, selectedObjects, 0, 0);
+                            insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, currentObject, hoveredObject, selectedObjects, 0, 0);
                         }
                     }
                 }
                 //Release Object over private Area which was owned before
                 else if (gamePanel.privateArea != null && activeObject.state.owner_id == player.id && activeObject.state.isActive && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
-                    removeFromOwnStack(gamePanel, gameInstance, player, activeObject.id);
+                    removeFromOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, activeObject);
                     int index = gamePanel.privateArea.getInsertPosition(posX, posY);
-                    insertIntoOwnStack(gamePanel, gameInstance, player, point, offset, activeObject, hoveredObject, selectedObjects, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
+                    insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, activeObject, hoveredObject, selectedObjects, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
                 }
                 //Release previously owned card
                 else if (activeObject.state.owner_id == player.id && !gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
-                    removeFromOwnStack(gamePanel, gameInstance, player, activeObject.id);
+                    removeFromOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, activeObject);
                     if (SwingUtilities.isLeftMouseButton(arg0)) {
                         ObjectFunctions.flipTokenObject(gamePanel.id, gameInstance, player, activeObject);
                         if(gamePanel.table.stackerShape.contains(posX, posY)){
@@ -1266,7 +1269,7 @@ public class ObjectFunctions {
     }
 
     public static ObjectInstance findNeighbouredStackTop(GameInstance gameInstance, Player player, ObjectInstance activeObject, int maxInaccuracy) {
-        for (int i = 0; i < gameInstance.getObjectNumber(); ++i) {
+        for (int i = 0; i < gameInstance.getObjectCount(); ++i) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             int xDiff = activeObject.state.posX - oi.state.posX, yDiff = activeObject.state.posY - oi.state.posY;
             int dist = xDiff * xDiff + yDiff * yDiff;
@@ -1435,34 +1438,33 @@ public class ObjectFunctions {
         insertIntoStack(gamePanelId, gameInstance, player, objectInstance, aboveInstance, belowInstance, cardMargin);
     }
 
-    public static void insertIntoOwnStack(GamePanel gamePanel, GameInstance gameInstance, Player player, Point2D point, double offset, ObjectInstance objectInstance, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, int insertId, int cardMargin) {
+    public static void insertIntoOwnStack(int id, PrivateArea pa, GameInstance gameInstance, Player player, Point2D point, double offset, ObjectInstance objectInstance, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, int insertId, int cardMargin) {
         IntegerArrayList idList = new IntegerArrayList();
         getOwnedStack(gameInstance, player, idList);
         ObjectState state = objectInstance.state.copy();
         state.owner_id = player.id;
         state.inPrivateArea = true;
         state.isActive = false;
-        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance, state));
-        gamePanel.privateArea.updatePrivateObjects(gameInstance, player);
-        insertIntoStack(gamePanel.id, gameInstance, player, objectInstance, idList, insertId, cardMargin);
-        moveOwnStackToBoardPosition(gamePanel.id, gameInstance, player, point, offset, idList);
-        deselectObject(gamePanel.id, gameInstance, player, objectInstance.id, hoveredObject, selectedObjects);
+        gameInstance.update(new GameObjectInstanceEditAction(id, player, objectInstance, state));
+        pa.updatePrivateObjects(gameInstance, player);
+        insertIntoStack(id, gameInstance, player, objectInstance, idList, insertId, cardMargin);
+        moveOwnStackToBoardPosition(id, gameInstance, player, point, offset, idList);
+        deselectObject(id, gameInstance, player, objectInstance.id, hoveredObject, selectedObjects);
     }
 
-    public static void removeFromOwnStack(GamePanel gamePanel, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList) {
+    public static void removeFromOwnStack(int source, PrivateArea pa, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList) {
         for (ObjectInstance oi : oiList){
-            removeFromOwnStack(gamePanel, gameInstance, player, oi.id);
+            removeFromOwnStack(source, pa, gameInstance, player, oi);
         }
     }
 
-    public static void removeFromOwnStack(GamePanel gamePanel, GameInstance gameInstance, Player player, int id) {
-        ObjectInstance objectInstance = gameInstance.getObjectInstanceById(id);
-        removeObject(gamePanel.id, gameInstance, player, objectInstance);
+    public static void removeFromOwnStack(int source, PrivateArea pa, GameInstance gameInstance, Player player, ObjectInstance objectInstance) {
+        removeObject(source, gameInstance, player, objectInstance);
         ObjectState objectState = objectInstance.state.copy();
         objectState.owner_id = -1;
         objectState.inPrivateArea = false;
-        gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance, objectState));
-        gamePanel.privateArea.updatePrivateObjects(gameInstance, player);
+        gameInstance.update(new GameObjectInstanceEditAction(source, player, objectInstance, objectState));
+        pa.updatePrivateObjects(gameInstance, player);
     }
 
     public static void getObjectOwner(GameInstance gameInstance, ObjectInstance objectInstance, Player player){
@@ -1476,7 +1478,7 @@ public class ObjectFunctions {
         if (objectInstance.go.groups.length > 0) {
             objectGroup = objectInstance.go.groups[0];
         }
-        for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
+        for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
             String oiGroup = oi.go.objectType;
             if (oi.go.groups.length > 0) {
@@ -1590,7 +1592,7 @@ public class ObjectFunctions {
     }
 
     public static void zoomObjects(GameInstance gameInstance, double zooming) {
-        for (int idx = 0; idx < gameInstance.getObjectNumber();++idx) {
+        for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
             ObjectInstance objectInstance = gameInstance.getObjectInstanceByIndex(idx);
             objectInstance.state.posX = (int) (objectInstance.state.posX * zooming);
             objectInstance.state.posY = (int) (objectInstance.state.posY * zooming);
@@ -1712,8 +1714,8 @@ public class ObjectFunctions {
         integerArrayListToObjectList(gameInstance, ial, oiList);
         sortByValue(gameInstance, oiList, reverse);
         for (int i = 0; i < oiList.size(); ++i){
-            removeFromOwnStack(gamePanel, gameInstance, player, oiList.get(i).id);
-            insertIntoOwnStack(gamePanel, gameInstance, player, point, offset, oiList.get(i), hoveredObject, selectedObjects, i, 0);
+            removeFromOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, oiList.get(i));
+            insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, oiList.get(i), hoveredObject, selectedObjects, i, 0);
         }
     }
 

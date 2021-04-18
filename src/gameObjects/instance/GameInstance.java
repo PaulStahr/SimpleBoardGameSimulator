@@ -119,7 +119,7 @@ public class GameInstance {
 	{
 		//return maxDrawValue;
         int maxDrawValue = 0;
-        for (int idx = 0; idx<getObjectNumber(); ++idx){
+        for (int idx = 0; idx<getObjectCount(); ++idx){
             maxDrawValue = max(maxDrawValue, getObjectInstanceByIndex(idx).state.drawValue);
         }
         return maxDrawValue;
@@ -259,7 +259,7 @@ public class GameInstance {
 
 	public ObjectInstance getObjectInstanceByIndex(int index){return this.objects.get(index);}
 
-	public int getObjectNumber(){return this.objects.size();}
+	public int getObjectCount(){return this.objects.size();}
 	
 	public GameObject getObjectByIndex(int index){return this.game.objects.get(index);}
 	

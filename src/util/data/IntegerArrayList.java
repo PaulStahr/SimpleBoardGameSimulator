@@ -48,7 +48,9 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 
 	}
 
-	public void add(int index, int value)
+	public IntegerArrayList(int[] data) {this.length = (this.data = data.clone()).length;}
+
+    public void add(int index, int value)
 	{
 		if (length == data.length){
 			data = Arrays.copyOf(data, Math.max(data.length + 1, data.length * 2));

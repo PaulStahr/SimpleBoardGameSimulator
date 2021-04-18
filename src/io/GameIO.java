@@ -434,7 +434,7 @@ public class GameIO {
 	    	Document doc_inst = new Document();
 	    	Element root_inst = new Element(StringIO.XML);
 
-			for (int idx = 0; idx < gi.getObjectNumber(); idx++) {
+			for (int idx = 0; idx < gi.getObjectCount(); idx++) {
 	        	ObjectInstance ObjectInstance = gi.getObjectInstanceByIndex(idx);
         		root_inst.addContent(createElementFromObjectInstance(ObjectInstance));
         	}

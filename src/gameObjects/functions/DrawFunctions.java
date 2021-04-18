@@ -528,7 +528,7 @@ public class DrawFunctions {
                 stringSelectedObjects.append("; ").append(selectedObjects.get(i));
             }
         }
-        for (int i = 0; i < gameInstance.getObjectNumber(); ++i)
+        for (int i = 0; i < gameInstance.getObjectCount(); ++i)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             if (oi.state.owner_id == player.id) {
@@ -540,7 +540,7 @@ public class DrawFunctions {
             }
         }
 
-        for (int i = 0; i < gameInstance.getObjectNumber(); ++i)
+        for (int i = 0; i < gameInstance.getObjectCount(); ++i)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             if (oi.state.isActive) {
@@ -560,7 +560,7 @@ public class DrawFunctions {
             }
         }
 
-        for (int i = 0; i < gameInstance.getObjectNumber(); ++i)
+        for (int i = 0; i < gameInstance.getObjectCount(); ++i)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             if (oi.state.inPrivateArea) {
