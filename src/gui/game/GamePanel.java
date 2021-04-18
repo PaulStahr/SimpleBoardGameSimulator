@@ -113,7 +113,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	
 	static boolean invert_rotation = false;
 	static boolean show_ping = false;
-	static boolean isDebug = false;
+	public static boolean isDebug = false;
 	static {
 		Options.addModificationListener(new Runnable() {
 

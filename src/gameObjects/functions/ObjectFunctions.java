@@ -1845,6 +1845,7 @@ public class ObjectFunctions {
             gamePanel.privateArea.transformPoint(transformedPoint, transformedPoint);
             int index = gamePanel.privateArea.getPrivateObjectIndexByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY());
             int oId = gamePanel.privateArea.getObjectIdByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY());
+
             if (gamePanel.privateArea.privateObjectsPositions.size() > index && index != -1) {
                 affineTransform.translate(gamePanel.getWidth() / 2, gamePanel.getHeight() - 2 * gamePanel.privateArea.objects.size());
                 affineTransform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));

@@ -38,14 +38,13 @@ public class PrivateAreaTest {
         assertEquals(null, CheckingFunctions.checkPlayerConsistency(-1, new ArrayList<>(), new ArrayList<>(), gi));
         assertEquals(null, CheckingFunctions.checkPlayerConsistency(pl.id, new ArrayList<>(), new ArrayList<>(), gi));
         ObjectState st = oi.state.copy();
-        st.owner_id = pl.id;
         st.aboveInstanceId = -1;
         st.belowInstanceId = -1;
         gi.update(new GameObjectInstanceEditAction(id, pl, oi, st));
-        assertEquals(0, pa.privateObjectsPositions.size());
-        ObjectFunctions.insertIntoOwnStack(id, pa, gi, pl, new Point2D.Double(), 0, oi, oi, new IntegerArrayList(new int[] {oi.id}), oi.id, 1);
-        assertEquals(1, pa.privateObjectsPositions.size());
+        assertEquals(0, pa.objects.size());
+        ObjectFunctions.insertIntoOwnStack(id, pa, gi, pl, new Point2D.Double(), 0, oi, oi, null, 0, 1);
+        assertEquals(1, pa.objects.size());
         ObjectFunctions.removeFromOwnStack(id, pa, gi, pl, oi);
-        assertEquals(0, pa.privateObjectsPositions.size());
+        assertEquals(0, pa.objects.size());
     }
 }

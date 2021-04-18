@@ -161,7 +161,7 @@ public class DrawFunctions {
             }
         }
         g2.setTransform(tmp);
-        if (gamePanel.hoveredObject != null && gameInstance.debug_mode) {
+        if (gamePanel.hoveredObject != null && gamePanel.isDebug) {
             g2.fillRect(gamePanel.hoveredObject.state.posX-5, gamePanel.hoveredObject.state.posY-5, 10, 10);
             if (gamePanel.hoveredObject.state.inPrivateArea && gamePanel.hoveredObject.state.owner_id != -1) {
                 Vector2d mouseBoardPos = new Vector2d();
@@ -170,10 +170,10 @@ public class DrawFunctions {
                 gamePanel.privateArea.transformPoint(transformedPoint, transformedPoint);
                 int index = gamePanel.privateArea.getPrivateObjectIndexByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY());
                 int oId = gamePanel.privateArea.getObjectIdByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY());
-                //ObjectInstance objectInstance = gameInstance.getObjectInstanceById(oId);
+
+
                 if (gamePanel.privateArea.privateObjectsPositions.size() > index && index != -1) {
                     AffineTransform temp = g2.getTransform();
-                    
                     AffineTransform affineTransform = new AffineTransform();
                     affineTransform.translate(gamePanel.getWidth()/2, gamePanel.getHeight()-2*gamePanel.privateArea.objects.size());
                     affineTransform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));
@@ -183,13 +183,6 @@ public class DrawFunctions {
 
                     g2.setTransform(affineTransform);
                     g2.fillRect(- 5, - 5, 10, 10);
-
-                    //double x = g2.getTransform().getTranslateX();
-                    //double y = g2.getTransform().getTranslateY();
-
-                    /*Vector2d boardPos = new Vector2d();
-                    gamePanel.screenToBoardPos((int) x, (int) y, boardPos);*/
-
                     g2.setTransform(temp);
                 }
                 g2.drawString(String.valueOf(index), 0, 0);
