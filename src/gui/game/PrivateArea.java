@@ -1,11 +1,6 @@
 package gui.game;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Point2D;
@@ -34,6 +29,7 @@ public class PrivateArea {
     private final AffineTransform boardToScreenTransformation;
     private final AffineTransform screenToBoardTransformation;
     public Point2D.Double origin = new Point2D.Double();
+    public Point2D.Double basePoint = new Point2D.Double();
 
     public int currentDragPosition = -1;
     public double savedZooming;
@@ -99,7 +95,7 @@ public class PrivateArea {
 
     public double getAngle(int posX, int posY) {
         Point2D baseLine = new Point2D.Double(1, 0);
-        Point2D point = new Point2D.Double(posX - (int) this.origin.getX(), (int) this.origin.getY() - posY);
+        Point2D point = new Point2D.Double(posX - (int) this.basePoint.getX(), (int) this.basePoint.getY() - posY);
         double angle = 180 - Math.toDegrees(Math.atan2(point.getY() - baseLine.getY(), point.getX() - baseLine.getX()));
         return angle;
     }

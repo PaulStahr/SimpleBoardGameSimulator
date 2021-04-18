@@ -589,6 +589,13 @@ public class DrawFunctions {
             stringSortValue.append(objectInstance.state.sortValue);
         }
 
+        Vector2d mouseBoardPos = new Vector2d();
+        gamePanel.screenToBoardPos(gamePanel.mouseScreenX, gamePanel.mouseScreenY, mouseBoardPos);
+        Point2D transformedPoint = new Point2D.Double(mouseBoardPos.getXI(), mouseBoardPos.getYI());
+        gamePanel.privateArea.transformPoint(transformedPoint, transformedPoint);
+        int sectionIndex = gamePanel.privateArea.getPrivateObjectIndexByPosition((int) transformedPoint.getX(), (int) transformedPoint.getY());
+
+
         int yPos = 20;
         int yStep = 20;
         g2.setColor(player.color);
@@ -605,6 +612,8 @@ public class DrawFunctions {
         g2.drawString("Own Hand Cards: " + stringHandCards, 50, yPos);
         yPos+=yStep;
         g2.drawString("Cards in some private Area: " + stringPrivateAreaCards, 50, yPos);
+        yPos+=yStep;
+        g2.drawString("Hand Card Section Id: " + Integer.toString(sectionIndex), 50, yPos);
         yPos+=yStep;
         g2.drawString("Active Objects: " + stringActiveObjects, 50, yPos);
         yPos+=yStep;

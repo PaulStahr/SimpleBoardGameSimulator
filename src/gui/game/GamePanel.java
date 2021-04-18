@@ -1179,6 +1179,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		{
 			gameInstance.update(new PlayerCharacterPositionUpdate(id, player, player, screenToBoardTransformation, getWidth(), getHeight()));
 		}
+		if (privateArea!=null){
+			int privateAreaWidth = 750;
+			int privateAreaHeight = 750;
+			privateArea.basePoint = new Point2D.Double(getWidth()/2, getHeight());
+		}
 	}
 
 	public AffineTransform getBoardToScreenTransform(){return boardToScreenTransformation;}
