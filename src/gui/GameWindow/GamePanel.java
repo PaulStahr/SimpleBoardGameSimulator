@@ -729,7 +729,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			if (isSelectStarted) {
 				ObjectFunctions.getObjectsInsideBox(gameInstance, player, beginSelectPosScreenX, beginSelectPosScreenY, selectWidth, selectHeight, ial, boardToScreenTransformation);
 				if (!arg0.isControlDown()){
-					ObjectFunctions.deselectAllSelected(id, gameInstance, player, ial, hoveredObject, selectedObjects);
+					ObjectFunctions.deselectAllSelected(id, gameInstance, player, ial2, hoveredObject, selectedObjects);
 					ObjectFunctions.selectObjects(id, gameInstance, player, ial, selectedObjects);
 				}
 				else{

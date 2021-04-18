@@ -1034,7 +1034,6 @@ public class ObjectFunctions {
         ial.clear();
         getSelectedObjects(gameInstance, player, ial);
         deselectObjects(gamePanelId, gameInstance, player, ial, hoveredObject, selectedObjects);
-        updateSelectedObjects(gameInstance,player, selectedObjects);
     }
 
 
@@ -1056,8 +1055,8 @@ public class ObjectFunctions {
             state.isActive = true;
             state.isSelected = player.id;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, oi, state));
+            selectedObjects.add(oi.id);
             updateSelectedObjects(gameInstance, player, selectedObjects);
-
         }
 
     }
