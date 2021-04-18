@@ -1,4 +1,4 @@
-package gui.Language;
+package gui.language;
 
 import java.util.HashMap;
 

@@ -26,6 +26,7 @@ import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
+import util.ArrayUtil;
 import util.Buffers;
 
 public class DoubleArrayList extends AbstractList<Double> implements DoubleList{
@@ -138,14 +139,7 @@ public class DoubleArrayList extends AbstractList<Double> implements DoubleList{
 
 	public int indexOf(Double value){return indexOf((double)value);}
 
-	public int indexOf(double value){
-		for (int i=0;i<length;++i){
-			if (data[i] == value){
-				return i;
-			}
-		}
-		return -1;
-	}
+	public int indexOf(double value){return ArrayUtil.linearSearch(data, 0, length, value);}
 
 	public double[] toArrayD() {return Arrays.copyOf(data, length);}
 
@@ -165,16 +159,13 @@ public class DoubleArrayList extends AbstractList<Double> implements DoubleList{
 
     @Override
     public boolean removeIf(Predicate<? super Double> predicate) {
-        int write = 0;
-        int read;
-        for (read = 0; read < size(); ++read)
-        {
-            if (!predicate.test(data[read]))
-            {
-                data[write++] = data[read];
-            }
-        }
-        length = write;
-        return write != read;
+        int oldLength = length;
+        length = ArrayUtil.removeIf(data, 0, length, predicate);
+        return oldLength != length;
     }
+
+	public double average() {
+		return sum() / size();
+	}
+
 }

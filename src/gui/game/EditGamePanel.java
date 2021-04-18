@@ -1,4 +1,4 @@
-package gui.GameWindow;
+package gui.game;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -71,11 +71,11 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
-import gui.Language.Language;
-import gui.Language.LanguageChangeListener;
-import gui.Language.LanguageHandler;
-import gui.Language.Words;
 import gui.game.edit.ObjectEditPanel;
+import gui.language.Language;
+import gui.language.LanguageChangeListener;
+import gui.language.LanguageHandler;
+import gui.language.Words;
 import main.Player;
 import util.ArrayTools;
 import util.JFrameUtils;
@@ -240,7 +240,9 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             Component comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            try {
             comp.setForeground(CheckingFunctions.checkPlayerConsistency(gi.getPlayerByIndex(row).id, tmp, tmp2, gi) == null ? Color.BLACK : Color.RED);
+            }catch(Exception e) {}
             return comp;
         }
 	};

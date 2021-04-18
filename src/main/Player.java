@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 import gameObjects.columnTypes.PlayerColumnType;
 import gameObjects.instance.GameInstance;
-import gui.GameWindow.GamePanel;
+import gui.game.GamePanel;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 

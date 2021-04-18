@@ -1,4 +1,4 @@
-package gui.Language;
+package gui.language;
 
 import java.awt.Component;
 import java.io.IOException;
@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.DataHandler;
-import gui.Language.Language.LanguageSummary;
+import gui.language.Language.LanguageSummary;
 import util.ListTools;
 
 public class LanguageHandler {

@@ -48,9 +48,9 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 
 	}
 
-	public void fill(IntBuffer buf){Buffers.fillIntBuffer(buf, data, length);}
+	public IntegerArrayList(int[] data) {this.length = (this.data = data.clone()).length;}
 
-	public void add(int index, int value)
+    public void add(int index, int value)
 	{
 		if (length == data.length){
 			data = Arrays.copyOf(data, Math.max(data.length + 1, data.length * 2));
@@ -67,6 +67,8 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		--length;
 		return tmp;
 	}
+
+	public void fill(IntBuffer buf){Buffers.fillIntBuffer(buf, data, length);}
 
 	@Override
 	public Integer remove(int index){return removeI(index);}
@@ -114,12 +116,9 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 
 	private void enlargeTo(int length)
 	{
-		if (length > data.length)
-		{
-			this.data = Arrays.copyOf(this.data, Math.max(this.data.length, data.length * 2));
-		}
+		if (length > data.length){this.data = Arrays.copyOf(this.data, Math.max(this.data.length, data.length * 2));}
 	}
-	
+
 	public void add(int data[], int begin, int end)
 	{
 		enlargeTo(length + end - begin);
@@ -188,9 +187,7 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 		}
 
 		@Override
-		public int size() {
-			return length;
-		}
+		public int size() {return length;}
 		
 		@Override
 		public final void setElem(int index, int elem){throw new RuntimeException();}
@@ -216,25 +213,15 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 	    }
 	    return strB;
 	}
-	
+
 	@Override
-    public String toString(){
-	    return toString(new StringBuilder()).toString();
-	}
+    public String toString(){return toString(new StringBuilder()).toString();}
 
     @Override
     public boolean removeIf(Predicate<? super Integer> predicate) {
-        int write = 0;
-        int read;
-        for (read = 0; read < size(); ++read)
-        {
-            if (!predicate.test(data[read]))
-            {
-                data[write++] = data[read];
-            }
-        }
-        length = write;
-        return write != read;
+        int oldLength = length;
+        length = ArrayUtil.removeIf(data, 0, length, predicate);
+        return oldLength != length;
     }
 
     @Override

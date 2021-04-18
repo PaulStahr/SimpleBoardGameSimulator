@@ -1,4 +1,4 @@
-package gui.ServerWindow;
+package gui.server;
 
 import static test.SimpleNetworkServertest.connectAndStartGame;
 import static test.SimpleNetworkServertest.startNewServer;
@@ -19,12 +19,13 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 
-import gui.CreateGames.CreateNewGameWindow;
-import gui.GameWindow.GameWindow;
-import gui.Language.Language;
-import gui.Language.LanguageChangeListener;
-import gui.Language.LanguageHandler;
-import gui.Language.Words;
+import gui.create.CreateNewGameWindow;
+import gui.game.GameWindow;
+import gui.language.Language;
+import gui.language.LanguageChangeListener;
+import gui.language.LanguageHandler;
+import gui.language.Words;
+
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

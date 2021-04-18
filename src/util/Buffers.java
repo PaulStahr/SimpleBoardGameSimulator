@@ -87,6 +87,11 @@ public abstract class Buffers
     {
     	buf.put(pos++, (float)vec.z).put(pos++, (float)vec.y).put(pos++, (float)vec.x);
     }
+    
+    public static final void putRev(IntBuffer buf, Vector3d vec, int pos)
+    {
+    	buf.put(pos++, (int)vec.z).put(pos++, (int)vec.y).put(pos++, (int)vec.x);
+    }
 
     public static final void get(IntBuffer buf, Vector3d vec, int pos)
     {
@@ -131,7 +136,7 @@ public abstract class Buffers
     public static final FloatBuffer createFloatBuffer(float... data){
         return fillFloatBuffer(createFloatBuffer(data.length), data);
     }
-    
+
     public static final FloatBuffer ensureCapacity(int elements, FloatBuffer floatBuffer)
     {
     	if (floatBuffer == null || elements > floatBuffer.capacity())
@@ -141,7 +146,7 @@ public abstract class Buffers
     	floatBuffer.limit(elements);
     	return floatBuffer;
     }
-    
+
 	public static final IntBuffer ensureCapacity(int elements, IntBuffer intBuffer) {
     	if (intBuffer == null || elements > intBuffer.capacity())
     	{
@@ -232,7 +237,15 @@ public abstract class Buffers
     public static final IntBuffer createIntBuffer(int data[]){
         return fillIntBuffer(createIntBuffer(data.length), data);
     }
-    
+
+    /**
+     * Erzeugt einen direkten IntBuffer
+     * @param data[] Inhalt des Buffers
+     */
+    public static final FloatBuffer createFloatBuffer(int data[]){
+        return fillFloatBuffer(createFloatBuffer(data.length), data);
+    }
+
     /**
      * Erzeugt einen direkten ByteBuffer
      * @param data[] Inhalt des Buffers
@@ -240,14 +253,23 @@ public abstract class Buffers
     public static final ByteBuffer createByteBuffer(byte data[]){
         return fillByteBuffer(createByteBuffer(data.length), data, data.length);
     }
-    
+
     /**
      * F\u00FCllt einen Buffer mit Integer Werten
      * @param buf der IntBuffer der gef\u00FCllt werden soll
      * @param data[] die Daten mit denen der IntBuffer gef\u00FCllt werden soll
      */
-    public static final IntBuffer fillIntBuffer(IntBuffer buf, int data[]){
-        return fillIntBuffer(buf, data, data.length);
+    public static final IntBuffer fillIntBuffer(IntBuffer buf, int data[]){return fillIntBuffer(buf, data, data.length);}
+
+    /**
+     * F\u00FCllt einen Buffer mit Integer Werten
+     * @param buf der IntBuffer der gef\u00FCllt werden soll
+     * @param data[] die Daten mit denen der IntBuffer gef\u00FCllt werden soll
+     */
+    public static final FloatBuffer fillFloatBuffer(FloatBuffer buf, int data[]){
+        for (int i=0;i<data.length;i++)
+            buf.put(i,data[i]);
+        return buf;
     }
 
     public static final IntBuffer fillIntBuffer(IntBuffer buf, int data[], int size){

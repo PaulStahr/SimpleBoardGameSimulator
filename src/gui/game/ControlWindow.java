@@ -1,12 +1,12 @@
-package gui.GameWindow;
+package gui.game;
 
 import javax.swing.JFrame;
 
 import gameObjects.instance.GameInstance;
-import gui.Language.Language;
-import gui.Language.LanguageChangeListener;
-import gui.Language.LanguageHandler;
-import gui.Language.Words;
+import gui.language.Language;
+import gui.language.LanguageChangeListener;
+import gui.language.LanguageHandler;
+import gui.language.Words;
 
 public class ControlWindow extends JFrame implements LanguageChangeListener {
     /**

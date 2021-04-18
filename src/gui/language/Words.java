@@ -1,4 +1,4 @@
-package gui.Language;
+package gui.language;
 
 public enum Words {
     new_game,

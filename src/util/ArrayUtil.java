@@ -5,8 +5,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.function.Predicate;
 
-import gameObjects.instance.ObjectInstance;
 import util.data.DoubleList;
 import util.data.IntegerArrayList;
 import util.data.IntegerList;
@@ -185,9 +185,9 @@ public class ArrayUtil {
 				return i;
 			}
 		}
-		return -1;	
+		return -1;
 	}
-	
+
 	public static final int linearSearch(Object data[], Object value)
 	{
 		return linearSearch(data, 0, data.length, value);
@@ -207,11 +207,11 @@ public class ArrayUtil {
 	
 	public static final int linearSearch(int data[], int begin, int end, int value)
 	{
-		for (int i = begin; i < end; ++i)
+		for (; begin < end; ++begin)
 		{
-			if (data[i] == value)
+			if (data[begin] == value)
 			{
-				return i;
+				return begin;
 			}
 		}
 		return -1;
@@ -219,11 +219,11 @@ public class ArrayUtil {
 	
 	public static final int linearSearch(byte data[], int begin, int end, byte value)
 	{
-		for (int i = begin; i < end; ++i)
+		for (; begin < end; ++begin)
 		{
-			if (data[i] == value)
+			if (data[begin] == value)
 			{
-				return i;
+				return begin;
 			}
 		}
 		return -1;
@@ -234,17 +234,18 @@ public class ArrayUtil {
 		return firstEqualIndex(data, 0, data.length, value);
 	}
 
-	public static final int firstEqualIndex(Object data[], int begin, int end, Object value)
-	{
-		for (int i = begin; i < end; ++i)
-		{
-			if (value.equals(data[i]))
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
+    
+    public static int firstEqualIndex(Object data[], int begin, int end, Object key)
+    {
+        for (; begin < end; ++begin)
+        {
+            if (data[begin].equals(key))
+            {
+                return begin;
+            }
+        }
+        return -1;
+    }
 	
 	public static final float[] setToLength(float[] data, int length) {return data.length == length ? data : new float[length];}
 
@@ -321,22 +322,29 @@ public class ArrayUtil {
 		}*/
 	}
 
-	public static void normalizeTo(float[] imageColorArray, int begin, int end, float to) {
+	/*
+	 * Normalizes the array in a way, that the highest value is equal to to
+	 * Returns the scaling factor which was needed to achive this
+	 * 
+	 */
+	public static float normalizeTo(float[] imageColorArray, int begin, int end, float to) {
 		float max = max(imageColorArray, begin, end);
 		if (max == 0)
 		{
-			return;
+			return 0;
 		}
 		float mult = to / max;
-		for (;begin < end; ++begin)
-		{
-			imageColorArray[begin] *= mult;			
-		}
-		/*long mult = ((long)to * (long)Integer.MAX_VALUE) / max;
-		for (; begin != end; ++begin)
-		{
-			imageColorArray[begin] = (int)(((long)imageColorArray[begin] * mult) >> 31) ;
-		}*/
+		mult(imageColorArray, begin, end, mult);
+		return mult;
+	}
+
+	public static float normQ(float data[], int begin, int end, float init)
+	{
+	    for (; begin < end; ++begin)
+	    {
+	        init += data[begin] * data[begin];
+	    }
+	    return init;
 	}
 
 	public static void multAdd(float[] in, int iBegin, int iEnd, int[] out, int oBegin, int mult) {
@@ -365,7 +373,7 @@ public class ArrayUtil {
 		return res;
 	}
 
-	public static int firstUnequalIndex(Object data[], int begin, int end, Object key)
+	public static int firstUnsameIndex(Object data[], int begin, int end, Object key)
 	{
 		for (; begin < end; ++begin)
 		{
@@ -384,10 +392,18 @@ public class ArrayUtil {
 		}
 	}
 	
-	public static void setTo(float[] data0, int begin0, int end0, int[] data1, int begin1, float mult) {
-		for (; begin0 != end0; ++begin0, ++begin1)
+	public static void setTo(float[] input, int ibegin, int oend, int[] output, int obegin, float mult) {
+		if (input == null)
 		{
-			data1[begin1] = (int)(data0[begin0] * mult);
+			throw new NullPointerException("InputArray IsNull");
+		}
+		if (output == null)
+		{
+			throw new NullPointerException("OutputArray Is Null");
+		}
+		for (; ibegin != oend; ++ibegin, ++obegin)
+		{
+			output[obegin] = (int)(input[ibegin] * mult);
 		}
 	}
 
@@ -508,9 +524,11 @@ public class ArrayUtil {
 		}
 	}
 
-	public static void indexOf(int[] data, int i, int length, int value) {
-		// TODO Auto-generated method stub
-		
+	public static void arraycopy(float[] input, int inputBegin, int[] output, int outputBegin, int size) {
+		for (size += inputBegin; inputBegin < size; ++inputBegin, ++outputBegin)
+		{
+			output[outputBegin] = (int)input[inputBegin];
+		}
 	}
 
 	public static void setLementsAt(byte[] output, int[] inputIndices, byte[] inputValues) {
@@ -520,10 +538,10 @@ public class ArrayUtil {
 		}
 	}
 
-	public static void sortWeak(ArrayList<ObjectInstance> tmp, Comparator<ObjectInstance> comparator) {
+	public static <E> void sortWeak(ArrayList<E> tmp, Comparator<E> comparator) {
 		for (int i = 0; i < tmp.size(); ++i)
 		{
-			ObjectInstance current_min = tmp.get(i);
+			E current_min = tmp.get(i);
 			int current_min_index = i;
 			for (int j = i + 1; j < tmp.size(); ++j)
 			{
@@ -553,6 +571,36 @@ public class ArrayUtil {
         return result;
     }
 
+	public static void arraycopy(float[] source, int inputBegin, double[] dest, int outputBegin, int size) {
+		if (inputBegin + size > source.length) {throw new ArrayIndexOutOfBoundsException("Index " + size + inputBegin + " out of bounds for length " + source.length);}
+		if (outputBegin + size > dest.length)	{throw new ArrayIndexOutOfBoundsException("Index " + size + outputBegin + " out of bounds for length " + dest.length);}
+		for (size += inputBegin; inputBegin < size; ++inputBegin, ++outputBegin)
+		{
+			dest[outputBegin] = source[inputBegin];
+		}
+	}
+
+	public static int linearSearch(double[] data, int begin, int end, double value) {
+		for (int i = begin; i < end; ++i)
+		{
+			if (data[i] == value)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
+    public static double distanceQ(float[] data0, int begin0, float[] data1, int begin1, int size) {
+        double result = 0;
+        for (size += begin0; begin0 < size; ++begin0, ++begin1)
+        {
+            double diff = data0[begin0] - data1[begin1];
+            result += diff * diff;
+        }
+        return result;
+    }
+
     public static void unifySorted(IntegerArrayList ial) {
         if (ial.isEmpty()) {return;}
         int current = ial.getI(0);
@@ -566,5 +614,41 @@ public class ArrayUtil {
         }
         ial.set(write, current);
         ial.removeRange(write, ial.size());
+    }
+
+    public static final int removeIf(byte[] data, int begin, int end, Predicate<? super Byte> predicate) {
+        int write = 0;
+        for (; begin < end; ++begin)
+        {
+            if (!predicate.test(data[begin]))
+            {
+                data[write++] = data[begin];
+            }
+        }
+        return write;
+    }
+    
+    public static final int removeIf(int[] data, int begin, int end, Predicate<? super Integer> predicate) {
+        int write = 0;
+        for (; begin < end; ++begin)
+        {
+            if (!predicate.test(data[begin]))
+            {
+                data[write++] = data[begin];
+            }
+        }
+        return write;
+    }
+    
+    public static final int removeIf(double[] data, int begin, int end, Predicate<? super Double> predicate) {
+        int write = 0;
+        for (; begin < end; ++begin)
+        {
+            if (!predicate.test(data[begin]))
+            {
+                data[write++] = data[begin];
+            }
+        }
+        return write;
     }
 }

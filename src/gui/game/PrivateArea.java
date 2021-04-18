@@ -1,4 +1,4 @@
-package gui.GameWindow;
+package gui.game;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -38,6 +38,11 @@ public class PrivateArea {
     public int currentDragPosition = -1;
     public double savedZooming;
 
+    public PrivateArea(AffineTransform boardToScreenTransformation, AffineTransform screenToBoardTransformation) {
+        this.boardToScreenTransformation = boardToScreenTransformation;
+        this.screenToBoardTransformation = screenToBoardTransformation;
+    }
+
     public PrivateArea(GamePanel gamePanel, GameInstance gameInstance, AffineTransform boardToScreenTransformation, AffineTransform screenToBoardTransformation) {
         this.boardToScreenTransformation = boardToScreenTransformation;
         this.screenToBoardTransformation = screenToBoardTransformation;
@@ -50,9 +55,8 @@ public class PrivateArea {
     	}
     	else
     	{
-	        Shape privateArea = new Arc2D.Double(posX, posY, width*zooming, height*zooming, 0, 180, Arc2D.OPEN);
-	        this.shape = privateArea;
-	        this.width = (int) width;
+	        this.shape = new Arc2D.Double(posX, posY, width*zooming, height*zooming, 0, 180, Arc2D.OPEN);;
+	        this.width = (int) width;//TODO shouldn't this be executed in both cases?
 	        this.height = (int) height;
             this.origin.setLocation(posX + width/2, posY + height/2);
     	}
@@ -78,11 +82,10 @@ public class PrivateArea {
     }
 
     public boolean containsBoardCoordinates(int posX, int posY) {
-        Point2D transformedPoint = boardToScreenTransformation.transform(new Point2D.Double(posX, posY), null);
-        if (shape != null) {
-            return transformedPoint != null && shape.contains(transformedPoint);
-        }
-        return false;
+        if (shape == null){return false;}
+        Point2D transformedPoint = new Point2D.Double(posX, posY);
+        boardToScreenTransformation.transform(transformedPoint, transformedPoint);
+        return shape.contains(transformedPoint);
     }
 
     public boolean containsScreenCoordinates(int posX, int posY) {

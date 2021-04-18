@@ -78,7 +78,7 @@ public class StreamUtil {
             }
 	    }
 	}
-	
+
 	public static final void copy(InputStream in, OutputStream out) throws IOException{
 		byte data[] = new byte[4096];
         int len = 0;

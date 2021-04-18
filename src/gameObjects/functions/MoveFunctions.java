@@ -10,7 +10,7 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
 import geometry.Vector2d;
-import gui.GameWindow.GamePanel;
+import gui.game.GamePanel;
 import main.Player;
 import util.data.IntegerArrayList;
 
