@@ -23,7 +23,7 @@ import util.JFrameUtils;
 public class ExitProgram {
     private final int id = (int)System.nanoTime();
     @Test
-    public void testNoRemainingWindow() throws IOException, JDOMException, InvocationTargetException, InterruptedException {
+    public void testNoRemainingWindow() throws Throwable {
         final AtomicBoolean exitCalled = new AtomicBoolean(false);
         final AtomicBoolean awtMethodRan = new AtomicBoolean(false);
         Runnable origExitRunnable = DataHandler.swapExitRunnable(new Runnable() {
@@ -71,6 +71,8 @@ public class ExitProgram {
             }
         }catch(IOException| JDOMException e) {
             throw e;
+        }catch(InvocationTargetException e) {
+            throw e.getTargetException();
         }finally {
             DataHandler.swapExitRunnable(origExitRunnable);
         }
