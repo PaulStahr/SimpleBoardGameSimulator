@@ -1,6 +1,7 @@
 package test.gui;
 
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -45,7 +46,11 @@ public class ExitProgram {
                     GameWindow gw = new GameWindow(gi, pl, lh);
                     gw.setVisible(true);
                     gw.dispatchEvent(new WindowEvent(gw, WindowEvent.WINDOW_CLOSING));
-                    gw.dispatchEvent(new WindowEvent(gw, WindowEvent.WINDOW_CLOSED));
+                    WindowEvent windowClosedEvent = new WindowEvent(gw, WindowEvent.WINDOW_CLOSED);
+                    for (WindowListener wl : gw.getWindowListeners())
+                    {
+                        wl.windowClosed(windowClosedEvent);
+                    }
                 }
             });
             synchronized(exitCalled)
