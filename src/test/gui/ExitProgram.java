@@ -24,6 +24,7 @@ public class ExitProgram {
     @Test
     public void testNoRemainingWindow() throws IOException, JDOMException {
         final AtomicBoolean exitCalled = new AtomicBoolean(false);
+        final AtomicBoolean awtMethodRan = new AtomicBoolean(false);
         Runnable origExitRunnable = DataHandler.swapExitRunnable(new Runnable() {
             @Override
             public void run() {
@@ -51,8 +52,10 @@ public class ExitProgram {
                     {
                         wl.windowClosed(windowClosedEvent);
                     }
+                    awtMethodRan.set(true);
                 }
             });
+            assert(awtMethodRan.get());
             synchronized(exitCalled)
             {
                 if (!exitCalled.get())
