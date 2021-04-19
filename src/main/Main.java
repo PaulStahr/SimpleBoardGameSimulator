@@ -102,7 +102,7 @@ public class Main {
     	}
     	try {
     		int port = 8000 + (int)(Math.random() * 100);
-    		JFrameUtils.runByDispatcherAndWait(new Runnable() {
+    		JFrameUtils.runByDispatcherAndWaitNoExcept(new Runnable() {
     		    @Override
                 public void run() {
     	            ServerLobbyWindow slw = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection("127.0.0.1", port), lh);

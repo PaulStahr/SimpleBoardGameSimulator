@@ -3,6 +3,7 @@ package test.gui;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.jdom2.JDOMException;
@@ -22,7 +23,7 @@ import util.JFrameUtils;
 public class ExitProgram {
     private final int id = (int)System.nanoTime();
     @Test
-    public void testNoRemainingWindow() throws IOException, JDOMException {
+    public void testNoRemainingWindow() throws IOException, JDOMException, InvocationTargetException, InterruptedException {
         final AtomicBoolean exitCalled = new AtomicBoolean(false);
         final AtomicBoolean awtMethodRan = new AtomicBoolean(false);
         Runnable origExitRunnable = DataHandler.swapExitRunnable(new Runnable() {
