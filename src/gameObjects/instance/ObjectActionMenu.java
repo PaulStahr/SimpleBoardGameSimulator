@@ -70,8 +70,6 @@ public class ObjectActionMenu {
                 /*Shuffle objects on a stack*/
                 ObjectFunctions.shuffleStack(gamePanel.id, gameInstance, player, objectInstance);
                 gamePanel.playAudio(GamePanel.AudioClip.shuffle);
-                .setFramePosition(0);
-                gamePanel.audioClips.get("shuffle").start();
             }
         });
 
