@@ -26,6 +26,7 @@ public class ObjectInstance {
 			return o.id;
 		}
 	};
+    public static enum Relation{ABOVE, BELOW};
 	public final ObjectState state;
 	public final GameObject go;
 	public final int id;

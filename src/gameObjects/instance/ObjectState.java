@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 
+import gameObjects.instance.ObjectInstance.Relation;
 import io.ObjectStateIO;
 import util.data.IntegerArrayList;
 
@@ -42,6 +43,7 @@ public abstract class ObjectState implements Serializable {
     public int boxId = -1;
     public boolean inBox = false;
 
+    public int getRelatedId(Relation r) {return r == Relation.ABOVE ? aboveInstanceId : belowInstanceId;}
 
     @Override
 	public int hashCode()
@@ -169,6 +171,7 @@ public abstract class ObjectState implements Serializable {
 				&& this.liesOnId == os.liesOnId
 				&& this.aboveLyingObectIds.equals(os.aboveLyingObectIds)
 	            && this.value == os.value
+	            && this.sortValue == os.sortValue
 	            && this.drawValue == os.drawValue
 	            && this.rotationStep == os.rotationStep
 				&& this.boxId == os.boxId

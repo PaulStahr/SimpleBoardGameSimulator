@@ -5,9 +5,14 @@ import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
 
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.definition.*;
+import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectBox;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.ObjectInstance.Relation;
 import gameObjects.instance.ObjectState;
 import geometry.Vector2d;
 import gui.game.GamePanel;
@@ -152,7 +157,7 @@ public class MoveFunctions {
     public static void moveAboveStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY, boolean include) {
         if (stackObject != null && stackObject.go instanceof GameObjectToken) {
             IntegerArrayList tmp = new IntegerArrayList();
-            ObjectFunctions.getAboveStack(gameInstance, stackObject, include, tmp);
+            ObjectFunctions.getToOneEnd(gameInstance, stackObject, include, tmp, Relation.ABOVE);
             moveStackTo(gamePanelId, gameInstance, player, tmp, posX, posY);
         }
     }
@@ -174,7 +179,7 @@ public class MoveFunctions {
     public static void moveAboveStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance targetObjectInstance, boolean include) {
         if (stackObject != null && stackObject.go instanceof GameObjectToken) {
             IntegerArrayList tmp = new IntegerArrayList();
-            ObjectFunctions.getAboveStack(gameInstance, stackObject, include, tmp);
+            ObjectFunctions.getToOneEnd(gameInstance, stackObject, include, tmp, Relation.ABOVE);
             moveStackTo(gamePanelId, gameInstance, player, tmp, targetObjectInstance);
         }
     }
@@ -198,7 +203,7 @@ public class MoveFunctions {
     public static void moveBelowStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, int posX, int posY, boolean include) {
         if (stackObject != null && stackObject.go instanceof GameObjectToken) {
             IntegerArrayList ial = new IntegerArrayList();
-            ObjectFunctions.getBelowStack(gameInstance, stackObject, include, ial);
+            ObjectFunctions.getToOneEnd(gameInstance, stackObject, include, ial, Relation.BELOW);
             moveStackTo(gamePanelId, gameInstance, player, ial, posX, posY);
         }
     }
@@ -220,7 +225,7 @@ public class MoveFunctions {
     public static void moveBelowStackTo(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance stackObject, ObjectInstance targetObjectInstance, boolean include) {
         if (stackObject != null && stackObject.go instanceof GameObjectToken) {
             IntegerArrayList ial = new IntegerArrayList();
-            ObjectFunctions.getBelowStack(gameInstance, stackObject, include, ial);
+            ObjectFunctions.getToOneEnd(gameInstance, stackObject, include, ial, Relation.BELOW);
             moveStackTo(gamePanelId, gameInstance, player, ial, targetObjectInstance);
         }
     }
