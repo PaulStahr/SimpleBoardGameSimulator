@@ -89,20 +89,14 @@ public abstract class DataHandler
     };
 
 	public static void closeWindow(Window window) {
-	    System.out.println("hunululu");
 	    java.awt.Window win[] = java.awt.Window.getWindows();
 	    for (int i = 0; i < win.length; ++i)
 	    {
-	        if (win[i].isVisible()) {
-	            return;
-	        }
+	        if (win[i].isVisible()) {return;}
 	    }
 	    for (int i = 0; i < exitProgramPredicates.size(); ++i)
 	    {
-	        if (exitProgramPredicates.get(i).getAsBoolean())
-	        {
-	            return;
-	        }
+	        if (exitProgramPredicates.get(i).getAsBoolean()){return;}
 	    }
 	    exitRunnable.run();
 	}

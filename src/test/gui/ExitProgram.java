@@ -34,31 +34,32 @@ public class ExitProgram {
             }
         });
         try {
-        LanguageHandler lh = new LanguageHandler(new LanguageSummary("de", "de"));
-        GameInstance gi = new GameInstance(new Game(), "Foo");
-        GameIO.readSnapshotFromZip(DataHandler.getResourceAsStream("test/games/MinimalGame.zip"), gi);
-        Player pl = new Player("Max", 4);
-        gi.addPlayer(new PlayerAddAction(id, pl), pl);
-        JFrameUtils.runByDispatcherAndWait(new Runnable() {
-            @Override
-            public void run() {
-                GameWindow gw = new GameWindow(gi, pl, lh);
-                gw.setVisible(true);
-                gw.dispatchEvent(new WindowEvent(gw, WindowEvent.WINDOW_CLOSING));
-            }
-        });
-        synchronized(exitCalled)
-        {
-            if (!exitCalled.get())
-            {
-                try {
-                exitCalled.wait(100);
-                }catch(InterruptedException e) {
-                    e.printStackTrace();
+            LanguageHandler lh = new LanguageHandler(new LanguageSummary("de", "de"));
+            GameInstance gi = new GameInstance(new Game(), "Foo");
+            GameIO.readSnapshotFromZip(DataHandler.getResourceAsStream("test/games/MinimalGame.zip"), gi);
+            Player pl = new Player("Max", 4);
+            gi.addPlayer(new PlayerAddAction(id, pl), pl);
+            JFrameUtils.runByDispatcherAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    GameWindow gw = new GameWindow(gi, pl, lh);
+                    gw.setVisible(true);
+                    gw.dispatchEvent(new WindowEvent(gw, WindowEvent.WINDOW_CLOSING));
+                    gw.dispatchEvent(new WindowEvent(gw, WindowEvent.WINDOW_CLOSED));
                 }
-                assert(exitCalled.get());
+            });
+            synchronized(exitCalled)
+            {
+                if (!exitCalled.get())
+                {
+                    try {
+                        exitCalled.wait(100);
+                    }catch(InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    assert(exitCalled.get());
+                }
             }
-        }
         }catch(IOException| JDOMException e) {
             throw e;
         }finally {
