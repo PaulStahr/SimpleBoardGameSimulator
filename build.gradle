@@ -17,6 +17,13 @@ dependencies {
     compile 'junit:junit:4.12'
 }
 
+test {
+    testLogging {
+        events "failed"
+        showStackTraces true
+        exceptionFormat "full"
+    }
+}
 mainClassName = 'main.Main'
 sourceSets.main.java.srcDirs = ['src']
 sourceSets.test.java.srcDirs = ['src/test']

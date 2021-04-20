@@ -20,6 +20,7 @@ import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.ObjectInstance.Relation;
 import gameObjects.instance.ObjectState;
 import geometry.Vector2;
 import geometry.Vector2d;
@@ -175,76 +176,49 @@ public class ObjectFunctions {
      * @param included       if objectInstance should be included default is true
      * @return all ids of above Elements in the Stack starting with the bottom id
      */
-    public static void getAboveStack(GameInstance gameInstance, ObjectInstance objectInstance, boolean included, IntegerArrayList objectStack) {
+    public static void getToOneEnd(GameInstance gameInstance, ObjectInstance objectInstance, boolean included, IntegerArrayList objectStack, Relation relation) {
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
             objectStack.clear();
             if (included) {
                 objectStack.add(objectInstance.id);
             }
             ObjectInstance currentObjectInstance = objectInstance;
-            while (currentObjectInstance.state.aboveInstanceId != -1) {
-                objectStack.add(currentObjectInstance.state.aboveInstanceId);
-                currentObjectInstance = gameInstance.getObjectInstanceById(currentObjectInstance.state.aboveInstanceId);
+            int next;
+            while ((next = currentObjectInstance.state.getRelatedId(relation)) != -1) {
+                objectStack.add(next);
+                currentObjectInstance = gameInstance.getObjectInstanceById(next);
                 if (gameInstance.getObjectCount() < objectStack.size()) {
-                    throw new RuntimeException("Circle in stack" + gameInstance.getObjectCount() + objectStack.size());
+                    throw new RuntimeException("Circle in stack " + objectStack.toString() + " has more elements than the whole game " + gameInstance.getObjectCount());
                 }
             }
         }
     }
 
-    public static void getAboveStack(GameInstance gameInstance, ObjectInstance objectInstance, boolean included, ArrayList<ObjectInstance> oiList) {
+    public static void getToOneEnd(GameInstance gameInstance, ObjectInstance objectInstance, boolean included, ArrayList<ObjectInstance> oiList, Relation relation) {
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
             oiList.clear();
             if (included) {
                 oiList.add(objectInstance);
             }
             ObjectInstance currentObjectInstance = objectInstance;
-            while (currentObjectInstance.state.aboveInstanceId != -1) {
-                oiList.add(gameInstance.getObjectInstanceById(currentObjectInstance.state.aboveInstanceId));
-                currentObjectInstance = gameInstance.getObjectInstanceById(currentObjectInstance.state.aboveInstanceId);
+            int next;
+            while ((next = currentObjectInstance.state.getRelatedId(relation)) != -1) {
+                currentObjectInstance = gameInstance.getObjectInstanceById(next);
+                oiList.add(currentObjectInstance);
                 if (gameInstance.getObjectCount() < oiList.size()) {
-                    throw new RuntimeException("Circle in stack" + gameInstance.getObjectCount() + oiList.size());
+                    throw new RuntimeException("Circle in stack " + gameInstance.getObjectCount() + oiList.size());
                 }
             }
         }
     }
 
-    public static void getAboveStack(GameInstance gameInstance, ObjectInstance objectInstance, IntegerArrayList objectStack) {
-        getAboveStack(gameInstance, objectInstance, true, objectStack);
+    public static void getStackToOneEnd(GameInstance gameInstance, ObjectInstance objectInstance, IntegerArrayList objectStack, Relation relation) {
+        getToOneEnd(gameInstance, objectInstance, true, objectStack, relation);
     }
 
-    public static void getAboveStack(GameInstance gameInstance, ObjectInstance objectInstance, ArrayList<ObjectInstance> oiList) {
-        getAboveStack(gameInstance, objectInstance, true, oiList);
+    public static void getStackToOneEnd(GameInstance gameInstance, ObjectInstance objectInstance, ArrayList<ObjectInstance> oiList, Relation relation) {
+        getToOneEnd(gameInstance, objectInstance, true, oiList,relation);
     }
-
-    /**
-     * @param gameInstance   Instance of the game
-     * @param objectInstance Instance of the object
-     * @param included       if objectInstance should be included default is true
-     * @return all ids of below Elements in the Stack starting with the bottom id
-     */
-    public static void getBelowStack(GameInstance gameInstance, ObjectInstance objectInstance, boolean included, IntegerArrayList objectStack) {
-        if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
-            objectStack.clear();
-            if (included) {
-                objectStack.add(objectInstance.id);
-            }
-            ObjectInstance currentObjectInstance = objectInstance;
-            while (currentObjectInstance.state.belowInstanceId != -1) {
-            	if (objectStack.size() > gameInstance.getObjectInstanceList().size())
-            	{
-            		throw new RuntimeException();
-            	}
-                objectStack.add(currentObjectInstance.state.belowInstanceId);
-                currentObjectInstance = gameInstance.getObjectInstanceById(currentObjectInstance.state.belowInstanceId);
-            }
-        }
-    }
-
-    public static void getBelowStack(GameInstance gameInstance, ObjectInstance objectInstance, IntegerArrayList ial) {
-        getBelowStack(gameInstance, objectInstance, true, ial);
-    }
-
 
     /**
      * @param gameInstance   Instance of the game
@@ -253,7 +227,7 @@ public class ObjectFunctions {
      */
     public static void getStackFromTop(GameInstance gameInstance, ObjectInstance objectInstance, IntegerArrayList ial) {
         ial.clear();
-        getBelowStack(gameInstance, getStackTop(gameInstance, objectInstance), ial);
+        getStackToOneEnd(gameInstance, getStackTop(gameInstance, objectInstance), ial, Relation.BELOW);
     }
 
     /**
@@ -263,12 +237,12 @@ public class ObjectFunctions {
      */
     public static void getStackFromBottom(GameInstance gameInstance, ObjectInstance objectInstance, IntegerArrayList objectStack) {
         objectStack.clear();
-        getAboveStack(gameInstance, getStackBottom(gameInstance, objectInstance), objectStack);
+        getStackToOneEnd(gameInstance, getStackBottom(gameInstance, objectInstance), objectStack, Relation.ABOVE);
     }
 
     public static void getStackFromBottom(GameInstance gameInstance, ObjectInstance objectInstance, ArrayList<ObjectInstance> oiList) {
         oiList.clear();
-        getAboveStack(gameInstance, getStackBottom(gameInstance, objectInstance), oiList);
+        getStackToOneEnd(gameInstance, getStackBottom(gameInstance, objectInstance), oiList, Relation.ABOVE);
     }
 
     /**
@@ -467,7 +441,7 @@ public class ObjectFunctions {
     public static int countAboveStack(GameInstance gameInstance, ObjectInstance stackObject, boolean include) {
         if (stackObject != null && stackObject.go instanceof GameObjectToken) {
             IntegerArrayList stack = new IntegerArrayList();
-            getAboveStack(gameInstance, stackObject, include, stack);
+            getToOneEnd(gameInstance, stackObject, include, stack, Relation.ABOVE);
             return stack.size();
         }
         return 0;
@@ -488,7 +462,7 @@ public class ObjectFunctions {
     public static int countBelowStack(GameInstance gameInstance, ObjectInstance stackObject, boolean include) {
         if (stackObject != null && stackObject.go instanceof GameObjectToken) {
             IntegerArrayList ial = new IntegerArrayList();
-            getBelowStack(gameInstance, stackObject, include, ial);
+            getToOneEnd(gameInstance, stackObject, include, ial, Relation.BELOW);
             return ial.size();
         }
         return 0;
@@ -509,7 +483,7 @@ public class ObjectFunctions {
     public static int countStackValues(GameInstance gameInstance, ObjectInstance stackObject, boolean include) {
         if (stackObject != null && stackObject.go instanceof GameObjectToken) {
             IntegerArrayList stackIds = new IntegerArrayList();
-            getBelowStack(gameInstance, stackObject, include, stackIds);
+            getToOneEnd(gameInstance, stackObject, include, stackIds, Relation.BELOW);
             int counter = 0;
             for (int id : stackIds) {
                 ObjectInstance currentObject = gameInstance.getObjectInstanceById(id);
@@ -741,7 +715,6 @@ public class ObjectFunctions {
     //Get element nearest to xPos, yPos with some inaccuracy
     public static ObjectInstance getNearestObjectByPosition(GamePanel gamePanel, GameInstance gameInstance, Player player, int xPos, int yPos, double zooming, int maxInaccuracy, IntegerArrayList ignoredObjects) {
         ObjectInstance activeObject = null;
-        int distance = Integer.MAX_VALUE;
         if (isInPrivateArea(gamePanel.privateArea, xPos, yPos)) {
             Point2D transformedPoint = new Point2D.Double(xPos, yPos);
             gamePanel.privateArea.transformPoint(transformedPoint, transformedPoint);
@@ -774,7 +747,7 @@ public class ObjectFunctions {
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
             ObjectInstance stackTopInstance = getStackTop(gameInstance,objectInstance);
             IntegerArrayList belowList = new IntegerArrayList();
-            getBelowStack(gameInstance, stackTopInstance, belowList);
+            getStackToOneEnd(gameInstance, stackTopInstance, belowList,Relation.BELOW);
             if (belowList.size() > 1) {
                 if (isStackCollected(gameInstance, stackTopInstance)) {
                     for (int i = 0; i < belowList.size(); i++) {
@@ -792,7 +765,7 @@ public class ObjectFunctions {
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
             ObjectInstance stackTopInstance = getStackTop(gameInstance,objectInstance);
             IntegerArrayList belowList = new IntegerArrayList();
-            getBelowStack(gameInstance, stackTopInstance, belowList);
+            getStackToOneEnd(gameInstance, stackTopInstance, belowList, Relation.BELOW);
             if (belowList.size() > 1) {
                 int posX = stackTopInstance.state.posX;
                 int posY = stackTopInstance.state.posY;
@@ -822,8 +795,9 @@ public class ObjectFunctions {
     }
 
     public static boolean stackIsCollected(GameInstance gameInstance, Player player, IntegerArrayList ial){
-        for (int i=0;i<ial.size();++i){
-            if (!haveSamePositions(gameInstance.getObjectInstanceById(ial.getI(0)), gameInstance.getObjectInstanceById(ial.get(i)))){
+        ObjectInstance first = gameInstance.getObjectInstanceById(ial.getI(0));
+        for (int i=1;i<ial.size();++i){
+            if (!haveSamePositions(first, gameInstance.getObjectInstanceById(ial.get(i)))){
                 return false;
             }
         }

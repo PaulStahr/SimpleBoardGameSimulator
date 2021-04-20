@@ -11,20 +11,27 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
 
-import javax.swing.*;
+import javax.swing.AbstractAction;
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-
-import gui.create.CreateNewGameWindow;
-import gui.game.GameWindow;
-import gui.language.Language;
-import gui.language.LanguageChangeListener;
-import gui.language.LanguageHandler;
-import gui.language.Words;
 
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
@@ -38,6 +45,12 @@ import gameObjects.GameMetaInfo;
 import gameObjects.columnTypes.GameInstanceColumnType;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
+import gui.create.CreateNewGameWindow;
+import gui.game.GameWindow;
+import gui.language.Language;
+import gui.language.LanguageChangeListener;
+import gui.language.LanguageHandler;
+import gui.language.Words;
 import io.GameIO;
 import gui.game.Player;
 import net.AsynchronousGameConnection;
@@ -67,7 +80,6 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 
 
 	private final JTextField textFieldName = new JTextField(Options.getString("last_connection.name"));
-	private boolean bStartStopServer = true;
 	//private final JTextField textFieldChat = new JTextField();
 	//private final JTextArea textAreaChat = new JTextArea();
 	/*TODOS here:
@@ -104,6 +116,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
  	private final ButtonColumn connectColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.CONNECT));
 	private final ButtonColumn visitColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.VISIT));
  	private final ButtonColumn deleteColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.DELETE));
+    private GameServer gs;
 
 
 
@@ -175,18 +188,23 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		}
 		else if (source == buttonStartServer)
 		{
-			if (bStartStopServer == true) {
-				bStartStopServer = false;
-				GameServer gs = new GameServer(Integer.parseUnsignedInt(textFieldPort.getText()));
+			if (gs == null) {
+				gs = new GameServer(Integer.parseUnsignedInt(textFieldPort.getText()));
 				JFrameUtils.showInfoMessage(lh.getCurrentLanguage().getString(Words.server_start_info), logger);
 				buttonStartServer.setText(lh.getCurrentLanguage().getString(Words.stop_server));
+				DataHandler.addKeepProgramPredicate(new BooleanSupplier() {
+	                @Override
+	                public boolean getAsBoolean() {
+	                    return gs.isRunning();
+	                }
+	            });
 				gs.start();
 			}
-			else if(bStartStopServer == false){
-				GameServer gs = new GameServer(Integer.parseUnsignedInt(textFieldPort.getText()));
+			else{
 				buttonStartServer.setText(lh.getCurrentLanguage().getString(Words.start_server));
 				JFrameUtils.showInfoMessage(lh.getCurrentLanguage().getString(Words.server_stop_info), logger);
 				gs.stop();
+				gs = null;
 			}
 		}
 		else if (source == buttonCreateGame){
@@ -433,13 +451,11 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		buttonLoadGame.addActionListener(this);
 		buttonStartServer.addActionListener(this);
 		buttonCreateGame.addActionListener(this);
-		String Port = Integer.toString(client.getPort());
-		String Address = client.getAddress();
-		//textFieldAddress.setText(client.getAddress());
-		//textFieldPort.setText(Integer.toString(client.getPort()));
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		setMinimumSize(getPreferredSize());
 		updateCurrentGames();
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		addWindowListener(DataHandler.closeProgramWindowListener);
 	}
 	
     @Override
@@ -449,14 +465,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
    		int rowBegin = e.getFirstRow();
     	if (rowBegin == TableModelEvent.HEADER_ROW){return;}
     	isUpdating = true;
-		Object source = e.getSource();
-		int colBegin = e.getColumn() == TableModelEvent.ALL_COLUMNS ? 0 : e.getColumn();
-    	int rowEnd = e.getLastRow() + 1;
-		if (source == tableModelOpenGames)
-		{
-			
-			//tablechanged(e, tableOperGames, scene.surfaceObjectList, colBegin, rowBegin, rowEnd, tableModelOpenGames, GameInstance.TYPES);
-		}
+		
 
 		isUpdating = false;
     }

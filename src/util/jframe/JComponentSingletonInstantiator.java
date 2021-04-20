@@ -58,7 +58,7 @@ public class JComponentSingletonInstantiator<T> implements Supplier<T>, ActionLi
 				}
 			}
 		};
-		JFrameUtils.runByDispatcherAndWait(sup);
+		JFrameUtils.runByDispatcherAndWaitNoExcept(sup);
 		T o = sup.get();
 		ref = new WeakReference<T>(o);
     	return o;

@@ -1,6 +1,11 @@
 package gui.game;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Point2D;
@@ -27,8 +32,8 @@ public class PrivateArea {
     public AffineTransform objectTransform;
     private final AffineTransform boardToScreenTransformation;
     private final AffineTransform screenToBoardTransformation;
-    public Point2D.Double origin = new Point2D.Double();
-    public Point2D.Double basePoint = new Point2D.Double();
+    public final Point2D.Double origin = new Point2D.Double();
+    public final Point2D.Double basePoint = new Point2D.Double();
 
     public int currentDragPosition = -1;
     public double savedZooming;
@@ -58,6 +63,9 @@ public class PrivateArea {
 
     }
 
+    private static final BasicStroke stroke2 =new BasicStroke();
+    private static final Color privateAreaBackgound = new Color(255,153,153,127);
+    
     public void draw(Graphics g, int originX, int originY) {
         Graphics2D graphics = (Graphics2D) g;
         AffineTransform tmp = graphics.getTransform();
@@ -65,12 +73,10 @@ public class PrivateArea {
                 RenderingHints.VALUE_ANTIALIAS_ON);
 
         // set background color
-        Color privateAreaBackgound = new Color(255,153,153,127);
-
         graphics.setPaint(privateAreaBackgound);
         // set border color
         graphics.setColor(privateAreaBackgound);
-        graphics.setStroke(new BasicStroke(2));
+        graphics.setStroke(stroke2);
         setArea(originX-(width/2.*zooming), originY-(height/2.*zooming), width, height, 0, 0, 0, zooming);
         graphics.fill(this.shape);
         graphics.setTransform(tmp);

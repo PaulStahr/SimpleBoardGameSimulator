@@ -38,11 +38,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -201,7 +199,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public BufferedImage[] playerImages = new BufferedImage[10];
 
-	public Map<String, Clip> audioClips = new HashMap<String, Clip>();
+	private final Map<AudioClip, Clip> audioClips = new HashMap<>();
 
 	public Set<Integer> downKeys = new HashSet<>();
 	
@@ -228,6 +226,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		}
 	};
 
+	public static enum AudioClip{drop, open, select, click, shuffle};
+	
 	public GamePanel(GameInstance gameInstance, LanguageHandler lh)
 	{
 		this.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -268,29 +268,37 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			}
 		}
 		//Read the audio clips
-		List<String> clipList = Arrays.asList("drop", "open", "select", "click", "shuffle");
-		for(String clipString : clipList) {
-			Clip clip;
+		for(AudioClip clipString : AudioClip.values()) {
 			try {
 				ByteArrayInputStream bis = new ByteArrayInputStream(StreamUtil.toByteArray(DataHandler.getResourceAsStream("audio/kenney-audio/" + clipString + ".wav")));
 				AudioInputStream stream = AudioSystem.getAudioInputStream(bis);
 				AudioFormat format = stream.getFormat();
 				DataLine.Info info = new DataLine.Info(Clip.class, format);
-				clip = (Clip) AudioSystem.getLine(info);
+				Clip clip = (Clip) AudioSystem.getLine(info);
 				clip.open(stream);
 				audioClips.put(clipString, clip);
 			} catch (UnsupportedAudioFileException e) {
 				logger.error("Unsupported Audio File", e);
 			} catch (IOException e) {
 				logger.error("IO Error loading sounds", e);
-			} catch (LineUnavailableException e) {
+			} catch (LineUnavailableException | IllegalArgumentException e) {
 				logger.error("No sound availible", e);
 			}
 		}
-		audioClips.get("open").start();
+		playAudio(AudioClip.open);
 		DataHandler.timedUpdater.add(autosave);
 	}
-    
+
+    public void playAudio(AudioClip clip) {
+        Clip cl = audioClips.get(clip);
+        if (cl == null) {
+            logger.warn("Couldn't find sound " + clip);
+        }else{
+            cl.setFramePosition(0);
+            cl.start();
+        }
+    }
+
     public void setPlayer(Player pl)
     {
     	this.player = pl;
@@ -434,16 +442,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-		this.audioClips.get("click").setFramePosition(0);
-		this.audioClips.get("click").start();
+	    playAudio(AudioClip.click);
 		if (!player.visitor) {
 			if (arg0.getClickCount() == 2) {
 				//Play object with double click
 				if (hoveredObject != null) {
 					if (!ObjectFunctions.IsObjectOnShape(gameInstance, table.stackerShape, getBoardToScreenTransform(), hoveredObject) && hoveredObject.go instanceof GameObjectToken) {
 						ObjectFunctions.playObject(this, gameInstance, player, hoveredObject, hoveredObject, selectedObjects);
-						this.audioClips.get("drop").setFramePosition(0);
-						this.audioClips.get("drop").start();
+						playAudio(AudioClip.drop);
 					} else if (ObjectFunctions.IsObjectOnShape(gameInstance, table.stackerShape, getBoardToScreenTransform(), hoveredObject) && hoveredObject.go instanceof GameObjectToken) {
 						double offset = 0;
 						if (table != null){
@@ -617,14 +623,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						if (!arg0.isControlDown()) {
 							ObjectFunctions.deselectAllSelected(id, gameInstance, player, ial, hoveredObject, selectedObjects);
 							ObjectFunctions.selectObject(id, gameInstance, player, nearestObject.id, selectedObjects);
-							this.audioClips.get("select").setFramePosition(0);
-							this.audioClips.get("select").start();
+                            playAudio(AudioClip.select);
 						} else if (ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, nearestObject.id)) {
 							ObjectFunctions.deselectObject(id, gameInstance, player, nearestObject.id, hoveredObject, selectedObjects);
 						} else {
 							ObjectFunctions.selectObject(id, gameInstance, player, nearestObject.id, selectedObjects);
-							this.audioClips.get("select").setFramePosition(0);
-							this.audioClips.get("select").start();
+							playAudio(AudioClip.select);
 						}
 					}
 				} else if (mouseInPrivateArea && hoveredObject != null && this.privateArea.contains(hoveredObject.id)) {
@@ -637,8 +641,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 					ObjectFunctions.deselectAllSelected(id, gameInstance, player, ial, hoveredObject, selectedObjects);
 					ObjectFunctions.selectObject(id, gameInstance, player, hoveredObject.id, selectedObjects);
-					this.audioClips.get("select").setFramePosition(0);
-					this.audioClips.get("select").start();
+                    playAudio(AudioClip.select);
 					ObjectFunctions.setNewDrawValue(id, gameInstance, player, hoveredObject);
 
 				} else {
@@ -882,8 +885,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					for (int oId : ObjectFunctions.getObjectRepresentatives(gameInstance, ial)) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 						ObjectFunctions.shuffleStack(id, gameInstance, player, oi);
-						this.audioClips.get("shuffle").setFramePosition(0);
-						this.audioClips.get("shuffle").start();
+                        playAudio(AudioClip.shuffle);
 						ObjectFunctions.deselectObject(id, gameInstance, player, oi.id, hoveredObject, selectedObjects);
 						ObjectFunctions.selectObject(id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, oi).id, selectedObjects);
 					}
@@ -940,8 +942,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				} else if (e.getKeyCode() == KeyEvent.VK_P && !shiftDown) {
 					if (hoveredObject != null) {
 						ObjectFunctions.playObject(this, gameInstance, player, hoveredObject, hoveredObject, selectedObjects);
-						this.audioClips.get("drop").setFramePosition(0);
-						this.audioClips.get("drop").start();
+                        playAudio(AudioClip.drop);
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 					sitDown(player, PlayerFunctions.GetTablePlayerPosition(player));
@@ -1181,7 +1182,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (privateArea!=null){
 			int privateAreaWidth = 750;
 			int privateAreaHeight = 750;
-			privateArea.basePoint = new Point2D.Double(getWidth()/2, getHeight());
+			privateArea.basePoint.setLocation(getWidth()/2, getHeight());
 		}
 	}
 

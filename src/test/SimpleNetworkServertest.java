@@ -47,7 +47,7 @@ public class SimpleNetworkServertest {
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi, null);
     	connection.start();
     	gi.addPlayer(null, player);
-    	JFrameUtils.runByDispatcherAndWait(
+    	JFrameUtils.runByDispatcherAndWaitNoExcept(
     			new Runnable() {
 					
 					@Override
@@ -68,7 +68,7 @@ public class SimpleNetworkServertest {
     	connection.start();
     	player = gi.addPlayer(null, player);
     	GameWindow gw = new GameWindow(gi, player, lh);
-    	JFrameUtils.runByDispatcherAndWait(new Runnable() {
+    	JFrameUtils.runByDispatcherAndWaitNoExcept(new Runnable() {
 			
 			@Override
 			public void run() {

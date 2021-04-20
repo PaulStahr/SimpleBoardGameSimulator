@@ -327,6 +327,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 				}
 			}
 		});
+		addWindowListener(DataHandler.closeProgramWindowListener);
 	}
 
 	@Override

@@ -91,18 +91,26 @@ public class JFrameUtils{
 		return false;
 	}
 	
-	public static final void runByDispatcherAndWait(Runnable runnable){
-		if (EventQueue.isDispatchThread()){
-			runnable.run();
-		}else{
-    		try {
-				EventQueue.invokeAndWait(runnable);
-			}catch (InvocationTargetException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {}
-		}
-	}
-	
+    public static final void runByDispatcherAndWaitNoExcept(Runnable runnable){
+        if (EventQueue.isDispatchThread()){
+            runnable.run();
+        }else{
+            try {
+                EventQueue.invokeAndWait(runnable);
+            }catch (InvocationTargetException | InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    public static final void runByDispatcherAndWait(Runnable runnable) throws InvocationTargetException,InterruptedException{
+        if (EventQueue.isDispatchThread()){
+            runnable.run();
+        }else{
+            EventQueue.invokeAndWait(runnable);
+        }
+    }
+    
 	public static final Object runSupplierByDispatcherAndWait(final Supplier<?> sup){
 		if (EventQueue.isDispatchThread()){
 			return sup.get();

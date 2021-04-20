@@ -132,11 +132,7 @@ public class ThreadPool {
 		public final E get()
 		{
 			int id = getCurrentId();
-			if (id > obj.length)
-			{
-				return null;
-			}
-			return obj[id];
+			return id > obj.length ? null :obj[id];
 		}
 		
 		public final void set(E value)

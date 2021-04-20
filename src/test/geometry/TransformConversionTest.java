@@ -11,6 +11,16 @@ import geometry.TransformConversion;
 
 public class TransformConversionTest {    
     @Test
+    public void testMatrixConversion() {
+        AffineTransform at0 = new AffineTransform(1,2,3,4,5,6);
+        AffineTransform at1 = new AffineTransform(0,0,0,0,0,0);
+        Matrix3d mat3d = new Matrix3d();
+        TransformConversion.copy(at0, mat3d);
+        TransformConversion.copy(mat3d,at1);
+        assertTrue(at0 + "!=" + at1, TransformConversion.distQ(at0, at1) < 0.1);        
+    }
+    
+    @Test
     public void testCompatibility()
     {
         AffineTransform at = new AffineTransform(1,2,3,4,5,6);
@@ -20,8 +30,6 @@ public class TransformConversionTest {
         mat3d.invert(mat3d);
         mat3d.postTranslate(-3.5, -4.5);
         mat3d.invert(mat3d);
-             //at.rotate(2);
-        //mat3d.rotateZ(2);
-        assertTrue(at + "!=" + mat3d, TransformConversion.qdist(at, mat3d) < 0.1);
+        assertTrue(at + "!=" + mat3d, TransformConversion.distQ(at, mat3d) < 0.1);
     }
 }

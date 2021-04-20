@@ -21,6 +21,9 @@
  ******************************************************************************/
 package data;
 
+import java.awt.Window;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,6 +32,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,9 +55,55 @@ public abstract class DataHandler
 	private static final Logger logger = LoggerFactory.getLogger(DataHandler.class);
     private static final String resourceFolder = "/resources/";
     public static final TimedUpdater timedUpdater = new TimedUpdater(10);
-    public static volatile int openWindows = 0;
-	public static final ThreadPool tp = new ThreadPool();
+    public static final ThreadPool tp = new ThreadPool();
 	public static final HeapSceduler hs = new HeapSceduler();
+	private static final ArrayList<BooleanSupplier> exitProgramPredicates = new ArrayList<>();
+	public static final WindowListener closeProgramWindowListener = new WindowListener() {
+        
+	    @Override
+	    public void windowActivated(WindowEvent arg0) {}
+
+	    @Override
+	    public void windowClosed(WindowEvent e) {DataHandler.closeWindow(e.getWindow());}
+
+	    @Override
+	    public void windowClosing(WindowEvent e) {}
+
+	    @Override
+	    public void windowDeactivated(WindowEvent e) {}
+
+	    @Override
+	    public void windowDeiconified(WindowEvent e) {}
+
+	    @Override
+	    public void windowIconified(WindowEvent e) {}
+
+	    @Override
+	    public void windowOpened(WindowEvent e) {}
+    };
+    private static Runnable exitRunnable = new Runnable() {
+        @Override
+        public void run() {
+            System.exit(0);
+        }
+    };
+
+	public static void closeWindow(Window window) {
+	    java.awt.Window win[] = java.awt.Window.getWindows();
+	    for (int i = 0; i < win.length; ++i)
+	    {
+	        if (win[i].isVisible()) {return;}
+	    }
+	    for (int i = 0; i < exitProgramPredicates.size(); ++i)
+	    {
+	        if (exitProgramPredicates.get(i).getAsBoolean()){return;}
+	    }
+	    exitRunnable.run();
+	}
+
+	public static void addKeepProgramPredicate(BooleanSupplier pred) {
+	    exitProgramPredicates.add(pred);
+    }
 
 	static {
 	    hs.start();
@@ -138,5 +188,11 @@ public abstract class DataHandler
     	}catch(Exception e){
     		logger.error("Error at adding recent file: ", e);
     	}
+    }
+
+    public static Runnable swapExitRunnable(Runnable runnable) {
+        Runnable res = exitRunnable ;
+        exitRunnable = runnable;
+        return res;
     }
 }

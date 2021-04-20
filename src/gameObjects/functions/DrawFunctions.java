@@ -20,13 +20,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import gameObjects.definition.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.Texture;
+import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectBox;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.ObjectInstance.Relation;
 import geometry.Vector2d;
 import gui.game.GamePanel;
 import gui.game.Player;
@@ -105,7 +110,7 @@ public class DrawFunctions {
         //draw tokens in the order of its draw value
         if (ObjectFunctions.isStackTop(objectInstance)) {
             tmp.clear();
-            ObjectFunctions.getBelowStack(gameInstance, objectInstance, tmp);
+            ObjectFunctions.getStackToOneEnd(gameInstance, objectInstance, tmp, Relation.BELOW);
             drawStack(gamePanel, g, tmp, gameInstance, player, 1);
         }
         tmp.clear();
