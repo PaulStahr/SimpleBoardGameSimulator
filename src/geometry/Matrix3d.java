@@ -115,7 +115,6 @@ public class Matrix3d implements Matrixd, DoubleList{
 		throw new ArrayIndexOutOfBoundsException(x);
 	}
 
-
 	public final void set(Matrix3d o) {
 		this.m00 = o.m00;this.m01 = o.m01;this.m02 = o.m02;
 		this.m10 = o.m10;this.m11 = o.m11;this.m12 = o.m12;

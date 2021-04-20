@@ -39,6 +39,7 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
 import gui.Credits;
+import gui.OptionWindow;
 import gui.language.Language;
 import gui.language.LanguageChangeListener;
 import gui.language.LanguageHandler;

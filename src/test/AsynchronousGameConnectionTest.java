@@ -3,12 +3,14 @@ package test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
 import org.junit.Test;
 
+import data.Texture;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.definition.GameObjectToken;
@@ -25,11 +27,13 @@ public class AsynchronousGameConnectionTest {
     private Object block0 = new Object(), block1 = new Object();
     private AsynchronousGameConnection connection0;
     private AsynchronousGameConnection connection1;
+    final int id = 4;
 
     public AsynchronousGameConnectionTest() throws IOException {
-        game.objects.add(new GameObjectToken("token", "card", 10, 10, null, null, 5, 5, 90, 0, false, -1));
+        game.images.put("white.png", new Texture(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB), "png"));
+        game.addObject(new GameObjectToken("token", "card", 10, 10, game.images.get("white.png"), game.images.get("white.png"), 5, 5, 90, 0, false, -1));
         gi0 = new GameInstance(game, "Foobar");
-        gi0.addObjectInstance(new ObjectInstance(game.objects.get(0), 4));
+        gi0.addObjectInstance(new ObjectInstance(game.getGameObjectByIndex(0), id));
         gi1 = new GameInstance(gi0);
         assertEquals(gi0.hashCode(), gi1.hashCode());
         PipedInputStream pis0 = new PipedInputStream();
@@ -63,13 +67,13 @@ public class AsynchronousGameConnectionTest {
                 }
             }
         });
-    }   
+    }
 
     @Test
     public void simpleConnectionTest() throws IOException
     {
         assertEquals (gi0.hashCode(), gi1.hashCode());
-        ObjectInstance oi = gi0.getObjectInstanceById(4);
+        ObjectInstance oi = gi0.getObjectInstanceById(id);
         ObjectState state = oi.copyState();
         state.posX = 4;
         state.posY = 2;
@@ -77,24 +81,31 @@ public class AsynchronousGameConnectionTest {
         try {
             synchronized(block1){block1.wait(1000);}
         } catch (InterruptedException e) {}
-        assertEquals(state + "!=" + gi1.getObjectInstanceById(4).state, state, gi1.getObjectInstanceById(4).state);
+        assertEquals(state + "!=" + gi1.getObjectInstanceById(id).state, state, gi1.getObjectInstanceById(id).state);
     }
 
     @Test
     public void syncPullTest() throws IOException
     {
         assertEquals (gi0.hashCode(), gi1.hashCode());
-        ObjectInstance oi = gi0.getObjectInstanceById(4);
+        ObjectInstance oi = gi0.getObjectInstanceById(id);
         ObjectState state = oi.state;
-        state.posX = 4;
-        state.posY = 2;
+        state.posX = 8;
+        state.posY = 5;
         assertNotEquals(gi0.hashCode(), gi1.hashCode());
         connection1.syncPull();
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 1000; ++i) {
             try {
                 Thread.sleep(1);
             } catch (InterruptedException e) {}
             if (gi0.hashCode() == gi1.hashCode()) {break;}
+        }
+        for (int i = 0; i < gi0.getObjectInstanceCount(); ++i)
+        {
+            ObjectInstance oi0 = gi0.getObjectInstanceByIndex(i);
+            ObjectInstance oi1 = gi1.getObjectInstanceById(oi0.id);
+            assertEquals(oi0.state, oi1.state);
+            
         }
         assertEquals (gi0.hashCode(), gi1.hashCode());
     }

@@ -16,12 +16,12 @@ import gui.language.LanguageHandler;
 @RunWith(Parameterized.class)
 public class LanguageHandlerTest {
     @Parameters
-    public static List<String> params() {return Arrays.asList(new String[] {"de","en"});}
+    public static List<String> params() {return Arrays.asList(new String[] {"de","en"});}   
     private final String lang;    
     public LanguageHandlerTest(String lang) {this.lang = lang;}
 
     @Test
-    public void testGerman()
+    public void testLanguage()
     {
         LanguageHandler lh = new LanguageHandler(new LanguageSummary(lang, lang));
         assertNotNull(lh.getCurrentLanguage());

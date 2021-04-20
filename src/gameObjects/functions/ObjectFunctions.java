@@ -56,7 +56,7 @@ public class ObjectFunctions {
                 if (objectInstance == currentTop) {
                     throw new RuntimeException();
                 }
-                if (++i > gameInstance.getObjectCount()) {
+                if (++i > gameInstance.getObjectInstanceCount()) {
                     throw new RuntimeException("Circle in Card Stack");
                 }
             }
@@ -82,7 +82,7 @@ public class ObjectFunctions {
                 if (objectInstance == currentBottom) {
                     throw new RuntimeException("Reached first card again " + currentBottom.id + " below " + objectInstance.state.belowInstanceId);
                 }
-                if (++i > gameInstance.getObjectCount()) {
+                if (++i > gameInstance.getObjectInstanceCount()) {
                     throw new RuntimeException("Circle in Card Stack " + currentBottom.id);
                 }
             }
@@ -187,8 +187,8 @@ public class ObjectFunctions {
             while ((next = currentObjectInstance.state.getRelatedId(relation)) != -1) {
                 objectStack.add(next);
                 currentObjectInstance = gameInstance.getObjectInstanceById(next);
-                if (gameInstance.getObjectCount() < objectStack.size()) {
-                    throw new RuntimeException("Circle in stack " + objectStack.toString() + " has more elements than the whole game " + gameInstance.getObjectCount());
+                if (gameInstance.getObjectInstanceCount() < objectStack.size()) {
+                    throw new RuntimeException("Circle in stack " + objectStack.toString() + " has more elements than the whole game " + gameInstance.getObjectInstanceCount());
                 }
             }
         }
@@ -205,8 +205,8 @@ public class ObjectFunctions {
             while ((next = currentObjectInstance.state.getRelatedId(relation)) != -1) {
                 currentObjectInstance = gameInstance.getObjectInstanceById(next);
                 oiList.add(currentObjectInstance);
-                if (gameInstance.getObjectCount() < oiList.size()) {
-                    throw new RuntimeException("Circle in stack " + gameInstance.getObjectCount() + oiList.size());
+                if (gameInstance.getObjectInstanceCount() < oiList.size()) {
+                    throw new RuntimeException("Circle in stack " + gameInstance.getObjectInstanceCount() + oiList.size());
                 }
             }
         }
@@ -576,7 +576,7 @@ public class ObjectFunctions {
     public static ObjectInstance getTopActiveObjectByPosition(GameInstance gameInstance, Player player, int xPos, int yPos, int maxInaccuracy) {
         ObjectInstance activeObject = null;
         int distance = Integer.MAX_VALUE;
-        for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
+        for (int idx = 0; idx < gameInstance.getObjectInstanceCount();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
             int dist = getObjectDistanceTo(oi, xPos, yPos);
             if (dist < distance && isOnObject(xPos, yPos, oi, player.id, maxInaccuracy)) {
@@ -633,11 +633,11 @@ public class ObjectFunctions {
 
 
     private static ObjectInstance getGroundObject(GameInstance gameInstance, Player player, ObjectInstance oi, int playerId, int maxInaccuracy) {
-        for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
+        for (int idx = 0; idx < gameInstance.getObjectInstanceCount();++idx) {
             ObjectInstance currentObject = gameInstance.getObjectInstanceByIndex(idx);
             if (oi.id != currentObject.id && isValidLieOnObject(player, currentObject) && liesOnObject(currentObject, oi, player.id, maxInaccuracy)){
                 int Counter = 0;
-                while (currentObject.state.aboveLyingObectIds.size() > 0 && Counter < gameInstance.getObjectCount()){
+                while (currentObject.state.aboveLyingObectIds.size() > 0 && Counter < gameInstance.getObjectInstanceCount()){
                     for (int id : currentObject.state.aboveLyingObectIds){
                         if (liesOnObject(gameInstance.getObjectInstanceById(id), oi, playerId, maxInaccuracy)){
                             currentObject = gameInstance.getObjectInstanceByIndex(id);
@@ -722,7 +722,7 @@ public class ObjectFunctions {
             activeObject = gameInstance.getObjectInstanceById(id);
         }
         else {
-            for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
+            for (int idx = 0; idx < gameInstance.getObjectInstanceCount();++idx) {
                 ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
                 if (CheckFunctions.isValidNearestObject(oi, player, ignoredObjects)) {
                     if (isOnObject(xPos, yPos, oi, player.id, maxInaccuracy) && (activeObject == null || (oi.state.drawValue > activeObject.state.drawValue))) {
@@ -950,7 +950,7 @@ public class ObjectFunctions {
     //TODO can only handle one stack
     public static void getOwnedStack(GameInstance gameInstance, Player player, IntegerArrayList idList, boolean ignoreActiveObject) {
         idList.clear();
-        for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
+        for (int idx = 0; idx < gameInstance.getObjectInstanceCount();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
             if (oi.state.owner_id == player.id && (!ignoreActiveObject || !oi.state.isActive)) {
                 getStackFromBottom(gameInstance, oi, idList);
@@ -960,7 +960,7 @@ public class ObjectFunctions {
     }
     public static void getOwnedStack(GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList, boolean ignoreActiveObject) {
         oiList.clear();
-        for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
+        for (int idx = 0; idx < gameInstance.getObjectInstanceCount();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
             if (oi.state.owner_id == player.id && (!ignoreActiveObject || !oi.state.isActive)) {
                 getStackFromBottom(gameInstance, oi, oiList);
@@ -1073,7 +1073,7 @@ public class ObjectFunctions {
     }
 
     public static void deactivateAllObjects(GameInstance gameInstance){
-        for (int i = 0; i < gameInstance.getObjectCount(); ++i)
+        for (int i = 0; i < gameInstance.getObjectInstanceCount(); ++i)
         {
             deactivateObject(gameInstance, gameInstance.getObjectInstanceByIndex(i).id);
         }
@@ -1242,7 +1242,7 @@ public class ObjectFunctions {
     }
 
     public static ObjectInstance findNeighbouredStackTop(GameInstance gameInstance, Player player, ObjectInstance activeObject, int maxInaccuracy) {
-        for (int i = 0; i < gameInstance.getObjectCount(); ++i) {
+        for (int i = 0; i < gameInstance.getObjectInstanceCount(); ++i) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             int xDiff = activeObject.state.posX - oi.state.posX, yDiff = activeObject.state.posY - oi.state.posY;
             int dist = xDiff * xDiff + yDiff * yDiff;
@@ -1451,7 +1451,7 @@ public class ObjectFunctions {
         if (objectInstance.go.groups.length > 0) {
             objectGroup = objectInstance.go.groups[0];
         }
-        for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
+        for (int idx = 0; idx < gameInstance.getObjectInstanceCount();++idx) {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(idx);
             String oiGroup = oi.go.objectType;
             if (oi.go.groups.length > 0) {
@@ -1565,7 +1565,7 @@ public class ObjectFunctions {
     }
 
     public static void zoomObjects(GameInstance gameInstance, double zooming) {
-        for (int idx = 0; idx < gameInstance.getObjectCount();++idx) {
+        for (int idx = 0; idx < gameInstance.getObjectInstanceCount();++idx) {
             ObjectInstance objectInstance = gameInstance.getObjectInstanceByIndex(idx);
             objectInstance.state.posX = (int) (objectInstance.state.posX * zooming);
             objectInstance.state.posY = (int) (objectInstance.state.posY * zooming);

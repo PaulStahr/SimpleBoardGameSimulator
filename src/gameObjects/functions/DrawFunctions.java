@@ -44,6 +44,7 @@ public class DrawFunctions {
 
         g.clearRect(0, 0, gamePanel.getWidth(), gamePanel.getHeight());
         //TODO Florian:sometimes images are drawn twice (the active object?)
+        if (gameInstance.game.background == null) {return;}
         g.drawString(String.valueOf(gamePanel.mouseWheelValue), gamePanel.mouseScreenX, gamePanel.mouseScreenY);
         try {
             g.drawImage(gameInstance.game.background.getImage(), 0, 0, gamePanel.getWidth(), gamePanel.getHeight(), Color.BLACK, null);
@@ -526,7 +527,7 @@ public class DrawFunctions {
                 stringSelectedObjects.append("; ").append(selectedObjects.get(i));
             }
         }
-        for (int i = 0; i < gameInstance.getObjectCount(); ++i)
+        for (int i = 0; i < gameInstance.getObjectInstanceCount(); ++i)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             if (oi.state.owner_id == player.id) {
@@ -538,7 +539,7 @@ public class DrawFunctions {
             }
         }
 
-        for (int i = 0; i < gameInstance.getObjectCount(); ++i)
+        for (int i = 0; i < gameInstance.getObjectInstanceCount(); ++i)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             if (oi.state.isActive) {
@@ -558,7 +559,7 @@ public class DrawFunctions {
             }
         }
 
-        for (int i = 0; i < gameInstance.getObjectCount(); ++i)
+        for (int i = 0; i < gameInstance.getObjectInstanceCount(); ++i)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             if (oi.state.inPrivateArea) {

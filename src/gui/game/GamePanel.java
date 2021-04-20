@@ -303,7 +303,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
     public void setPlayer(Player pl)
     {
     	this.player = pl;
-		privateArea.updatePrivateObjects(gameInstance, player);
+    	try {
+    	    privateArea.updatePrivateObjects(gameInstance, player);
+    	}catch(Exception e) {
+    	    logger.error("Couldn't update private area");
+    	}
     }
 
 	/** Drawing of all the game objects, draws the board, object instances and the players

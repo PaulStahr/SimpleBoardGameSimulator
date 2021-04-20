@@ -2,6 +2,7 @@ package gameObjects.instance;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -11,7 +12,7 @@ import gameObjects.definition.GameObject;
 public class Game {
 	public String name;
 	public Texture background;
-	public ArrayList<GameObject> objects = new ArrayList<>();
+	private ArrayList<GameObject> objects = new ArrayList<>();
 	public final HashMap<String, Texture> images = new HashMap<>();
 	public Game(Game other) {
         this.name = other.name;
@@ -102,4 +103,36 @@ public class Game {
 	public Texture getImage(String str) {
 		return images.get(str);
 	}
+
+    public List<GameObject> getObjects() {return objects;}
+
+    public int getGameObjectCount() {return objects.size();}
+
+    public void removeObject(GameObject object) {objects.remove(object);}
+
+    public GameObject addObject(GameObject obj) {
+        GameObject res = getObejctByUniqueName(obj.uniqueObjectName);
+        if (res != null) {
+            res.set(obj);
+        }else {
+            objects.add(res = obj);
+        }
+        return res;
+    }
+
+    public GameObject getObejctByUniqueName(String uniqueObjectName) {
+        for (int i = 0; i < objects.size(); ++i)
+        {
+            GameObject current = objects.get(i);
+            if (uniqueObjectName.equals(current.uniqueObjectName))
+            {
+                return current;
+            }
+        }
+        return null;
+    }
+
+    public GameObject getGameObjectByIndex(int i) {
+        return objects.get(i);
+    }
 }
