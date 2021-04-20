@@ -131,4 +131,5 @@
     <dices>Dices</dices>
     <books>Books</books>
     <connection>Connection</connection>
+    <loglevel>Loglevel</loglevel>
 </xml>
