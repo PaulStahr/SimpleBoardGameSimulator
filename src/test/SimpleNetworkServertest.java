@@ -15,7 +15,7 @@ import gameObjects.instance.GameInstance;
 import gui.game.GameWindow;
 import gui.language.LanguageHandler;
 import io.GameIO;
-import main.Player;
+import gui.game.Player;
 import net.AsynchronousGameConnection;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;

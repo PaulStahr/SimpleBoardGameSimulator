@@ -33,7 +33,7 @@ import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import io.GameIO;
-import main.Player;
+import gui.game.Player;
 import util.StringUtils;
 
 public class GameServer implements Runnable {

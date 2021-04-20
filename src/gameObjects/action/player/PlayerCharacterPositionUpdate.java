@@ -2,7 +2,7 @@ package gameObjects.action.player;
 
 import java.awt.geom.AffineTransform;
 
-import main.Player;
+import gui.game.Player;
 
 public class PlayerCharacterPositionUpdate extends PlayerEditAction{
     /**

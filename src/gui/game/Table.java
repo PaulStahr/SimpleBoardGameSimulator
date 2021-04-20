@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import gameObjects.functions.PlayerFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import main.Player;
 
 public class Table {
     private int diameter;

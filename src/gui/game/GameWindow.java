@@ -48,7 +48,6 @@ import gui.minigames.TetrisGameInstance.TetrisGameEvent;
 import gui.minigames.TetrisGameInstance.TetrisGameListener;
 import gui.minigames.TetrisWindow;
 import io.GameIO;
-import main.Player;
 import net.AsynchronousGameConnection;
 import net.AsynchronousGameConnection.PingCallback;
 import net.AsynchronousGameConnection.PingInformation;

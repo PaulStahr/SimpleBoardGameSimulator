@@ -60,7 +60,6 @@ import gameObjects.action.message.UsertextMessageAction;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
-import main.Player;
 import util.JFrameUtils;
 import util.io.StreamUtil;
 

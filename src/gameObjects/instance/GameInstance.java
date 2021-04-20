@@ -33,7 +33,7 @@ import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.functions.CheckingFunctions;
 import gameObjects.functions.ObjectFunctions;
-import main.Player;
+import gui.game.Player;
 import util.ArrayTools;
 import util.ListTools;
 import util.jframe.table.TableColumnType;

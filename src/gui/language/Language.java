@@ -21,8 +21,8 @@ public class Language {
     public final String getString(Words languageWords){
         return wordsToString.get(languageWords);
     }
-    
-    
+
+
     public static class LanguageSummary
     {
     	public final String name;

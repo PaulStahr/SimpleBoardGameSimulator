@@ -96,7 +96,6 @@ import gui.language.LanguageChangeListener;
 import gui.language.LanguageHandler;
 import gui.language.Words;
 import io.GameIO;
-import main.Player;
 import util.StringUtils;
 import util.TimedUpdateHandler;
 import util.data.DoubleArrayList;

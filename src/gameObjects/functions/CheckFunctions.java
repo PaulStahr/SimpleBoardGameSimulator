@@ -2,7 +2,7 @@ package gameObjects.functions;
 
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import main.Player;
+import gui.game.Player;
 import util.data.IntegerArrayList;
 
 import java.util.ArrayList;

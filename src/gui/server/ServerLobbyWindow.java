@@ -39,7 +39,7 @@ import gameObjects.columnTypes.GameInstanceColumnType;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import io.GameIO;
-import main.Player;
+import gui.game.Player;
 import net.AsynchronousGameConnection;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;

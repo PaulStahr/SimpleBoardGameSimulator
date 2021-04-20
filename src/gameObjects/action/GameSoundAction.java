@@ -1,6 +1,6 @@
 package gameObjects.action;
 
-import main.Player;
+import gui.game.Player;
 
 public class GameSoundAction extends GameAction {
     public final int player;

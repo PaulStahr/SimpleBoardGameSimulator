@@ -11,7 +11,7 @@ import javax.swing.SwingUtilities;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.functions.ObjectFunctions;
 import gui.game.GamePanel;
-import main.Player;
+import gui.game.Player;
 
 public class ObjectActionMenu {
     /*Popup menu for object actions*/

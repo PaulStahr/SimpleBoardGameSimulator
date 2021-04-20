@@ -25,7 +25,7 @@ import geometry.Vector2;
 import geometry.Vector2d;
 import gui.game.GamePanel;
 import gui.game.PrivateArea;
-import main.Player;
+import gui.game.Player;
 import util.AwtGeometry;
 import util.Pair;
 import util.data.IntegerArrayList;

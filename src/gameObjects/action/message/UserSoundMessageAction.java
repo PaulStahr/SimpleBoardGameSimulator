@@ -1,6 +1,6 @@
 package gameObjects.action.message;
 
-import main.Player;
+import gui.game.Player;
 
 public class UserSoundMessageAction extends UserMessage{
 	/**

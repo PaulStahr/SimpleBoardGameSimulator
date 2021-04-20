@@ -2,7 +2,7 @@ package gameObjects.action.player;
 
 import gameObjects.action.GameAction;
 import gameObjects.instance.GameInstance;
-import main.Player;
+import gui.game.Player;
 
 public class PlayerEditAction extends GameAction{
 	/**

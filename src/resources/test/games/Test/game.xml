@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xml>
+<object type="card" unique_name="caro10" rotation_step="90" front="caro10.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="carobube" rotation_step="90" front="carobube.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="carodame" rotation_step="90" front="carodame.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="carokoenig" rotation_step="90" front="carokoenig.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="caroass" rotation_step="90" front="caroass.jpg" back="back.jpg"><group>card</group></object>
+
+<object type="card" unique_name="herz10" rotation_step="90" front="herz10.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="herzbube" rotation_step="90" front="herzbube.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="herzdame" rotation_step="90" front="herzdame.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="herzkoenig" rotation_step="90" front="herzkoenig.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="herzass" rotation_step="90" front="herzass.jpg" back="back.jpg"><group>card</group></object>
+
+<object type="card" unique_name="pik10" rotation_step="90" front="pik10.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="pikbube" rotation_step="90" front="pikbube.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="pikdame" rotation_step="90" front="pikdame.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="pikkoenig" rotation_step="90" front="pikkoenig.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="pikass" rotation_step="90" front="pikass.jpg" back="back.jpg"><group>card</group></object>
+
+<object type="card" unique_name="kreuz10" rotation_step="90" front="kreuz10.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="kreuzbube" rotation_step="90" front="kreuzbube.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="kreuzdame" rotation_step="90" front="kreuzdame.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="kreuzkoenig" rotation_step="90" front="kreuzkoenig.jpg" back="back.jpg"><group>card</group></object>
+<object type="card" unique_name="kreuzass" rotation_step="90" front="kreuzass.jpg" back="back.jpg"><group>card</group></object>
+
+<object type="dice" unique_name="sechserwuerfel" width="30" height="30">
+<side value="1">wuerfel1.png</side>
+<side value="2">wuerfel2.png</side>
+<side value="3">wuerfel3.png</side>
+<side value="4">wuerfel4.png</side>
+<side value="5">wuerfel5.png</side>
+<side value="6">wuerfel6.png</side>
+</object>
+<background>background.jpg</background>
+</xml>

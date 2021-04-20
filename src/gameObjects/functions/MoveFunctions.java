@@ -11,7 +11,7 @@ import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
 import geometry.Vector2d;
 import gui.game.GamePanel;
-import main.Player;
+import gui.game.Player;
 import util.data.IntegerArrayList;
 
 public class MoveFunctions {

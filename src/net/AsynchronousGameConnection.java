@@ -46,7 +46,7 @@ import gui.minigames.TetrisGameInstance.TetrisGameEvent;
 import io.GameIO;
 import io.ObjectStateIO;
 import io.PlayerIO;
-import main.Player;
+import gui.game.Player;
 import util.ArrayUtil;
 import util.StringUtils;
 import util.data.UniqueObjects;

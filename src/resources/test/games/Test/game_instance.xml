@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xml>
+<name>Test</name>
+<settings>
+<name>Test</name>
+<table table_radius="600" put_down_area="true" color="#d2a56d">true</table>
+<private_area>true</private_area>
+<debug_mode>false</debug_mode>
+</settings>
+<object unique_name="caro10" number="2" value="10" sort_value="9" x="0" y="0" r="0"/>
+<object unique_name="carobube" number="2" value="2" sort_value="11" x="0" y="0" r="0"/>
+<object unique_name="carodame" number="2" value="3" sort_value="15" x="0" y="0" r="0"/>
+<object unique_name="carokoenig" number="2" value="4" sort_value="8" x="0" y="0" r="0"/>
+<object unique_name="caroass" number="2" value="11" sort_value="10" x="0" y="0" r="0"/>
+
+
+<object unique_name="herz10" number="2" value="10" sort_value="19" x="0" y="0" r="0"/>
+<object unique_name="herzbube" number="2" value="2" sort_value="12" x="0" y="0" r="0"/>
+<object unique_name="herzdame" number="2" value="3" sort_value="16" x="0" y="0" r="0"/>
+<object unique_name="herzkoenig" number="2" value="4" sort_value="0" x="0" y="0" r="0"/>
+<object unique_name="herzass" number="2" value="11" sort_value="1" x="0" y="0" r="0"/>
+
+
+<object unique_name="pik10" number="2" value="10" sort_value="3" x="0" y="0" r="0"/>
+<object unique_name="pikbube" number="2" value="2" sort_value="13" x="0" y="0" r="0"/>
+<object unique_name="pikdame" number="2" value="3" sort_value="17" x="0" y="0" r="0"/>
+<object unique_name="pikkoenig" number="2" value="4" sort_value="2" x="0" y="0" r="0"/>
+<object unique_name="pikass" number="2" value="11" sort_value="4" x="0" y="0" r="0"/>
+
+
+<object unique_name="kreuz10" number="2" value="10" sort_value="6" x="0" y="0" r="0"/>
+<object unique_name="kreuzbube" number="2" value="2" sort_value="14" x="0" y="0" r="0"/>
+<object unique_name="kreuzdame" number="2" value="3" sort_value="18" x="0" y="0" r="0"/>
+<object unique_name="kreuzkoenig" number="2" value="4" sort_value="5" x="0" y="0" r="0"/>
+<object unique_name="kreuzass" number="2" value="11" sort_value="7" x="0" y="0" r="0"/>
+<object unique_name="sechserwuerfel" number="3" x="150" y="150" r="0"/>
+</xml>

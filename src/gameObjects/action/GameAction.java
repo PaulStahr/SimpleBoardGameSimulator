@@ -3,7 +3,7 @@ package gameObjects.action;
 import java.io.Serializable;
 
 import gameObjects.instance.GameInstance;
-import main.Player;
+import gui.game.Player;
 
 public abstract class GameAction implements Serializable{
 	/**

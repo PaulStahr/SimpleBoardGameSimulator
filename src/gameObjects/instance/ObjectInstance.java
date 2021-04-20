@@ -6,7 +6,7 @@ import data.Texture;
 import gameObjects.columnTypes.GameObjectInstanceColumnType;
 import gameObjects.definition.GameObject;
 import gui.game.GamePanel;
-import main.Player;
+import gui.game.Player;
 import util.ArrayTools;
 import util.ArrayTools.ObjectToIntTransform;
 import util.jframe.table.TableColumnType;

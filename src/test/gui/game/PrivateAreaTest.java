@@ -11,18 +11,15 @@ import org.jdom2.JDOMException;
 import org.junit.Test;
 
 import data.DataHandler;
-import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.player.PlayerAddAction;
 import gameObjects.functions.CheckingFunctions;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import gameObjects.instance.ObjectState;
 import gui.game.PrivateArea;
 import io.GameIO;
-import main.Player;
-import util.data.IntegerArrayList;
+import gui.game.Player;
 
 public class PrivateAreaTest {
     int id = (int)System.nanoTime();
@@ -37,12 +34,8 @@ public class PrivateAreaTest {
         PrivateArea pa = new PrivateArea(new AffineTransform(), new AffineTransform());
         assertEquals(null, CheckingFunctions.checkPlayerConsistency(-1, new ArrayList<>(), new ArrayList<>(), gi));
         assertEquals(null, CheckingFunctions.checkPlayerConsistency(pl.id, new ArrayList<>(), new ArrayList<>(), gi));
-        ObjectState st = oi.state.copy();
-        st.aboveInstanceId = -1;
-        st.belowInstanceId = -1;
-        gi.update(new GameObjectInstanceEditAction(id, pl, oi, st));
         assertEquals(0, pa.objects.size());
-        ObjectFunctions.insertIntoOwnStack(id, pa, gi, pl, new Point2D.Double(), 0, oi, oi, null, 0, 1);
+        ObjectFunctions.insertIntoOwnStack(id, pa, gi, pl, new Point2D.Double(), 0, oi, null, null, 0, 0);
         assertEquals(1, pa.objects.size());
         ObjectFunctions.removeFromOwnStack(id, pa, gi, pl, oi);
         assertEquals(0, pa.objects.size());

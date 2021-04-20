@@ -47,7 +47,7 @@ import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import main.Player;
+import gui.game.Player;
 import net.AsynchronousGameConnection;
 import util.ArrayUtil;
 import util.StringUtils;
