@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import gui.game.Player;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 
@@ -17,7 +18,6 @@ import gui.game.GameWindow;
 import gui.language.Language.LanguageSummary;
 import gui.language.LanguageHandler;
 import io.GameIO;
-import main.Player;
 import util.JFrameUtils;
 
 public class ExitProgram {

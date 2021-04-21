@@ -3,6 +3,7 @@ package test.functions;
 import data.DataHandler;
 import gameObjects.action.player.PlayerAddAction;
 import gameObjects.functions.CheckingFunctions;
+import gameObjects.functions.MoveFunctions;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
@@ -64,6 +65,14 @@ public class ObjectFunctionsTest {
         assertEquals(8, ial.size());
         assertEquals(7, ObjectFunctions.getStackTop(gi, gi.getObjectInstanceById(0)).id);
         assertEquals(0, ObjectFunctions.getStackBottom(gi, gi.getObjectInstanceById(0)).id);
+    }
+
+
+
+    @Test
+    public void automaticMerge() throws IOException, JDOMException
+    {
+        //TODO
     }
 
 }
