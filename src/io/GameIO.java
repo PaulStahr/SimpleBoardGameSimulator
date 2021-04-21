@@ -1,7 +1,6 @@
 package io;
 
 import static java.lang.Integer.max;
-import static java.lang.Integer.min;
 
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
@@ -16,13 +15,13 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import javax.imageio.ImageIO;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
-import javax.swing.*;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -47,8 +46,7 @@ import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import gui.game.Player;
-import net.AsynchronousGameConnection;
+import main.Player;
 import util.ArrayUtil;
 import util.StringUtils;
 import util.data.IntegerArrayList;
@@ -115,9 +113,9 @@ public class GameIO {
 	 * @param gi the GameInstance that shall the updated
 	 */
 	private static void editGameInstanceFromElement(Element root, GameInstance gi) throws JDOMException, IOException {
-		//Control the xml version, downward compatible current version 2.0
+        //Control the xml version, downward compatible current version 2.0
 		//String xmlVersion = root.getAttributeValue(StringIO.VERSION);
-		Integer uniqueId = 0;
+		int uniqueId = 0;
 		for (Element elem : root.getChildren()) {
 			String name = elem.getName();
 			switch (name) {
@@ -175,36 +173,25 @@ public class GameIO {
 					}
 					break;
 				case StringIO.OBJECT:
-					String uniqueName = "";
-					if (elem.getAttributeValue(StringIO.UNIQUE_NAME) == null) {
+					String uniqueName = elem.getAttributeValue(StringIO.UNIQUE_NAME);
+					if (uniqueName == null) {
 						throw new IOException("Object must have a unique name");
 					}
-					uniqueName = elem.getAttributeValue(StringIO.UNIQUE_NAME);
-					int objectNumber = 1;
-					if (elem.getAttributeValue(StringIO.NUMBER) != null) {
-						objectNumber = Integer.parseInt(elem.getAttributeValue(StringIO.NUMBER));
-					}
-					for (int i = 0; i < objectNumber; ++i) {
+					int objectCount = readAttribute(elem, StringIO.NUMBER, 1);
+					for (int i = 0; i < objectCount; ++i) {
 						if (gi.game.getObject(uniqueName) == null) {
 							throw new IOException("Unique name" + uniqueName + " not defined");
 						}
-						ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), uniqueId);
-						ObjectStateIO.editStateFromElement(oi.state, elem);
-						if (oi.state.isFixed) {
-							oi.state.drawValue = 0;
-						} else {
-							oi.state.drawValue = max(max(oi.state.drawValue, uniqueId), 1);
-						}
-
-						if (elem.getAttributeValue(StringIO.ORIGINAL_X) == null) {
-							oi.state.originalX = oi.state.posX;
-						}
-						if (elem.getAttributeValue(StringIO.ORIGINAL_Y) == null) {
-							oi.state.originalY = oi.state.posY;
-						}
-						if (elem.getAttributeValue(StringIO.ORIGINAL_ROTATION) == null) {
-							oi.state.originalRotation = oi.state.rotation;
-						}
+						ObjectInstance oi = new ObjectInstance(gi.game.getObject(uniqueName), readAttribute(elem, StringIO.ID, uniqueId));
+                        if (oi.state.isFixed) {
+                            oi.state.drawValue = 0;
+                        } else {
+                            oi.state.drawValue = max(max(oi.state.drawValue, uniqueId), 1);
+                        }
+                        ObjectStateIO.editStateFromElement(oi.state, elem);
+                        oi.state.originalX = readAttribute(elem, StringIO.ORIGINAL_X, oi.state.posX);
+                        oi.state.originalY = readAttribute(elem, StringIO.ORIGINAL_Y, oi.state.posY);
+                        oi.state.originalRotation = readAttribute(elem, StringIO.ORIGINAL_ROTATION, oi.state.rotation);
 						gi.addObjectInstance(oi);
 						++uniqueId;
 					}
@@ -296,9 +283,7 @@ public class GameIO {
 				groups.add(child.getText());
 			}
 		}
-
 		result.groups = groups.toArray(new String[groups.size()]);
-
 		return result;
 	}
 
@@ -312,6 +297,7 @@ public class GameIO {
 	{
 		Element elem = new Element(StringIO.OBJECT);
 		elem.setAttribute(StringIO.UNIQUE_NAME, objectInstance.go.uniqueObjectName);
+		elem.setAttribute(StringIO.ID, Integer.toString(objectInstance.id));
 		ObjectStateIO.writeStateToElement(objectInstance.state, elem);
 		return elem;
 	}
@@ -346,10 +332,8 @@ public class GameIO {
 		{
 			GameObjectToken token = (GameObjectToken) gameObject;
 			elem.setAttribute(StringIO.FRONT, game.getImageKey(token.getUpsideLook()));
-			if (token.getDownsideLook() != null)
-			{
-				elem.setAttribute(StringIO.BACK, game.getImageKey(token.getDownsideLook()));
-			}
+			Texture downsideLook = token.getDownsideLook();
+			if (downsideLook != null) {elem.setAttribute(StringIO.BACK, game.getImageKey(downsideLook));}
 		}
 		else if (gameObject instanceof GameObjectFigure)
 		{
@@ -434,7 +418,7 @@ public class GameIO {
 	    	Document doc_inst = new Document();
 	    	Element root_inst = new Element(StringIO.XML);
 
-			for (int idx = 0; idx < gi.getObjectCount(); idx++) {
+			for (int idx = 0; idx < gi.getObjectInstanceCount(); idx++) {
 	        	ObjectInstance ObjectInstance = gi.getObjectInstanceByIndex(idx);
         		root_inst.addContent(createElementFromObjectInstance(ObjectInstance));
         	}
@@ -556,8 +540,8 @@ public class GameIO {
     	Element root_game = new Element(StringIO.XML);
     	doc_game.addContent(root_game);
 
-        for (int idx = 0; idx < game.objects.size(); idx++) {
-        	GameObject entry = game.objects.get(idx);
+        for (int idx = 0; idx < game.getGameObjectCount(); idx++) {
+        	GameObject entry = game.getGameObjectByIndex(idx);
         	root_game.addContent(createElementFromGameObject(entry, game));
         }
         
@@ -609,26 +593,7 @@ public class GameIO {
 
 	}
 
-
-	/**
-	 * Reads a snapshot of a GameInstance encoded into @param in incl. the
-	 * GameObject gi.game itself.
-	 * ATTENTION 1: Even though the @param in is an abstract InputStream, it will
-	 * used to create a ZipInputStream via ZipInputStream(in).
-	 * ATTENTION 2: It is expected, that all images used in the game are in the stream.
-	 * Possible image formats are .png and .jpg.
-	 * Besides, two files StringIO.GAME_XML and StringIO.GAME_INSTANCE_XML are expected, that encode
-	 * the game itself and the specific instance respectively.
-	 * @param in the InputStream that encodes the snapshot
-	 * @return the GameInstance encodes in @param stream
-	 */
-	public static GameInstance readSnapshotFromZip(InputStream in, GameInstance gi, JProgressBar progressBar) throws IOException, JDOMException
-	{
-		ZipInputStream stream = new ZipInputStream(in);
-		GameInstance result = readSnapshotFromZip(stream, gi, progressBar);
-		in.close();
-		return result;
-	}
+    
 
 	/**
 	 * Reads a snapshot of a GameInstance encoded into @param in incl. the
@@ -654,15 +619,16 @@ public class GameIO {
 
 	private static class GameSnapshotreader
 	{
-		ByteArrayOutputStream gameBuffer = new ByteArrayOutputStream();
-		ByteArrayOutputStream gameInstanceBuffer = new ByteArrayOutputStream();
-		final GameInstance result;
+		private final ByteArrayOutputStream gameBuffer = new ByteArrayOutputStream();
+		private final ByteArrayOutputStream gameInstanceBuffer = new ByteArrayOutputStream();
+		private final GameInstance result;
+		private final HashMap<String, Texture> images = new HashMap<>();
 		
 		public GameSnapshotreader(GameInstance result)
 		{
 			this.result = result;
 		}
-		
+
 		void put (String name, InputStream content) throws IOException
 		{
 			if (name.equals(StringIO.GAME_XML))
@@ -679,10 +645,18 @@ public class GameIO {
 			    if (filetype != null && ArrayUtil.firstEqualIndex(ImageIO.getReaderFileSuffixes(), filetype) != -1)
 			    {
 		    		Texture img = new Texture(content, filetype);
-					result.game.images.put(name, img);
+					images.put(name, img);
 			    }
 			}
 		}
+		
+		private static <K, V> Map<K, V>copyMap(Map<K, V> original, Map<K, V> second_Map)
+	    {
+	        for (Map.Entry<K, V> entry : original.entrySet()) {
+	            second_Map.put(entry.getKey(),entry.getValue());
+	        }
+	        return second_Map;
+	    }
 		
 		void run() throws JDOMException, IOException
 		{
@@ -690,7 +664,8 @@ public class GameIO {
 			Element root = doc.getRootElement();
 
 			//Control the xml version, downward compatible current version 2.0
-			int uniqueId = 0;
+			result.game.images.clear();
+			copyMap(images, result.game.images);
 			for (Element elem : root.getChildren()) {
 				final String name = elem.getName();
 				if (name.equals(StringIO.OBJECT)) {
@@ -698,13 +673,11 @@ public class GameIO {
 					{
 					    int count = Integer.parseInt(elem.getAttributeValue(StringIO.NUMBER));
 						for (int i=0; i<count;++i) {
-							result.game.objects.add(createGameObjectFromElement(elem, result.game.images));
-							++uniqueId;
+							result.game.addObject(createGameObjectFromElement(elem, result.game.images));
 						}
 					}
 					else {
-						result.game.objects.add(createGameObjectFromElement(elem, result.game.images));
-						++uniqueId;
+						result.game.addObject(createGameObjectFromElement(elem, result.game.images));
 					}
 				} else if (name.equals(StringIO.BACKGROUND)) {
 					result.game.background = result.game.images.get(elem.getValue());
@@ -717,21 +690,7 @@ public class GameIO {
 				result.name = String.valueOf(Math.random());
 			}
 			editGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
-			
 		}
-	}
-
-	public static GameInstance readSnapshotFromFolder(File folder, GameInstance result, JProgressBar progressBar) throws IOException, JDOMException
-	{
-		GameSnapshotreader gsr = new GameSnapshotreader(result);
-		for (File subfile : folder.listFiles())
-		{
-			FileInputStream input = new FileInputStream(subfile);
-			gsr.put(subfile.getName(), input);
-			input.close();
-		}
-		gsr.run();
-		return gsr.result;
 	}
 	
 	public static GameInstance readSnapshotFromFolder(File folder, GameInstance result) throws IOException, JDOMException
@@ -767,29 +726,6 @@ public class GameIO {
 			{
 				String name = entry.getName();
 				gsr.put(name, stream);
-			}
-		}
-		finally
-		{
-			stream.close();
-		}
-		gsr.run();
-		return gsr.result;
-	}
-
-	public static GameInstance readSnapshotFromZip(ZipInputStream stream, GameInstance gi, JProgressBar progressBar) throws IOException, JDOMException
-	{
-		GameSnapshotreader gsr = new GameSnapshotreader(gi);
-		try
-		{
-			ZipEntry entry;
-			int counter = 0;
-			while((entry = stream.getNextEntry())!=null)
-			{
-				String name = entry.getName();
-				gsr.put(name, stream);
-				++counter;
-				progressBar.setValue(min(99, counter));
 			}
 		}
 		finally
@@ -837,60 +773,30 @@ public class GameIO {
 		editGameInstanceFromElement(root, gi);
 	}
 
-	/**
-	 * Edit the GameInstance @param gi from information encoded in @param input.
-	 * ATTENTION 1: @param input is expected to contain an XML document
-	 * that can be used to build a Document via the SAXBuilder.
-	 * ATTENTION 2: Only the fields players, name and objects get updated.
-	 * @param gi the GameInstance to be edited
-	 * @param is the InputStream with all update information
-	 */
-	public static void editGameInstanceFromZip(InputStream is, GameInstance gi) throws JDOMException, IOException
-	{
-		ZipInputStream stream = new ZipInputStream(is);
-		editGameInstanceFromStream(stream, gi);
-		stream.close();
-	}
-
-	/**
-	 * Edit the GameInstance @param gi from information encoded in @param input.
-	 * ATTENTION 1: @param input is expected to contain an XML document
-	 * that can be used to build a Document via the SAXBuilder.
-	 * ATTENTION 2: Only the fields players, name and objects get updated.
-	 * @param gi the GameInstance to be edited
-	 * @param inputStream the InputStream with all update information
-	 * @param source Paul sagt wir brauchen irgendwann die AsynchronousGameConnection^^ Bisher brauchen wir sie nicht.
-	 */
-	public static void editGameInstanceFromZip(InputStream inputStream, GameInstance gi,
-			AsynchronousGameConnection source) throws JDOMException, IOException {
-		ZipInputStream stream = new ZipInputStream(inputStream);
-		ZipEntry entry;
-		ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-		while ((entry = stream.getNextEntry()) != null)
-		{
-		    StreamUtil.copy(stream, byteStream);
-			if (entry.getName().equals(StringIO.GAME_INSTANCE_XML))
-			{
-				editGameInstanceFromStream(new ByteArrayInputStream(byteStream.toByteArray()), gi);
-			}
-			byteStream.reset();
-		}
-		stream.close();
-	}
-	
-	/**
-	 * Edit the GameInstance @param gi from information encoded in @param input.
-	 * ATTENTION 1: @param input is expected to contain an XML document
-	 * that can be used to build a Document via the SAXBuilder.
-	 * ATTENTION 2: Only the fields players, name and objects get updated.
-	 * @param gi the GameInstance to be edited
-	 * @param inputStream the InputStream with all update information
-	 * @param source Paul sagt wir brauchen irgendwann die AsynchronousGameConnection^^ Bisher brauchen wir sie nicht.
-	 */
-	public static void editGameInstanceFromStream(InputStream inputStream, GameInstance gi,
-			AsynchronousGameConnection source) throws JDOMException, IOException {
-		editGameInstanceFromStream(inputStream, gi);
-	}
+    /**
+     * Edit the GameInstance @param gi from information encoded in @param input.
+     * ATTENTION 1: @param input is expected to contain an XML document
+     * that can be used to build a Document via the SAXBuilder.
+     * ATTENTION 2: Only the fields players, name and objects get updated.
+     * @param gi the GameInstance to be edited
+     * @param inputStream the InputStream with all update information
+     * @param source Paul sagt wir brauchen irgendwann die AsynchronousGameConnection^^ Bisher brauchen wir sie nicht.
+     */
+    public static void editGameInstanceFromZip(InputStream inputStream, GameInstance gi) throws JDOMException, IOException {
+        ZipInputStream stream = new ZipInputStream(inputStream);
+        ZipEntry entry;
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        while ((entry = stream.getNextEntry()) != null)
+        {
+            StreamUtil.copy(stream, byteStream);
+            if (entry.getName().equals(StringIO.GAME_INSTANCE_XML))
+            {
+                editGameInstanceFromStream(new ByteArrayInputStream(byteStream.toByteArray()), gi);
+            }
+            byteStream.reset();
+        }
+        stream.close();
+    }
 
 	public static void writeObjectToStreamObject(ObjectOutputStream objOut, GameObject editedObject) throws IOException {
 		objOut.writeInt(editedObject.widthInMM);

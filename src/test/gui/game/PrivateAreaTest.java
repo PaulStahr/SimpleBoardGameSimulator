@@ -19,7 +19,7 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gui.game.PrivateArea;
 import io.GameIO;
-import gui.game.Player;
+import main.Player;
 
 public class PrivateAreaTest {
     int id = (int)System.nanoTime();

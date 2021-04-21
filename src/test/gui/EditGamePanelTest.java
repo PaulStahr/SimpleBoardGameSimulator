@@ -7,7 +7,7 @@ import gameObjects.instance.GameInstance;
 import gui.game.EditGamePanel;
 import gui.language.LanguageHandler;
 import gui.language.Language.LanguageSummary;
-import gui.game.Player;
+import main.Player;
 
 public class EditGamePanelTest {
     @Test

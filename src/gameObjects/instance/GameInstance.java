@@ -33,7 +33,7 @@ import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.functions.CheckingFunctions;
 import gameObjects.functions.ObjectFunctions;
-import gui.game.Player;
+import main.Player;
 import util.ArrayTools;
 import util.ListTools;
 import util.jframe.table.TableColumnType;
@@ -119,7 +119,7 @@ public class GameInstance {
 	{
 		//return maxDrawValue;
         int maxDrawValue = 0;
-        for (int idx = 0; idx<getObjectCount(); ++idx){
+        for (int idx = 0; idx<getObjectInstanceCount(); ++idx){
             maxDrawValue = max(maxDrawValue, getObjectInstanceByIndex(idx).state.drawValue);
         }
         return maxDrawValue;
@@ -220,12 +220,12 @@ public class GameInstance {
 
 	public ObjectInstance addObjectInstance(ObjectInstance objectInstance)
 	{
-		ObjectInstance oi = getObjectInstanceById(objectInstance.id);
-		if (oi != null)
+		ObjectInstance res = getObjectInstanceById(objectInstance.id);
+        if (res != null)
 		{
-			oi.updateState(objectInstance.state);
-			oi.scale = objectInstance.scale *= objectInstance.state.scale;
-			return oi;
+	        res.updateState(objectInstance.state);
+			res.scale = objectInstance.scale *= objectInstance.state.scale;
+            return res;
 		}
 		objects.add(objectInstance);
 		return objectInstance;
@@ -242,10 +242,11 @@ public class GameInstance {
                 {
             		for (int i = 0; i < objects.size(); ++i)
             		{
-            			if (objects.get(i).id == id)
+            		    ObjectInstance current = objects.get(i);
+            			if (current.id == id)
             			{
                             if (!lock.validate(stamp)){break lock;}
-            				return objects.get(i);
+            				return current;
             			}
             		}
                     if (lock.validate(stamp)){return null;}
@@ -259,9 +260,9 @@ public class GameInstance {
 
 	public ObjectInstance getObjectInstanceByIndex(int index){return this.objects.get(index);}
 
-	public int getObjectCount(){return this.objects.size();}
+	public int getObjectInstanceCount(){return this.objects.size();}
 	
-	public GameObject getObjectByIndex(int index){return this.game.objects.get(index);}
+	public GameObject getObjectByIndex(int index){return this.game.getObjectByIndex(index);}
 	
 	@Override
     public int hashCode()
@@ -304,9 +305,9 @@ public class GameInstance {
         {
 	        String textureName = ((GameTextureRemoveAction)action).textureName;
 	        game.images.remove(textureName);
-	        for (int i = 0; i < game.objects.size(); ++i)
+	        for (int i = 0; i < game.getGameObjectCount(); ++i)
 	        {
-	            GameObject go = game.objects.get(i);
+	            GameObject go = game.getObjectByIndex(i);
 	            if (go instanceof GameObjectToken) {
 	                GameObjectToken token = (GameObjectToken)go;
                     if (textureName.equals(token.getUpsideLookId()))
@@ -469,7 +470,7 @@ public class GameInstance {
 	public List<Player> getPlayerList(boolean with_visitors){return with_visitors ? unmodifiablePlayer : getPlayerList();}
 
 	public void remove(int source, GameObject object) {
-		game.objects.remove(object);
+		game.removeObject(object);
 		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_OBJECT, object.uniqueObjectName.hashCode()));
 	}
 	

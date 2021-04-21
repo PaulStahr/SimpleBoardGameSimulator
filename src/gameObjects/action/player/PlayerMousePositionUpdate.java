@@ -1,6 +1,6 @@
 package gameObjects.action.player;
 
-import gui.game.Player;
+import main.Player;
 
 public class PlayerMousePositionUpdate extends PlayerEditAction{
     public final int mouseX, mouseY;

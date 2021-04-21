@@ -1,4 +1,4 @@
-package gui.game;
+package main;
 
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import gameObjects.columnTypes.PlayerColumnType;
 import gameObjects.instance.GameInstance;
+import gui.game.GamePanel;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
 

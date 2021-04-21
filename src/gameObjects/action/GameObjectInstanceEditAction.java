@@ -4,7 +4,7 @@ package gameObjects.action;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
-import gui.game.Player;
+import main.Player;
 public class GameObjectInstanceEditAction extends GameAction{
 	/**
 	 * 

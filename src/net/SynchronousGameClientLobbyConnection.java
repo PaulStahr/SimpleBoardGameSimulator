@@ -28,7 +28,7 @@ import gameObjects.action.message.UsertextMessageAction;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import io.GameIO;
-import gui.game.Player;
+import main.Player;
 import util.StringUtils;
 
 public class SynchronousGameClientLobbyConnection {

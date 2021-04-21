@@ -46,7 +46,7 @@ import gui.minigames.TetrisGameInstance.TetrisGameEvent;
 import io.GameIO;
 import io.ObjectStateIO;
 import io.PlayerIO;
-import gui.game.Player;
+import main.Player;
 import util.ArrayUtil;
 import util.StringUtils;
 import util.data.UniqueObjects;
@@ -83,7 +83,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
     public void changeUpdate(GameAction action) {
         if (Thread.currentThread() != inputThread && !stop) //TODO this is only a workaround
         {
-            if (logger.isDebugEnabled()){logger.debug("Queue Action != " + inputThread.getName());}
+            if (logger.isDebugEnabled()){logger.debug("Queue Action" + action);}
             queueOutput(action);
         }
         if (action instanceof DestroyInstance)
@@ -94,7 +94,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 
     private void queueOutput(Object output)
     {
-        if (logger.isDebugEnabled()){logger.debug("Addd queue " + id);}
+        if (logger.isDebugEnabled()){logger.debug("Add queue " + id + " output");}
         synchronized(queuedOutputs)
         {
             queuedOutputs.add(output);
@@ -159,6 +159,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
     {
         final String type;
         public CommandRead(String type) {this.type = type;}
+        
+        @Override
+        public String toString() {
+            return CommandRead.class + " " + type;
+        }
     }
 
     static class CommandWrite
@@ -349,26 +354,28 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
             logger.error("Error at emmiting Game Action", e);
         }
     }
-    
-    private void outputLoop()
-    {
-        ArrayList<String> split = new ArrayList<>();
-        StringBuilder strB = new StringBuilder();
-        ObjectOutputStream objOut = null;
-        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
-        try {
-            objOut = StreamUtil.toObjectStream(output);
-        } catch (IOException e1) {
-            logger.error("Can't initialize ObjectStream", e1);
-        }
-        while (!stop)
+
+    private Object getQueuedObject(ObjectOutputStream objOut) {
+        boolean flush = true;
+        while(!stop)
         {
-            Object outputObject = null;
             synchronized(queuedOutputs)
             {
-                outputObject = queuedOutputs.size() == 0 ? null : queuedOutputs.pop();
+                if (!queuedOutputs.isEmpty())
+                {
+                    return queuedOutputs.pop();
+                }
+                else if (!flush)
+                {
+                    if (stop){return null;}
+                    try {
+                        queuedOutputs.wait();
+                    } catch (InterruptedException e) {
+                        logger.error("Unexpected interrupt", e);
+                    }
+                }
             }
-            if (outputObject == null)
+            if (flush)
             {
                 try {
                     if (blocksize  != 0)
@@ -387,27 +394,38 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                     }
                     objOut.flush();
                     output.flush();
+                    flush = false;
                 } catch (IOException e1) {
                     logger.error("Error during flushing output", e1);
                     if (e1 instanceof SocketException)
                     {
-                        return;
+                        stop = true;
+                        return null;
                     }
-                }
-                synchronized(queuedOutputs)
-                {
-                    if (queuedOutputs.size() == 0)
-                    {                    
-                        try {
-                            queuedOutputs.wait();
-                        } catch (InterruptedException e) {
-                            logger.error("Unexpected interrupt", e);
-                        }
-                    }
-                    outputObject = queuedOutputs.size() == 0 ? null : queuedOutputs.pop();
                 }
             }
-            if (outputObject == null){continue;}
+        }
+        return null;
+    }
+    
+    private void outputLoop()
+    {
+        ArrayList<String> split = new ArrayList<>();
+        StringBuilder strB = new StringBuilder();
+        ObjectOutputStream objOut = null;
+        ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        try {
+            objOut = StreamUtil.toObjectStream(output);
+        } catch (IOException e1) {
+            logger.error("Can't initialize ObjectStream", e1);
+        }
+        while (!stop)
+        {
+            Object outputObject = getQueuedObject(objOut);
+            if (stop)
+            {
+                return;
+            }
             if (logger.isDebugEnabled()){logger.debug("Next queued object:" + outputObject.toString());}
             try
             {
@@ -540,6 +558,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                     logger.error("Can't extract object", e);
                     if (stopOnError){return;}
                 }
+                if (logger.isDebugEnabled()){logger.debug("Next input object:" + inputObject.toString());}
                 if (inputObject instanceof TimingOffsetChanged)
                 {
                     otherTimingOffset = ((TimingOffsetChanged) inputObject).offset;
@@ -745,7 +764,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                                         int size = Integer.parseInt(split.get(3));
                                         //byte data[] = (byte[])objIn.readObject();
                                         cappedIn.setCap(size);
-                                        GameIO.editGameInstanceFromZip(cappedIn, gi, this);
+                                        GameIO.readSnapshotFromZip(cappedIn, gi);
                                         cappedIn.drain();
                                         break;
                                     }

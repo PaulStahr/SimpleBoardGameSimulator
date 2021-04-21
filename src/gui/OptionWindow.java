@@ -1,4 +1,4 @@
-package gui.game;
+package gui;
 
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -17,10 +17,10 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import data.JFrameLookAndFeelUtil;
 import data.Options;
 import gui.language.Language;
+import gui.language.Language.LanguageSummary;
 import gui.language.LanguageChangeListener;
 import gui.language.LanguageHandler;
 import gui.language.Words;
-import gui.language.Language.LanguageSummary;
 import util.JFrameUtils;
 
 public class OptionWindow extends JFrame implements LanguageChangeListener, ActionListener {
@@ -42,6 +42,8 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 	private final JCheckBox checkBoxShowPing = new JCheckBox();
 	private final JLabel labelDebug = new JLabel();
 	private final JCheckBox checkBoxDebug = new JCheckBox();
+	private final JLabel labelLoglevel = new JLabel();
+	private final JComboBox<String> comboBoxLoglevel = new JComboBox<>(new String[] {"OFF","ERROR", "WARN", "INFO", "DEBUG"});
 	private final LanguageHandler lh;
 	
 	public OptionWindow(LanguageHandler lh)
@@ -57,6 +59,8 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		
 		checkBoxShowPing.setSelected(Options.getBoolean("gui.show_ping", false));
 		checkBoxDebug.setSelected(Options.getBoolean("debug", false));
+		comboBoxLoglevel.setSelectedItem(Options.getString("log.level"));
+		comboBoxLanguages.setSelectedItem(lh.getCurrentLanguage());
 		
 		panelSettings.setLayout(JFrameUtils.DOUBLE_COLUMN_LAUYOUT);
 		panelSettings.add(labelLanguage);
@@ -69,6 +73,8 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		panelSettings.add(checkBoxShowPing);
 		panelSettings.add(labelDebug);
 		panelSettings.add(checkBoxDebug);
+		panelSettings.add(labelLoglevel);
+		panelSettings.add(comboBoxLoglevel);
 		GroupLayout layout = new GroupLayout(getContentPane());
 		getContentPane().setLayout(layout);
 		layout.setHorizontalGroup(layout.createParallelGroup().addComponent(panelSettings).addGroup(layout.createSequentialGroup().addComponent(buttonOk).addComponent(buttonAccept).addComponent(buttonCancel)));
@@ -89,6 +95,7 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
 		labelInvertRotation.setText(language.getString(Words.invert_rotation));
 		labelShowPing.setText(language.getString(Words.show_ping));
 		labelDebug.setText(language.getString(Words.debug));
+		labelLoglevel.setText(language.getString(Words.loglevel));
 	}
 
 	@Override
@@ -107,6 +114,7 @@ public class OptionWindow extends JFrame implements LanguageChangeListener, Acti
             Options.set("invert_rotation", checkBoxInvertRotation.isSelected());
             Options.set("gui.show_ping", checkBoxShowPing.isSelected());
             Options.set("debug", checkBoxDebug.isSelected());
+            Options.set("log.level", comboBoxLoglevel.getSelectedItem());
             Options.triggerUpdates();
 		}
 		if (source == buttonOk || source == buttonCancel)

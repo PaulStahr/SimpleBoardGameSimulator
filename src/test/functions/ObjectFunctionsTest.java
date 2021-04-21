@@ -2,23 +2,17 @@ package test.functions;
 
 import data.DataHandler;
 import gameObjects.action.player.PlayerAddAction;
-import gameObjects.functions.CheckingFunctions;
-import gameObjects.functions.MoveFunctions;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import gui.game.PrivateArea;
 import io.GameIO;
-import gui.game.Player;
+import main.Player;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 import util.data.IntegerArrayList;
 
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 

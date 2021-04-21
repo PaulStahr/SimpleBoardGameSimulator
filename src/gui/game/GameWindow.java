@@ -25,6 +25,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
+import main.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,7 @@ import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
 import gui.Credits;
+import gui.OptionWindow;
 import gui.language.Language;
 import gui.language.LanguageChangeListener;
 import gui.language.LanguageHandler;

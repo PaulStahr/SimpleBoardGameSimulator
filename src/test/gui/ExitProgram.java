@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import gui.game.Player;
+import main.Player;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 

@@ -8,6 +8,7 @@ import gui.language.Language;
 import gui.language.LanguageChangeListener;
 import gui.language.LanguageHandler;
 import gui.language.Words;
+import main.Player;
 
 import java.awt.event.WindowEvent;
 

@@ -109,5 +109,5 @@ public enum Words {
     password,
     seats,
     show_ping,
-    create_new_game, start_new_game, load_game, create_game, debug, cards, figures, dices, books, connection;
+    create_new_game, start_new_game, load_game, create_game, debug, cards, figures, dices, books, connection, loglevel;
 }

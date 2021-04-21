@@ -13,7 +13,7 @@ import org.jdom2.JDOMException;
 import org.junit.Test;
 
 import io.PlayerIO;
-import gui.game.Player;
+import main.Player;
 
 public class PlayerIOTest {
     @Test

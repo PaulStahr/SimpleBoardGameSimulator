@@ -7,7 +7,7 @@ import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
-import gui.game.Player;
+import main.Player;
 import io.GameIO;
 import org.jdom2.JDOMException;
 import org.junit.Test;

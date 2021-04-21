@@ -1,6 +1,6 @@
 package gameObjects.columnTypes;
 
-import gui.game.Player;
+import main.Player;
 import util.ArrayTools;
 import util.ArrayTools.UnmodifiableArrayList;
 import util.ArrayUtil;

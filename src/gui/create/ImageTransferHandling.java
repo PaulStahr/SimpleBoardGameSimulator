@@ -1,7 +1,6 @@
 package gui.create;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Cursor;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
@@ -9,7 +8,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.swing.JComponent;
+import javax.swing.JTextField;
+import javax.swing.TransferHandler;
+
+import util.ArrayUtil;
+
 public class ImageTransferHandling extends TransferHandler {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 760200676505143156L;
+
     private static final DataFlavor FILE_FLAVOR = DataFlavor.javaFileListFlavor;
 
     private JTextField textField;
@@ -22,13 +32,15 @@ public class ImageTransferHandling extends TransferHandler {
      * The method to handle the transfer between the source of data and the
      * destination, which is in our case the main panel.
      */
+    @Override
     public boolean importData(JComponent c, Transferable t) {
         if (canImport(c, t.getTransferDataFlavors())) {
             if (transferFlavor(t.getTransferDataFlavors(), FILE_FLAVOR)) {
                 try {
+                    @SuppressWarnings("unchecked")
                     List<File> fileList = (List<File>) t.getTransferData(FILE_FLAVOR);
                     if (fileList != null && fileList.toArray() instanceof File[]) {
-                        File[] files = (File[]) fileList.toArray();
+                        File[] files = fileList.toArray(new File[fileList.size()]);
                         //mainPanel.addFiles(files);
                     }
                     return true;
@@ -45,6 +57,7 @@ public class ImageTransferHandling extends TransferHandler {
     /**
      * Returns the type of transfer actions to be supported.
      */
+    @Override
     public int getSourceActions(JComponent c) {
         return COPY_OR_MOVE;
     }
@@ -52,6 +65,7 @@ public class ImageTransferHandling extends TransferHandler {
     /**
      * Specifies the actions to be performed after the data has been exported.
      */
+    @Override
     protected void exportDone(JComponent c, Transferable data, int action) {
         c.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
@@ -61,23 +75,15 @@ public class ImageTransferHandling extends TransferHandler {
      * false otherwise.
      */
     private boolean transferFlavor(DataFlavor[] flavors, DataFlavor flavor) {
-        boolean found = false;
-        for (int i = 0; i < flavors.length && !found; i++) {
-            found = flavors[i].equals(flavor);
-        }
-        return found;
+        return ArrayUtil.firstEqualIndex(flavors, flavor) != -1;
     }
 
     /**
      * Returns true if the component can import the specified flavours, false
      * otherwise.
      */
+    @Override
     public boolean canImport(JComponent c, DataFlavor[] flavors) {
-        for (int i = 0; i < flavors.length; i++) {
-            if (FILE_FLAVOR.equals(flavors[i])) {
-                return true;
-            }
-        }
-        return false;
+        return ArrayUtil.firstEqualIndex(flavors, c) != -1;
     }
 }

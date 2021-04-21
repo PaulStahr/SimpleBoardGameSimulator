@@ -1,6 +1,6 @@
 package gameObjects.action.player;
 
-import gui.game.Player;
+import main.Player;
 
 public class PlayerRemoveAction extends PlayerEditAction{
 	public PlayerRemoveAction(int source, Player sourcePlayer, Player editedPlayer) {

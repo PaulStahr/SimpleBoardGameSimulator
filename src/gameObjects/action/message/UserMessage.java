@@ -2,7 +2,7 @@ package gameObjects.action.message;
 
 import gameObjects.action.GameAction;
 import gameObjects.instance.GameInstance;
-import gui.game.Player;
+import main.Player;
 
 public class UserMessage extends GameAction{
 	/**

@@ -76,6 +76,7 @@ import gui.language.Language;
 import gui.language.LanguageChangeListener;
 import gui.language.LanguageHandler;
 import gui.language.Words;
+import main.Player;
 import util.ArrayTools;
 import util.JFrameUtils;
 import util.StringUtils;
@@ -409,7 +410,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
     	if (!EventQueue.isDispatchThread()){throw new RuntimeException("Game-Panel changes only allowed by dispatchment thread");}
     	if (isUpdating){return;}
 		isUpdating = true;
-		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.objects, GameObject.TYPES, tableModelGameObjects, null, deleteObjectColumn);
+		JFrameUtils.updateTable(tableGameObjects, scrollPaneGameObjects, gi.game.getObjects(), GameObject.TYPES, tableModelGameObjects, null, deleteObjectColumn);
 		JFrameUtils.updateTable(tableGameObjectInstances, scrollPaneGameObjectInstances, gi.getObjectInstanceList(), ObjectInstance.TYPES, tableModelGameObjectInstances, comboBoxOverrides, resetObjectInstanceColumn, deleteObjectInstanceColumn);
 		JFrameUtils.updateTable(tableCards, scrollPaneCards, gi.getTokenList(), GameObjectToken.TOKEN_ATTRIBUTES, tableModelCards, comboBoxOverrides, resetCardColumn, deleteCardColumn);
 		JFrameUtils.updateTable(tableFigures, scrollPaneFigures, gi.getFigureList(), GameObjectFigure.FIGURE_ATTRIBUTES, tableModelFigures, null, resetFiguresColumn, deleteFigureColumn);
@@ -525,9 +526,9 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	            final ArrayList<GameObject> go = new ArrayList<>();
 	            for (int i = 0; i < selectedRows.length; ++i)
 	            {
-	                go.add(gi.game.objects.get(selectedRows[i]));
+	                go.add(gi.game.getGameObjectByIndex(selectedRows[i]));
 	            }
-	            go.add(gi.game.objects.get(row));
+	            go.add(gi.game.getGameObjectByIndex(row));
 	            GameObject gocp = ObjectEditPanel.reduce(go);
 	            frame.add(new ObjectEditPanel(gocp, gi, lh));
 	            JButton buttonOk = new JButton("Ok");

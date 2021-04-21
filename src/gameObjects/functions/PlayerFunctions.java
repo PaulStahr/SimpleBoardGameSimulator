@@ -1,7 +1,7 @@
 package gameObjects.functions;
 
 import gameObjects.instance.GameInstance;
-import gui.game.Player;
+import main.Player;
 
 public class PlayerFunctions {
     public static Player GetPlayerFromTablePlace(GameInstance gameInstance, int tablePlace){

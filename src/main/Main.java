@@ -7,16 +7,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-import gui.game.Player;
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import data.Options;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gui.game.GameWindow;
-import gui.language.LanguageHandler;
 import gui.language.Language.LanguageSummary;
+import gui.language.LanguageHandler;
 import gui.server.ServerLobbyWindow;
 import io.GameIO;
 import logging.LockbackUtil;
@@ -34,7 +34,7 @@ public class Main {
 		/*ServerLobbyWindow tmp = new ServerLobbyWindow(new SynchronousGameClientLobbyConnection("212.201.75.217", 20));
 		tmp.setVisible(true);
     	tmp.setSize(500,200);*/
-		LockbackUtil.setLoglevel("WARN");
+		LockbackUtil.setLoglevel(Options.getString("log.level"));
 		//LockbackUtil.setLoglevel("DEBUG");
 		/*if (true)
 		{

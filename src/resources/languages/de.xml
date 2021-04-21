@@ -123,4 +123,5 @@
     <dices>Würfel</dices>
     <books>Bücher</books>
     <connection>Verbindung</connection>
+    <loglevel>Loglevel</loglevel>
 </xml>

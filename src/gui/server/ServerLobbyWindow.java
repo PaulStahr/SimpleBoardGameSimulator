@@ -1,7 +1,6 @@
 package gui.server;
 
 import static test.SimpleNetworkServertest.connectAndStartGame;
-import static test.SimpleNetworkServertest.startNewServer;
 
 import java.awt.Container;
 import java.awt.EventQueue;
@@ -52,10 +51,11 @@ import gui.language.LanguageChangeListener;
 import gui.language.LanguageHandler;
 import gui.language.Words;
 import io.GameIO;
-import gui.game.Player;
+import main.Player;
 import net.AsynchronousGameConnection;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
+import test.SimpleNetworkServertest;
 import util.JFrameUtils;
 import util.ThreadPool.RunnableObject;
 import util.jframe.JFileChooserRecentFiles;
@@ -72,12 +72,6 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	public final SynchronousGameClientLobbyConnection client;
 	private final JProgressBar loadProgressBar = new JProgressBar(0, 100);
 	private final JLabel progressBarTitle = new JLabel();
-
-	String Id = String.valueOf(Options.getInteger("last_connection.id"));
-	String Address = Options.getString("last_connection.address");
-	String Port = String.valueOf(Options.getInteger("last_connection.port"));
-	String Name = Options.getString("last_connection.name");
-
 
 	private final JTextField textFieldName = new JTextField(Options.getString("last_connection.name"));
 	//private final JTextField textFieldChat = new JTextField();
@@ -146,7 +140,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						progressBarTitle.setVisible(true);
 						loadProgressBar.setVisible(true);
 						repaint();
-						GameIO.readSnapshotFromFolder(file, gi, loadProgressBar);
+						GameIO.readSnapshotFromFolder(file, gi);
 						//showProgressBar(false);
 					}
 					else if(file.getName().endsWith(".zip"))
@@ -154,7 +148,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						progressBarTitle.setVisible(true);
 						loadProgressBar.setVisible(true);
 						repaint();
-						GameIO.readSnapshotFromZip(new FileInputStream(file), gi, loadProgressBar);
+						GameIO.readSnapshotFromZip(new FileInputStream(file), gi);
 						//showProgressBar(false);
 					}
 					else
@@ -210,7 +204,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		else if (source == buttonCreateGame){
 			String address = "127.0.0.1";
 			int port = 8000 + (int)(Math.random() * 100);
-			GameServer gs = startNewServer(port);
+			GameServer gs = SimpleNetworkServertest.startNewServer(port);
 			Player player = new Player("NewGame", 1);
 			FileInputStream fis = null;
 			try {
@@ -271,13 +265,18 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 								password = new String(pf.getPassword());
 							}
 						}
-						GameInstance gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.indexOf(GameInstanceColumnType.ID)));
-				    	if (password != null)
+						GameInstance gi = null;
+                        try {
+                            gi = client.getGameInstance((String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.indexOf(GameInstanceColumnType.ID)));
+                        } catch (JDOMException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+				    	//GameInstance gi = new GameInstance(new Game(), (String)tableModelOpenGames.getValueAt(row, GameInstance.TYPES.indexOf(GameInstanceColumnType.ID)));
+						if (password != null)
 				    	{
 				    		gi.password = password;
 				    	}
-						
-						//client.addPlayerToGameSession(player, gi.name, gi.password);
 				    	AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
 				    	player = gi.addPlayer(null, player);
 				    	connection.syncPull();
@@ -285,7 +284,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				    	GameWindow gw = new GameWindow(gi, player, lh);
 				    	gw.setVisible(true);
 				    	gw.client = client;
-					} catch (IOException | JDOMException e1) {
+					} catch (IOException e1) {
 						JFrameUtils.logErrorAndShow("Can't connect to server", e1, logger);
 					}
 					updateCurrentGames();
@@ -295,10 +294,11 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 					try
 					{
 						int playerId = Integer.parseInt(textFieldId.getText());
-						Options.set("last_connection.address", textFieldAddress.getText());
-						Options.set("last_connection.port", Integer.valueOf(textFieldPort.getText()));
-						Options.set("last_connection.name", textFieldName.getText());
-						Options.set("last_connection.id", playerId);
+						OptionTreeNode last_connection = Options.getNode("last_connection");
+						Options.set(last_connection, "address", textFieldAddress.getText());
+						Options.set(last_connection, "port", Integer.valueOf(textFieldPort.getText()));
+						Options.set(last_connection, "name", textFieldName.getText());
+						Options.set(last_connection, "id", playerId);
 						Player player = new Player(textFieldName.getText(), playerId, true);
 						String password = null;
 						if (gmi.get(row).passwordRequired)

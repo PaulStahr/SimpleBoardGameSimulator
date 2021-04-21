@@ -2,7 +2,7 @@ package gameObjects.action.player;
 
 import gameObjects.action.AddObjectAction;
 import gameObjects.instance.GameInstance;
-import gui.game.Player;
+import main.Player;
 
 public class PlayerAddAction extends AddObjectAction{
 	public PlayerAddAction(int source, int objectId) {

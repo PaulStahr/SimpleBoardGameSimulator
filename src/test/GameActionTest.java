@@ -1,6 +1,7 @@
 package test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
@@ -16,13 +17,14 @@ public class GameActionTest {
     public void ObjectStateEvent()
     {
         Game game = new Game();
-        game.objects.add(new GameObjectToken("token", "card", 10, 10, null, null, 5, 5, 90, 0, false, -1));
+        game.addObject(new GameObjectToken("token", "card", 10, 10, null, null, 5, 5, 90, 0, false, -1));
         GameInstance gi = new GameInstance(game, "Foobar");
-        gi.addObjectInstance(new ObjectInstance(game.objects.get(0), 4));
+        gi.addObjectInstance(new ObjectInstance(game.getGameObjectByIndex(0), 4));
         ObjectState state = gi.getObjectInstanceById(4).copyState();
         state.posX = 4;
         state.posY = 2;
+        assertNotEquals(state, gi.getObjectInstanceById(4).state);
         gi.update(new GameObjectInstanceEditAction(-1, -1, 4, state));
-        assertTrue(state.equals(gi.getObjectInstanceById(4).state));
+        assertEquals(state, gi.getObjectInstanceById(4).state);
     }
 }

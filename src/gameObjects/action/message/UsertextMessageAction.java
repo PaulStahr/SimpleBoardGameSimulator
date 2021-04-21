@@ -1,6 +1,6 @@
 package gameObjects.action.message;
 
-import gui.game.Player;
+import main.Player;
 
 public class UsertextMessageAction extends UserMessage{
 	/**

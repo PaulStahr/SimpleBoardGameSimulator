@@ -16,7 +16,7 @@ import gameObjects.instance.ObjectInstance.Relation;
 import gameObjects.instance.ObjectState;
 import geometry.Vector2d;
 import gui.game.GamePanel;
-import gui.game.Player;
+import main.Player;
 import util.data.IntegerArrayList;
 
 public class MoveFunctions {

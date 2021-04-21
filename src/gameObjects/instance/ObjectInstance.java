@@ -6,7 +6,7 @@ import data.Texture;
 import gameObjects.columnTypes.GameObjectInstanceColumnType;
 import gameObjects.definition.GameObject;
 import gui.game.GamePanel;
-import gui.game.Player;
+import main.Player;
 import util.ArrayTools;
 import util.ArrayTools.ObjectToIntTransform;
 import util.jframe.table.TableColumnType;
@@ -48,6 +48,13 @@ public class ObjectInstance {
         this.tmpScale = other.tmpScale;
     }
 
+	@Override
+    public boolean equals(Object other) {
+	    if (!(other instanceof ObjectInstance)) {return false;}
+	    ObjectInstance obi = (ObjectInstance)other;
+	    return this.state.equals(obi.state) && this.go.equals(obi.go) && this.id == obi.id && this.scale == obi.scale && this.tmpScale == obi.tmpScale;
+	}
+
     public Texture getLook(int playerId){return go.getLook(state, playerId);}
 
 	public int getWidth(int playerId){return go.getWidth(state, playerId) * this.state.scale;}
@@ -74,7 +81,7 @@ public class ObjectInstance {
 	@Override
 	public int hashCode()
 	{
-		return go.hashCode() + state.hashCode() + id;
+		return go.hashCode() + state.hashCode() + id * 17;
 	}
 	
 	public ObjectActionMenu newObjectActionMenu(GameInstance gameInstance, Player player, GamePanel gamePanel){
