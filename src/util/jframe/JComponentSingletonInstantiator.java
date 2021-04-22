@@ -20,10 +20,7 @@ public class JComponentSingletonInstantiator<T> implements Supplier<T>, ActionLi
 	private WeakReference<T> ref;
 	private final Class<?> cl;
 	
-	public JComponentSingletonInstantiator(Class<?> cl)
-	{
-		this.cl = cl;
-	}
+	public JComponentSingletonInstantiator(Class<?> cl){this.cl = cl;}
 	
 	@Override
 	@SuppressWarnings("unchecked")

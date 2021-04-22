@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import data.Options;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
+import gui.CheckVersionWindow;
 import gui.game.GameWindow;
 import gui.language.Language.LanguageSummary;
 import gui.language.LanguageHandler;
@@ -41,6 +42,7 @@ public class Main {
 			return;
 		}*/
 		LanguageHandler lh = new LanguageHandler(new LanguageSummary("de", "de"));
+		CheckVersionWindow.setLanguageHandler(lh);
 		for (int i = 0; i < args.length; ++i)
     	{
     		if (args[i].equals("--loglevel"))
