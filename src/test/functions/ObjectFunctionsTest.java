@@ -1,20 +1,20 @@
 package test.functions;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.IOException;
+
+import org.jdom2.JDOMException;
+import org.junit.Test;
+
 import data.DataHandler;
 import gameObjects.action.player.PlayerAddAction;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
-import gameObjects.instance.ObjectInstance;
 import io.GameIO;
 import main.Player;
-import org.jdom2.JDOMException;
-import org.junit.Test;
 import util.data.IntegerArrayList;
-
-import java.io.IOException;
-
-import static org.junit.Assert.assertEquals;
 
 public class ObjectFunctionsTest {
 
@@ -25,7 +25,6 @@ public class ObjectFunctionsTest {
     {
         GameInstance gi = new GameInstance(new Game(), "Foo");
         GameIO.readSnapshotFromZip(DataHandler.getResourceAsStream("test/games/Test.zip"), gi);
-        ObjectInstance oi = gi.getObjectInstanceByIndex(0);
         Player pl = new Player("Max", 4);
         gi.addPlayer(new PlayerAddAction(id, pl), pl);
         int[] idList = new int[] {0, 1, 2, 3, 4};
@@ -45,7 +44,6 @@ public class ObjectFunctionsTest {
     {
         GameInstance gi = new GameInstance(new Game(), "Foo");
         GameIO.readSnapshotFromZip(DataHandler.getResourceAsStream("test/games/Test.zip"), gi);
-        ObjectInstance oi = gi.getObjectInstanceByIndex(0);
         Player pl = new Player("Max", 4);
         gi.addPlayer(new PlayerAddAction(id, pl), pl);
         int[] idList = new int[] {0, 1, 2, 3, 4};
