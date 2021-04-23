@@ -26,10 +26,7 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 	private final Random rand = new Random();
 	private boolean down;
 	
-	public TetrisGameInstance getGameInstance()
-	{
-		return tgi;
-	}
+	public TetrisGameInstance getGameInstance(){return tgi;}
 	
 	
 	public TetrisPanel(TetrisGameInstance tetrisInstance)

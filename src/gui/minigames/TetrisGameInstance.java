@@ -237,7 +237,7 @@ public class TetrisGameInstance implements GameChangeListener {
 		}
 		TetrisObjectType type = objectTypes[tp];
 		setPixels(fo, (byte)0);
-		byte ret = 0;
+		byte res = 0;
 		for (int y = 0; y < type.height; ++y)
 		{
 			for (int x = 0; x < type.width; ++x)
@@ -251,14 +251,14 @@ public class TetrisGameInstance implements GameChangeListener {
 					}
 					else if (pixel < 0)
 					{
-						ret = -1;
+						res = -1;
 					}
 						
 				}
 			}
 		}
 		setPixels(fo, (byte)-1);
-		return ret;
+		return res;
 	}
 	
 	public boolean row_filled(int row)
