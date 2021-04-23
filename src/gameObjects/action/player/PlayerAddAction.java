@@ -28,4 +28,6 @@ public class PlayerAddAction extends AddObjectAction{
 		}
 		return player;
 	}
+
+    public int getPlayerId() {return objectId;}
 }

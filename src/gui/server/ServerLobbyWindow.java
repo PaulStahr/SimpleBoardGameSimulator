@@ -41,6 +41,7 @@ import data.JFrameLookAndFeelUtil;
 import data.Options;
 import data.Options.OptionTreeNode;
 import gameObjects.GameMetaInfo;
+import gameObjects.action.player.PlayerAddAction;
 import gameObjects.columnTypes.GameInstanceColumnType;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
@@ -222,7 +223,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				jdomException.printStackTrace();
 			}
 			gi.name = "Create Game";
-			gi.addPlayer(null, player);
+			player = gi.addPlayer(new PlayerAddAction(-1, player));
 			try {
 				fis.close();
 			} catch (IOException ioException) {
@@ -278,7 +279,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				    		gi.password = password;
 				    	}
 				    	AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
-				    	player = gi.addPlayer(null, player);
+				    	player = gi.addPlayer(new PlayerAddAction(-1, player));
 				    	connection.syncPull();
 				    	connection.start();
 				    	GameWindow gw = new GameWindow(gi, player, lh);
@@ -318,7 +319,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 
 						//client.addPlayerToGameSession(player, gi.name, gi.password);
 						AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
-						player = gi.addPlayer(null, player);
+						player = gi.addPlayer(new PlayerAddAction(-1, player));
 						connection.syncPull();
 						connection.start();
 						GameWindow gw = new GameWindow(gi, player, lh);

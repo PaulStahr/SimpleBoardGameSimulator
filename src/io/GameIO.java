@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import data.Texture;
 import gameObjects.action.GameObjectInstanceEditAction;
+import gameObjects.action.player.PlayerAddAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectBook;
 import gameObjects.definition.GameObjectBook.BookSide;
@@ -121,7 +122,7 @@ public class GameIO {
 			switch (name) {
 				case StringIO.PLAYER:
 					Player player = PlayerIO.createPlayerFromElement(elem);
-					gi.addPlayer(null, player);
+					player = gi.addPlayer(new PlayerAddAction(-1, player));
 					break;
 				case StringIO.NAME:
 					gi.name = elem.getValue();

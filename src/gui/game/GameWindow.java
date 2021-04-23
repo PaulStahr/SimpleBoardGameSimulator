@@ -25,7 +25,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 
-import main.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +32,7 @@ import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
 import data.Options;
 import gameObjects.action.GameAction;
+import gameObjects.action.player.PlayerAddAction;
 import gameObjects.action.player.PlayerRemoveAction;
 import gameObjects.functions.CheckingFunctions;
 import gameObjects.functions.CheckingFunctions.GameInconsistency;
@@ -50,6 +50,7 @@ import gui.minigames.TetrisGameInstance.TetrisGameEvent;
 import gui.minigames.TetrisGameInstance.TetrisGameListener;
 import gui.minigames.TetrisWindow;
 import io.GameIO;
+import main.Player;
 import net.AsynchronousGameConnection;
 import net.AsynchronousGameConnection.PingCallback;
 import net.AsynchronousGameConnection.PingInformation;
@@ -421,7 +422,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 				GameInstance gi = client.getGameInstance(this.gi.name);
 				gi.password = this.gi.password;
 				AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
-				player = gi.addPlayer(null, player);
+				player = gi.addPlayer(new PlayerAddAction(-1, player));
 				connection.syncPull();
 				connection.start();
 				GameWindow gw = new GameWindow(gi, player, lh);

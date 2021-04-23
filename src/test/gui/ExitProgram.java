@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import main.Player;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 
@@ -18,6 +17,7 @@ import gui.game.GameWindow;
 import gui.language.Language.LanguageSummary;
 import gui.language.LanguageHandler;
 import io.GameIO;
+import main.Player;
 import util.JFrameUtils;
 
 public class ExitProgram {
@@ -40,8 +40,7 @@ public class ExitProgram {
             LanguageHandler lh = new LanguageHandler(new LanguageSummary("de", "de"));
             GameInstance gi = new GameInstance(new Game(), "Foo");
             GameIO.readSnapshotFromZip(DataHandler.getResourceAsStream("test/games/MinimalGame.zip"), gi);
-            Player pl = new Player("Max", 4);
-            gi.addPlayer(new PlayerAddAction(id, pl), pl);
+            Player pl = gi.addPlayer(new PlayerAddAction(id, new Player("Max", 4)));
             JFrameUtils.runByDispatcherAndWait(new Runnable() {
                 @Override
                 public void run() {

@@ -200,6 +200,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 
         public CommandPingBack(int id, int ttl) {super(id, ttl);}
 
+        @Override
+        public String toString() {
+            return "Command Ping " + id + " " + ttl;
+        }
+
         /**
          *
          */
@@ -252,19 +257,19 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
         queueOutput(cpf);
         return pc;
     }
-    
+
     static class CommandList
     {
         final String type;
         public CommandList(String type) {this.type = type;}
     }
-    
+
     static class CommandHash
     {
         final String type;
         public CommandHash(String type) {this.type = type;}
     }
-    
+
     static class CommandScip implements Serializable
     {
         /**
@@ -274,7 +279,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
         final int bytes;
         public CommandScip(int bytes) {this.bytes = bytes;}
     }
-    
+
     static class TimingOffsetChanged implements Serializable{
         
         /**
@@ -284,7 +289,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
         public final long offset;
         public TimingOffsetChanged(long offset){this.offset = offset;}
     }
-    
+
     void send(GameAction action, ObjectOutputStream objOut, ByteArrayOutputStream byteStream)
     {
         try
@@ -407,7 +412,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
         }
         return null;
     }
-    
+
     private void outputLoop()
     {
         ArrayList<String> split = new ArrayList<>();
@@ -676,36 +681,34 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                     GameStructureEditAction action = (GameStructureEditAction)inputObject;
                     if (action instanceof AddObjectAction)
                     {
-                        AddObjectAction addAction = (AddObjectAction)action;
-                        switch(action.type)
+                        if (action instanceof PlayerAddAction)
                         {
-                            case AddObjectAction.ADD_IMAGE:
-                            {
-                                String name = (String)objIn.readObject();
-                                int cap = objIn.readInt();
-                                gi.game.images.put(name, new Texture(StreamUtil.toByteArray(objIn, cap), StringUtils.getFileType(name)));
-                                gi.update(action);
-                                break;
+                            PlayerAddAction addAction = ((PlayerAddAction)action);
+                            Player player =((PlayerAddAction)action).getPlayer(gi);
+                            if (player == null){
+                                player = new Player("", addAction.objectId);
+                                addAction = new PlayerAddAction(id, player);
                             }
-                            case AddObjectAction.ADD_PLAYER:
+                            PlayerIO.editPlayerFromStreamObject(objIn, player);
+                            gi.addPlayer(addAction);
+                        }
+                        else
+                        {
+                            switch(action.type)
                             {
-                                Player player =((PlayerAddAction)action).getPlayer(gi);
-                                if (player == null){player = new Player("", addAction.objectId);}
-                                PlayerIO.editPlayerFromStreamObject(objIn, player);
-                                gi.addPlayer((PlayerAddAction)action, player);
-                                break;
+                                case AddObjectAction.ADD_IMAGE:
+                                {
+                                    String name = (String)objIn.readObject();
+                                    int cap = objIn.readInt();
+                                    gi.game.images.put(name, new Texture(StreamUtil.toByteArray(objIn, cap), StringUtils.getFileType(name)));
+                                    gi.update(action);
+                                    break;
+                                }
+                                case AddObjectAction.ADD_PLAYER:{break;}
+                                case AddObjectAction.ADD_GAME_OBJECT:{break;}
+                                case AddObjectAction.ADD_GAME_OBJECT_INSTANCE:{break;}
+                                default: logger.error("Unknown type: " + action.type);
                             }
-                            case AddObjectAction.ADD_GAME_OBJECT:
-                            {
-                                //TODO
-                                break;
-                            }
-                            case AddObjectAction.ADD_GAME_OBJECT_INSTANCE:
-                            {
-                                //todo
-                                break;
-                            }
-                            default: logger.error("Unknown type: " + action.type);
                         }
                     }
                     else
