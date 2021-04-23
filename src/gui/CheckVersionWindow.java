@@ -34,6 +34,9 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
 import data.ProgrammData;
@@ -51,12 +54,13 @@ import util.jframe.JComponentSingletonInstantiator;
 
 public class CheckVersionWindow extends JFrame implements Runnable, LanguageChangeListener
 {
+    private static final Logger logger = LoggerFactory.getLogger(CheckVersionWindow.class);
     private static final long serialVersionUID = -6479080661365866948L;
     private static final JComponentSingletonInstantiator<CheckVersionWindow> instantiator = new JComponentSingletonInstantiator<CheckVersionWindow>(CheckVersionWindow.class);
     private final JLabel labelOwnVersion        = new JLabel();
     private final JLabel versionOwnVersion      = new JLabel(ProgrammData.getVersion());
     private final JLabel labelCurrentVersion     = new JLabel();
-    private final JLabel versionActualVersion   = new JLabel();
+    private final JLabel versionCurrentVersion   = new JLabel();
     private final JEditorPane editorPaneChangelog= new JEditorPane();
     private final JScrollPane scrollPaneChangelog= new JScrollPane(editorPaneChangelog);
     private final JButton buttonDownload        = new JButton("Herunterladen");
@@ -68,13 +72,26 @@ public class CheckVersionWindow extends JFrame implements Runnable, LanguageChan
     @Override
     public void run (){
         //try {
-            final List<ProgrammData.Version> versionList = ProgrammData.getLocalVersionList();
+            final List<ProgrammData.Version> versionList = ProgrammData.getRemoteVersionList();
             //final boolean isNewer = chLog != nuTll && ProgrammData.isNewer(chLog.version);
             //versionActualVersion.setText(isNewer ? chLog.version.concat(" (aktueller)") : chLog.version);
             JFrameUtils.runByDispatcher(new Runnable() {
                 @Override
                 public void run() {
-                    editorPaneChangelog.setText(convertToHtml(versionList));                    
+                    long maxVersion = Integer.MIN_VALUE;
+                    String code = "";
+                    for (int i = 0; i < versionList.size(); ++i)
+                    {
+                        ProgrammData.Version v = versionList.get(i);
+                        if(ProgrammData.getLongOfVersion(v.code) > maxVersion)
+                        {
+                            code = v.code;
+                            maxVersion = ProgrammData.getLongOfVersion(code);
+                        }
+                    }
+                    editorPaneChangelog.setText(convertToHtml(versionList));
+                    versionCurrentVersion.setText(code);
+                    logger.info("Downloaded online version list");
                 }
             });
         //} catch (InterruptedException e) {
@@ -118,7 +135,7 @@ public class CheckVersionWindow extends JFrame implements Runnable, LanguageChan
                         .addComponent(labelCurrentVersion)
                     ).addGap(5).addGroup(layout.createParallelGroup()
                         .addComponent(versionOwnVersion)
-                        .addComponent(versionActualVersion)
+                        .addComponent(versionCurrentVersion)
                     ).addGap(5).addComponent(buttonDownload)
                 ).addComponent(scrollPaneChangelog)
             ).addGap(5)
@@ -130,7 +147,7 @@ public class CheckVersionWindow extends JFrame implements Runnable, LanguageChan
                 .addComponent(versionOwnVersion, Alignment.CENTER)
             ).addGap(5).addGroup(layout.createParallelGroup()
                 .addComponent(labelCurrentVersion, Alignment.CENTER)
-                .addComponent(versionActualVersion, Alignment.CENTER)
+                .addComponent(versionCurrentVersion, Alignment.CENTER)
                 .addComponent(buttonDownload, Alignment.CENTER)
             ).addGap(5).addComponent(scrollPaneChangelog, 0, 300, 10000).addGap(5)
         );
@@ -164,6 +181,6 @@ public class CheckVersionWindow extends JFrame implements Runnable, LanguageChan
     public void languageChanged(Language language) {
         labelOwnVersion.setText(language.getString(Words.your_version));
         labelCurrentVersion.setText(language.getString(Words.current_version));
-        versionActualVersion.setText(language.getString(Words.loading));
+        versionCurrentVersion.setText(language.getString(Words.loading));
     }
 }

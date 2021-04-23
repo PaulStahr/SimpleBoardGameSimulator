@@ -22,7 +22,9 @@
 package data;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -60,8 +62,10 @@ public class ProgrammData {
 	private static final String version = new String("1.0.0");
 	public static final List<String> authors = ArrayTools.unmodifiableList(new String[]{"Paul Stahr","Florian Seiffarth"});
 	public static final String jarDirectory;
-	private static WeakReference<Element> localVersion;
-	private static WeakReference<List<Version> > localVersionList;
+    private static WeakReference<Element> localVersion;
+    private static WeakReference<Element> remoteVersion;
+    private static WeakReference<List<Version> > localVersionList;
+    private static WeakReference<List<Version> > remoteVersionList;
 
 	public static String getVersion(){return version;}
 
@@ -91,6 +95,19 @@ public class ProgrammData {
         }
 	}
 
+	public static List<Version> getRemoteVersionList(){
+	    Element elem = getRemoteVersion();
+        List<Version> result = remoteVersionList == null ? null : remoteVersionList.get();
+        if (result == null)
+        {
+            ArrayList<Version> v = new ArrayList<>();
+            parseVersionXml(elem, v);
+            result = ArrayTools.unmodifiableList(v.toArray(new Version[v.size()]));
+            remoteVersionList = new WeakReference<List<Version>>(result);
+        }
+        return result;
+	}
+
 	public static List<Version> getLocalVersionList(){
 	    Element elem = getLocalVersion();
 	    List<Version> result = localVersionList == null ? null : localVersionList.get();
@@ -103,6 +120,24 @@ public class ProgrammData {
 	    }
 	    return result;
 	}
+
+	private static Element getRemoteVersion() {
+        Element root = remoteVersion == null ? null : remoteVersion.get();
+        if (root == null) {
+            try {
+                InputStream input = new URL("https://raw.githubusercontent.com/PaulStahr/SimpleBoardGameSimulator/checkversion/src/resources/version.xml").openStream();
+                Document doc = new SAXBuilder().build(input);
+                input.close();
+                root = doc.getRootElement();
+                remoteVersion = new WeakReference<Element>(root);
+            } catch (JDOMException e) {
+                logger.error("Couldn't read version",e);
+            } catch (IOException e) {
+                logger.error("Couldn't read version",e);
+            }
+        }
+        return root;
+    }
 
 	private static Element getLocalVersion() {
 	    Element root = localVersion == null ? null : localVersion.get();
