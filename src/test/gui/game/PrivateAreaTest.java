@@ -30,7 +30,7 @@ public class PrivateAreaTest {
         GameIO.readSnapshotFromZip(DataHandler.getResourceAsStream("test/games/MinimalGame.zip"), gi);
         ObjectInstance oi = gi.getObjectInstanceByIndex(0);
         Player pl = new Player("Max", 4);
-        gi.addPlayer(new PlayerAddAction(id, pl), pl);
+        gi.addPlayer(null, pl);
         PrivateArea pa = new PrivateArea(new AffineTransform(), new AffineTransform());
         assertEquals(null, CheckingFunctions.checkPlayerConsistency(-1, new ArrayList<>(), new ArrayList<>(), gi));
         assertEquals(null, CheckingFunctions.checkPlayerConsistency(pl.id, new ArrayList<>(), new ArrayList<>(), gi));
