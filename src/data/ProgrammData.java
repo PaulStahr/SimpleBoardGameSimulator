@@ -21,29 +21,140 @@
  ******************************************************************************/
 package data;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import util.ArrayTools;
 
 public class ProgrammData {
+    public static class Version{
+        public final Date date;
+        public final String code;
+        public final String title;
+        public final String compatibility;
+        public final List<String> notices;
+
+        public Version(Date date, String code, String title, String compatibility, List<String> notices) {
+            this.date = date;
+            this.code = code;
+            this.title = title;
+            this.compatibility = compatibility;
+            this.notices = notices;
+        }
+    }
+
+    private static final Logger logger = LoggerFactory.getLogger(ProgrammData.class);
 	public static final String name = new String("Simple Online Board-Game Simulator");
-	private static final String version = new String("0.0.1 beta");
+	private static final String version = new String("1.0.0");
 	public static final List<String> authors = ArrayTools.unmodifiableList(new String[]{"Paul Stahr","Florian Seiffarth"});
 	public static final String jarDirectory;
-	
-	public static String getVersion(){
-		return version;
-	}
-	
+    private static WeakReference<Element> localVersion;
+    private static WeakReference<Element> remoteVersion;
+    private static WeakReference<List<Version> > localVersionList;
+    private static WeakReference<List<Version> > remoteVersionList;
+
+	public static String getVersion(){return version;}
+
 	static{
 		/*long authorHash = 0;
 		for (int i=0;i<authors.size();i++)
 			authorHash += authors.get(i).hashCode();
 		authorHash %= name.hashCode();
 		authorHash *= version.hashCode();*/
-		jarDirectory = ProgrammData.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+ 		jarDirectory = ProgrammData.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 	}
-	
+
+	private static void parseVersionXml(Element elem, ArrayList<Version> v)
+	{
+        for (Element version : elem.getChildren("version"))
+        {
+            try {
+                ArrayList<String> notices = new ArrayList<>();
+                for (Element notice : version.getChildren("notice"))
+                {
+                    notices.add(notice.getValue());
+                }
+                v.add(new Version((new SimpleDateFormat("yyyy.MM.dd")).parse(version.getAttributeValue("date")), version.getAttributeValue("code"), version.getAttributeValue("title"), version.getAttributeValue("compatibility"), ArrayTools.unmodifiableList(notices.toArray(new String[notices.size()]))));
+            } catch (ParseException e) {
+                logger.error("Couldn't parse Version", e);
+            }
+        }
+	}
+
+	public static List<Version> getRemoteVersionList(){
+	    Element elem = getRemoteVersion();
+        List<Version> result = remoteVersionList == null ? null : remoteVersionList.get();
+        if (result == null)
+        {
+            ArrayList<Version> v = new ArrayList<>();
+            parseVersionXml(elem, v);
+            result = ArrayTools.unmodifiableList(v.toArray(new Version[v.size()]));
+            remoteVersionList = new WeakReference<List<Version>>(result);
+        }
+        return result;
+	}
+
+	public static List<Version> getLocalVersionList(){
+	    Element elem = getLocalVersion();
+	    List<Version> result = localVersionList == null ? null : localVersionList.get();
+	    if (result == null)
+	    {
+	        ArrayList<Version> v = new ArrayList<>();
+	        parseVersionXml(elem, v);
+	        result = ArrayTools.unmodifiableList(v.toArray(new Version[v.size()]));
+    	    localVersionList = new WeakReference<List<Version>>(result);
+	    }
+	    return result;
+	}
+
+	private static Element getRemoteVersion() {
+        Element root = remoteVersion == null ? null : remoteVersion.get();
+        if (root == null) {
+            try {
+                InputStream input = new URL("https://raw.githubusercontent.com/PaulStahr/SimpleBoardGameSimulator/checkversion/src/resources/version.xml").openStream();
+                Document doc = new SAXBuilder().build(input);
+                input.close();
+                root = doc.getRootElement();
+                remoteVersion = new WeakReference<Element>(root);
+            } catch (JDOMException e) {
+                logger.error("Couldn't read version",e);
+            } catch (IOException e) {
+                logger.error("Couldn't read version",e);
+            }
+        }
+        return root;
+    }
+
+	private static Element getLocalVersion() {
+	    Element root = localVersion == null ? null : localVersion.get();
+	    if (root == null) {
+	        try {
+                Document doc = new SAXBuilder().build(DataHandler.getResourceAsStream("version.xml"));
+                root = doc.getRootElement();
+                localVersion = new WeakReference<Element>(root);
+            } catch (JDOMException e) {
+                logger.error("Couldn't read version",e);
+            } catch (IOException e) {
+                logger.error("Couldn't read version",e);
+            }
+	    }
+	    return root;
+	}
+
 	public static boolean isNewer(String version){
 		return getLongOfVersion(version) > getLongOfVersion(ProgrammData.version);
 	}

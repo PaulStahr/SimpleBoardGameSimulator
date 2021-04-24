@@ -125,23 +125,31 @@ public class GameInstance {
         return maxDrawValue;
 	}
 	
-	
-	public Player addPlayer(PlayerAddAction action, Player player)
+	/**
+	 * Adds a new player or overwrites if already existant
+	 * @return The either added or edited Player
+	 */
+	public Player addPlayer(PlayerAddAction action)
 	{
-		Player pl = action == null ? getPlayerById(player.id) : action.getPlayer(this);
-		if (pl != null)
+	    Player actionPlayer = action.getPlayer(this);
+	    int playerId = action.getPlayerId();
+	    assert(actionPlayer != null);
+	    Player localPlayer = getPlayerById(action.getPlayerId());
+		if (localPlayer == null)
 		{
-			pl.set(player);
-			update(new PlayerEditAction(action == null ? 0 : action.source, pl, pl));
-			return pl;
-		}else {
-			players.add(player);
+		    long stamp = lock.writeLock();
+			players.add(actionPlayer);
+			lock.unlock(stamp);
 			if (this.admin == -1){
-				this.admin = player.id;
+				this.admin = playerId;
 			}
-			update(action == null ? new PlayerAddAction(0, player) : action);
-			return player;
-		}
+			update(action);
+			return actionPlayer;
+        }else {
+            localPlayer.set(actionPlayer);
+            update(new PlayerEditAction(action == null ? 0 : action.source, localPlayer, localPlayer));
+            return localPlayer;
+        }
 	}
 	
 	public Player getPlayerById(int id)

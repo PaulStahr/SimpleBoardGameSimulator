@@ -12,8 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import data.Options;
+import gameObjects.action.player.PlayerAddAction;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
+import gui.CheckVersionWindow;
 import gui.game.GameWindow;
 import gui.language.Language.LanguageSummary;
 import gui.language.LanguageHandler;
@@ -41,6 +43,7 @@ public class Main {
 			return;
 		}*/
 		LanguageHandler lh = new LanguageHandler(new LanguageSummary("de", "de"));
+		CheckVersionWindow.setLanguageHandler(lh);
 		for (int i = 0; i < args.length; ++i)
     	{
     		if (args[i].equals("--loglevel"))
@@ -81,7 +84,7 @@ public class Main {
 			 		GameIO.readSnapshotFromZip(fis, game0);
 	            	fis.close();
 	            	game0.name = "Testsession";
-	            	game0.addPlayer(null, new Player(args[i + 3], Integer.parseInt(args[i + 4])));
+	            	game0.addPlayer(new PlayerAddAction(-1, new Player(args[i + 3], Integer.parseInt(args[i + 4]))));
 	            	test.SimpleNetworkServertest.connectAndStartGame(args[i + 1], Integer.parseInt(args[i + 2]), game0.getPlayerById(Integer.parseInt(args[i + 4])), game0, lh);
 	    		} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
@@ -199,7 +202,7 @@ public class Main {
 		    	AsynchronousGameConnection sgc1 = new AsynchronousGameConnection(game1, socket2.getInputStream(), socket2.getOutputStream(), socket2);
 		    	sgc1.start();
 		    	GameWindow gw2 = new GameWindow(game1, lh);
-		       	player = game1.addPlayer(null, player);    	
+		       	player = game1.addPlayer(new PlayerAddAction(-1,player));
 		       	gw2.gamePanel.setPlayer(player);
 		       	gw2.setVisible(true);
 		    }
@@ -208,7 +211,7 @@ public class Main {
 	        AsynchronousGameConnection sgc = new AsynchronousGameConnection(game0, socket[0].getInputStream(), socket[0].getOutputStream(), socket[0]);
 	    	sgc.start();
 	    	GameWindow gw0 = new GameWindow(game0, lh);
-	    	player = game0.addPlayer(null, player);
+	    	player = game0.addPlayer(new PlayerAddAction(-1, player));
 	    	gw0.gamePanel.setPlayer(player);
 	    		//GameWindow gw1 = new GameWindow(game0);
 	    	

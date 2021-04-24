@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import data.DataHandler;
 import gameObjects.GameMetaInfo;
 import gameObjects.action.message.UsertextMessageAction;
+import gameObjects.action.player.PlayerAddAction;
 import gameObjects.definition.GameObject;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
@@ -328,7 +329,7 @@ public class GameServer implements Runnable {
 						}
 			    		if (gi.password == null || gi.password.equals("") || (split.size() > 4 && gi.password.equals(split.get(4))))
 			    		{
-			    			gi.addPlayer(null, new Player(player, id));
+			    			gi.addPlayer(new PlayerAddAction(-1, new Player(player, id)));
 			    		}
 			    		else
 			    		{
