@@ -13,6 +13,7 @@ import gameObjects.functions.MoveFunctions;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectState;
 import io.GameIO;
 import main.Player;
 import util.data.IntegerArrayList;
@@ -32,8 +33,9 @@ public class MoveFunctionsTest {
         ObjectFunctions.makeStack(id, gi, pl, ial, null, null, ObjectFunctions.SIDE_TO_FRONT);
         MoveFunctions.moveStackTo(id, gi, pl, gi.getObjectInstanceById(0), 500, 1000);
         for (int id : idList){
-            assertEquals(500, gi.getObjectInstanceById(id).state.posX);
-            assertEquals(1000, gi.getObjectInstanceById(id).state.posY);
+            ObjectState state = gi.getObjectInstanceById(id).state;
+            assertEquals(500, state.posX);
+            assertEquals(1000, state.posY);
         }
     }
 }
