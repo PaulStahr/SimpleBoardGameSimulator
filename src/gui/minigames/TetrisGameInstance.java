@@ -101,15 +101,23 @@ public class TetrisGameInstance implements GameChangeListener {
 		byte type;
 		int x;
 		int y;
-		
-		public FallingObject(byte type, int x, int y)
+
+		private FallingObject(byte type, int x, int y)
 		{
+            this.type = type;
 			this.x = x;
 			this.y = y;
-			this.type = type;
 		}
+
+        public FallingObject(byte type) {this(type, Integer.MIN_VALUE, Integer.MIN_VALUE);}
+
+		public int getX() {return x;}
+
+		public int getY() {return y;}
+
+        public boolean isPlaced() {return x != Integer.MIN_VALUE && y != Integer.MIN_VALUE;}
 	}
-	
+
 	private static class TetrisObjectType
 	{
 		public final int width;
@@ -117,7 +125,7 @@ public class TetrisGameInstance implements GameChangeListener {
 		public final boolean stencil[];
 		public byte next;
 		public final int id;
-		
+
 		public TetrisObjectType(int width, int height, int id, boolean ...stencil)
 		{
 			this.width = width;
@@ -130,7 +138,7 @@ public class TetrisGameInstance implements GameChangeListener {
 			return stencil[x + y * width];
 		}
 	}
-	
+
 	private static final TetrisObjectType objectTypes[] = new TetrisObjectType[] {
 			new TetrisObjectType(1, 4, 0, true, true, true, true),
 			new TetrisObjectType(4, 1, 0, true, true, true, true),
@@ -228,15 +236,12 @@ public class TetrisGameInstance implements GameChangeListener {
 			}
 		}
 	}
-	
+
 	public byte isPlacable(FallingObject fo, int fox, int foy, byte tp)
 	{
-		if (foy < 0)
-		{
-			return 1;
-		}
+		if (foy < 0){return 1;}
 		TetrisObjectType type = objectTypes[tp];
-		setPixels(fo, (byte)0);
+        if (fo.isPlaced()) {setPixels(fo, (byte)0);}
 		byte res = 0;
 		for (int y = 0; y < type.height; ++y)
 		{
@@ -245,22 +250,15 @@ public class TetrisGameInstance implements GameChangeListener {
 				if (type.get(x, y) && foy + y < rows)
 				{
 					byte pixel = getPixel(fox + x, foy + y);
-					if (pixel > 0)
-					{
-						return 1;
-					}
-					else if (pixel < 0)
-					{
-						res = -1;
-					}
-						
+					if (pixel > 0){return 1;}
+					if (pixel < 0){res = -1;}
 				}
 			}
 		}
-		setPixels(fo, (byte)-1);
+		if (fo.isPlaced()) {setPixels(fo, (byte)-1);}
 		return res;
 	}
-	
+
 	public boolean row_filled(int row)
 	{
 		int offset = row * cols;
@@ -273,10 +271,9 @@ public class TetrisGameInstance implements GameChangeListener {
 		}
 		return true;
 	}
-	
+
 	private final IntegerArrayList indices = new IntegerArrayList();
 	private final ByteArrayList values = new ByteArrayList();
-	
 
 	public void logic_step()
 	{
@@ -320,17 +317,11 @@ public class TetrisGameInstance implements GameChangeListener {
 		toRemove.clear();
 	}
 
-	public int getRows() {
-		return rows;
-	}
-	
-	public int getCols() {
-		return cols;
-	}
+	public int getRows() {return rows;}
 
-	public int placedObjectCount() {
-		return placedObjects;
-	}
+	public int getCols() {return cols;}
+
+	public int placedObjectCount() {return placedObjects;}
 
 	public void moveRight(int i) {
 		FallingObject fo = fallingObject.get(i);
@@ -384,11 +375,13 @@ public class TetrisGameInstance implements GameChangeListener {
 		}
 	}
 
-	public byte add(FallingObject fo) {
-		byte placable = isPlacable(fo, fo.x, fo.y, fo.type);
+	public byte add(FallingObject fo, int x, int y) {
+		byte placable = isPlacable(fo, x, y, fo.type);
 		if (placable == 0)
 		{
-			setPixels(fo, (byte)1);
+		    fo.x = x;
+		    fo.y = y;
+			setPixels(fo, (byte)-1);
 			fallingObject.add(fo);
 		}
 		return placable;		
@@ -447,7 +440,5 @@ public class TetrisGameInstance implements GameChangeListener {
 		}
 	}
 
-	public void reset() {
-		actionPerformed(new TetrisGameResetEvent(source));
-	}
+	public void reset() {actionPerformed(new TetrisGameResetEvent(source));    }
 }

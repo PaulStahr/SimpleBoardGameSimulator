@@ -67,7 +67,7 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 			
 			if (tgi.fallingObject.size() == 0)
 			{
-				byte successfull = tgi.add(new FallingObject((byte)rand.nextInt(18), 4, 18));
+				byte successfull = tgi.add(new FallingObject((byte)rand.nextInt(18)), 4, 18);
 				if (successfull > 0)
 				{
 					tgi.reset();
@@ -89,13 +89,17 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 		super.paintComponent(g);
 		for (int y = 0; y < numRows; ++y)
 		{
+            int yPos0 = height - ((y * 10 + 9) * height) / (numRows * 10);
+            int yPos1 = height - ((y) * height) / numRows;
 			for (int x = 0; x < numCols; ++x)
 			{
 				byte type = tgi.getPixel(x, y);
+                int xPos0 = (x * width) / numCols;
+                int xPos1 = ((x * 10 + 9) * width) / (numCols * 10);
 				if (type != 0)
 				{
 					g.setColor(colors[Math.abs(type) - 1]);
-					g.fillRect((x * width) / numCols, height - ((y + 1) * height) / numRows, width / numCols, height / numRows);
+					g.fillRect(xPos0, yPos0, xPos1 - xPos0, yPos1 - yPos0);
 				}
 			}
 		}
