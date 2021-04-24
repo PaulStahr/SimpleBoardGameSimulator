@@ -56,7 +56,6 @@ public enum Words {
     left_click,
     middle_click,
     right_click,
-    mouse_wheel,
     view_collect_stack,
     collect_all_objects,
     get_bottom_card,
