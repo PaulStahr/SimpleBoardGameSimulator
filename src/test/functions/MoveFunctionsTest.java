@@ -30,7 +30,7 @@ public class MoveFunctionsTest {
         gi.addPlayer(new PlayerAddAction(id, pl));
         int[] idList = new int[] {0, 1, 2, 3, 4};
         IntegerArrayList ial = new IntegerArrayList(idList);
-        ObjectFunctions.makeStack(id, gi, pl, ial, null, null, ObjectFunctions.SIDE_TO_FRONT);
+        ObjectFunctions.makeStack(id, gi, pl, ial, null, ObjectFunctions.SIDE_TO_FRONT);
         MoveFunctions.moveStackTo(id, gi, pl, gi.getObjectInstanceById(0), 500, 1000);
         for (int id : idList){
             ObjectState state = gi.getObjectInstanceById(id).state;

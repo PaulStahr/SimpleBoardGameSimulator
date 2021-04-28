@@ -187,7 +187,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	{
 		private final ArrayList<ObjectInstance> tmp = new ArrayList<>();
 		private final ArrayList<ObjectInstance> tmp2 = new ArrayList<>();
-		private boolean hasStarted;
+		private boolean hasStarted = false;
 
 		@Override
 		public int getUpdateInterval() {return 1000;}

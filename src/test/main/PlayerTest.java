@@ -1,7 +1,11 @@
 package test.main;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import data.Texture;
+import gameObjects.definition.GameObjectToken;
+import gameObjects.instance.ObjectInstance;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 
@@ -32,24 +36,32 @@ public class PlayerTest {
 
     @Test
     public void PlayerColorTest() throws IOException, JDOMException {
-        GameInstance gi = new GameInstance(new Game(), "Foo");
+        Game game = new Game("Testgame");
+        GameInstance gi0, gi1;
+        gi0 = new GameInstance(game, "Foo");
         Player pl = new Player("Max1", 4);
-        gi.addPlayer(new PlayerAddAction(id, pl));
-        gi.getPlayerList().indexOf(pl);
+        gi0.addPlayer(new PlayerAddAction(id, pl));
+        gi1 = new GameInstance(gi0);
+
+
+        gi1.getPlayerList().indexOf(pl);
         if (pl.seatNum == -1) {
-            pl.seatNum = gi.getPlayerList().indexOf(pl);
+            pl.seatNum = gi1.getPlayerList().indexOf(pl);
         }
         Player pl1 = new Player("Max2", 5);
-        gi.addPlayer(new PlayerAddAction(id, pl1));
+        gi1.addPlayer(new PlayerAddAction(id, pl1));
 
         if (pl1.seatNum == -1) {
-            pl1.seatNum = gi.getPlayerList().indexOf(pl1);
+            pl1.seatNum = gi1.getPlayerList().indexOf(pl1);
         }
         assertFalse(pl.seatNum == -1);
         assertFalse(pl1.seatNum == -1);
         assertEquals(0, pl.seatNum);
         assertEquals(1, pl1.seatNum);
     }
+
+
+
     @Test
     public void UpdatePlayerTest() throws IOException, JDOMException {
         GameInstance gi = new GameInstance(new Game(), "Foo");
@@ -63,4 +75,6 @@ public class PlayerTest {
         gi.update(new PlayerEditAction(id, pl, pl1));
         assertEquals(1, gi.getPlayerById(pl1.id).trickNum);
     }
+
+
 }

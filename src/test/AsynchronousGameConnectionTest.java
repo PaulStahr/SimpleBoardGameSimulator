@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
+import gameObjects.action.player.PlayerAddAction;
+import gameObjects.action.player.PlayerEditAction;
+import main.Player;
 import org.junit.Test;
 
 import data.Texture;
@@ -82,6 +85,46 @@ public class AsynchronousGameConnectionTest {
             synchronized(block1){block1.wait(1000);}
         } catch (InterruptedException e) {}
         assertEquals(state + "!=" + gi1.getObjectInstanceById(id).state, state, gi1.getObjectInstanceById(id).state);
+    }
+
+    @Test
+    public void simplePlayerTest() throws IOException
+    {
+        Player pl = new Player("Max1", 4);
+        gi0.addPlayer(new PlayerAddAction(id, pl));
+
+        Player pl1 = new Player("Max2", 5);
+        gi1.addPlayer(new PlayerAddAction(id, pl1));
+        try {
+            synchronized(block1){block1.wait(1000);}
+        } catch (InterruptedException e) {}
+        assertEquals(gi0.getPlayerById(4), gi1.getPlayerById(4));
+        assertEquals(2, gi0.getPlayerCount());
+        assertEquals(2, gi1.getPlayerCount());
+    }
+
+    @Test
+    public void simplePlayerEditTest() throws IOException
+    {
+        Player pl1 = new Player("Max1", 4);
+        gi0.addPlayer(new PlayerAddAction(id, pl1));
+        Player pl2 = new Player("Max2", 5);
+        gi1.addPlayer(new PlayerAddAction(id, pl2));
+        try {
+            synchronized(block1){block1.wait(1000);}
+        } catch (InterruptedException e) {}
+
+        Player p11 = gi1.getPlayerById(4);
+        Player p12 = gi1.getPlayerById(5);
+        p11.seatNum = 1;
+        gi1.update(new PlayerEditAction(id, p11, p11));
+        try {
+            synchronized(block1){block1.wait(1000);}
+        } catch (InterruptedException e) {}
+
+        Player p01 = gi0.getPlayerById(4);
+        Player p02 = gi0.getPlayerById(5);
+        assertEquals(1, p01.seatNum);
     }
 
     @Test

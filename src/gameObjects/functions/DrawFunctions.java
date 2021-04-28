@@ -225,7 +225,9 @@ public class DrawFunctions {
 
         if (gamePanel.privateArea.objects.size() != 0) {
             int extraSpace; //Private Area needs extra space if object is dragged into it
-            if (gamePanel.privateArea.currentDragPosition != -1 && gamePanel.hoveredObject != null && gamePanel.getNumberOfSelectedObjects() != 0 && !gamePanel.isSelectStarted) {
+            IntegerArrayList selectedObjects = new IntegerArrayList();
+            ObjectFunctions.getSelectedObjects(gameInstance, player, selectedObjects);
+            if (gamePanel.privateArea.currentDragPosition != -1 && gamePanel.hoveredObject != null && selectedObjects.size() != 0 && !gamePanel.isSelectStarted) {
                 extraSpace = 1;
             } else {
                 extraSpace = 0;
@@ -498,7 +500,8 @@ public class DrawFunctions {
 
     public static void drawDebugInfo(GamePanel gamePanel, Graphics2D g2, GameInstance gameInstance, Player player) {
         ObjectInstance hoveredObject = gamePanel.hoveredObject;
-        IntegerArrayList selectedObjects = gamePanel.getSelectedObjects();
+        IntegerArrayList selectedObjects = new IntegerArrayList();
+        ObjectFunctions.getSelectedObjects(gameInstance, player, selectedObjects);
         IntegerArrayList ial = new IntegerArrayList();
         int hoverId = (hoveredObject== null) ? -1 : hoveredObject.id;
         int drawValue = (hoveredObject== null) ? -1 : hoveredObject.state.drawValue;
