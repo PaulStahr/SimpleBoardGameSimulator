@@ -985,11 +985,11 @@ public class ObjectFunctions {
             {
                 hoveredObject = null;
             }
-            if(ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, objectId))
+            if(ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, oi))
             {
                 state.isActive = false;
                 state.isSelected = -1;
-                if (gameInstance.getObjectInstanceById(objectId).go instanceof GameObjectDice)
+                if (oi.go instanceof GameObjectDice)
                 {
                     GameObjectDice.DiceState diceState = (GameObjectDice.DiceState) state;
                     diceState.unfold = false;
@@ -1025,7 +1025,7 @@ public class ObjectFunctions {
     }
 
     public static void selectObject(int gamePanelId, GameInstance gameInstance, Player player, int objectId, IntegerArrayList selectedObjects){
-        if (getObjectSelector(gameInstance, objectId) == -1)
+        if (getObjectSelector(gameInstance, gameInstance.getObjectInstanceById(objectId)) == -1)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceById(objectId);
             ObjectState state = oi.state.copy();
@@ -1083,20 +1083,24 @@ public class ObjectFunctions {
         return gameInstance.getObjectInstanceById(objectId).state.isSelected == player.id;
     }
 
-    private static boolean objectIsSelectedByOtherPlayer(GameInstance gameInstance, Player player, int objectId) {
-        return !objectIsSelectedByPlayer(gameInstance,player,objectId) && objectIsSelected(gameInstance,objectId);
+    public static boolean objectIsSelectedByPlayer(GameInstance gameInstance, Player player, ObjectInstance oi){
+        return oi.state.isSelected == player.id;
     }
 
-    public static int getObjectSelector(GameInstance gameInstance, int objectId){
-        return gameInstance.getObjectInstanceById(objectId).state.isSelected;
+    private static boolean objectIsSelectedByOtherPlayer(GameInstance gameInstance, Player player, ObjectInstance oi) {
+        return !objectIsSelectedByPlayer(gameInstance,player,oi) && objectIsSelected(gameInstance,oi);
     }
 
-    public static void getObjectSelector(GameInstance gameInstance, int objectId, Player player){//This method doesn't make any sense
+    public static int getObjectSelector(GameInstance gameInstance, ObjectInstance oi){
+        return oi.state.isSelected;
+    }
+
+    public static void getObjectSelector(GameInstance gameInstance, ObjectInstance objectId, Player player){//This method doesn't make any sense
         player = gameInstance.getPlayerById(getObjectSelector(gameInstance, objectId));
     }
 
-    public static boolean objectIsSelected(GameInstance gameInstance, int objectId){
-        return getObjectSelector(gameInstance, objectId) != -1;
+    public static boolean objectIsSelected(GameInstance gameInstance, ObjectInstance oi){
+        return getObjectSelector(gameInstance, oi) != -1;
     }
 
     public static void getSelectedObjects(GameInstance gameInstance, Player player, IntegerArrayList ial)
@@ -1104,7 +1108,7 @@ public class ObjectFunctions {
         ial.clear();
         for(ObjectInstance oi : gameInstance.getObjectInstanceList())
         {
-            if (ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, oi.id))
+            if (ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, oi))
             {
                 ial.add(oi.id);
             }
@@ -1270,7 +1274,7 @@ public class ObjectFunctions {
         if (oiList.size() > 1) {
             for (int i = 0; i < oiList.size(); ++i) {
                 ObjectInstance currentObject = oiList.get(i);
-                if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1 && !ObjectFunctions.objectIsSelectedByOtherPlayer(gameInstance, player, currentObject.id)) {
+                if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1 && !ObjectFunctions.objectIsSelectedByOtherPlayer(gameInstance, player, currentObject)) {
                     if (side != SIDE_UNCHANGED){flipTokenToSide(gamePanelId, gameInstance, player, currentObject, side == SIDE_TO_FRONT);}
                     ObjectState state = currentObject.state.copy();
                     state.rotation = currentObject.state.originalRotation;
@@ -1283,12 +1287,12 @@ public class ObjectFunctions {
                         state.aboveInstanceId = -1;
                         state.belowInstanceId = oiList.get(i - 1).id;
                         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject, state));
-                        MoveFunctions.moveObjectTo(gamePanelId, gameInstance, player, currentObject, gameInstance.getObjectInstanceById(oiList.get(i - 1).id));
+                        MoveFunctions.moveObjectTo(gamePanelId, gameInstance, player, currentObject, oiList.get(i - 1));
                     } else {
                         state.aboveInstanceId = oiList.get(i + 1).id;
                         state.belowInstanceId = oiList.get(i - 1).id;
                         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject, state));
-                        MoveFunctions.moveObjectTo(gamePanelId, gameInstance, player, currentObject, gameInstance.getObjectInstanceById(oiList.get(i - 1).id));
+                        MoveFunctions.moveObjectTo(gamePanelId, gameInstance, player, currentObject, oiList.get(i - 1));
                         deselectObject(gamePanelId, gameInstance, player, currentObject.id, hoveredObject, selectedObjects);
                     }
                 }
@@ -1301,7 +1305,7 @@ public class ObjectFunctions {
         if (stackElements.size() > 1) {
             for (int i = 0; i < stackElements.size(); ++i) {
                 ObjectInstance currentObject = gameInstance.getObjectInstanceById(stackElements.getI(i));
-                if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1 && !ObjectFunctions.objectIsSelectedByOtherPlayer(gameInstance, player, currentObject.id)) {
+                if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1 && !ObjectFunctions.objectIsSelectedByOtherPlayer(gameInstance, player, currentObject)) {
                     if (side != SIDE_UNCHANGED){flipTokenToSide(gamePanelId, gameInstance, player, currentObject, side == SIDE_TO_FRONT);}
                     ObjectState state = currentObject.state.copy();
                     state.rotation = currentObject.state.originalRotation;

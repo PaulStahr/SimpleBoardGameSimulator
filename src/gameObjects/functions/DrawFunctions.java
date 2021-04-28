@@ -299,7 +299,7 @@ public class DrawFunctions {
     public static void drawStack(GamePanel gamePanel, Graphics g, IntegerArrayList stackList, GameInstance gameInstance, Player player, double zooming) {
         if (stackList.size()>0) {
             if (isStackCollected(gameInstance,gameInstance.getObjectInstanceById(stackList.get(0))) || isStackOwned(gameInstance, stackList)){
-                int oiId = gameInstance.getObjectInstanceById(stackList.getI(0)).id;
+                int oiId = stackList.getI(0);
                 stackList.clear();
                 stackList.add(oiId);
             }
@@ -354,7 +354,7 @@ public class DrawFunctions {
                     }
                 }
                 //Draw Objects not in private area
-                if (objectInstance.state.owner_id == -1 || ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id)) {
+                if (objectInstance.state.owner_id == -1 || ObjectFunctions.objectIsSelected(gameInstance, objectInstance)) {
                     g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
                 }
                 //Draw Objects in private area
@@ -406,7 +406,7 @@ public class DrawFunctions {
                     g2.setColor(gamePanel.stackColor);
                 }
                 //draw selection border
-                if (ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, objectInstance.id)) {
+                if (ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, objectInstance)) {
                     g2.setStroke(selectStroke);
                     g2.setColor(player.color);
                 }
@@ -420,14 +420,14 @@ public class DrawFunctions {
 
 
             //Draw border around object
-            int objectSelector = ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id);
+            int objectSelector = ObjectFunctions.getObjectSelector(gameInstance, objectInstance);
             if (objectSelector != -1)
             {
                 g2.setStroke(selectStroke);
                 g2.setColor(gameInstance.getPlayerById(objectSelector).color);
             }
             if (objectInstance.go instanceof GameObjectToken) {
-                if (ObjectFunctions.isObjectHovered(objectInstance, gamePanel.hoveredObject) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id) != -1 || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
+                if (ObjectFunctions.isObjectHovered(objectInstance, gamePanel.hoveredObject) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance) != -1 || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
                     if (isStackCollected(gameInstance, objectInstance)) {
                         g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth / 2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth / 2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth / 2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
                     }
@@ -441,7 +441,7 @@ public class DrawFunctions {
                 }
             }
             else{
-                if (ObjectFunctions.isObjectHovered(objectInstance, gamePanel.hoveredObject) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id) != -1) {
+                if (ObjectFunctions.isObjectHovered(objectInstance, gamePanel.hoveredObject) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance) != -1) {
                     g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth/2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth/2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth/2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
                 }
             }
