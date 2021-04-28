@@ -1002,7 +1002,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 					}else if (e.getKeyCode() == KeyEvent.VK_M && !shiftDown) {
 						ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
-								ial2.set(ObjectFunctions.getObjectRepresentatives(gameInstance, ial, true));
+						ial2.set(ObjectFunctions.getObjectRepresentatives(gameInstance, ial, true));
 						for (int idx = 0; idx < ial2.size() - 1; ++idx) {
 							int topId = ial2.getI(idx);
 							int bottomId = ial2.getI(idx + 1);
@@ -1029,15 +1029,16 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 					}
 					else if (e.getKeyCode() == KeyEvent.VK_G){
+						ial2.clear();
 						ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 						for (int oId : ObjectFunctions.getObjectRepresentatives(gameInstance, ial)) {
 							IntegerArrayList stackList = new IntegerArrayList();
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.getStack(gameInstance, oi, stackList);
 							ObjectFunctions.removeStackRelations(id, gameInstance, player, oi);
-							ial.add(stackList);
+							ial2.add(stackList);
 						}
-						ObjectFunctions.giveObjects(this, gameInstance, table.getTableCenter(new Point2D.Double()), table.getTableOffset(player, gameInstance.getObjectInstanceById(ial.get(0))), ial, objectInstanceList, hoveredObject);
+						ObjectFunctions.giveObjects(this, gameInstance, table.getTableCenter(new Point2D.Double()), table.getTableOffset(player, gameInstance.getObjectInstanceById(ial.get(0))), ial2, objectInstanceList, hoveredObject);
 					}
 					else if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD) {
 						//Scale hovered Object
