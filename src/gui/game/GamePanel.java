@@ -57,7 +57,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import main.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,6 +94,7 @@ import gui.language.LanguageChangeListener;
 import gui.language.LanguageHandler;
 import gui.language.Words;
 import io.GameIO;
+import main.Player;
 import util.StringUtils;
 import util.TimedUpdateHandler;
 import util.data.DoubleArrayList;
@@ -880,7 +880,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						ObjectFunctions.flipTokenObject(id, gameInstance, player, oi);
 						ObjectFunctions.rollTheDice(id, gameInstance, player, oi);
 					}
-					if (hoveredObject != null && ObjectFunctions.getObjectSelector(gameInstance, hoveredObject.id) != player.id) {
+					if (hoveredObject != null && ObjectFunctions.getObjectSelector(gameInstance, hoveredObject) != player.id) {
 						ObjectFunctions.flipTokenObject(id, gameInstance, player, hoveredObject);
 						ObjectFunctions.rollTheDice(id, gameInstance, player, hoveredObject);
 					}
@@ -925,7 +925,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 								state.unfold = !state.unfold;
 							}
 						}
-						if (hoveredObject != null && player.id != ObjectFunctions.getObjectSelector(gameInstance, hoveredObject.id) && hoveredObject.go instanceof GameObjectDice) {
+						if (hoveredObject != null && player.id != ObjectFunctions.getObjectSelector(gameInstance, hoveredObject) && hoveredObject.go instanceof GameObjectDice) {
 							GameObjectDice.DiceState state = (GameObjectDice.DiceState) hoveredObject.state;
 							state.unfold = !state.unfold;
 						}
@@ -1291,7 +1291,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	public void setHoveredObject(GameInstance gameInstance, Player player, ObjectInstance objectInstance){
 		//Can only hover if not selected
-		if (objectInstance != null && (!ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id) || ObjectFunctions.objectIsSelectedByPlayer(gameInstance,player, objectInstance.id))) {
+		if (objectInstance != null && (!ObjectFunctions.objectIsSelected(gameInstance, objectInstance) || ObjectFunctions.objectIsSelectedByPlayer(gameInstance,player, objectInstance.id))) {
 			//unhover old object
 			unhoverObject(gameInstance, player);
 			//hover new object

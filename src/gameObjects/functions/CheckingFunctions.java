@@ -8,14 +8,47 @@ import util.ArrayTools;
 
 public class CheckingFunctions {
 	public static class GameInconsistency{}
-    public static class InconsistencyMultistackBottom   extends GameInconsistency{public final int first; public final int second;  public InconsistencyMultistackBottom(int first,int second)     {this.first = first; this.second = second;}}
-    public static class InconsistencyMultistackTop      extends GameInconsistency{public final int first; public final int second;  public InconsistencyMultistackTop(int first,int second)     {this.first = first; this.second = second;}}
-	public static class InconsistencyNotLinkedViceVersa extends GameInconsistency{public final int first; public final int second; 	public InconsistencyNotLinkedViceVersa(int first,int second){this.first = first; this.second = second;}}
-    public static class InconsistencyNostackBottom      extends GameInconsistency{                                                  public InconsistencyNostackBottom()                      {}}
-    public static class InconsistencyNostackTop         extends GameInconsistency{                                                  public InconsistencyNostackTop()                         {}}
-	public static class InconsistencyNotInPrivateArea 	extends GameInconsistency{public final int id; 								public InconsistencyNotInPrivateArea(int id) 				{this.id = id;}}
-	public static class InconsistencyNotOwnedArea 		extends GameInconsistency{public final int id; 								public InconsistencyNotOwnedArea(int id) 					{this.id = id;}}
-	public static class StackEndReached 				extends GameInconsistency{public final int id; 								public StackEndReached(int id) 								{this.id = id;}}
+    public static class InconsistencyMultistackBottom   extends GameInconsistency{
+        public final int first; public final int second;
+        public InconsistencyMultistackBottom(int first,int second) {this.first = first; this.second = second;}
+        @Override
+        public String toString() {return "Multiple stash-bottoms " + first + ' ' + second;}
+    }
+    public static class InconsistencyMultistackTop      extends GameInconsistency{
+        public final int first; public final int second;
+        public InconsistencyMultistackTop(int first,int second) {this.first = first; this.second = second;}
+        @Override
+        public String toString () {return "Multiple stack-tops " + first + ' ' + second;}
+    }
+	public static class InconsistencyNotLinkedViceVersa extends GameInconsistency{
+	    public final int first; public final int second;
+	    public InconsistencyNotLinkedViceVersa(int first,int second){this.first = first; this.second = second;}
+	    @Override
+        public String toString() {return "not linked vice-versa " + first + ' ' + second;}
+	}
+    public static class InconsistencyNostackBottom      extends GameInconsistency{
+        public InconsistencyNostackBottom(){}
+        @Override
+        public String toString() {return "no stack-bottom";}}
+    public static class InconsistencyNostackTop         extends GameInconsistency{
+        public InconsistencyNostackTop(){}
+        @Override
+        public String toString() {return "No stack-top";}}
+	public static class InconsistencyNotInPrivateArea 	extends GameInconsistency{
+	    public final int id;
+	    public InconsistencyNotInPrivateArea(int id){this.id = id;}
+	    @Override
+        public String toString() {return "Not in private Area " + id;}}
+	public static class InconsistencyNotOwnedArea 		extends GameInconsistency{
+	    public final int id;
+	    public InconsistencyNotOwnedArea(int id){this.id = id;}
+	    @Override
+        public String toString() {return "Not owned area" + id;}}
+	public static class StackEndReached 				extends GameInconsistency{
+	    public final int id;
+	    public StackEndReached(int id) {this.id = id;}
+	    @Override
+	    public String toString() {return "Stackend reached " + id;}}
 
 	public static void countIncoming(ArrayList<ObjectInstance> tmp, int incoming[]) {
 		for (int i = 0; i < tmp.size(); ++i)
