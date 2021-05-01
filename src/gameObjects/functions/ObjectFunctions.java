@@ -1800,7 +1800,12 @@ public class ObjectFunctions {
         for (int id:ial){
             ObjectInstance oi = gameInstance.getObjectInstanceById(id);
             ObjectState state = oi.state.copy();
-            state.rotation = oi.getRotation() + oi.state.rotationStep;
+            if (oi.state.rotationStep != -1) {
+                state.rotation = oi.getRotation() + oi.state.rotationStep;
+            }
+            else{
+                state.rotation = oi.getRotation() + 360/gameInstance.getPlayerCount(false);
+            }
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, oi, state));
         }
     }

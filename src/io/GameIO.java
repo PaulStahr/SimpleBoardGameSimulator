@@ -224,7 +224,7 @@ public class GameIO {
 		int height = readAttribute(elem, StringIO.HEIGHT, 88);
 		int value = readAttribute(elem, StringIO.VALUE, 0);
 		int sortValue = readAttribute(elem, StringIO.SORT_VALUE, 0);
-		int rotationStep = readAttribute(elem, StringIO.ROTATION_STEP, 90);
+		int rotationStep = readAttribute(elem, StringIO.ROTATION_STEP, -1);
 		int boxId = readAttribute(elem, StringIO.BOX_ID, -1);
 		boolean inBox = readAttribute(elem, StringIO.IN_BOX, false);
 		int isFixed = readAttribute(elem, StringIO.IS_FIXED, 0);

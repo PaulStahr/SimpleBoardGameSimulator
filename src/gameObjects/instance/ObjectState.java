@@ -36,7 +36,7 @@ public abstract class ObjectState implements Serializable {
 	public int value = 0;
 	public int sortValue = 0;
 	public int drawValue = 0;
-	public int rotationStep = 90;
+	public int rotationStep = -1;
 
 	/*fix an object*/
 	public boolean isFixed = false;
@@ -125,7 +125,6 @@ public abstract class ObjectState implements Serializable {
 		liesOnId = -1;
 		aboveLyingObectIds.clear();
 		drawValue = 1;
-		rotationStep = 90;
 		inBox = false;
 		isFixed = false;
 		lastChange = System.nanoTime();
