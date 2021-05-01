@@ -530,7 +530,7 @@ public class GameIO {
 		    ZipEntry imageZipOutput = new ZipEntry(key);
 		    zipOutputStream.putNextEntry(imageZipOutput);
 		    String filetype = StringUtils.getFileType(key);
-		    if (filetype != null && ArrayUtil.firstEqualIndex(ImageIO.getWriterFileSuffixes(), filetype) != -1)
+		    if (filetype != null && ArrayUtil.linearSearchEqual(ImageIO.getWriterFileSuffixes(), filetype) != -1)
 		    {
 	    		writeImageToStream(pair.getValue(), filetype, zipOutputStream);
 		    }
@@ -643,7 +643,7 @@ public class GameIO {
 			else
 			{
 			    String filetype = StringUtils.getFileType(name);
-			    if (filetype != null && ArrayUtil.firstEqualIndex(ImageIO.getReaderFileSuffixes(), filetype) != -1)
+			    if (filetype != null && ArrayUtil.linearSearchEqual(ImageIO.getReaderFileSuffixes(), filetype) != -1)
 			    {
 		    		Texture img = new Texture(content, filetype);
 					images.put(name, img);

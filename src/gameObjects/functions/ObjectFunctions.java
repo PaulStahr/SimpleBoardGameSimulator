@@ -4,7 +4,10 @@ import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
 import java.util.function.Predicate;
 
 import javax.swing.SwingUtilities;
@@ -24,6 +27,7 @@ import geometry.Vector2d;
 import gui.game.GamePanel;
 import gui.game.PrivateArea;
 import main.Player;
+import util.ArrayUtil;
 import util.AwtGeometry;
 import util.Pair;
 import util.data.IntegerArrayList;
@@ -1249,7 +1253,7 @@ public class ObjectFunctions {
 
     private static boolean sameGroups(ObjectInstance nearestObject, ObjectInstance activeObject) {
         for (String group : nearestObject.go.groups){
-            if (Arrays.asList(activeObject.go.groups).contains(group)){
+            if (ArrayUtil.linearSearchEqual(activeObject.go.groups, group) >= 0){
                 return true;
             }
         }
@@ -1662,20 +1666,18 @@ public class ObjectFunctions {
         return getObjectRepresentatives(gameInstance, objectIds, false);
     }
 
-    public static IntegerArrayList getObjectRepresentatives(GameInstance gameInstance, IntegerArrayList objectIds, boolean sorted) {
+    public static IntegerArrayList getObjectRepresentatives(GameInstance gameInstance, IntegerArrayList objectIds, boolean sorted) {//TODO sorted is not doing anything
         IntegerArrayList ial = new IntegerArrayList();
         for (int id : objectIds) {
             if (gameInstance.getObjectInstanceById(id).go instanceof GameObjectToken) {
                 int topId = getStackTop(gameInstance, gameInstance.getObjectInstanceById(id)).id;
-                if (!ial.contains(topId)) {
-                    ial.add(topId);
-                }
+                ial.addUnique(topId);
             }
             else{
                 ial.add(id);
             }
         }
-        ial.sort(new Comparator<Integer>() {
+        ial.sort(new Comparator<Integer>() {//TODO this is probably very slow
             @Override
             public int compare(Integer o1, Integer o2) {
                 return countStack(gameInstance, gameInstance.getObjectInstanceById(o1)) - countStack(gameInstance, gameInstance.getObjectInstanceById(o2));

@@ -12,10 +12,8 @@ public class HeapSceduler implements Runnable{
     private int length;
     private boolean stop;
     private static final Logger logger = LoggerFactory.getLogger(HeapSceduler.class);
-    
-    public synchronized boolean isEnqueued(Runnable r) {
-        return ArrayUtil.firstEqualIndex(rHeap, 0,length, r) >= 0;
-    }
+
+    public synchronized boolean isEnqueued(Runnable r) {return ArrayUtil.linearSearch(rHeap, 0,length, r) >= 0;}
 
     public synchronized boolean enqueue(Runnable r, long nanoTime, boolean multipleAllowed)
     {
@@ -53,8 +51,7 @@ public class HeapSceduler implements Runnable{
         rHeap[position] = r;
         notify();
     }
-    
-    
+
     public synchronized boolean start()
     {
         if (th != null) {return false;}

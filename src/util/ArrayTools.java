@@ -138,15 +138,8 @@ public class ArrayTools {
 	
 	public static final <E> E[] delete(E data[], E object)
 	{
-		int index = find(data, 0, data.length, object);
-		if (index >= 0)
-		{
-			return delete(data, index);
-		}
-		else
-		{
-			return data;
-		}
+		int index = ArrayUtil.linearSearchEqual(data, 0, data.length, object);
+		return index >= 0 ? delete(data, index) : data;
 	}
 	
 	public static final int[] delete(int data[], int index)
@@ -225,47 +218,31 @@ public class ArrayTools {
 			this.array = array;
 			this.length = length;
 		}
-		
+
 		@Override
 		public final E get(int elem) {
 			if (elem > length)
 				throw new ArrayIndexOutOfBoundsException(elem);
 			return array[elem];
 		}
-		
-		@Override
-		public final int size() {
-			return length;
-		}
-		
-		@Override
-		public final boolean contains(Object o){
-			return indexOf(o) > -1;
-		}
-		
-		public final int indexOfEqual(Object value)
-		{
-			return ArrayUtil.firstEqualIndex(array, 0, length, value);
-		}
-		
-		@Override
-		public final int indexOf(Object value){
-			return ArrayUtil.linearSearch(array, 0, length, value);
-		}
 
-		
 		@Override
-		public final int lastIndexOf(Object value){
-			return ArrayUtil.reverseLinearSearch(array, 0, length, value);
-		}
+		public final int size() {return length;}
+
+		@Override
+		public final boolean contains(Object o){return indexOf(o) > -1;}
+
+		public final int indexOfEqual(Object value){return ArrayUtil.linearSearchEqual(array, 0, length, value);}
+
+		@Override
+		public final int indexOf(Object value){return ArrayUtil.linearSearch(array, 0, length, value);}
+
+		@Override
+		public final int lastIndexOf(Object value){return ArrayUtil.reverseLinearSearch(array, 0, length, value);}
 	}
 	
-	public static interface ObjectToIntTransform<T>
-	{
-		public int toInt(T o);
-	}
-	
-	
+	public static interface ObjectToIntTransform<T>{public int toInt(T o);}
+
 	public static <T> int binarySearch(List<T> a, int fromIndex, int toIndex, int key, ObjectToIntTransform<T> tr) {
 		int low = fromIndex;
 		int high = toIndex - 1;
@@ -281,11 +258,9 @@ public class ArrayTools {
 		}
 		return -(low + 1);
 	}
-	
-	public static <T> int binarySearch(List<T> a, int key, ObjectToIntTransform<T> tr) {
-		return binarySearch(a, 0, a.size(), key, tr);
-	}
-	
+
+	public static <T> int binarySearch(List<T> a, int key, ObjectToIntTransform<T> tr) {return binarySearch(a, 0, a.size(), key, tr);}
+
 	public static <T> int binarySearch(T[] a, int fromIndex, int toIndex, int key, ObjectToIntTransform<T> tr) {
 		int low = fromIndex;
 		int high = toIndex - 1;
@@ -309,8 +284,7 @@ public class ArrayTools {
 			this.array = array;
 			this.length = length;
 		}
-	
-		
+
 		@Override
 		public final E get(int elem) {
 			if (elem > length)
@@ -318,58 +292,19 @@ public class ArrayTools {
 			return array[elem];
 		}
 
+		@Override
+		public final int size() {return length;}
 		
 		@Override
-		public final int size() {
-			return length;
-		}
-		
+		public final boolean contains(Object o){return indexOf(o) > -1;}
 		
 		@Override
-		public final boolean contains(Object o){
-			return indexOf(o) > -1;
-		}
-		
+		public final int indexOf(Object object){return Arrays.binarySearch(array, 0, length, object);}
 		
 		@Override
-		public final int indexOf(Object object){
-			return Arrays.binarySearch(array, 0, length, object);
-		}
-
-		
-		@Override
-		public final int lastIndexOf(Object object){
-			return Arrays.binarySearch(array, 0, length, object);
-		}
+		public final int lastIndexOf(Object object){return Arrays.binarySearch(array, 0, length, object);}
 	}
 
-	public static int find(int[] ids, int begin, int end, int id) {
-		for (int i = begin; i < end; ++i)
-		{
-			if (ids[i] == id)
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	public static int find(Object[] data, int begin, int end, Object elem) {
-		for (int i = begin; i < end; ++i)
-		{
-			if (data[i] == elem)
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-
-	public static int find(Object[] data, Object elem) {
-		return find (data, 0, data.length, elem);
-	}
-
-	
 	public static final <E> int removeReferences(WeakReference<?> data[], int size, E obj)
 	{
 		int write = 0;

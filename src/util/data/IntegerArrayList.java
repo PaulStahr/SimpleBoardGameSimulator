@@ -103,6 +103,8 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 	@Override
 	public boolean add(Integer value){return add((int)value);}
 
+	public boolean addUnique(int value) {return contains(value) && add(value);}
+
 	public boolean add(int value){
 		if (length == data.length){
 			data = Arrays.copyOf(data, Math.max(data.length + 1, data.length * 2));

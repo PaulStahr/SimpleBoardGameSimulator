@@ -167,7 +167,7 @@ public class DrawFunctions {
             }
         }
         g2.setTransform(tmp);
-        if (gamePanel.hoveredObject != null && gamePanel.isDebug) {
+        if (gamePanel.hoveredObject != null && GamePanel.isDebug) {
             g2.fillRect(gamePanel.hoveredObject.state.posX-5, gamePanel.hoveredObject.state.posY-5, 10, 10);
             if (gamePanel.hoveredObject.state.inPrivateArea && gamePanel.hoveredObject.state.owner_id != -1) {
                 Vector2d mouseBoardPos = new Vector2d();
