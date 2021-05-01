@@ -18,6 +18,9 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JProgressBar;
@@ -41,9 +44,11 @@ import data.JFrameLookAndFeelUtil;
 import data.Options;
 import data.Options.OptionTreeNode;
 import gameObjects.GameMetaInfo;
+import gameObjects.action.player.PlayerAddAction;
 import gameObjects.columnTypes.GameInstanceColumnType;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
+import gui.CheckVersionWindow;
 import gui.create.CreateNewGameWindow;
 import gui.game.GameWindow;
 import gui.language.Language;
@@ -98,7 +103,10 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private boolean isUpdating = false;
 	private final LanguageHandler lh;
 	private final ArrayList<GameMetaInfo> gmi = new ArrayList<>();
-	
+    private final JMenu menuExtras = new JMenu();;
+	private final JMenuItem menuItemSettings = new JMenuItem();
+	private final JMenuItem menuItemVersion = new JMenuItem();
+
     private final AbstractAction tableAction = new AbstractAction() {
     	private static final long serialVersionUID = 3980835476835695337L;
 			@Override
@@ -111,9 +119,6 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	private final ButtonColumn visitColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.VISIT));
  	private final ButtonColumn deleteColumn = new ButtonColumn(tableOpenGames,tableAction, GameInstance.TYPES.indexOf(GameInstanceColumnType.DELETE));
     private GameServer gs;
-
-
-
 
 
 	@Override
@@ -222,7 +227,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				jdomException.printStackTrace();
 			}
 			gi.name = "Create Game";
-			gi.addPlayer(null, player);
+			player = gi.addPlayer(new PlayerAddAction(-1, player));
 			try {
 				fis.close();
 			} catch (IOException ioException) {
@@ -278,7 +283,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				    		gi.password = password;
 				    	}
 				    	AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
-				    	player = gi.addPlayer(null, player);
+				    	player = gi.addPlayer(new PlayerAddAction(-1, player));
 				    	connection.syncPull();
 				    	connection.start();
 				    	GameWindow gw = new GameWindow(gi, player, lh);
@@ -318,7 +323,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 
 						//client.addPlayerToGameSession(player, gi.name, gi.password);
 						AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
-						player = gi.addPlayer(null, player);
+						player = gi.addPlayer(new PlayerAddAction(-1, player));
 						connection.syncPull();
 						connection.start();
 						GameWindow gw = new GameWindow(gi, player, lh);
@@ -389,12 +394,16 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
             updateCurrentGames();
         }
     };
-
 	private void updateCurrentGames() {DataHandler.tp.run(updateGamesRunnable, false);}
 
 	public ServerLobbyWindow(SynchronousGameClientLobbyConnection client, LanguageHandler lh)
 	{
 		this.lh = lh;
+		JMenuBar menuBar = new JMenuBar();
+		setJMenuBar(menuBar);
+		menuBar.add(menuExtras );
+		menuExtras.add(menuItemSettings);
+		menuExtras.add(menuItemVersion);
 		lh.addLanguageChangeListener(this);
 		languageChanged(lh.getCurrentLanguage());
 		Container content = getContentPane();
@@ -452,6 +461,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		buttonStartServer.addActionListener(this);
 		buttonCreateGame.addActionListener(this);
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
+		menuItemVersion.addActionListener(CheckVersionWindow.getOpenWindowListener());
 		setMinimumSize(getPreferredSize());
 		updateCurrentGames();
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -489,6 +499,9 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		labelName.setText(language.getString(Words.player_name));
 		labelId.setText(language.getString(Words.player_id));
 		progressBarTitle.setText(language.getString(Words.load_game));
+		menuExtras.setText(language.getString(Words.extras));
+		menuItemSettings.setText(language.getString(Words.settings));
+		menuItemVersion.setText(language.getString(Words.version));
 		this.setTitle(language.getString(Words.game_list));
 	}
 

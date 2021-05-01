@@ -75,7 +75,7 @@ public class ImageTransferHandling extends TransferHandler {
      * false otherwise.
      */
     private boolean transferFlavor(DataFlavor[] flavors, DataFlavor flavor) {
-        return ArrayUtil.firstEqualIndex(flavors, flavor) != -1;
+        return ArrayUtil.linearSearchEqual(flavors, flavor) != -1;
     }
 
     /**
@@ -84,6 +84,6 @@ public class ImageTransferHandling extends TransferHandler {
      */
     @Override
     public boolean canImport(JComponent c, DataFlavor[] flavors) {
-        return ArrayUtil.firstEqualIndex(flavors, c) != -1;
+        return ArrayUtil.linearSearchEqual(flavors, c) != -1;
     }
 }

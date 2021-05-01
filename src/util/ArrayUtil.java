@@ -16,7 +16,7 @@ public class ArrayUtil {
         final int len1 = first.length;
         final int len2 = second.length;
         final int lim = Math.min(len1, len2);
-       
+
         for (int k = 0;k < lim; ++k) {
             final char c1 = first[k];
             final char c2 = second[k];
@@ -26,12 +26,12 @@ public class ArrayUtil {
         }
         return len1 - len2;
     }
-	
+
 	public static final int compareTo(CharSequence first, char second[]) {
         final int len1 = first.length();
         final int len2 = second.length;
         final int lim = Math.min(len1, len2);
-       
+
         for (int k = 0;k < lim; ++k) {
             final char c1 = first.charAt(k);
             final char c2 = second[k];
@@ -41,7 +41,7 @@ public class ArrayUtil {
         }
         return len1 - len2;
     }
-	
+
 	public static final int compareTo(String first, char second[]) {
         final int len1 = first.length();
         final int len2 = second.length;
@@ -67,7 +67,7 @@ public class ArrayUtil {
 		}
 		return true;
 	}
-	
+
 	public static final double max(double data[])
 	{
 		double max = Double.NEGATIVE_INFINITY;
@@ -80,7 +80,7 @@ public class ArrayUtil {
 		}
 		return max;
 	}
-	
+
 	public static final double min(double data[])
 	{
 		double min = Double.POSITIVE_INFINITY;
@@ -93,7 +93,7 @@ public class ArrayUtil {
 		}
 		return min;
 	}
-	
+
 	public static final float max(float data[])
 	{
 		float max = Float.NEGATIVE_INFINITY;
@@ -106,7 +106,7 @@ public class ArrayUtil {
 		}
 		return max;
 	}
-	
+
 	public static final float min(float data[])
 	{
 		float min = Float.POSITIVE_INFINITY;
@@ -132,7 +132,7 @@ public class ArrayUtil {
 		}
 		return max;
 	}
-	
+
 	public static final int min(int data[])
 	{
 		int min = Integer.MAX_VALUE;
@@ -188,23 +188,34 @@ public class ArrayUtil {
 		return -1;
 	}
 
-	public static final int linearSearch(Object data[], Object value)
-	{
-		return linearSearch(data, 0, data.length, value);
-	}
-	
-	public static final int linearSearch(Object data[], int begin, int end, Object value)
-	{
-		for (int i = begin; i < end; ++i)
-		{
-			if (data[i] == value)
-			{
-				return i;
-			}
-		}
-		return -1;
-	}
-	
+    public static final int linearSearch     (Object data[], Object value){return linearSearch      (data, 0, data.length, value);}
+    public static final int linearSearchEqual(Object data[], Object value){return linearSearchEqual (data, 0, data.length, value);}
+
+    public static final int linearSearch(Object data[], int begin, int end, Object value)
+    {
+        for (int i = begin; i < end; ++i)
+        {
+            if (data[i] == value)
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public static final int linearSearchEqual(Object data[], int begin, int end, Object value)
+    {
+        if (value == null)return linearSearch(data, begin, end, null);
+        for (int i = begin; i < end; ++i)
+        {
+            if (value.equals(data[i]))
+            {
+                return i;
+            }
+        }
+        return -1;
+    }
+
 	public static final int linearSearch(int data[], int begin, int end, int value)
 	{
 		for (; begin < end; ++begin)
@@ -228,24 +239,6 @@ public class ArrayUtil {
 		}
 		return -1;
 	}
-	
-	public static final int firstEqualIndex(Object data[], Object value)
-	{
-		return firstEqualIndex(data, 0, data.length, value);
-	}
-
-    
-    public static int firstEqualIndex(Object data[], int begin, int end, Object key)
-    {
-        for (; begin < end; ++begin)
-        {
-            if (data[begin].equals(key))
-            {
-                return begin;
-            }
-        }
-        return -1;
-    }
 	
 	public static final float[] setToLength(float[] data, int length) {return data.length == length ? data : new float[length];}
 

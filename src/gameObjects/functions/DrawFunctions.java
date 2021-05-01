@@ -167,7 +167,7 @@ public class DrawFunctions {
             }
         }
         g2.setTransform(tmp);
-        if (gamePanel.hoveredObject != null && gamePanel.isDebug) {
+        if (gamePanel.hoveredObject != null && GamePanel.isDebug) {
             g2.fillRect(gamePanel.hoveredObject.state.posX-5, gamePanel.hoveredObject.state.posY-5, 10, 10);
             if (gamePanel.hoveredObject.state.inPrivateArea && gamePanel.hoveredObject.state.owner_id != -1) {
                 Vector2d mouseBoardPos = new Vector2d();
@@ -225,7 +225,9 @@ public class DrawFunctions {
 
         if (gamePanel.privateArea.objects.size() != 0) {
             int extraSpace; //Private Area needs extra space if object is dragged into it
-            if (gamePanel.privateArea.currentDragPosition != -1 && gamePanel.hoveredObject != null && gamePanel.getNumberOfSelectedObjects() != 0 && !gamePanel.isSelectStarted) {
+            IntegerArrayList selectedObjects = new IntegerArrayList();
+            ObjectFunctions.getSelectedObjects(gameInstance, player, selectedObjects);
+            if (gamePanel.privateArea.currentDragPosition != -1 && gamePanel.hoveredObject != null && selectedObjects.size() != 0 && !gamePanel.isSelectStarted) {
                 extraSpace = 1;
             } else {
                 extraSpace = 0;
@@ -299,7 +301,7 @@ public class DrawFunctions {
     public static void drawStack(GamePanel gamePanel, Graphics g, IntegerArrayList stackList, GameInstance gameInstance, Player player, double zooming) {
         if (stackList.size()>0) {
             if (isStackCollected(gameInstance,gameInstance.getObjectInstanceById(stackList.get(0))) || isStackOwned(gameInstance, stackList)){
-                int oiId = gameInstance.getObjectInstanceById(stackList.getI(0)).id;
+                int oiId = stackList.getI(0);
                 stackList.clear();
                 stackList.add(oiId);
             }
@@ -354,7 +356,7 @@ public class DrawFunctions {
                     }
                 }
                 //Draw Objects not in private area
-                if (objectInstance.state.owner_id == -1 || ObjectFunctions.objectIsSelected(gameInstance, objectInstance.id)) {
+                if (objectInstance.state.owner_id == -1 || ObjectFunctions.objectIsSelected(gameInstance, objectInstance)) {
                     g.drawImage(img, -(int) (objectInstance.scale * img.getWidth() * zooming * 0.5), -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5), (int) (objectInstance.scale * img.getWidth() * zooming), (int) (objectInstance.scale * img.getHeight() * zooming), null);
                 }
                 //Draw Objects in private area
@@ -406,7 +408,7 @@ public class DrawFunctions {
                     g2.setColor(gamePanel.stackColor);
                 }
                 //draw selection border
-                if (ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, objectInstance.id)) {
+                if (ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, objectInstance)) {
                     g2.setStroke(selectStroke);
                     g2.setColor(player.color);
                 }
@@ -420,14 +422,14 @@ public class DrawFunctions {
 
 
             //Draw border around object
-            int objectSelector = ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id);
+            int objectSelector = ObjectFunctions.getObjectSelector(gameInstance, objectInstance);
             if (objectSelector != -1)
             {
                 g2.setStroke(selectStroke);
                 g2.setColor(gameInstance.getPlayerById(objectSelector).color);
             }
             if (objectInstance.go instanceof GameObjectToken) {
-                if (ObjectFunctions.isObjectHovered(objectInstance, gamePanel.hoveredObject) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id) != -1 || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
+                if (ObjectFunctions.isObjectHovered(objectInstance, gamePanel.hoveredObject) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance) != -1 || objectInstance.state.owner_id != -1 || (ObjectFunctions.isStackTop(objectInstance) && !ObjectFunctions.isStackBottom(objectInstance))) {
                     if (isStackCollected(gameInstance, objectInstance)) {
                         g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth / 2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth / 2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth / 2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
                     }
@@ -441,7 +443,7 @@ public class DrawFunctions {
                 }
             }
             else{
-                if (ObjectFunctions.isObjectHovered(objectInstance, gamePanel.hoveredObject) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance.id) != -1) {
+                if (ObjectFunctions.isObjectHovered(objectInstance, gamePanel.hoveredObject) || ObjectFunctions.getObjectSelector(gameInstance, objectInstance) != -1) {
                     g2.drawRect(-(int) (objectInstance.scale * img.getWidth() * zooming * 0.5) - borderWidth/2, -(int) (objectInstance.scale * img.getHeight() * zooming * 0.5) - borderWidth/2, (int) (objectInstance.scale * img.getWidth() * zooming) + borderWidth/2, (int) (objectInstance.scale * img.getHeight() * zooming) + borderWidth / 2);
                 }
             }
@@ -498,7 +500,8 @@ public class DrawFunctions {
 
     public static void drawDebugInfo(GamePanel gamePanel, Graphics2D g2, GameInstance gameInstance, Player player) {
         ObjectInstance hoveredObject = gamePanel.hoveredObject;
-        IntegerArrayList selectedObjects = gamePanel.getSelectedObjects();
+        IntegerArrayList selectedObjects = new IntegerArrayList();
+        ObjectFunctions.getSelectedObjects(gameInstance, player, selectedObjects);
         IntegerArrayList ial = new IntegerArrayList();
         int hoverId = (hoveredObject== null) ? -1 : hoveredObject.id;
         int drawValue = (hoveredObject== null) ? -1 : hoveredObject.state.drawValue;
@@ -604,21 +607,21 @@ public class DrawFunctions {
         gamePanel.screenToBoardPos(gamePanel.mouseScreenX, gamePanel.mouseScreenY, boardPosition);
         g2.drawString("Board: (" + Integer.toString(boardPosition.getXI()) + ", " + Integer.toString(boardPosition.getYI()) + ")" + " Wheel: " + Integer.toString(gamePanel.mouseWheelValue), 50, yPos);
         yPos+=yStep;
-        g2.drawString("Player Pos: " + Boolean.toString(gamePanel.mouseInPrivateArea), 50, yPos);
+        g2.drawString("Player Pos: " + gamePanel.mouseInPrivateArea, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Private Area: " + Boolean.toString(gamePanel.mouseInPrivateArea), 50, yPos);
+        g2.drawString("Private Area: " + gamePanel.mouseInPrivateArea, 50, yPos);
         yPos+=yStep;
         g2.drawString("Own Hand Cards: " + stringHandCards, 50, yPos);
         yPos+=yStep;
         g2.drawString("Cards in some private Area: " + stringPrivateAreaCards, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Hand Card Section Id: " + Integer.toString(sectionIndex), 50, yPos);
+        g2.drawString("Hand Card Section Id: " + sectionIndex, 50, yPos);
         yPos+=yStep;
         g2.drawString("Active Objects: " + stringActiveObjects, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Hovered Object: " + Integer.toString(hoverId), 50, yPos);
+        g2.drawString("Hovered Object: " + hoverId, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Hovered Draw Value: " + Long.toString(drawValue), 50, yPos);
+        g2.drawString("Hovered Draw Value: " + drawValue, 50, yPos);
         yPos+=yStep;
         g2.drawString("Hovered Stack: " + stringHoveredStack, 50, yPos);
         yPos+=yStep;
@@ -636,11 +639,11 @@ public class DrawFunctions {
         yPos+=yStep;
         g2.drawString("Selected Objects: " + stringSelectedObjects, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Player Id: " + Integer.toString(player.id), 50, yPos);
+        g2.drawString("Player Id: " + player.id, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Admin Id: " + Integer.toString(gameInstance.admin), 50, yPos);
+        g2.drawString("Admin Id: " + gameInstance.admin, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Number of Pressed Keys: " + Integer.toString(gamePanel.downKeys.size()), 50, yPos);
+        g2.drawString("Number of Pressed Keys: " + gamePanel.downKeys.size(), 50, yPos);
         yPos+=yStep;
     }
 }

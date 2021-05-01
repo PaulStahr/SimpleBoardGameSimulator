@@ -41,7 +41,7 @@ public enum GameObjectInstanceColumnType implements TableColumnType{
 	}
 	
 	public static GameObjectInstanceColumnType getByName(String name) {
-		int index = ArrayUtil.firstEqualIndex(columnNames, name);
+		int index = ArrayUtil.linearSearchEqual(columnNames, name);
 		return index < 0 ? null : ct[index];
 	}
 

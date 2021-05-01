@@ -20,10 +20,7 @@ public class JComponentSingletonInstantiator<T> implements Supplier<T>, ActionLi
 	private WeakReference<T> ref;
 	private final Class<?> cl;
 	
-	public JComponentSingletonInstantiator(Class<?> cl)
-	{
-		this.cl = cl;
-	}
+	public JComponentSingletonInstantiator(Class<?> cl){this.cl = cl;}
 	
 	@Override
 	@SuppressWarnings("unchecked")
@@ -32,10 +29,7 @@ public class JComponentSingletonInstantiator<T> implements Supplier<T>, ActionLi
 		if (ref != null)
 		{
 			T o = ref.get();
-			if (o != null)
-			{
-				return o;
-			}
+			if (o != null){return o;}
 		}
 		RunnableSupplier<T> sup = new RunnableSupplier<T>() {
 			@Override

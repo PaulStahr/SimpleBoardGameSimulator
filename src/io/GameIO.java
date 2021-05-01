@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import data.Texture;
 import gameObjects.action.GameObjectInstanceEditAction;
+import gameObjects.action.player.PlayerAddAction;
 import gameObjects.definition.GameObject;
 import gameObjects.definition.GameObjectBook;
 import gameObjects.definition.GameObjectBook.BookSide;
@@ -121,7 +122,7 @@ public class GameIO {
 			switch (name) {
 				case StringIO.PLAYER:
 					Player player = PlayerIO.createPlayerFromElement(elem);
-					gi.addPlayer(null, player);
+					player = gi.addPlayer(new PlayerAddAction(-1, player));
 					break;
 				case StringIO.NAME:
 					gi.name = elem.getValue();
@@ -223,7 +224,7 @@ public class GameIO {
 		int height = readAttribute(elem, StringIO.HEIGHT, 88);
 		int value = readAttribute(elem, StringIO.VALUE, 0);
 		int sortValue = readAttribute(elem, StringIO.SORT_VALUE, 0);
-		int rotationStep = readAttribute(elem, StringIO.ROTATION_STEP, 90);
+		int rotationStep = readAttribute(elem, StringIO.ROTATION_STEP, -1);
 		int boxId = readAttribute(elem, StringIO.BOX_ID, -1);
 		boolean inBox = readAttribute(elem, StringIO.IN_BOX, false);
 		int isFixed = readAttribute(elem, StringIO.IS_FIXED, 0);
@@ -529,7 +530,7 @@ public class GameIO {
 		    ZipEntry imageZipOutput = new ZipEntry(key);
 		    zipOutputStream.putNextEntry(imageZipOutput);
 		    String filetype = StringUtils.getFileType(key);
-		    if (filetype != null && ArrayUtil.firstEqualIndex(ImageIO.getWriterFileSuffixes(), filetype) != -1)
+		    if (filetype != null && ArrayUtil.linearSearchEqual(ImageIO.getWriterFileSuffixes(), filetype) != -1)
 		    {
 	    		writeImageToStream(pair.getValue(), filetype, zipOutputStream);
 		    }
@@ -642,7 +643,7 @@ public class GameIO {
 			else
 			{
 			    String filetype = StringUtils.getFileType(name);
-			    if (filetype != null && ArrayUtil.firstEqualIndex(ImageIO.getReaderFileSuffixes(), filetype) != -1)
+			    if (filetype != null && ArrayUtil.linearSearchEqual(ImageIO.getReaderFileSuffixes(), filetype) != -1)
 			    {
 		    		Texture img = new Texture(content, filetype);
 					images.put(name, img);

@@ -27,6 +27,7 @@ import geometry.Vector2d;
 import gui.game.GamePanel;
 import gui.game.PrivateArea;
 import main.Player;
+import util.ArrayUtil;
 import util.AwtGeometry;
 import util.Pair;
 import util.data.IntegerArrayList;
@@ -379,7 +380,7 @@ public class ObjectFunctions {
      * @param objectInstance Instance of Object
      * @param include        if object should be included in flipping, default is true
      */
-    public static void flipTokenStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, boolean include) {
+    public static void flipTokenStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, boolean include) {
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
             IntegerArrayList objectStack = new IntegerArrayList();
             getStack(gameInstance, objectInstance, objectStack);
@@ -406,12 +407,12 @@ public class ObjectFunctions {
                 }
             }
             player.actionString = "Stack Flipped";
-            selectStack(gamePanelId, gameInstance, player, objectStack.getI(0), hoveredObject, selectedObjects);
+            selectStack(gamePanelId, gameInstance, player, objectStack.getI(0), hoveredObject);
         }
     }
 
-    public static void flipTokenStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, IntegerArrayList selectedObjects) {
-        flipTokenStack(gamePanelId, gameInstance, player, objectInstance, hoveredObject, selectedObjects, true);
+    public static void flipTokenStack(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject) {
+        flipTokenStack(gamePanelId, gameInstance, player, objectInstance, hoveredObject, true);
     }
 
     /**
@@ -839,7 +840,7 @@ public class ObjectFunctions {
     }
 
     //take an object in the hand of player
-    public static void takeObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, Point2D point, double offset, ObjectInstance objectInstance, ObjectInstance hoveredObject, IntegerArrayList selectedObjects) {
+    public static void takeObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, Point2D point, double offset, ObjectInstance objectInstance, ObjectInstance hoveredObject) {
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
             IntegerArrayList stackIds = new IntegerArrayList();
             getStack(gameInstance, objectInstance, stackIds);
@@ -847,7 +848,7 @@ public class ObjectFunctions {
             for (int id : stackIds) {
                 ObjectInstance currentInstance = gameInstance.getObjectInstanceById(id);
                 if (player.id != currentInstance.state.owner_id && currentInstance.state.owner_id == -1) {
-                    insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, currentInstance, hoveredObject, selectedObjects, 0, (int) (currentInstance.getWidth(player.id) * gameInstance.cardOverlap));
+                    insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, currentInstance, hoveredObject, 0, (int) (currentInstance.getWidth(player.id) * gameInstance.cardOverlap));
                 }
             }
             //ObjectFunctions.displayStack(gamePanel, gameInstance, player, objectInstance, (int) (objectInstance.getWidth(player.id) * gamePanel.cardOverlap));
@@ -855,13 +856,13 @@ public class ObjectFunctions {
     }
 
     //drop all objects from the hand of player
-    public static void dropObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance hoveredObject, IntegerArrayList selectedObjects) {
+    public static void dropObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance hoveredObject) {
         ArrayList<ObjectInstance> oiList = new ArrayList<>();
         getOwnedStack(gameInstance, player, oiList);
         ObjectFunctions.removeFromOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, oiList);
         ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, oiList);
         //stack all dropped objects
-        makeStack(gamePanel.id, gameInstance, player, oiList, hoveredObject, selectedObjects, SIDE_UNCHANGED);
+        makeStack(gamePanel.id, gameInstance, player, oiList, hoveredObject, SIDE_UNCHANGED);
     }
 
     public static void dropObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
@@ -871,11 +872,11 @@ public class ObjectFunctions {
         }
     }
 
-    public static void playObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, IntegerArrayList selectedObjects){
-        playObject(gamePanel, gameInstance, player, objectInstance, hoveredObject, selectedObjects, true);
+    public static void playObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject){
+        playObject(gamePanel, gameInstance, player, objectInstance, hoveredObject, true);
     }
 
-    public static void playObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, boolean front){
+    public static void playObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, boolean front){
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
             removeFromOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, objectInstance);
             ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, objectInstance);
@@ -888,7 +889,7 @@ public class ObjectFunctions {
         Point2D tableCenter = AwtGeometry.addTo(PlayerShift, gamePanel.table.getTableCenter(new Point2D.Double()));
         MoveFunctions.moveObjectTo(gamePanel.id, gameInstance,player, objectInstance, (int) (tableCenter.getX()), (int) (tableCenter.getY()));
         flipTokenToSide(gamePanel.id, gameInstance, player, objectInstance, front);
-        deselectObject(gamePanel.id, gameInstance, player, objectInstance.id, hoveredObject, selectedObjects);
+        deselectObject(gamePanel.id, gameInstance, player, objectInstance.id, hoveredObject);
     }
 
     public static boolean IsObjectOnShape(GameInstance gameInstance, Shape shape, AffineTransform boardToScreenTransform, ObjectInstance objectInstance){
@@ -913,9 +914,9 @@ public class ObjectFunctions {
         });
     }
 
-    public static void stackObjectsOnShapeAndMoveToPoint(int gamePanelId, GameInstance gameInstance, Player player, Shape shape, Point2D centerPoint, AffineTransform boardToScreenTransform, IntegerArrayList ial, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, int side){
+    public static void stackObjectsOnShapeAndMoveToPoint(int gamePanelId, GameInstance gameInstance, Player player, Shape shape, Point2D centerPoint, AffineTransform boardToScreenTransform, IntegerArrayList ial, ObjectInstance hoveredObject, int side){
         getObjectsOnShape(gamePanelId, gameInstance, player, shape, boardToScreenTransform, hoveredObject, ial);
-        makeStack(gamePanelId, gameInstance, player, ial, hoveredObject, selectedObjects, side);
+        makeStack(gamePanelId, gameInstance, player, ial, hoveredObject, side);
         MoveFunctions.moveStackTo(gamePanelId, gameInstance, player, ial, (int) centerPoint.getX(), (int) centerPoint.getY());
     }
 
@@ -977,7 +978,7 @@ public class ObjectFunctions {
         getOwnedStack(gameInstance,player,oiList,true);
     }
 
-    public static void deselectObject(int gamePanelId, GameInstance gameInstance, Player player, int objectId, ObjectInstance hoveredObject, IntegerArrayList selectedObjects){
+    public static void deselectObject(int gamePanelId, GameInstance gameInstance, Player player, int objectId, ObjectInstance hoveredObject){
         ObjectInstance oi = gameInstance.getObjectInstanceById(objectId);
         if(oi != null) {
             ObjectState state = oi.state.copy();
@@ -985,32 +986,31 @@ public class ObjectFunctions {
             {
                 hoveredObject = null;
             }
-            if(ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, objectId))
+            if(player == null || ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, objectId))
             {
                 state.isActive = false;
                 state.isSelected = -1;
-                if (gameInstance.getObjectInstanceById(objectId).go instanceof GameObjectDice)
+                if (oi.go instanceof GameObjectDice)
                 {
                     GameObjectDice.DiceState diceState = (GameObjectDice.DiceState) state;
                     diceState.unfold = false;
                 }
                 gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, oi, state));
-                updateSelectedObjects(gameInstance,player, selectedObjects);
             }
         }
     }
 
-    public static void deselectObjects(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList idList, ObjectInstance hoveredObject, IntegerArrayList selectedObjects){
+    public static void deselectObjects(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList idList, ObjectInstance hoveredObject){
         for (int id: idList){
-            deselectObject(gamePanelId, gameInstance, player, id, hoveredObject, selectedObjects);
+            deselectObject(gamePanelId, gameInstance, player, id, hoveredObject);
         }
     }
 
-    public static void deselectAllSelected(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList ial, ObjectInstance hoveredObject, IntegerArrayList selectedObjects)
+    public static void deselectAllSelected(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList ial, ObjectInstance hoveredObject)
     {
         ial.clear();
         getSelectedObjects(gameInstance, player, ial);
-        deselectObjects(gamePanelId, gameInstance, player, ial, hoveredObject, selectedObjects);
+        deselectObjects(gamePanelId, gameInstance, player, ial, hoveredObject);
     }
 
 
@@ -1019,44 +1019,37 @@ public class ObjectFunctions {
         return hoveredObject != null && hoveredObject.id == objectInstance.id;
     }
 
-    public static void updateSelectedObjects(GameInstance gameInstance, Player player, IntegerArrayList selectedObjects)
-    {
-        getSelectedObjects(gameInstance, player, selectedObjects);
-    }
-
-    public static void selectObject(int gamePanelId, GameInstance gameInstance, Player player, int objectId, IntegerArrayList selectedObjects){
-        if (getObjectSelector(gameInstance, objectId) == -1)
+    public static void selectObject(int gamePanelId, GameInstance gameInstance, Player player, int objectId){
+        ObjectInstance oi = gameInstance.getObjectInstanceById(objectId);
+        if (getObjectSelector(gameInstance, oi) == -1)
         {
-            ObjectInstance oi = gameInstance.getObjectInstanceById(objectId);
             ObjectState state = oi.state.copy();
             state.isActive = true;
             state.isSelected = player.id;
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, oi, state));
-            selectedObjects.add(oi.id);
-            updateSelectedObjects(gameInstance, player, selectedObjects);
         }
 
     }
 
-    public static void selectStack(int gamePanelId, GameInstance gameInstance, Player player, int objectId, ObjectInstance hoveredObject, IntegerArrayList selectedObjects){
+    public static void selectStack(int gamePanelId, GameInstance gameInstance, Player player, int objectId, ObjectInstance hoveredObject){
         IntegerArrayList ial = new IntegerArrayList();
         getStackFromTop(gameInstance, gameInstance.getObjectInstanceById(objectId), ial);
-        deselectObjects(gamePanelId, gameInstance, player, ial, hoveredObject, selectedObjects);
-        selectObject(gamePanelId, gameInstance, player, ial.getI(0), selectedObjects);
+        deselectObjects(gamePanelId, gameInstance, player, ial, hoveredObject);
+        selectObject(gamePanelId, gameInstance, player, ial.getI(0));
     }
 
-    public static void selectObjects(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList objectInstances, IntegerArrayList selectedObjects){
+    public static void selectObjects(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList objectInstances){
         objectInstances.sort(gameInstance.idObjectInstanceDrawValueComparator);
         for (int id: objectInstances)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceById(id);
             if (oi.go instanceof GameObjectToken){
                 if(isStackTop(oi)){
-                    selectObject(gamePanelId, gameInstance, player, id, selectedObjects);
+                    selectObject(gamePanelId, gameInstance, player, id);
                 }
             }
             else {
-                selectObject(gamePanelId, gameInstance, player, id, selectedObjects);
+                selectObject(gamePanelId, gameInstance, player, id);
             }
         }
     }
@@ -1083,20 +1076,24 @@ public class ObjectFunctions {
         return gameInstance.getObjectInstanceById(objectId).state.isSelected == player.id;
     }
 
-    private static boolean objectIsSelectedByOtherPlayer(GameInstance gameInstance, Player player, int objectId) {
-        return !objectIsSelectedByPlayer(gameInstance,player,objectId) && objectIsSelected(gameInstance,objectId);
+    public static boolean objectIsSelectedByPlayer(GameInstance gameInstance, Player player, ObjectInstance oi){
+        return oi.state.isSelected == player.id;
     }
 
-    public static int getObjectSelector(GameInstance gameInstance, int objectId){
-        return gameInstance.getObjectInstanceById(objectId).state.isSelected;
+    private static boolean objectIsSelectedByOtherPlayer(GameInstance gameInstance, Player player, ObjectInstance oi) {
+        return !objectIsSelectedByPlayer(gameInstance,player,oi) && objectIsSelected(gameInstance,oi);
     }
 
-    public static void getObjectSelector(GameInstance gameInstance, int objectId, Player player){//This method doesn't make any sense
+    public static int getObjectSelector(GameInstance gameInstance, ObjectInstance oi){
+        return oi.state.isSelected;
+    }
+
+    public static void getObjectSelector(GameInstance gameInstance, ObjectInstance objectId, Player player){//This method doesn't make any sense
         player = gameInstance.getPlayerById(getObjectSelector(gameInstance, objectId));
     }
 
-    public static boolean objectIsSelected(GameInstance gameInstance, int objectId){
-        return getObjectSelector(gameInstance, objectId) != -1;
+    public static boolean objectIsSelected(GameInstance gameInstance, ObjectInstance oi){
+        return getObjectSelector(gameInstance, oi) != -1;
     }
 
     public static void getSelectedObjects(GameInstance gameInstance, Player player, IntegerArrayList ial)
@@ -1104,14 +1101,56 @@ public class ObjectFunctions {
         ial.clear();
         for(ObjectInstance oi : gameInstance.getObjectInstanceList())
         {
-            if (ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, oi.id))
+            if (ObjectFunctions.objectIsSelectedByPlayer(gameInstance, player, oi))
             {
                 ial.add(oi.id);
             }
         }
     }
 
-    public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, Point2D point, double offset, ObjectInstance activeObject, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, int posX, int posY, double zooming, int maxInaccuracy) {
+    public static void getSelectedObjects(GameInstance gameInstance, IntegerArrayList ial)
+    {
+        ial.clear();
+        for(ObjectInstance oi : gameInstance.getObjectInstanceList())
+        {
+            if (ObjectFunctions.objectIsSelected(gameInstance, oi))
+            {
+                ial.add(oi.id);
+            }
+        }
+    }
+
+    static public void sortSelectedObjectsByDrawValue(GameInstance gameInstance, Player player, IntegerArrayList ial, IntegerArrayList objOrigPosX, IntegerArrayList objOrigPosY){
+        IntegerArrayList selectedObjects = new IntegerArrayList();
+        ObjectFunctions.getSelectedObjects(gameInstance, player, selectedObjects);
+        IntegerArrayList sortedObjPosX = new IntegerArrayList();
+        IntegerArrayList sortedObjPosY = new IntegerArrayList();
+        if (objOrigPosX.size() > 0) {
+            for (int i = 0; i < selectedObjects.size();++i) {
+                sortedObjPosX.add(0);
+                sortedObjPosY.add(0);
+            }
+        }
+        ial.sort(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return gameInstance.getObjectInstanceById(o1).state.drawValue - gameInstance.getObjectInstanceById(o2).state.drawValue;
+            }
+        });
+        if (objOrigPosX.size() > 0) {
+            for (int i = 0; i < ial.size(); ++i) {
+                int idx = selectedObjects.indexOf(ial.getI(i));
+                sortedObjPosX.set(i, objOrigPosX.getI(idx));
+                sortedObjPosY.set(i, objOrigPosY.getI(idx));
+            }
+        }
+        if (sortedObjPosX.size() > 0) {
+            objOrigPosX.set(sortedObjPosX);
+            objOrigPosY.set(sortedObjPosY);
+        }
+    }
+
+    public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, Point2D point, double offset, ObjectInstance activeObject, ObjectInstance hoveredObject, int posX, int posY, double zooming, int maxInaccuracy) {
         if (activeObject != null) {
             // Game Token Objects
             if (activeObject.go instanceof GameObjectToken) {
@@ -1126,7 +1165,7 @@ public class ObjectFunctions {
                         if (SwingUtilities.isRightMouseButton(arg0)){
                             flipTokenObject(gamePanel.id,gameInstance,player,currentObject);
                         }
-                        insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, currentObject, hoveredObject, selectedObjects, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
+                        insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, currentObject, hoveredObject, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
                     }
                     stackIds.clear();
                     getAllAboveLyingObjects(gameInstance, player, activeObject, stackIds);
@@ -1134,7 +1173,7 @@ public class ObjectFunctions {
                         ObjectInstance currentObject = gameInstance.getObjectInstanceById(id);
                         removeLieOnRelation(gamePanel.id, gameInstance, player, currentObject);
                         if (currentObject.go instanceof GameObjectToken) {
-                            insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, currentObject, hoveredObject, selectedObjects, 0, 0);
+                            insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, currentObject, hoveredObject, 0, 0);
                         }
                     }
                 }
@@ -1142,7 +1181,7 @@ public class ObjectFunctions {
                 else if (gamePanel.privateArea != null && activeObject.state.owner_id == player.id && activeObject.state.isActive && gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
                     removeFromOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, activeObject);
                     int index = gamePanel.privateArea.getInsertPosition(posX, posY);
-                    insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, activeObject, hoveredObject, selectedObjects, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
+                    insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, activeObject, hoveredObject, index, 0); //(int) (activeObject.getWidth(player.id)*gamePanel.cardOverlap)
                 }
                 //Release previously owned card
                 else if (activeObject.state.owner_id == player.id && !gamePanel.privateArea.containsScreenCoordinates(posX, posY)) {
@@ -1150,7 +1189,7 @@ public class ObjectFunctions {
                     if (SwingUtilities.isLeftMouseButton(arg0)) {
                         ObjectFunctions.flipTokenObject(gamePanel.id, gameInstance, player, activeObject);
                         if(gamePanel.table.stackerShape.contains(posX, posY)){
-                            playObject(gamePanel, gameInstance, player, activeObject, hoveredObject, selectedObjects);
+                            playObject(gamePanel, gameInstance, player, activeObject, hoveredObject);
                         }
                     }
                 }
@@ -1163,7 +1202,8 @@ public class ObjectFunctions {
                             IntegerArrayList oiIds = new IntegerArrayList();
                             getStack(gameInstance, nearestObject, oiIds);
                             //If release token on token stack then stack all together
-                            if (nearestObject != activeObject && (activeOIds.size() > 1 || oiIds.size() > 1) && haveSameSize(player, nearestObject, activeObject)) {
+
+                            if (nearestObject != activeObject && (activeOIds.size() > 1 || oiIds.size() > 1) && sameGroups(nearestObject, activeObject)) {
                                 ObjectFunctions.mergeStacks(gamePanel.id, gameInstance, player, activeObject, nearestObject);
                                 activeOIds.clear();
                                 getStack(gameInstance, nearestObject, activeOIds);
@@ -1211,6 +1251,15 @@ public class ObjectFunctions {
         }
     }
 
+    private static boolean sameGroups(ObjectInstance nearestObject, ObjectInstance activeObject) {
+        for (String group : nearestObject.go.groups){
+            if (ArrayUtil.linearSearchEqual(activeObject.go.groups, group) >= 0){
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static boolean haveSameSize(Player player, ObjectInstance nearestObject, ObjectInstance activeObject) {
         return nearestObject.getWidth(player.id) == activeObject.getWidth(player.id) && nearestObject.getHeight(player.id) == activeObject.getHeight(player.id);
     }
@@ -1237,8 +1286,8 @@ public class ObjectFunctions {
         }
     }
 
-    public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, Point2D point, double offset, ObjectInstance activeObject, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, int posX, int posY, double zooming) {
-        releaseObjects(arg0, gamePanel, gameInstance, player, point, offset, activeObject, hoveredObject, selectedObjects, posX, posY, zooming, 0);
+    public static void releaseObjects(MouseEvent arg0, GamePanel gamePanel, GameInstance gameInstance, Player player, Point2D point, double offset, ObjectInstance activeObject, ObjectInstance hoveredObject, int posX, int posY, double zooming) {
+        releaseObjects(arg0, gamePanel, gameInstance, player, point, offset, activeObject, hoveredObject, posX, posY, zooming, 0);
     }
 
     public static ObjectInstance findNeighbouredStackTop(GameInstance gameInstance, Player player, ObjectInstance activeObject, int maxInaccuracy) {
@@ -1266,11 +1315,13 @@ public class ObjectFunctions {
         return stackList.contains(checkInstance.id);
     }
 
-    public static void makeStack(int gamePanelId, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, int side) {
+    public static void makeStack(int gamePanelId, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList, ObjectInstance hoveredObject, int side) {
         if (oiList.size() > 1) {
             for (int i = 0; i < oiList.size(); ++i) {
                 ObjectInstance currentObject = oiList.get(i);
-                if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1 && !ObjectFunctions.objectIsSelectedByOtherPlayer(gameInstance, player, currentObject.id)) {
+                if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1 && !ObjectFunctions.objectIsSelectedByOtherPlayer(gameInstance, player, currentObject)) {
+                    deselectObject(gamePanelId, gameInstance, player, currentObject.id, hoveredObject);
+                    removeStackRelations(gamePanelId, gameInstance, player, currentObject);
                     if (side != SIDE_UNCHANGED){flipTokenToSide(gamePanelId, gameInstance, player, currentObject, side == SIDE_TO_FRONT);}
                     ObjectState state = currentObject.state.copy();
                     state.rotation = currentObject.state.originalRotation;
@@ -1278,18 +1329,16 @@ public class ObjectFunctions {
                         state.belowInstanceId = -1;
                         state.aboveInstanceId = oiList.get(i + 1).id;
                         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject, state));
-                        deselectObject(gamePanelId, gameInstance, player, currentObject.id, hoveredObject, selectedObjects);
                     } else if (i == oiList.size() - 1) {
                         state.aboveInstanceId = -1;
                         state.belowInstanceId = oiList.get(i - 1).id;
                         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject, state));
-                        MoveFunctions.moveObjectTo(gamePanelId, gameInstance, player, currentObject, gameInstance.getObjectInstanceById(oiList.get(i - 1).id));
+                        MoveFunctions.moveObjectTo(gamePanelId, gameInstance, player, currentObject, oiList.get(i - 1));
                     } else {
                         state.aboveInstanceId = oiList.get(i + 1).id;
                         state.belowInstanceId = oiList.get(i - 1).id;
                         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject, state));
                         MoveFunctions.moveObjectTo(gamePanelId, gameInstance, player, currentObject, gameInstance.getObjectInstanceById(oiList.get(i - 1).id));
-                        deselectObject(gamePanelId, gameInstance, player, currentObject.id, hoveredObject, selectedObjects);
                     }
                 }
             }
@@ -1297,11 +1346,13 @@ public class ObjectFunctions {
     }
 
 
-    public static void makeStack(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList stackElements, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, int side) {
+    public static void makeStack(int gamePanelId, GameInstance gameInstance, Player player, IntegerArrayList stackElements, ObjectInstance hoveredObject, int side) {
         if (stackElements.size() > 1) {
             for (int i = 0; i < stackElements.size(); ++i) {
                 ObjectInstance currentObject = gameInstance.getObjectInstanceById(stackElements.getI(i));
-                if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1 && !ObjectFunctions.objectIsSelectedByOtherPlayer(gameInstance, player, currentObject.id)) {
+                if (currentObject.go instanceof GameObjectToken && currentObject.state.owner_id == -1 && !ObjectFunctions.objectIsSelectedByOtherPlayer(gameInstance, player, currentObject)) {
+                    deselectObject(gamePanelId, gameInstance, player, currentObject.id, hoveredObject);
+                    removeStackRelations(gamePanelId, gameInstance, player, currentObject);
                     if (side != SIDE_UNCHANGED){flipTokenToSide(gamePanelId, gameInstance, player, currentObject, side == SIDE_TO_FRONT);}
                     ObjectState state = currentObject.state.copy();
                     state.rotation = currentObject.state.originalRotation;
@@ -1309,7 +1360,6 @@ public class ObjectFunctions {
                         state.belowInstanceId = -1;
                         state.aboveInstanceId = stackElements.getI(i + 1);
                         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject, state));
-                        deselectObject(gamePanelId, gameInstance, player, currentObject.id, hoveredObject, selectedObjects);
                     } else if (i == stackElements.size() - 1) {
                         state.aboveInstanceId = -1;
                         state.belowInstanceId = stackElements.getI(i - 1);
@@ -1320,7 +1370,6 @@ public class ObjectFunctions {
                         state.belowInstanceId = stackElements.getI(i - 1);
                         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, currentObject, state));
                         MoveFunctions.moveObjectTo(gamePanelId, gameInstance, player, currentObject, gameInstance.getObjectInstanceById(stackElements.getI(i - 1)));
-                        deselectObject(gamePanelId, gameInstance, player, currentObject.id, hoveredObject, selectedObjects);
                     }
                 }
             }
@@ -1411,7 +1460,7 @@ public class ObjectFunctions {
         insertIntoStack(gamePanelId, gameInstance, player, objectInstance, aboveInstance, belowInstance, cardMargin);
     }
 
-    public static void insertIntoOwnStack(int id, PrivateArea pa, GameInstance gameInstance, Player player, Point2D point, double offset, ObjectInstance objectInstance, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, int insertId, int cardMargin) {
+    public static void insertIntoOwnStack(int id, PrivateArea pa, GameInstance gameInstance, Player player, Point2D point, double offset, ObjectInstance objectInstance, ObjectInstance hoveredObject, int insertId, int cardMargin) {
         IntegerArrayList idList = new IntegerArrayList();
         getOwnedStack(gameInstance, player, idList);
         ObjectState state = objectInstance.state.copy();
@@ -1422,7 +1471,7 @@ public class ObjectFunctions {
         pa.updatePrivateObjects(gameInstance, player);
         insertIntoStack(id, gameInstance, player, objectInstance, idList, insertId, cardMargin);
         moveOwnStackToBoardPosition(id, gameInstance, player, point, offset, idList);
-        deselectObject(id, gameInstance, player, objectInstance.id, hoveredObject, selectedObjects);
+        deselectObject(id, gameInstance, player, objectInstance.id, hoveredObject);
     }
 
     public static void removeFromOwnStack(int source, PrivateArea pa, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList) {
@@ -1459,6 +1508,7 @@ public class ObjectFunctions {
             }
             if (oiGroup.equals(objectGroup) && oi.id != objectInstance.id) {
                 if (allCards) {
+                    deselectObject(gamePanelId, gameInstance, null, oi.id, null);
                     if (oi.state.owner_id != -1){
                         ObjectState objectState = oi.state.copy();
                         objectState.owner_select_reset();
@@ -1475,10 +1525,10 @@ public class ObjectFunctions {
 
     }
 
-    public static void stackAllObjectsOfGroup(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, boolean withHandCards) {
+    public static void stackAllObjectsOfGroup(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, boolean withHandCards) {
         IntegerArrayList ial = new IntegerArrayList();
         getAllObjectsOfGroup(gamePanelId, gameInstance, player, objectInstance, ial, withHandCards);
-        makeStack(gamePanelId, gameInstance, player, ial, hoveredObject, selectedObjects, SIDE_TO_BACK);
+        makeStack(gamePanelId, gameInstance, player, ial, hoveredObject, SIDE_TO_BACK);
     }
 
     public static IntegerArrayList getTopNObjects(GameInstance gameInstance, ObjectInstance objectInstance, int number) {
@@ -1613,54 +1663,57 @@ public class ObjectFunctions {
     }
 
     public static IntegerArrayList getObjectRepresentatives(GameInstance gameInstance, IntegerArrayList objectIds) {
+        return getObjectRepresentatives(gameInstance, objectIds, false);
+    }
+
+    public static IntegerArrayList getObjectRepresentatives(GameInstance gameInstance, IntegerArrayList objectIds, boolean sorted) {//TODO sorted is not doing anything
         IntegerArrayList ial = new IntegerArrayList();
         for (int id : objectIds) {
             if (gameInstance.getObjectInstanceById(id).go instanceof GameObjectToken) {
                 int topId = getStackTop(gameInstance, gameInstance.getObjectInstanceById(id)).id;
-                if (!ial.contains(topId)) {
-                    ial.add(topId);
-                }
+                ial.addUnique(topId);
             }
             else{
                 ial.add(id);
             }
         }
+        ial.sort(new Comparator<Integer>() {//TODO this is probably very slow
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return countStack(gameInstance, gameInstance.getObjectInstanceById(o1)) - countStack(gameInstance, gameInstance.getObjectInstanceById(o2));
+            }
+        });
         return ial;
     }
 
+
+
     public static ArrayList<ObjectInstance> getObjectRepresentatives(GameInstance gameInstance, ArrayList<ObjectInstance> objectInstances) {
-        ArrayList<ObjectInstance> objectInstances1 = new ArrayList<>();
         IntegerArrayList ial = new IntegerArrayList();
         for (ObjectInstance oi : objectInstances) {
             if (oi.go instanceof GameObjectToken) {
                 ial.add(oi.id);
             }
         }
-        for (int id : getObjectRepresentatives(gameInstance, ial)) {
-            objectInstances1.add(gameInstance.getObjectInstanceById(id));
-        }
+        ArrayList<ObjectInstance> objectInstances1 = new ArrayList<>();
+        addIdListToObjectList(gameInstance, ial, objectInstances1);
         return objectInstances1;
     }
 
     public static void getDrawOrder(GameInstance gameInstance, IntegerArrayList ial){
         ArrayList<ObjectInstance> drawValues = new ArrayList<>();
-        integerArrayListToObjectList(gameInstance, ial, drawValues);
+        addIdListToObjectList(gameInstance, ial, drawValues);
         drawValues.sort(objectInstanceDrawValueComparator);
-        objectListToIntegerArrayList(ial, drawValues);
-    }
-
-    public static void integerArrayListToObjectList(GameInstance gameInstance, IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
-        oiList.clear();
-        for (int id : ial){
-            oiList.add(gameInstance.getObjectInstanceById(id));
-        }
-    }
-
-    public static void objectListToIntegerArrayList(IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
         ial.clear();
-        for (ObjectInstance oi : oiList){
-            ial.add(oi.id);
-        }
+        addObjectListToIdList(drawValues, ial);
+    }
+
+    public static void addIdListToObjectList(GameInstance gameInstance, IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
+        for (int id : ial){oiList.add(gameInstance.getObjectInstanceById(id));}
+    }
+
+    public static void addObjectListToIdList(ArrayList<ObjectInstance> oiList, IntegerArrayList ial){
+        for (ObjectInstance oi : oiList){ial.add(oi.id);}
     }
     
     private static final Comparator<ObjectInstance> sortValueComparator = new Comparator<ObjectInstance>() {
@@ -1682,13 +1735,14 @@ public class ObjectFunctions {
         if (reverse) {Collections.reverse(oiList);}
     }
 
-    public static void sortHandCardsByValue(GamePanel gamePanel, GameInstance gameInstance, Player player, Point2D point, double offset, IntegerArrayList ial, ArrayList<ObjectInstance> oiList, ObjectInstance hoveredObject, IntegerArrayList selectedObjects, boolean reverse){
+    public static void sortHandCardsByValue(GamePanel gamePanel, GameInstance gameInstance, Player player, Point2D point, double offset, IntegerArrayList ial, ArrayList<ObjectInstance> oiList, ObjectInstance hoveredObject, boolean reverse){
         getOwnedStack(gameInstance, player, ial);
-        integerArrayListToObjectList(gameInstance, ial, oiList);
+        oiList.clear();
+        addIdListToObjectList(gameInstance, ial, oiList);
         sortByValue(gameInstance, oiList, reverse);
         for (int i = 0; i < oiList.size(); ++i){
             removeFromOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, oiList.get(i));
-            insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, oiList.get(i), hoveredObject, selectedObjects, i, 0);
+            insertIntoOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, point, offset, oiList.get(i), hoveredObject, i, 0);
         }
     }
 
@@ -1735,14 +1789,18 @@ public class ObjectFunctions {
         }
     }
 
-
     public static void rotateStep(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial){
         ial.clear();
         getStack(gameInstance,objectInstance,ial);
         for (int id:ial){
             ObjectInstance oi = gameInstance.getObjectInstanceById(id);
             ObjectState state = oi.state.copy();
-            state.rotation = oi.getRotation() + oi.state.rotationStep;
+            if (oi.state.rotationStep != -1) {
+                state.rotation = oi.getRotation() + oi.state.rotationStep;
+            }
+            else{
+                state.rotation = oi.getRotation() + 360/gameInstance.getPlayerCount(false);
+            }
             gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, oi, state));
         }
     }
@@ -1753,8 +1811,7 @@ public class ObjectFunctions {
         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, oi, state));
     }
 
-
-    public static void giveObjects(GamePanel gamePanel, GameInstance gameInstance, Point2D point, double offset, IntegerArrayList ial, ArrayList<ObjectInstance> oiList, ObjectInstance hoveredObject, IntegerArrayList selectedObjects) {
+    public static void giveObjects(GamePanel gamePanel, GameInstance gameInstance, Point2D point, double offset, IntegerArrayList ial, ArrayList<ObjectInstance> oiList, ObjectInstance hoveredObject) {
         Collections.shuffle(ial);
         int playerNum = gameInstance.getPlayerCount();
         int numElements = ial.size()/playerNum;
@@ -1770,14 +1827,14 @@ public class ObjectFunctions {
             gameInstance.update(new PlayerEditAction(gamePanel.id, player, player));
             for (int currentElementIndex = 0; currentElementIndex < numElements; ++currentElementIndex){
                 int Pos = numElements*playerCounter + currentElementIndex;
-                takeObjects(gamePanel,gameInstance,player, point, offset, gameInstance.getObjectInstanceById(ial.getI(Pos)), hoveredObject, selectedObjects);
+                takeObjects(gamePanel,gameInstance,player, point, offset, gameInstance.getObjectInstanceById(ial.getI(Pos)), hoveredObject);
             }
             if(counter < modElements){
                 int Pos = numElements*playerNum + counter;
-                takeObjects(gamePanel,gameInstance,player, point, offset, gameInstance.getObjectInstanceById(ial.getI(Pos)), hoveredObject, selectedObjects);
+                takeObjects(gamePanel,gameInstance,player, point, offset, gameInstance.getObjectInstanceById(ial.getI(Pos)), hoveredObject);
                 counter+= 1;
             }
-            sortHandCardsByValue(gamePanel, gameInstance, player, point, offset, integerList, oiList, hoveredObject, selectedObjects, false);
+            sortHandCardsByValue(gamePanel, gameInstance, player, point, offset, integerList, oiList, hoveredObject, false);
             integerList.clear();
             ++playerCounter;
         }
@@ -1789,8 +1846,8 @@ public class ObjectFunctions {
         return stackerShape != null && stackerShape.contains(transformedPoint);
     }
 
-    public static void takeTrick(int gamePanelId, GameInstance gameInstance, Player player, Shape shape, Point2D point, double offset, AffineTransform boardToScreenTransform, ObjectInstance objectInstance, IntegerArrayList ial, ObjectInstance hoveredObject, IntegerArrayList selectedObjects) {
-        stackObjectsOnShapeAndMoveToPoint(gamePanelId, gameInstance, player, shape, point, boardToScreenTransform, ial, hoveredObject, selectedObjects, SIDE_TO_BACK);
+    public static void takeTrick(int gamePanelId, GameInstance gameInstance, Player player, Shape shape, Point2D point, double offset, AffineTransform boardToScreenTransform, ObjectInstance objectInstance, IntegerArrayList ial, ObjectInstance hoveredObject) {
+        stackObjectsOnShapeAndMoveToPoint(gamePanelId, gameInstance, player, shape, point, boardToScreenTransform, ial, hoveredObject, SIDE_TO_BACK);
         double angle = PlayerFunctions.GetCurrentPlayerRotation(gameInstance, player);
         //TODO change the trick angle according to the number of tricks
         double trickAngle = angle - (5*player.trickNum - 15);
@@ -1929,5 +1986,10 @@ public class ObjectFunctions {
 
     }
 
+    public static void deselectAll(int id, GameInstance gameInstance) {
+        for (ObjectInstance oi : gameInstance.getObjectInstanceList()){
+            ObjectFunctions.deselectObject(id, gameInstance, null, oi.id, null);
+        }
+    }
 }
 

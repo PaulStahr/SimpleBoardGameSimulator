@@ -10,6 +10,7 @@ import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gameObjects.action.player.PlayerAddAction;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gui.game.GameWindow;
@@ -25,7 +26,7 @@ public class SimpleNetworkServertest {
     private static final Logger logger = LoggerFactory.getLogger(SimpleNetworkServertest.class);
     public static List<Player> PlayerList = new ArrayList<>();
     public static List<GameWindow> GameWindowList = new ArrayList<>();
-    public static int AdditionalPlayers = 0;
+    public static int AdditionalPlayers = 3;
     public static boolean startGame = true;
     public static GameServer startNewServer(int port)
     {
@@ -46,7 +47,7 @@ public class SimpleNetworkServertest {
 		}
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi, null);
     	connection.start();
-    	gi.addPlayer(null, player);
+    	gi.addPlayer(new PlayerAddAction((int)System.nanoTime(), player));
     	JFrameUtils.runByDispatcherAndWaitNoExcept(
     			new Runnable() {
 					
@@ -66,7 +67,7 @@ public class SimpleNetworkServertest {
     	AsynchronousGameConnection connection = sclc.connectToGameSession(gi, null);
     	connection.syncPull();
     	connection.start();
-    	player = gi.addPlayer(null, player);
+    	player = gi.addPlayer(new PlayerAddAction(-1, player));
     	GameWindow gw = new GameWindow(gi, player, lh);
     	JFrameUtils.runByDispatcherAndWaitNoExcept(new Runnable() {
 			
@@ -100,7 +101,7 @@ public class SimpleNetworkServertest {
 			GameIO.readSnapshotFromZip(fis, gi);
 			gi.name = "Testsession";
 			gi.begin_play();
-			gi.addPlayer(null, player);
+			gi.addPlayer(new PlayerAddAction(-1, player));
 			fis.close();
 			connectAndStartGame(address, port, player, gi, lh);
 

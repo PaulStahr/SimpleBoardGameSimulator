@@ -56,7 +56,6 @@ public enum Words {
     left_click,
     middle_click,
     right_click,
-    mouse_wheel,
     view_collect_stack,
     collect_all_objects,
     get_bottom_card,
@@ -109,5 +108,5 @@ public enum Words {
     password,
     seats,
     show_ping,
-    create_new_game, start_new_game, load_game, create_game, debug, cards, figures, dices, books, connection, loglevel;
+    create_new_game, start_new_game, load_game, create_game, debug, cards, figures, dices, books, connection, loglevel, version, your_version, current_version, loading, current_developement_version;
 }

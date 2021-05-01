@@ -132,4 +132,9 @@
     <books>Books</books>
     <connection>Connection</connection>
     <loglevel>Loglevel</loglevel>
+    <version>Version</version>
+    <your_version>Your version</your_version>
+    <current_version>Current version</current_version>
+    <current_developement_version>Current developer version</current_developement_version>
+    <loading>Loading</loading>
 </xml>
