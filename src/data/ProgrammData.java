@@ -63,9 +63,12 @@ public class ProgrammData {
 	public static final List<String> authors = ArrayTools.unmodifiableList(new String[]{"Paul Stahr","Florian Seiffarth"});
 	public static final String jarDirectory;
     private static WeakReference<Element> localVersion;
-    private static WeakReference<Element> remoteVersion;
     private static WeakReference<List<Version> > localVersionList;
-    private static WeakReference<List<Version> > remoteVersionList;
+    public static enum Branch{
+        DEV, MASTER;
+        private WeakReference<Element> remoteVersion;
+        private WeakReference<List<Version> > remoteVersionList;
+    }
 
 	public static String getVersion(){return version;}
 
@@ -95,15 +98,15 @@ public class ProgrammData {
         }
 	}
 
-	public static List<Version> getRemoteVersionList(){
-	    Element elem = getRemoteVersion();
-        List<Version> result = remoteVersionList == null ? null : remoteVersionList.get();
+	public static List<Version> getRemoteVersionList(Branch b){
+	    Element elem = getRemoteVersion(b);
+        List<Version> result = b.remoteVersionList == null ? null : b.remoteVersionList.get();
         if (result == null)
         {
             ArrayList<Version> v = new ArrayList<>();
             parseVersionXml(elem, v);
             result = ArrayTools.unmodifiableList(v.toArray(new Version[v.size()]));
-            remoteVersionList = new WeakReference<List<Version>>(result);
+            b.remoteVersionList = new WeakReference<List<Version>>(result);
         }
         return result;
 	}
@@ -121,15 +124,21 @@ public class ProgrammData {
 	    return result;
 	}
 
-	private static Element getRemoteVersion() {
-        Element root = remoteVersion == null ? null : remoteVersion.get();
+	private static Element getRemoteVersion(Branch b) {
+        Element root = b.remoteVersion == null ? null : b.remoteVersion.get();
         if (root == null) {
             try {
-                InputStream input = new URL("https://raw.githubusercontent.com/PaulStahr/SimpleBoardGameSimulator/checkversion/src/resources/version.xml").openStream();
+                String address;
+                switch (b) {
+                    case DEV:   address = "https://raw.githubusercontent.com/PaulStahr/SimpleBoardGameSimulator/dev/src/resources/version.xml";break;
+                    case MASTER:address = "https://raw.githubusercontent.com/PaulStahr/SimpleBoardGameSimulator/master/src/resources/version.xml";break;
+                    default:    throw new IllegalArgumentException();
+                }
+                InputStream input = new URL(address).openStream();
                 Document doc = new SAXBuilder().build(input);
                 input.close();
                 root = doc.getRootElement();
-                remoteVersion = new WeakReference<Element>(root);
+                b.remoteVersion = new WeakReference<Element>(root);
             } catch (JDOMException e) {
                 logger.error("Couldn't read version",e);
             } catch (IOException e) {
@@ -181,5 +190,21 @@ public class ProgrammData {
 			return -1;
 		erg |= (long)tmp << shift;
     	return beta ? erg * 2 + 1 : erg * 2;
+    }
+
+    public static Version getHighestVerion(List<Version> versionListMaster) {
+        ProgrammData.Version result = null;
+        long maxVersion = Long.MIN_VALUE;
+        for (int i = 0; i < versionListMaster.size(); ++i)
+        {
+            ProgrammData.Version v = versionListMaster.get(i);
+            long currentVersionNumber = ProgrammData.getLongOfVersion(v.code);
+            if(currentVersionNumber > maxVersion)
+            {
+                result = v;
+                maxVersion = currentVersionNumber;
+            }
+        }
+        return result;
     }   
 }
