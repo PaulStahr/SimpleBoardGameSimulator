@@ -1789,7 +1789,6 @@ public class ObjectFunctions {
         }
     }
 
-
     public static void rotateStep(int gamePanelId, GameInstance gameInstance, Player player, ObjectInstance objectInstance, IntegerArrayList ial){
         ial.clear();
         getStack(gameInstance,objectInstance,ial);
@@ -1811,7 +1810,6 @@ public class ObjectFunctions {
         state.isFixed = true;
         gameInstance.update(new GameObjectInstanceEditAction(gamePanelId, player, oi, state));
     }
-
 
     public static void giveObjects(GamePanel gamePanel, GameInstance gameInstance, Point2D point, double offset, IntegerArrayList ial, ArrayList<ObjectInstance> oiList, ObjectInstance hoveredObject) {
         Collections.shuffle(ial);

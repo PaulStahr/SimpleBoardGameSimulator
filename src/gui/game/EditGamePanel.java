@@ -67,6 +67,7 @@ import gameObjects.definition.GameObjectDice;
 import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.functions.CheckingFunctions;
+import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
@@ -621,7 +622,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 								}
 								if (NewOwerId != -1){
 									Player newOwner = gi.getPlayerById(NewOwerId);
-									//ObjectFunctions.removeObject(gamePanel, gi, newOwner, instance);
+									ObjectFunctions.removeObject(id, gi, newOwner, instance);
 									//ObjectFunctions.takeObjects(gamePanel, gi, newOwner, instance);
 								}
 								break;

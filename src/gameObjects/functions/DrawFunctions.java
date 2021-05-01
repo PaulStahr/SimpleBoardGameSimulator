@@ -607,21 +607,21 @@ public class DrawFunctions {
         gamePanel.screenToBoardPos(gamePanel.mouseScreenX, gamePanel.mouseScreenY, boardPosition);
         g2.drawString("Board: (" + Integer.toString(boardPosition.getXI()) + ", " + Integer.toString(boardPosition.getYI()) + ")" + " Wheel: " + Integer.toString(gamePanel.mouseWheelValue), 50, yPos);
         yPos+=yStep;
-        g2.drawString("Player Pos: " + Boolean.toString(gamePanel.mouseInPrivateArea), 50, yPos);
+        g2.drawString("Player Pos: " + gamePanel.mouseInPrivateArea, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Private Area: " + Boolean.toString(gamePanel.mouseInPrivateArea), 50, yPos);
+        g2.drawString("Private Area: " + gamePanel.mouseInPrivateArea, 50, yPos);
         yPos+=yStep;
         g2.drawString("Own Hand Cards: " + stringHandCards, 50, yPos);
         yPos+=yStep;
         g2.drawString("Cards in some private Area: " + stringPrivateAreaCards, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Hand Card Section Id: " + Integer.toString(sectionIndex), 50, yPos);
+        g2.drawString("Hand Card Section Id: " + sectionIndex, 50, yPos);
         yPos+=yStep;
         g2.drawString("Active Objects: " + stringActiveObjects, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Hovered Object: " + Integer.toString(hoverId), 50, yPos);
+        g2.drawString("Hovered Object: " + hoverId, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Hovered Draw Value: " + Long.toString(drawValue), 50, yPos);
+        g2.drawString("Hovered Draw Value: " + drawValue, 50, yPos);
         yPos+=yStep;
         g2.drawString("Hovered Stack: " + stringHoveredStack, 50, yPos);
         yPos+=yStep;
@@ -639,11 +639,11 @@ public class DrawFunctions {
         yPos+=yStep;
         g2.drawString("Selected Objects: " + stringSelectedObjects, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Player Id: " + Integer.toString(player.id), 50, yPos);
+        g2.drawString("Player Id: " + player.id, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Admin Id: " + Integer.toString(gameInstance.admin), 50, yPos);
+        g2.drawString("Admin Id: " + gameInstance.admin, 50, yPos);
         yPos+=yStep;
-        g2.drawString("Number of Pressed Keys: " + Integer.toString(gamePanel.downKeys.size()), 50, yPos);
+        g2.drawString("Number of Pressed Keys: " + gamePanel.downKeys.size(), 50, yPos);
         yPos+=yStep;
     }
 }
