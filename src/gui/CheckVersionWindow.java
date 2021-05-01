@@ -21,8 +21,14 @@
  ******************************************************************************/
 package gui;
 
+import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -52,18 +58,21 @@ import util.jframe.JComponentSingletonInstantiator;
 * @version 04.02.2012
 */
 
-public class CheckVersionWindow extends JFrame implements Runnable, LanguageChangeListener
+public class CheckVersionWindow extends JFrame implements Runnable, LanguageChangeListener, ActionListener
 {
     private static final Logger logger = LoggerFactory.getLogger(CheckVersionWindow.class);
     private static final long serialVersionUID = -6479080661365866948L;
     private static final JComponentSingletonInstantiator<CheckVersionWindow> instantiator = new JComponentSingletonInstantiator<CheckVersionWindow>(CheckVersionWindow.class);
     private final JLabel labelOwnVersion        = new JLabel();
     private final JLabel versionOwnVersion      = new JLabel(ProgrammData.getVersion());
-    private final JLabel labelCurrentVersion     = new JLabel();
-    private final JLabel versionCurrentVersion   = new JLabel();
+    private final JLabel labelCurrentMasterVersion     = new JLabel();
+    private final JLabel versionCurrentMasterVersion   = new JLabel();
+    private final JLabel labelCurrentDevVersion     = new JLabel();
+    private final JLabel versionCurrentDevVersion   = new JLabel();
     private final JEditorPane editorPaneChangelog= new JEditorPane();
     private final JScrollPane scrollPaneChangelog= new JScrollPane(editorPaneChangelog);
-    private final JButton buttonDownload        = new JButton("Herunterladen");
+    private final JButton buttonDownloadMaster        = new JButton("Herunterladen");
+    private final JButton buttonDownloadDev        = new JButton("Herunterladen");
     boolean isDownloading = false;
     private static LanguageHandler lh;
 
@@ -71,32 +80,29 @@ public class CheckVersionWindow extends JFrame implements Runnable, LanguageChan
 
     @Override
     public void run (){
-        //try {
-            final List<ProgrammData.Version> versionList = ProgrammData.getRemoteVersionList();
-            //final boolean isNewer = chLog != nuTll && ProgrammData.isNewer(chLog.version);
-            //versionActualVersion.setText(isNewer ? chLog.version.concat(" (aktueller)") : chLog.version);
-            JFrameUtils.runByDispatcher(new Runnable() {
-                @Override
-                public void run() {
-                    long maxVersion = Integer.MIN_VALUE;
-                    String code = "";
-                    for (int i = 0; i < versionList.size(); ++i)
-                    {
-                        ProgrammData.Version v = versionList.get(i);
-                        if(ProgrammData.getLongOfVersion(v.code) > maxVersion)
-                        {
-                            code = v.code;
-                            maxVersion = ProgrammData.getLongOfVersion(code);
-                        }
-                    }
-                    editorPaneChangelog.setText(convertToHtml(versionList));
-                    versionCurrentVersion.setText(code);
-                    logger.info("Downloaded online version list");
-                }
-            });
-        //} catch (InterruptedException e) {
-          //  logger.error("Unexpcted interrupt");
-        //}
+        try {
+        final List<ProgrammData.Version> versionListMaster = ProgrammData.getRemoteVersionList(ProgrammData.Branch.MASTER);
+        JFrameUtils.runByDispatcher(new Runnable() {
+            @Override
+            public void run() {
+                ProgrammData.Version currentMasterVersion = ProgrammData.getHighestVerion(versionListMaster);
+                versionCurrentMasterVersion.setText(currentMasterVersion.code);
+                logger.info("Downloaded online version list");
+            }
+        });
+        }catch(Exception e) {logger.error("Couldn't fetch version information", e);}
+        try {
+        final List<ProgrammData.Version> versionListDev = ProgrammData.getRemoteVersionList(ProgrammData.Branch.DEV);
+        JFrameUtils.runByDispatcher(new Runnable() {
+            @Override
+            public void run() {
+                ProgrammData.Version currentDevVersion = ProgrammData.getHighestVerion(versionListDev);
+                editorPaneChangelog.setText(convertToHtml(versionListDev));
+                versionCurrentDevVersion.setText(currentDevVersion.code);
+                logger.info("Downloaded online version list");
+            }
+        });
+        }catch(Exception e) {logger.error("Couldn't fetch version information", e);}
         isDownloading = false;
     }
     
@@ -132,11 +138,15 @@ public class CheckVersionWindow extends JFrame implements Runnable, LanguageChan
                 .addGroup(layout.createSequentialGroup()
                     .addGroup(layout.createParallelGroup()
                         .addComponent(labelOwnVersion)
-                        .addComponent(labelCurrentVersion)
+                        .addComponent(labelCurrentMasterVersion)
+                        .addComponent(labelCurrentDevVersion)
                     ).addGap(5).addGroup(layout.createParallelGroup()
                         .addComponent(versionOwnVersion)
-                        .addComponent(versionCurrentVersion)
-                    ).addGap(5).addComponent(buttonDownload)
+                        .addComponent(versionCurrentMasterVersion)
+                        .addComponent(versionCurrentDevVersion)
+                    ).addGap(5).addGroup(layout.createParallelGroup()
+                        .addComponent(buttonDownloadDev)
+                        .addComponent(buttonDownloadMaster))
                 ).addComponent(scrollPaneChangelog)
             ).addGap(5)
         );
@@ -146,14 +156,21 @@ public class CheckVersionWindow extends JFrame implements Runnable, LanguageChan
                 .addComponent(labelOwnVersion, Alignment.CENTER)
                 .addComponent(versionOwnVersion, Alignment.CENTER)
             ).addGap(5).addGroup(layout.createParallelGroup()
-                .addComponent(labelCurrentVersion, Alignment.CENTER)
-                .addComponent(versionCurrentVersion, Alignment.CENTER)
-                .addComponent(buttonDownload, Alignment.CENTER)
+                .addComponent(labelCurrentMasterVersion, Alignment.CENTER)
+                .addComponent(versionCurrentMasterVersion, Alignment.CENTER)
+                .addComponent(buttonDownloadMaster, Alignment.CENTER)
+            ).addGap(5).addGroup(layout.createParallelGroup()
+                .addComponent(labelCurrentDevVersion, Alignment.CENTER)
+                .addComponent(versionCurrentDevVersion, Alignment.CENTER)                
+                .addComponent(buttonDownloadDev, Alignment.CENTER)
             ).addGap(5).addComponent(scrollPaneChangelog, 0, 300, 10000).addGap(5)
         );
 
         editorPaneChangelog.setContentType("text/html"); 
         editorPaneChangelog.setEditable(false);
+
+        buttonDownloadDev.addActionListener(this);
+        buttonDownloadMaster.addActionListener(this);
 
         setTitle("Version");
         setResizable(true);      
@@ -180,7 +197,51 @@ public class CheckVersionWindow extends JFrame implements Runnable, LanguageChan
     @Override
     public void languageChanged(Language language) {
         labelOwnVersion.setText(language.getString(Words.your_version));
-        labelCurrentVersion.setText(language.getString(Words.current_version));
-        versionCurrentVersion.setText(language.getString(Words.loading));
+        labelCurrentMasterVersion.setText(language.getString(Words.current_version));
+        labelCurrentDevVersion.setText(language.getString(Words.current_developement_version));
+        versionCurrentMasterVersion.setText(language.getString(Words.loading));
+    }
+
+    public static boolean openWebpage(URI uri) {
+        Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+        if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+            try {
+                desktop.browse(uri);
+                return true;
+            } catch (Exception e) {
+                logger.error("Couldn't open browser", e);
+            }
+        }
+        return false;
+    }
+
+    public static boolean openWebpage(URL url) {
+        try {
+            return openWebpage(url.toURI());
+        } catch (URISyntaxException e) {
+            logger.error("Couldn't parse uril",e);
+        }
+        return false;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent arg0) {
+        Object source = arg0.getSource();
+        if (source == buttonDownloadMaster)
+        {
+            try {
+                openWebpage(new URL("https://github.com/PaulStahr/SimpleBoardGameSimulator"));
+            } catch (MalformedURLException e) {
+               logger.error("Couldn't parse url", e);
+            }
+        }
+        else if (source == buttonDownloadDev)
+        {
+            try {
+                openWebpage(new URL("https://github.com/PaulStahr/SimpleBoardGameSimulator/tree/dev"));
+            } catch (MalformedURLException e) {
+                logger.error("Couldn't parse url", e);
+            }
+        }
     }
 }
