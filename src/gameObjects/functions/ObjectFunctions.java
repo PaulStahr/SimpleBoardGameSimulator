@@ -1689,38 +1689,31 @@ public class ObjectFunctions {
 
 
     public static ArrayList<ObjectInstance> getObjectRepresentatives(GameInstance gameInstance, ArrayList<ObjectInstance> objectInstances) {
-        ArrayList<ObjectInstance> objectInstances1 = new ArrayList<>();
         IntegerArrayList ial = new IntegerArrayList();
         for (ObjectInstance oi : objectInstances) {
             if (oi.go instanceof GameObjectToken) {
                 ial.add(oi.id);
             }
         }
-        for (int id : getObjectRepresentatives(gameInstance, ial)) {
-            objectInstances1.add(gameInstance.getObjectInstanceById(id));
-        }
+        ArrayList<ObjectInstance> objectInstances1 = new ArrayList<>();
+        addIdListToObjectList(gameInstance, ial, objectInstances1);
         return objectInstances1;
     }
 
     public static void getDrawOrder(GameInstance gameInstance, IntegerArrayList ial){
         ArrayList<ObjectInstance> drawValues = new ArrayList<>();
-        integerArrayListToObjectList(gameInstance, ial, drawValues);
+        addIdListToObjectList(gameInstance, ial, drawValues);
         drawValues.sort(objectInstanceDrawValueComparator);
-        objectListToIntegerArrayList(ial, drawValues);
-    }
-
-    public static void integerArrayListToObjectList(GameInstance gameInstance, IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
-        oiList.clear();
-        for (int id : ial){
-            oiList.add(gameInstance.getObjectInstanceById(id));
-        }
-    }
-
-    public static void objectListToIntegerArrayList(IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
         ial.clear();
-        for (ObjectInstance oi : oiList){
-            ial.add(oi.id);
-        }
+        addObjectListToIdList(drawValues, ial);
+    }
+
+    public static void addIdListToObjectList(GameInstance gameInstance, IntegerArrayList ial, ArrayList<ObjectInstance> oiList){
+        for (int id : ial){oiList.add(gameInstance.getObjectInstanceById(id));}
+    }
+
+    public static void addObjectListToIdList(ArrayList<ObjectInstance> oiList, IntegerArrayList ial){
+        for (ObjectInstance oi : oiList){ial.add(oi.id);}
     }
     
     private static final Comparator<ObjectInstance> sortValueComparator = new Comparator<ObjectInstance>() {
@@ -1744,7 +1737,8 @@ public class ObjectFunctions {
 
     public static void sortHandCardsByValue(GamePanel gamePanel, GameInstance gameInstance, Player player, Point2D point, double offset, IntegerArrayList ial, ArrayList<ObjectInstance> oiList, ObjectInstance hoveredObject, boolean reverse){
         getOwnedStack(gameInstance, player, ial);
-        integerArrayListToObjectList(gameInstance, ial, oiList);
+        oiList.clear();
+        addIdListToObjectList(gameInstance, ial, oiList);
         sortByValue(gameInstance, oiList, reverse);
         for (int i = 0; i < oiList.size(); ++i){
             removeFromOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, oiList.get(i));

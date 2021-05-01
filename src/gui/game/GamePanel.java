@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -81,8 +80,8 @@ import gameObjects.definition.GameObjectToken;
 import gameObjects.functions.CheckFunctions;
 import gameObjects.functions.DrawFunctions;
 import gameObjects.functions.MoveFunctions;
-import gameObjects.functions.ObjectFunctions;
 import gameObjects.functions.PlayerFunctions;
+import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
@@ -332,7 +331,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		ArrayList<ObjectInstance> drawableObjects = new ArrayList<>();
 		CheckFunctions.drawableObjectsOnTable(oiList, drawableObjects);
 		drawableObjects.sort(ObjectFunctions.objectInstanceDrawValueComparator);
-		ObjectFunctions.objectListToIntegerArrayList(ial, drawableObjects);
+		ial.clear();
+		ObjectFunctions.addObjectListToIdList(drawableObjects, ial);
 		drawObjectsFromList(this,g,gameInstance,player, ial);
 
 		//Draw selection rectangle
