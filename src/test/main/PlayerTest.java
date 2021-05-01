@@ -1,11 +1,11 @@
 package test.main;
 
-import java.awt.image.BufferedImage;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.io.IOException;
 
-import data.Texture;
-import gameObjects.definition.GameObjectToken;
-import gameObjects.instance.ObjectInstance;
 import org.jdom2.JDOMException;
 import org.junit.Test;
 
@@ -14,9 +14,6 @@ import gameObjects.action.player.PlayerEditAction;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import main.Player;
-
-import static org.junit.Assert.*;
-
 public class PlayerTest {
     int id = (int)System.nanoTime();
     @Test
@@ -43,7 +40,6 @@ public class PlayerTest {
         gi0.addPlayer(new PlayerAddAction(id, pl));
         gi1 = new GameInstance(gi0);
 
-
         gi1.getPlayerList().indexOf(pl);
         if (pl.seatNum == -1) {
             pl.seatNum = gi1.getPlayerList().indexOf(pl);
@@ -54,13 +50,11 @@ public class PlayerTest {
         if (pl1.seatNum == -1) {
             pl1.seatNum = gi1.getPlayerList().indexOf(pl1);
         }
-        assertFalse(pl.seatNum == -1);
-        assertFalse(pl1.seatNum == -1);
+        assertNotEquals(pl.seatNum, -1);
+        assertNotEquals(pl1.seatNum, -1);
         assertEquals(0, pl.seatNum);
         assertEquals(1, pl1.seatNum);
     }
-
-
 
     @Test
     public void UpdatePlayerTest() throws IOException, JDOMException {
@@ -74,7 +68,5 @@ public class PlayerTest {
         pl1.trickNum = 1;
         gi.update(new PlayerEditAction(id, pl, pl1));
         assertEquals(1, gi.getPlayerById(pl1.id).trickNum);
-    }
-
-
+    }   
 }
