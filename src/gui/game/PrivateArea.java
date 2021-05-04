@@ -12,6 +12,9 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.functions.ObjectFunctions;
@@ -24,6 +27,7 @@ import util.data.IntegerArrayList;
 import util.data.IntegerArrayList.ReadOnlyIntegerArrayList;
 
 public class PrivateArea {
+    private static final Logger logger = LoggerFactory.getLogger(PrivateArea.class);
     public int width = 0;
     public int height = 0;
     public Shape shape = null;
@@ -57,6 +61,11 @@ public class PrivateArea {
     public void setPlayer(Player pl)
     {
         this.player = pl;
+        try {
+            updatePrivateObjects(gameInstance, player);
+        }catch(Exception e) {
+            logger.error("Couldn't update private area");
+        }
     }
 
     private GameAction privateAreaUpdate;
@@ -131,7 +140,7 @@ public class PrivateArea {
         return shape.contains(posX, posY);
     }
 
-    public void updatePrivateObjects(GameInstance gameInstance, Player player) {
+    private void updatePrivateObjects(GameInstance gameInstance, Player player) {
     	privateObjects.clear();
     	ObjectFunctions.getOwnedStack(gameInstance, player, privateObjects);
     }

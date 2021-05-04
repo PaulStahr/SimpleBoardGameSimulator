@@ -856,13 +856,13 @@ public class ObjectFunctions {
     }
 
     //drop all objects from the hand of player
-    public static void dropObjects(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance hoveredObject) {
+    public static void dropObjects(int source, GameInstance gameInstance, Player player, ObjectInstance hoveredObject) {
         ArrayList<ObjectInstance> oiList = new ArrayList<>();
         getOwnedStack(gameInstance, player, oiList);
-        ObjectFunctions.removeFromOwnStack(gamePanel.id, gamePanel.privateArea, gameInstance, player, oiList);
-        ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, oiList);
+        ObjectFunctions.removeFromOwnStack(source, gameInstance, player, oiList);
+        ObjectFunctions.setNewDrawValue(source, gameInstance, player, oiList);
         //stack all dropped objects
-        makeStack(gamePanel.id, gameInstance, player, oiList, hoveredObject, SIDE_UNCHANGED);
+        makeStack(source, gameInstance, player, oiList, hoveredObject, SIDE_UNCHANGED);
     }
 
     public static void dropObject(int source, GameInstance gameInstance, Player player, ObjectInstance objectInstance){
@@ -876,7 +876,7 @@ public class ObjectFunctions {
         playObject(gamePanel, gameInstance, player, objectInstance, hoveredObject, true);
     }
 
-    public static void playObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, boolean front){
+    public static void playObject(int source, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, boolean front){
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
             removeFromOwnStack(gamePanel.id, gameInstance, player, objectInstance);
             ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, objectInstance);
@@ -1473,7 +1473,7 @@ public class ObjectFunctions {
         deselectObject(id, gameInstance, player, objectInstance.id, hoveredObject);
     }
 
-    public static void removeFromOwnStack(int source, PrivateArea pa, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList) {
+    public static void removeFromOwnStack(int source, GameInstance gameInstance, Player player, ArrayList<ObjectInstance> oiList) {
         for (ObjectInstance oi : oiList){
             removeFromOwnStack(source, gameInstance, player, oi);
         }

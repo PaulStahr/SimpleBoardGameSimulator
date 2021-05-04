@@ -301,11 +301,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	public void setPlayer(Player pl)
 	{
 	    privateArea.setPlayer(this.player = pl);
-		try {
-			privateArea.updatePrivateObjects(gameInstance, player);
-		}catch(Exception e) {
-			logger.error("Couldn't update private area");
-		}
 	}
 
 	/** Drawing of all the game objects, draws the board, object instances and the players
@@ -935,7 +930,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 					}
 				} else if (e.getKeyCode() == KeyEvent.VK_D && shiftDown) {
-					ObjectFunctions.dropObjects(this, gameInstance, player, hoveredObject);
+					ObjectFunctions.dropObjects(id, gameInstance, player, hoveredObject);
 				} else if (e.getKeyCode() == KeyEvent.VK_D && !shiftDown) {
 					ObjectFunctions.dropObject(id, gameInstance, player, hoveredObject);
 				} else if (e.getKeyCode() == KeyEvent.VK_P && !shiftDown) {
