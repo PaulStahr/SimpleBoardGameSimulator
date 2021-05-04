@@ -12,8 +12,12 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import gameObjects.action.GameAction;
+import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
+import gameObjects.instance.GameInstance.GameChangeListener;
+import gameObjects.instance.ObjectInstance;
 import main.Player;
 import util.Calculate;
 import util.data.IntegerArrayList;
@@ -38,16 +42,49 @@ public class PrivateArea {
 
     public int currentDragPosition = -1;
     public double savedZooming;
+    private final GameInstance gameInstance;
+    private Player player;
 
-    public PrivateArea(AffineTransform boardToScreenTransformation, AffineTransform screenToBoardTransformation) {
+    public PrivateArea(GameInstance gameInstance, Player player, AffineTransform boardToScreenTransformation, AffineTransform screenToBoardTransformation) {
         this.boardToScreenTransformation = boardToScreenTransformation;
         this.screenToBoardTransformation = screenToBoardTransformation;
+        this.gameInstance = gameInstance;
+        this.player = player;
+        gameInstance.addPreChangeListener(preListener);
+        gameInstance.addChangeListener(postListener);
     }
 
-    public PrivateArea(GamePanel gamePanel, GameInstance gameInstance, AffineTransform boardToScreenTransformation, AffineTransform screenToBoardTransformation) {
-        this.boardToScreenTransformation = boardToScreenTransformation;
-        this.screenToBoardTransformation = screenToBoardTransformation;
+    public void setPlayer(Player pl)
+    {
+        this.player = pl;
     }
+
+    private GameAction privateAreaUpdate;
+
+    private final GameInstance.GameChangeListener preListener = new GameChangeListener() {
+
+        @Override
+        public void changeUpdate(GameAction action) {
+            if (action instanceof GameObjectInstanceEditAction)
+            {
+                GameObjectInstanceEditAction editAction = ((GameObjectInstanceEditAction) action);
+                ObjectInstance inst = editAction.getObject(gameInstance);
+                if ((inst.state.inPrivateArea && inst.state.owner_id == player.id) || (editAction.state.inPrivateArea && editAction.state.owner_id == player.id)) {
+                    privateAreaUpdate = action;
+                }
+            }
+        }
+    };
+
+    private final GameInstance.GameChangeListener postListener = new GameChangeListener() {
+        @Override
+        public void changeUpdate(GameAction action) {
+            if (action == privateAreaUpdate)
+            {
+                updatePrivateObjects(gameInstance, player);
+            }
+        }
+    };
 
     public void setArea(double posX, double posY, double width,  double height, int translateX, int translateY, double rotation, double zooming) {
     	if (this.shape instanceof Arc2D.Double)
@@ -56,7 +93,7 @@ public class PrivateArea {
     	}
     	else
     	{
-	        this.shape = new Arc2D.Double(posX, posY, width*zooming, height*zooming, 0, 180, Arc2D.OPEN);;
+	        this.shape = new Arc2D.Double(posX, posY, width*zooming, height*zooming, 0, 180, Arc2D.OPEN);
 	        this.width = (int) width;//TODO shouldn't this be executed in both cases?
 	        this.height = (int) height;
             this.origin.setLocation(posX + width/2, posY + height/2);
@@ -66,7 +103,7 @@ public class PrivateArea {
 
     private static final BasicStroke stroke2 =new BasicStroke();
     private static final Color privateAreaBackgound = new Color(255,153,153,127);
-    
+
     public void draw(Graphics g, int originX, int originY) {
         Graphics2D graphics = (Graphics2D) g;
         AffineTransform tmp = graphics.getTransform();
@@ -132,7 +169,6 @@ public class PrivateArea {
         } else {
             return -1;
         }
-
     }
 
     public int getInsertPosition(int posX, int posY) {
@@ -144,9 +180,8 @@ public class PrivateArea {
         } else {
             return 0;
         }
-
     }
-    
+
     public Point2D transformPoint(Point2D in, Point2D out) {
         return boardToScreenTransformation.transform(in, out);
     }

@@ -17,18 +17,16 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
 import data.ControlCombination;
-import gameObjects.action.GameAction;
-import gameObjects.instance.GameInstance.GameChangeListener;
 import gui.language.Language;
 import gui.language.LanguageChangeListener;
 import gui.language.LanguageHandler;
 import gui.language.Words;
 
-public class EditControlPanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener {
+public class EditControlPanel extends JPanel implements ActionListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener {
 
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -1686844504581572726L;
 	private static final FuncControl[] boardControls = {
@@ -110,17 +108,13 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
         this.add(countControlsLabel);
         this.add(countControlsPane);
     }
-    @Override
-    public void changeUpdate(GameAction action) {
 
-    }
-    
-	
+
 	private static class FuncControl
 	{
 		Words word;
 		ControlCombination cc[];
-		
+
 		public FuncControl(Words word, ControlCombination... cc){
 			this.word = word;
 			this.cc = cc;
@@ -212,7 +206,7 @@ public class EditControlPanel extends JPanel implements ActionListener, GameChan
 
     @Override
     public void tableChanged(TableModelEvent e) {
-       
+
     }
 }
 

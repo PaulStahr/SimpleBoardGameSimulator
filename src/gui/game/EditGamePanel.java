@@ -187,7 +187,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPaneImages), 				language.getString(Words.images));
 		tabPane.setTitleAt(tabPane.indexOfComponent(scrollPanePlayer), 				language.getString(Words.player));
 	}
-	
+
     private final AbstractAction tableAction = new AbstractAction() {
     	private static final long serialVersionUID = 3980835476835695337L;
 			@Override
@@ -215,7 +215,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  	private final ButtonColumn deleteImageColumn = new ButtonColumn(tableImages,tableAction, IMAGE_TYPES.indexOf(ImageColumnType.DELETE));
     private final ButtonColumn playerSelectColorColumn = new ButtonColumn(tablePlayer, tableAction, Player.TYPES.indexOf(PlayerColumnType.COLOR)) {
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = -6972127406930221792L;
 
@@ -227,7 +227,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
                 comp.setBackground(gi.getPlayerByIndex(row).color);
             }
             return comp;
-        }        
+        }
     };
  	private final ButtonColumn deletePlayerColumn = new ButtonColumn(tablePlayer,tableAction, Player.TYPES.indexOf(PlayerColumnType.DELETE));
 	private final ButtonColumn repairPlayerColumn = new ButtonColumn(tablePlayer, tableAction, Player.TYPES.indexOf(PlayerColumnType.REPAIR)) {
@@ -251,13 +251,13 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  	private class GeneralPanel extends JPanel implements ItemListener, DocumentListener, LanguageChangeListener, ComponentListener
  	{
  		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 3667665407550359889L;
 		private final JLabel labelName = new JLabel();
  		private final JTextField textFieldName = new JTextField();
  		private final JLabel labelBackground = new JLabel();
- 		private final JComboBox<String> comboBoxBackground = new JComboBox<String>();
+ 		private final JComboBox<String> comboBoxBackground = new JComboBox<>();
  		private final JLabel labelTableRadius = new JLabel("Table Radius");
  		private final JTextField textFieldTableRadius = new JTextField();
  		private final JLabel labelPassword = new JLabel();
@@ -270,7 +270,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  		{
  			GroupLayout layout = new GroupLayout(this);
  			setLayout(layout);
- 			
+
  			layout.setHorizontalGroup(
  					layout.createSequentialGroup()
  					.addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelBackground).addComponent(labelTableRadius).addComponent(labelPassword).addComponent(labelSeats))
@@ -380,9 +380,9 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
             update();
         }
  	}
- 	
+
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 9089357847164495823L;
 
@@ -445,7 +445,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				}
 				else if (button == deleteObjectInstanceColumn)
 				{
-					gi.remove(id, gi.getObjectInstanceByIndex(row));				
+					gi.remove(id, gi.getObjectInstanceByIndex(row));
 				}
 				else
 				{
@@ -502,7 +502,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		    DataHandler.hs.enqueue(triggerUpdateRunnable, System.nanoTime() + 100000000, false);
 		}
 	}
-	
+
 	@Override
 	public void mouseClicked(MouseEvent arg0) {}
 
@@ -534,7 +534,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	            frame.add(new ObjectEditPanel(gocp, gi, lh));
 	            JButton buttonOk = new JButton("Ok");
 	            buttonOk.addActionListener(new ActionListener() {
-                    
+
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         for (int i = 0; i < go.size(); ++i)
@@ -618,12 +618,12 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 								int NewOwerId = Integer.parseInt(tableModelGameObjectInstances.getValueAt(row, col).toString());
 								if (state.owner_id != -1){
 									Player owner = gi.getPlayerById(state.owner_id);
-									//ObjectFunctions.dropObject(gamePanel, gi, owner, instance);
+									ObjectFunctions.dropObject(id, gi, owner, instance);
 								}
 								if (NewOwerId != -1){
 									Player newOwner = gi.getPlayerById(NewOwerId);
 									ObjectFunctions.removeObject(id, gi, newOwner, instance);
-									//ObjectFunctions.takeObjects(gamePanel, gi, newOwner, instance);
+									//ObjectFunctions.takeObjects(id, gi, newOwner, instance);
 								}
 								break;
 							case ABOVE:

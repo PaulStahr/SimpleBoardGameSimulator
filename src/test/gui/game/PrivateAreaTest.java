@@ -31,13 +31,13 @@ public class PrivateAreaTest {
         ObjectInstance oi = gi.getObjectInstanceByIndex(0);
         Player pl = new Player("Max", 4);
         gi.addPlayer(new PlayerAddAction(id, pl));
-        PrivateArea pa = new PrivateArea(new AffineTransform(), new AffineTransform());
+        PrivateArea pa = new PrivateArea(gi, pl, new AffineTransform(), new AffineTransform());
         assertEquals(null, CheckingFunctions.checkPlayerConsistency(-1, new ArrayList<>(), new ArrayList<>(), gi));
         assertEquals(null, CheckingFunctions.checkPlayerConsistency(pl.id, new ArrayList<>(), new ArrayList<>(), gi));
         assertEquals(0, pa.objects.size());
-        ObjectFunctions.insertIntoOwnStack(id, pa, gi, pl, new Point2D.Double(), 0, oi, null, 0, 0);
+        ObjectFunctions.insertIntoOwnStack(id, gi, pl, new Point2D.Double(), 0, oi, null, 0, 0);
         assertEquals(1, pa.objects.size());
-        ObjectFunctions.removeFromOwnStack(id, pa, gi, pl, oi);
+        ObjectFunctions.removeFromOwnStack(id, gi, pl, oi);
         assertEquals(0, pa.objects.size());
     }
 }
