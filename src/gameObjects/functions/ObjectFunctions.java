@@ -876,7 +876,7 @@ public class ObjectFunctions {
         playObject(gamePanel, gameInstance, player, objectInstance, hoveredObject, true);
     }
 
-    public static void playObject(int source, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, boolean front){
+    public static void playObject(GamePanel gamePanel, GameInstance gameInstance, Player player, ObjectInstance objectInstance, ObjectInstance hoveredObject, boolean front){
         if (objectInstance != null && objectInstance.go instanceof GameObjectToken) {
             removeFromOwnStack(gamePanel.id, gameInstance, player, objectInstance);
             ObjectFunctions.setNewDrawValue(gamePanel.id, gameInstance, player, objectInstance);
