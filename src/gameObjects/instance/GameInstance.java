@@ -49,8 +49,8 @@ public class GameInstance {
 	private final List<ObjectInstance> unmodifiableObjectInstanceList = Collections.unmodifiableList(objects);
 	private final ArrayList<Player> players = new ArrayList<>();
 	private final List<Player> unmodifiablePlayer = Collections.unmodifiableList(players);
-	private final ArrayList<GameAction> actions = new ArrayList<>();
-	private final ArrayList<GameChangeListener> changeListener = new ArrayList<GameChangeListener>();
+    private final ArrayList<GameChangeListener> changeListener = new ArrayList<>();
+    private final ArrayList<GameChangeListener> preChangeListener = new ArrayList<>();
 	public boolean private_area = true;
 	public boolean drawTable = true;
     public boolean put_down_area = true;
@@ -64,7 +64,7 @@ public class GameInstance {
 	private long maxDrawValue = 0;
 	public int tableRadius = 1200;
 	private final StampedLock lock = new StampedLock();
-	
+
     public final Comparator<Integer> idObjectInstanceDrawValueComparator = new Comparator<Integer>() {
         @Override
         public int compare(Integer o1, Integer o2) {
@@ -72,12 +72,11 @@ public class GameInstance {
         }
     };
 
-
 	public static interface GameChangeListener
 	{
 		public void changeUpdate(GameAction action);
 	}
-	
+
 	public GameInstance(GameInstance other)
 	{
 	    this(new Game(other.game), other.name);
@@ -98,7 +97,7 @@ public class GameInstance {
 		this.game = game;
 		this.name = name;
 	}
-	
+
 	public void clear()
 	{
 		objects.clear();
@@ -124,7 +123,7 @@ public class GameInstance {
         }
         return maxDrawValue;
 	}
-	
+
 	/**
 	 * Adds a new player or overwrites if already existant
 	 * @return The either added or edited Player
@@ -151,7 +150,7 @@ public class GameInstance {
             return localPlayer;
         }
 	}
-	
+
 	public Player getPlayerById(int id)
 	{
         int tries = 0;
@@ -175,7 +174,7 @@ public class GameInstance {
                     else          {throw e;}
                 }
             }
-        }	
+        }
 	}
 
 	public Player getPlayerByIndex(int idx){return players.get(idx);}
@@ -198,7 +197,7 @@ public class GameInstance {
 			return non_visitors;
 		}
 	}
-	
+
 	public Player getPlayerByName(String name)
 	{
 	    int tries = 0;
@@ -238,7 +237,7 @@ public class GameInstance {
 		objects.add(objectInstance);
 		return objectInstance;
 	}
-	
+
 	public ObjectInstance getObjectInstanceById(int id)
 	{
         int tries = 0;
@@ -269,9 +268,9 @@ public class GameInstance {
 	public ObjectInstance getObjectInstanceByIndex(int index){return this.objects.get(index);}
 
 	public int getObjectInstanceCount(){return this.objects.size();}
-	
+
 	public GameObject getObjectByIndex(int index){return this.game.getObjectByIndex(index);}
-	
+
 	@Override
     public int hashCode()
 	{
@@ -292,6 +291,20 @@ public class GameInstance {
 
 	public void update(GameAction action) {
 	    Player sourcePlayer = action.getSourcePlayer(this);
+	    for (int i = 0; i < preChangeListener.size(); ++i)
+        {
+            try
+            {
+                preChangeListener.get(i).changeUpdate(action);
+            }catch(Exception e)
+            {
+                logger.error("Error in Change Listener", e);
+            }
+        }
+        if (action instanceof DestroyInstance)
+        {
+            preChangeListener.clear();
+        }
 	    if (sourcePlayer != null)
         {
 	        sourcePlayer.lastReceivedSignal = System.nanoTime();
@@ -351,7 +364,7 @@ public class GameInstance {
 		{
 			PlayerRemoveAction rpa = (PlayerRemoveAction)action;
 			for (int i = 0; i < objects.size(); ++i)
-			{    
+			{
 			    ObjectInstance oi = objects.get(i);
 			    ObjectState state = oi.state;
 				if (state.owner_id == rpa.editedPlayer)
@@ -481,7 +494,7 @@ public class GameInstance {
 		game.removeObject(object);
 		update(new GameStructureObjectEditAction(source, GameStructureEditAction.REMOVE_OBJECT, object.uniqueObjectName.hashCode()));
 	}
-	
+
 	public void getOwnedPrivateObjects(int player_id, boolean inPrivateArea, ArrayList<ObjectInstance> result)
 	{
 		for (int i = 0; i < objects.size(); ++i)
@@ -493,7 +506,7 @@ public class GameInstance {
 			}
 		}
 	}
-	
+
 	private static void makeStack(ArrayList<ObjectInstance> tmp, int begin, int end)
 	{
 		if (begin != end)
@@ -510,7 +523,7 @@ public class GameInstance {
 			last.state.aboveInstanceId = -1;
 		}
 	}
-	
+
 	private void update(ArrayList<ObjectInstance> list, int begin, int end, Player player)
 	{
 		for (int i = begin; i < end; ++i)
@@ -518,7 +531,7 @@ public class GameInstance {
 			update(new GameObjectInstanceEditAction(-1, player, list.get(i), list.get(i).state.copy()));
 		}
 	}
-	
+
 	/**
 	 * Collects all cards of a given player and makes a new stack out of it. Only the aboveId is considered. If there are more than one stack, then these will be merged, keeping the parial order. Circles will be put in at random order
 	 * @param player_id
@@ -557,10 +570,14 @@ public class GameInstance {
 		}
 	}
 
-	public void addChangeListener(GameChangeListener listener) {changeListener.add(listener);}
-	public GameChangeListener getChangeListener(int index){return changeListener.get(index);}
-	public int getChangeListenerCount() {return changeListener.size();}
-	public void removeChangeListener(GameChangeListener listener) {changeListener.remove(listener);}
+    public void addChangeListener(GameChangeListener listener) {changeListener.add(listener);}
+    public GameChangeListener getChangeListener(int index){return changeListener.get(index);}
+    public int getChangeListenerCount() {return changeListener.size();}
+    public void removeChangeListener(GameChangeListener listener) {changeListener.remove(listener);}
+    public void addPreChangeListener(GameChangeListener listener) {preChangeListener.add(listener);}
+    public GameChangeListener getPreChangeListener(int index){return preChangeListener.get(index);}
+    public int getPreChangeListenerCount() {return preChangeListener.size();}
+    public void removePreChangeListener(GameChangeListener listener) {preChangeListener.remove(listener);}
     public void getObjects(ArrayList<ObjectInstance> oiList) {oiList.addAll(objects);}
 
     public Player getPlayer(Predicate<Player> sameSeatPredicate) {return ListTools.get(sameSeatPredicate, players);}
