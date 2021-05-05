@@ -49,6 +49,7 @@ import gameObjects.action.AddObjectAction;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
+import gameObjects.action.player.PlayerAddAction;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerRemoveAction;
 import gameObjects.action.structure.GameStructureEditAction;
@@ -497,7 +498,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 
 	@Override
 	public void changeUpdate(GameAction action) {
-		if (action instanceof GameObjectInstanceEditAction || action instanceof GameStructureEditAction)
+		if (action instanceof GameObjectInstanceEditAction || action instanceof GameStructureEditAction || action instanceof PlayerAddAction || action instanceof PlayerRemoveAction)
 		{
 		    DataHandler.hs.enqueue(triggerUpdateRunnable, System.nanoTime() + 100000000, false);
 		}

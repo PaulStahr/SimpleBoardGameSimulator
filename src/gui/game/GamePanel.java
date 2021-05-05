@@ -802,10 +802,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		boolean shiftDown = e.isShiftDown();
 		boolean altDown = e.isAltDown();
 		translateBoard(e);
+        int keyCode = e.getKeyCode();
 
 		if (!player.visitor) {
 			//Mouse move independent keys
-			if (e.getKeyCode() == KeyEvent.VK_H) {
+			if (keyCode == KeyEvent.VK_H) {
 				if (privateArea.zooming == 0.1) {
 					privateArea.zooming = privateArea.savedZooming;
 					mouseInPrivateArea = ObjectFunctions.isInPrivateArea(privateArea, mouseBoardPos.getXI(), mouseBoardPos.getYI());
@@ -817,9 +818,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				updateGameTransform();
 				repaint();
 
-			} else if (e.getKeyCode() == KeyEvent.VK_T && altDown) {
+			} else if (keyCode == KeyEvent.VK_T && altDown) {
 				isTableVisible = !isTableVisible;
-			}else if (shiftDown && e.getKeyCode() == KeyEvent.VK_C) {
+			}else if (shiftDown && keyCode == KeyEvent.VK_C) {
 				int count = 0;
 				ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 				for (int oId : ial) {
@@ -828,7 +829,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 				player.actionString = "Value: " + String.valueOf(count);
 			}
-			else if (e.getKeyCode() == KeyEvent.VK_C && !shiftDown) {
+			else if (keyCode == KeyEvent.VK_C && !shiftDown) {
 				int count = 0;
 				ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 				for (int oId : ial) {
@@ -846,7 +847,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 			//Only allowed if mouse is in stacker in the middle of the table
 			if (mouseInStacker){
-				if(hoveredObject != null && e.getKeyCode() == KeyEvent.VK_M && !shiftDown)
+				if(hoveredObject != null && keyCode == KeyEvent.VK_M && !shiftDown)
 				{
 					Point2D tableCenter = table.getTableCenter(new Point2D.Double());
 					ObjectFunctions.stackObjectsOnShapeAndMoveToPoint(id, gameInstance, player, table.stackerShape, tableCenter, getBoardToScreenTransform(), ial, hoveredObject, ObjectFunctions.SIDE_TO_BACK);
@@ -855,7 +856,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 			//Only allowed if mouse is not clicked
 			if (!(isLeftMouseKeyHold || isRightMouseKeyHold || isMiddleMouseKeyHold)) {
-				if (e.getKeyCode() == KeyEvent.VK_F && !shiftDown && !altDown) {
+				if (keyCode == KeyEvent.VK_F && !shiftDown && !altDown) {
 					ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 					for (int oId : ial) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
@@ -866,13 +867,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						ObjectFunctions.flipTokenObject(id, gameInstance, player, hoveredObject);
 						ObjectFunctions.rollTheDice(id, gameInstance, player, hoveredObject);
 					}
-				} else if (e.getKeyCode() == KeyEvent.VK_F && shiftDown) {
+				} else if (keyCode == KeyEvent.VK_F && shiftDown) {
 					ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 					for (int oId : ObjectFunctions.getObjectRepresentatives(gameInstance, ial)) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 						ObjectFunctions.flipTokenStack(id, gameInstance, player, ObjectFunctions.getStackTop(gameInstance, oi), hoveredObject);
 					}
-				} else if (e.getKeyCode() == KeyEvent.VK_S) {
+				} else if (keyCode == KeyEvent.VK_S) {
 					ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 					for (int oId : ObjectFunctions.getObjectRepresentatives(gameInstance, ial)) {
 						ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
@@ -883,7 +884,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					}
 
 				}
-				else if (e.getKeyCode() == KeyEvent.VK_V) {
+				else if (keyCode == KeyEvent.VK_V) {
 					if (!mouseInPrivateArea) {
 						ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 						for (int oId : ObjectFunctions.getObjectRepresentatives(gameInstance, ial)) {
@@ -929,36 +930,36 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 							}
 						}
 					}
-				} else if (e.getKeyCode() == KeyEvent.VK_D && shiftDown) {
+				} else if (keyCode == KeyEvent.VK_D && shiftDown) {
 					ObjectFunctions.dropObjects(id, gameInstance, player, hoveredObject);
-				} else if (e.getKeyCode() == KeyEvent.VK_D && !shiftDown) {
+				} else if (keyCode == KeyEvent.VK_D && !shiftDown) {
 					ObjectFunctions.dropObject(id, gameInstance, player, hoveredObject);
-				} else if (e.getKeyCode() == KeyEvent.VK_P && !shiftDown) {
+				} else if (keyCode == KeyEvent.VK_P && !shiftDown) {
 					if (hoveredObject != null) {
 						ObjectFunctions.playObject(this, gameInstance, player, hoveredObject, hoveredObject);
 						playAudio(AudioClip.drop);
 					}
-				} else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+				} else if (keyCode == KeyEvent.VK_SPACE) {
 					sitDown(player, PlayerFunctions.GetTablePlayerPosition(player));
 				}
 
 
 				//Only allowed if mouse is not in private area
 				if (!mouseInPrivateArea) {
-					if (e.getKeyCode() == KeyEvent.VK_R && !shiftDown) {
+					if (keyCode == KeyEvent.VK_R && !shiftDown) {
 						ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 						for (int oId : ObjectFunctions.getObjectRepresentatives(gameInstance, ial)) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.rotateStep(id, gameInstance, player, oi, ial);
 						}
 						repaint();
-					} else if (e.getKeyCode() == KeyEvent.VK_R && shiftDown) {
+					} else if (keyCode == KeyEvent.VK_R && shiftDown) {
 						ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 						for (int oId : ial) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.removeStackRelations(id, gameInstance, player, oi);
 						}
-					} else if (e.getKeyCode() == KeyEvent.VK_T && !altDown) {
+					} else if (keyCode == KeyEvent.VK_T && !altDown) {
 						ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 						for (int oId : ObjectFunctions.getObjectRepresentatives(gameInstance, ial)) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
@@ -969,20 +970,20 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 							ObjectFunctions.takeObjects(this.id, gameInstance, player, table.getTableCenter(new Point2D.Double()), offset,  oi, hoveredObject);
 						}
 						ObjectFunctions.deselectAllSelected(id, gameInstance, player, ial, hoveredObject);
-					} else if (e.getKeyCode() == KeyEvent.VK_M && shiftDown && !altDown) {
+					} else if (keyCode == KeyEvent.VK_M && shiftDown && !altDown) {
 						ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 						for (int oId : ial) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.stackAllObjectsOfGroup(id, gameInstance, player, oi, hoveredObject, false);
 						}
 
-					} else if (e.getKeyCode() == KeyEvent.VK_M && shiftDown && altDown) {
+					} else if (keyCode == KeyEvent.VK_M && shiftDown && altDown) {
 						ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 						for (int oId : ial) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.stackAllObjectsOfGroup(id, gameInstance, player, oi, hoveredObject, true);
 						}
-					}else if (e.getKeyCode() == KeyEvent.VK_M && !shiftDown) {
+					}else if (keyCode == KeyEvent.VK_M && !shiftDown) {
 						ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 						ial2.set(ObjectFunctions.getObjectRepresentatives(gameInstance, ial, true));
 						for (int idx = 0; idx < ial2.size() - 1; ++idx) {
@@ -1003,14 +1004,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 							}
 						}
 						repaint();
-					} else if (e.getKeyCode() == KeyEvent.VK_F && altDown) {
+					} else if (keyCode == KeyEvent.VK_F && altDown) {
 						ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 						for (int oId : ial) {
 							ObjectInstance oi = gameInstance.getObjectInstanceById(oId);
 							ObjectFunctions.fixObject(id, gameInstance, player, oi);
 						}
 					}
-					else if (e.getKeyCode() == KeyEvent.VK_G){
+					else if (keyCode == KeyEvent.VK_G){
 						ial2.clear();
 						ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
 						for (int oId : ObjectFunctions.getObjectRepresentatives(gameInstance, ial)) {
@@ -1022,7 +1023,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 						ObjectFunctions.giveObjects(this, gameInstance, table.getTableCenter(new Point2D.Double()), table.getTableOffset(player, gameInstance.getObjectInstanceById(ial.get(0))), ial2, objectInstanceList, hoveredObject);
 					}
-					else if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD) {
+					else if (keyCode == KeyEvent.VK_PLUS || keyCode == KeyEvent.VK_ADD) {
 						//Scale hovered Object
 						double scale = 1.1;
 						if (hoveredObject != null && (hoveredObject.scale > 0.1 || scale > 1) && (hoveredObject.scale < 2 || scale < 1)) {
@@ -1030,7 +1031,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 							hoveredObject.scale *= scale;
 						}
 					}
-					else if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT) {
+					else if (keyCode == KeyEvent.VK_MINUS || keyCode == KeyEvent.VK_SUBTRACT) {
 						//Scale hovered Object
 						double scale = 0.9;
 						if (hoveredObject != null &&(hoveredObject.scale > 0.1 || scale > 1) && (hoveredObject.scale < 2 || scale < 1)) {
@@ -1038,14 +1039,14 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 							hoveredObject.scale *= scale;
 						}
 					}
-					else if(e.getKeyCode() == KeyEvent.VK_D && shiftDown){
+					else if(keyCode == KeyEvent.VK_D && shiftDown){
 						ObjectFunctions.deselectAll(id, gameInstance);
 					}
 				}
 
 				//Only allowed if mouse in private area
 				if (mouseInPrivateArea){
-					if (e.getKeyCode() == KeyEvent.VK_PLUS || e.getKeyCode() == KeyEvent.VK_ADD) {
+					if (keyCode == KeyEvent.VK_PLUS || keyCode == KeyEvent.VK_ADD) {
 						int value = 1;
 						privateArea.zoomingFactor += value;
 						if ((privateArea.zooming >= 0.2) && (privateArea.zooming < 2 || value>0)) {
@@ -1055,7 +1056,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 						updateGameTransform();
 					}
-					else if (e.getKeyCode() == KeyEvent.VK_MINUS || e.getKeyCode() == KeyEvent.VK_SUBTRACT) {
+					else if (keyCode == KeyEvent.VK_MINUS || keyCode == KeyEvent.VK_SUBTRACT) {
 						int value = -1;
 						privateArea.zoomingFactor += value;
 						if ((privateArea.zooming >= 0.2 || value < 0) && (privateArea.zooming < 2)) {
@@ -1065,7 +1066,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 						updateGameTransform();
 					}
-					else if (e.getKeyCode() == KeyEvent.VK_S){
+					else if (keyCode == KeyEvent.VK_S){
 						if (hoveredObject != null){
 							ObjectFunctions.sortHandCardsByValue(this, gameInstance, player, table.getTableCenter(new Point2D.Double()), table.getTableOffset(player, hoveredObject), ial, objectInstanceList, hoveredObject, false);
 						}
