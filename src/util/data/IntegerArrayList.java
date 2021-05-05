@@ -103,7 +103,7 @@ public class IntegerArrayList extends AbstractList<Integer> implements IntegerLi
 	@Override
 	public boolean add(Integer value){return add((int)value);}
 
-	public boolean addUnique(int value) {return contains(value) && add(value);}
+	public boolean addUnique(int value) {return !contains(value) && add(value);}
 
     public void addUnique(IntegerList il) {
         for (int i = 0; i < il.size(); ++i)
