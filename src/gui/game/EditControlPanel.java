@@ -16,7 +16,9 @@ import javax.swing.JTable;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-import data.ControlCombination;
+import data.controls.ControlCombination;
+import data.controls.ControlTypes;
+import data.controls.UserControl;
 import gui.language.Language;
 import gui.language.LanguageChangeListener;
 import gui.language.LanguageHandler;
@@ -24,7 +26,7 @@ import gui.language.Words;
 
 public class EditControlPanel extends JPanel implements ActionListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener {
 
-
+    private static final UserControl uc = new UserControl();
     /**
 	 *
 	 */
@@ -34,7 +36,7 @@ public class EditControlPanel extends JPanel implements ActionListener, Runnable
 			new FuncControl(Words.rotate, new ControlCombination(InputEvent.ALT_DOWN_MASK, 2,  -1, 0), new ControlCombination(0, -1,  KeyEvent.VK_UP, 0), new ControlCombination(0, -1,  KeyEvent.VK_DOWN, 0)),
 			new FuncControl(Words.zoom, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
 			new FuncControl(Words.sit_down, new ControlCombination(0, 0,  -1, 32)),
-			new FuncControl(Words.sit_to_own_seat, new ControlCombination(0, -1,  KeyEvent.VK_SPACE, 0)),
+			new FuncControl(Words.sit_to_own_seat, uc.get(ControlTypes.SIT_DOWN)),
 			new FuncControl(Words.hide_show_table, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  KeyEvent.VK_T, 0)),
 			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(0, -1, KeyEvent.VK_H,0)),
 	};
@@ -46,34 +48,34 @@ public class EditControlPanel extends JPanel implements ActionListener, Runnable
 			new FuncControl(Words.move_stack,	 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 0, -1, 1),new ControlCombination(0, 1, -1, 1)),
 			new FuncControl(Words.get_top_n_card, 	new ControlCombination(0, 1, -1, 5)),
 			new FuncControl(Words.get_bottom_card, 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 2,  -1, 1)),
-			new FuncControl(Words.rotate_object, 	new ControlCombination(0, -1,  KeyEvent.VK_R, 0)),
-			new FuncControl(Words.shuffle_stack, 	new ControlCombination(0, -1, KeyEvent.VK_S, 0)),
+			new FuncControl(Words.rotate_object, 	uc.get(ControlTypes.ROTATE)),
+			new FuncControl(Words.shuffle_stack, 	uc.get(ControlTypes.SHUFFLE)),
 			new FuncControl(Words.merge_objects, 	new ControlCombination(0, -1, KeyEvent.VK_M, 0)),
 			new FuncControl(Words.play_card_face_up, new ControlCombination(0, 0, -1, 32)),
 			new FuncControl(Words.collect_all_objects_of_a_group, new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_M, 0)),
 			new FuncControl(Words.flip_objects_roll_dice, new ControlCombination(0, -1,  KeyEvent.VK_F, 0)),
 			new FuncControl(Words.unfold_dice, new ControlCombination(0, -1,  KeyEvent.VK_V, 0)),
 			new FuncControl(Words.zoom, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
-			new FuncControl(Words.fix_object, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  KeyEvent.VK_F, 0)),
+			new FuncControl(Words.fix_object, uc.get(ControlTypes.FIX)),
 
 	};
 
 	private static final FuncControl[] privateAreaControls= {
-			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(0, -1, KeyEvent.VK_H,0)),
+			new FuncControl(Words.hide_and_show_hand_area, uc.get(ControlTypes.HIDE_PRIVATE_AREA)),
 			new FuncControl(Words.distribute_cards_to_players, new ControlCombination(0, -1,  KeyEvent.VK_G, 0)),
-			new FuncControl(Words.take_object_to_hand, new ControlCombination(0, -1,  KeyEvent.VK_T, 0), new ControlCombination(0, 0,  -1, 1)),
+			new FuncControl(Words.take_object_to_hand, uc.get(ControlTypes.TAKE,0), new ControlCombination(0, 0,  -1, 1)),
 			new FuncControl(Words.take_object_to_hand_face_down, new ControlCombination(0, 2,  -1,1)),
 			new FuncControl(Words.play_card_face_up, new ControlCombination(0, 1,  -1, 8)),
 			new FuncControl(Words.play_card_face_down, new ControlCombination(0, 2,  -1, 8)),
-			new FuncControl(Words.play_active_hand_card, new ControlCombination(0, -1, KeyEvent.VK_P, 0), new ControlCombination(0, 0, -1, 32)),
+			new FuncControl(Words.play_active_hand_card, uc.get(ControlTypes.PLAY, 0), new ControlCombination(0, 0, -1, 32)),
 			new FuncControl(Words.drop_all_hand_cards, new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, KeyEvent.VK_D, 0)),
 			new FuncControl(Words.drop_active_hand_card, new ControlCombination(0, -1, KeyEvent.VK_D, 0)),
 			new FuncControl(Words.zoom, new ControlCombination(0, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
 	};
 
 	private static final FuncControl[] countControls = {
-			new FuncControl(Words.count_card_number, new ControlCombination(0, -1,  KeyEvent.VK_C, 0)),
-			new FuncControl(Words.count_card_value, new ControlCombination(InputEvent.CTRL_DOWN_MASK, -1, KeyEvent.VK_C, 0)),
+			new FuncControl(Words.count_card_number, uc.get(ControlTypes.COUNT)),
+			new FuncControl(Words.count_card_value, uc.get(ControlTypes.COUNT_VALUES)),
 	};
 
 
@@ -124,13 +126,11 @@ public class EditControlPanel extends JPanel implements ActionListener, Runnable
 			StringBuilder strB = new StringBuilder();
 			for (int i = 0; i < cc.length; ++i)
 			{
-				StringBuilder strC = new StringBuilder();
 				if (i != 0)
 				{
 					strB.append(',');
 				}
-				cc[i].toString(strC, lang);
-				strB.append(strC);
+				cc[i].toString(strB, lang);
 			}
 			return strB.toString();
 		}

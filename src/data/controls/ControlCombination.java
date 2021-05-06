@@ -1,4 +1,4 @@
-package data;
+package data.controls;
 
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
