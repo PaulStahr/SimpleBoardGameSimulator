@@ -25,7 +25,7 @@ import util.JFrameUtils;
 
 public class ObjectEditPanel extends JPanel implements DocumentListener, ItemListener, LanguageChangeListener{
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -1555265079401333395L;
     private final JLabel labelName = new JLabel();
@@ -39,10 +39,10 @@ public class ObjectEditPanel extends JPanel implements DocumentListener, ItemLis
     private final ArrayList<JComboBox<String>> imageComboBoxes = new ArrayList<>();
     private final JComboBox<String> comboBoxFrontImage;
     private final JComboBox<String> comboBoxBackImage;
-    
+
     private void updateImages()
     {
-        String imageNames[] = gi.game.images.keySet().toArray(new String[gi.game.images.size()]);
+        String imageNames[] = gi.game.getTextureNames();
         for (int i = 0; i < imageComboBoxes.size(); ++i)
         {
             JFrameUtils.updateComboBox(imageComboBoxes.get(i), imageNames);
@@ -93,14 +93,14 @@ public class ObjectEditPanel extends JPanel implements DocumentListener, ItemLis
         textFieldHeight.setText(go.heightInMM == Integer.MIN_VALUE ? "" : Integer.toString(go.heightInMM));
         textFieldWidth.getDocument().addDocumentListener(this);
         textFieldHeight.getDocument().addDocumentListener(this);
-        
+
         add(labelName);
         add(textFieldName);
         add(labelWidth);
         add(textFieldWidth);
         add(labelHeight);
         add(textFieldHeight);
-        
+
         /*layout.setHorizontalGroup(
                 layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(labelWidth).addComponent(labelHeight))
@@ -110,19 +110,19 @@ public class ObjectEditPanel extends JPanel implements DocumentListener, ItemLis
                 .addGroup(layout.createParallelGroup().addComponent(labelName).addComponent(textFieldName))
                 .addGroup(layout.createParallelGroup().addComponent(labelWidth).addComponent(textFieldWidth))
                 .addGroup(layout.createParallelGroup().addComponent(labelHeight).addComponent(textFieldHeight)));*/
-        
+
         if(go instanceof GameObjectToken)
         {
             JLabel labelFrontImage = new JLabel("Front Image");
             JLabel labelBackImage = new JLabel("Back Image");
-            comboBoxFrontImage = new JComboBox<String>();
-            comboBoxBackImage = new JComboBox<String>();
+            comboBoxFrontImage = new JComboBox<>();
+            comboBoxBackImage = new JComboBox<>();
             imageComboBoxes.add(comboBoxFrontImage);
             imageComboBoxes.add(comboBoxBackImage);
             updateImages();
             GameObjectToken token = (GameObjectToken)go;
-            comboBoxFrontImage.setSelectedItem(gi.game.getImageKey(token.getUpsideLook()));
-            comboBoxBackImage.setSelectedItem(gi.game.getImageKey(token.getDownsideLook()));
+            comboBoxFrontImage.setSelectedItem(token.getUpsideLook().getId());
+            comboBoxBackImage.setSelectedItem(token.getDownsideLook().getId());
             comboBoxFrontImage.addItemListener(this);
             add(labelFrontImage);
             add(comboBoxFrontImage);
@@ -137,11 +137,11 @@ public class ObjectEditPanel extends JPanel implements DocumentListener, ItemLis
         languageChanged(lh.getCurrentLanguage());
         lh.addLanguageChangeListener(this);
     }
-    
+
     public void apply() {
-        
+
     }
-    
+
     @Override
     public void changedUpdate(DocumentEvent e) {
         Document source = e.getDocument();

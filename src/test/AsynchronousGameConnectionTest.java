@@ -8,20 +8,20 @@ import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 
-import gameObjects.action.player.PlayerAddAction;
-import gameObjects.action.player.PlayerEditAction;
-import main.Player;
 import org.junit.Test;
 
 import data.Texture;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectInstanceEditAction;
+import gameObjects.action.player.PlayerAddAction;
+import gameObjects.action.player.PlayerEditAction;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.GameInstance.GameChangeListener;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
+import main.Player;
 import net.AsynchronousGameConnection;
 
 public class AsynchronousGameConnectionTest {
@@ -33,8 +33,8 @@ public class AsynchronousGameConnectionTest {
     final int id = 4;
 
     public AsynchronousGameConnectionTest() throws IOException {
-        game.images.put("white.png", new Texture(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB), "png"));
-        game.addObject(new GameObjectToken("token", "card", 10, 10, game.images.get("white.png"), game.images.get("white.png"), 5, 5, 90, 0, false, -1));
+        game.images.add(new Texture(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB), "white.png", "png"));
+        game.addObject(new GameObjectToken("token", "card", 10, 10, game.getImage("white.png"), game.getImage("white.png"), 5, 5, 90, 0, false, -1));
         gi0 = new GameInstance(game, "Foobar");
         gi0.addObjectInstance(new ObjectInstance(game.getGameObjectByIndex(0), id));
         gi1 = new GameInstance(gi0);
@@ -54,7 +54,7 @@ public class AsynchronousGameConnectionTest {
                 if (action.source == 42)
                 {
                     synchronized (block0) {
-                        block0.notifyAll();                    
+                        block0.notifyAll();
                     }
                 }
             }
@@ -65,7 +65,7 @@ public class AsynchronousGameConnectionTest {
                 if (action.source == 42)
                 {
                     synchronized (block1) {
-                        block1.notifyAll();                    
+                        block1.notifyAll();
                     }
                 }
             }
@@ -148,7 +148,7 @@ public class AsynchronousGameConnectionTest {
             ObjectInstance oi0 = gi0.getObjectInstanceByIndex(i);
             ObjectInstance oi1 = gi1.getObjectInstanceById(oi0.id);
             assertEquals(oi0.state, oi1.state);
-            
+
         }
         assertEquals (gi0.hashCode(), gi1.hashCode());
     }

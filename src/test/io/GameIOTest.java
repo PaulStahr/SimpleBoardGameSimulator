@@ -18,14 +18,14 @@ public class GameIOTest {
     public void testXmlObject()
     {
         Game game = new Game();
-        Texture foo = new Texture(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "png");
-        Texture bar = new Texture(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "png");
-        game.images.put("foo.png",foo);
-        game.images.put("bar.png",bar);
+        Texture foo = new Texture(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "foo.png", "png");
+        Texture bar = new Texture(new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), "bar.png", "png");
+        game.images.add(foo);
+        game.images.add(bar);
         GameObjectToken token = new GameObjectToken("baz", "card", 10, 2, foo, bar, 1, 2, 3, 4, false, -1);
         GameObject res;
         Element elem = GameIO.createElementFromGameObject(token, game);
-        res = GameIO.createGameObjectFromElement(elem, game.images);
+        res = GameIO.createGameObjectFromElement(elem, game);
         assertEquals(token.toStringAdvanced() + "!=" + res.toStringAdvanced(), res,token);
     }
 }

@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.function.Function;
 
 import javax.swing.AbstractAction;
@@ -163,7 +162,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		            List<? extends File> droppedFiles = (List<? extends File>)
 		                evt.getTransferable().getTransferData(DataFlavor.javaFileListFlavor);
 		            for (File file : droppedFiles) {
-		            	gi.game.images.put(file.getName(), new Texture(Files.readAllBytes(file.toPath()), StringUtils.getFileType(file.getName())));
+		            	gi.game.images.add(new Texture(Files.readAllBytes(file.toPath()), file.getName(), StringUtils.getFileType(file.getName())));
 		            	gi.update(new AddObjectAction(id, AddObjectAction.ADD_IMAGE, file.getName().hashCode()));
 		            }
 		        } catch (Exception ex) {
@@ -305,8 +304,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			isUpdating = true;
 			textFieldName.setText(gi.name);
 			textFieldTableRadius.setText(Integer.toString(gi.tableRadius));
-		    JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getImageKeys());
-			comboBoxBackground.setSelectedItem(gi.game.getImageKey(gi.game.background));
+		    JFrameUtils.updateComboBox(comboBoxBackground, gi.game.getTextureNames());
+			comboBoxBackground.setSelectedItem(gi.game.background.getId());
             textFieldPassword.setText(gi.password);
 			textFieldSeats.setText(Integer.toString(gi.seats));
 			isUpdating = false;
@@ -318,7 +317,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			if (isUpdating){return;}
 			isUpdating = true;
 			if (arg0.getStateChange() == ItemEvent.SELECTED) {
-	            gi.game.background = gi.game.images.get(arg0.getItem());
+	            gi.game.background = gi.game.getImage((String)arg0.getItem());
                 gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_BACKGROUND));
 			}
 			isUpdating = false;
@@ -418,7 +417,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		JFrameUtils.updateTable(tableFigures, scrollPaneFigures, gi.getFigureList(), GameObjectFigure.FIGURE_ATTRIBUTES, tableModelFigures, null, resetFiguresColumn, deleteFigureColumn);
 		JFrameUtils.updateTable(tableDices, scrollPaneDices, gi.getDiceList(), GameObjectDice.DICE_ATTRIBUTES, tableModelDices, null, resetDiceColumn, deleteDiceColumn);
 		JFrameUtils.updateTable(tableBooks, scrollPaneBooks, gi.getBookList(), GameObjectBook.BOOK_ATTRIBUTES, tableModelBooks, null, resetBookColumn, deleteBookColumn);
-		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.entrySet().toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, null, deleteImageColumn);
+		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, null, deleteImageColumn);
 		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(true), Player.TYPES, tableModelPlayer, null, playerSelectColorColumn, deletePlayerColumn, repairPlayerColumn);
 		panelGeneral.update();
 		isUpdating = false;
@@ -455,10 +454,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			else if (tableSource == tableModelImages)
 			{
-				Set<Entry<String, Texture>> entrySet = gi.game.images.entrySet();
-				@SuppressWarnings("unchecked")
-				Entry<String, Texture> entry = entrySet.toArray(new Entry[entrySet.size()])[row];
-				gi.update(new GameTextureRemoveAction(id, entry.getKey()));
+				gi.update(new GameTextureRemoveAction(id, gi.game.images.get(row).getId()));
 			}
 			else if (tableSource == tableModelGameObjects)
 			{
@@ -592,7 +588,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 					if (ImageColumnType.get(col) == ImageColumnType.ID)
 					{
 						gi.game.images.remove(imageArray[row].getKey());
-						gi.game.images.put((String)tableModelPlayer.getValueAt(row, col), imageArray[row].getValue());
+						gi.game.images.add(imageArray[row].getValue());
 						//TODO update game
 					}
 				}

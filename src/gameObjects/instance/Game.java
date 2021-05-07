@@ -23,6 +23,15 @@ public class Game {
         }
     }
 
+	public String[] getTextureNames() {
+	    String result[] = new String[images.size()];
+	    for (int i = 0; i < images.size(); ++i)
+	    {
+	        result[i] = images.get(i).getId();
+	    }
+	    return result;
+	}
+
 	public Game copy() {return new Game(this);}
 
     public Game(String name) {this.name = name;}
