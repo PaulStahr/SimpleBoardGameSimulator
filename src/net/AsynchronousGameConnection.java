@@ -117,13 +117,13 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
         this.objIn = input;
         this.output = output;
     }
-    
+
     /**
      * Constructs an connection with the GameInstance and the two streams.
      * @param gi
      * @param input
      * @param output
-     * @param server 
+     * @param server
      */
     public AsynchronousGameConnection(GameInstance gi, InputStream input, OutputStream output, Socket socket)
     {
@@ -159,7 +159,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
     {
         final String type;
         public CommandRead(String type) {this.type = type;}
-        
+
         @Override
         public String toString() {
             return CommandRead.class + " " + type;
@@ -191,6 +191,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
         private static int sid = (int)System.nanoTime();
         public CommandPingForward(int ttl) {super(sid++, ttl);}
 
+        @Override
+        public String toString() {
+            return "Command Ping Fwd " + id + ' ' + ttl;
+        }
+
         /**
          *
          */
@@ -202,7 +207,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
 
         @Override
         public String toString() {
-            return "Command Ping " + id + " " + ttl;
+            return "Command Ping Back " + id + " " + ttl;
         }
 
         /**
@@ -273,7 +278,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
     static class CommandScip implements Serializable
     {
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = 3856297382586773057L;
         final int bytes;
@@ -281,9 +286,9 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
     }
 
     static class TimingOffsetChanged implements Serializable{
-        
+
         /**
-         * 
+         *
          */
         private static final long serialVersionUID = -8508545232652768659L;
         public final long offset;
@@ -427,10 +432,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
         while (!stop)
         {
             Object outputObject = getQueuedObject(objOut);
-            if (stop)
-            {
-                return;
-            }
+            if (stop){return;}
             if (logger.isDebugEnabled()){logger.debug("Next queued object:" + outputObject.toString());}
             try
             {
@@ -491,7 +493,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                             byteStream.reset();
                             break;
                         }
-                    }    
+                    }
                 }
                 else if (outputObject instanceof CommandRead)
                 {
@@ -536,7 +538,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
             }
         }
     }
-    
+
     public void inputLoop()
     {
         ArrayList<String> split = new ArrayList<>();
@@ -592,8 +594,11 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                         for (int read = 0; read < pings.size(); ++read)
                         {
                             PingInformation current = pings.get(read);
-                            if (current.id == cpb.id){DataHandler.tp.run(current, "Ping Callback");}
-                        }                        
+                            if (current.id == cpb.id){
+                                current.succesfull = true;
+                                DataHandler.tp.run(current, "Ping Callback");
+                            }
+                        }
                     }
                     continue;
                 }
@@ -663,7 +668,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                         ++inputEvents;
                         continue;
                     }
-                    if (action instanceof UsertextMessageAction 
+                    if (action instanceof UsertextMessageAction
                         || action instanceof UserSoundMessageAction
                         || action instanceof UserFileMessage
                         || action instanceof TetrisGameEvent
@@ -720,7 +725,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                             case GameStructureEditAction.EDIT_GAME_NAME:gi.game.name = (String)objIn.readObject();break;
                             case GameStructureEditAction.EDIT_SESSION_NAME:gi.name = (String)objIn.readObject();break;
                             case GameStructureEditAction.EDIT_SESSION_PASSWORD:gi.password = (String)objIn.readObject();break;
-                            default: logger.error("Unknown type: " + action.type);                        
+                            default: logger.error("Unknown type: " + action.type);
                         }
                         gi.update(action);
                     }
@@ -794,7 +799,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                                 int playerId = Integer.parseInt(split.get(5));
                                 int objectId = Integer.parseInt(split.get(6));
                                 Integer.parseInt(split.get(7)); //size
-                                
+
                                 ObjectInstance inst = gi.getObjectInstanceById(objectId);
                                 ObjectState state = inst.state.copy();
                                 ObjectStateIO.editStateFromStreamObject(objIn, state);
@@ -854,20 +859,20 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
             split.clear();
         }
     }
-    
+
     public void destroy()
     {
         stop();
         if (gi != null){gi.removeChangeListener(this);}
         destroyed  = true;
     }
-    
+
     public void stop()
     {
         queueOutput(new StopConnection());
         stop = true;
     }
-    
+
     @Override
     public void run()
     {

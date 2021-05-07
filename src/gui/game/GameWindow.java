@@ -60,7 +60,7 @@ import util.TimedUpdateHandler;
 
 public class GameWindow extends JFrame implements ActionListener, LanguageChangeListener {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -1441104795154034811L;
 	public SynchronousGameClientLobbyConnection client;
@@ -87,16 +87,16 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	private final JMenuItem menuItemStatusGaiaConsistency = new JMenuItem("Correct Free-Object-Consistency");
 	private final JMenuItem menuItemSyncPull = new JMenuItem();
 	private final JMenuItem menuItemReconnect = new JMenuItem();
-	
+
 	private final JMenu menuConnection = new JMenu();
 
 	private final LanguageHandler lh;
 	private final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 	private static int windowUpdates = 0;
 
-	private class GameConnectionMenuItem extends JMenu implements ActionListener{
+	private class GameConnectionMenuItem extends JMenu implements ActionListener, PingCallback, Runnable{
 	    /**
-         * 
+         *
          */
         private static final long serialVersionUID = -4342452358873847467L;
         public final int id;
@@ -111,7 +111,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	    private boolean timeouted = false;
 
 	    public GameConnectionMenuItem(AsynchronousGameConnection agc) {
-	        ref = new WeakReference<AsynchronousGameConnection>(agc);
+	        ref = new WeakReference<>(agc);
 	        this.id = agc.id;
 	        this.add(menuItemDisconnect);
 	        this.add(menuItemReconnect);
@@ -120,33 +120,20 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
             Socket socket = agc.getSocket();
             if (socket != null) {
                 address = socket.getRemoteSocketAddress().toString();
-                updateText();
+                JFrameUtils.runByDispatcher(this);
             }
 	    }
 
-	    private final void updateText() {
-	        setText(address + " " + ping/1000000);
-	        setForeground(timeouted ? Color.RED : Color.BLACK);
-	    }
-	    
 	    public void update(AsynchronousGameConnection agc) {
 	        lastUpdate = windowUpdates;
-	        agc.ping(new PingCallback() {
-                
-                @Override
-                public void run(PingInformation pi) {
-                    ping = System.nanoTime() - pi.timeout + 1000000000l;
-                    timeouted = pi.isTimeouted();
-                    updateText();
-                }
-            }, System.nanoTime() + 1000000000);
+	        agc.ping(this, System.nanoTime() + 1000000000);
 	    }
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
             Object source = arg0.getSource();
             if (source == menuItemDisconnect) {
-                
+
             }else if (source == menuItemReconnect) {
                 AsynchronousGameConnection agc = ref.get();
                 agc.destroy();
@@ -165,8 +152,36 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
                 AsynchronousGameConnection agc = ref.get();
                 if (agc != null) {
                     agc.syncPush();
-                }                
+                }
             }
+        }
+
+        @Override
+        public void run(PingInformation pi) {
+            ping = System.nanoTime() - pi.timeout + 1000000000l;
+            timeouted = pi.isTimeouted();
+            JFrameUtils.runByDispatcher(this);
+        }
+
+        @Override
+        public void run() {
+            setText(address + " " + ping/1000000);
+            setForeground(timeouted ? Color.RED : Color.BLACK);
+            boolean anyTimeouted = false;
+            for (int i = 0; i< menuConnection.getComponentCount(); ++i)
+            {
+                Component c = menuConnection.getItem(i);
+                if (c instanceof GameConnectionMenuItem && ((GameConnectionMenuItem)c).lastUpdate != windowUpdates)
+                {
+                    if (((GameConnectionMenuItem)c).timeouted)
+                    {
+                        anyTimeouted = true;
+                        break;
+                    }
+                }
+            }
+            Color col = anyTimeouted ? Color.RED : Color.BLACK;
+            if (menuItemReconnect.getForeground() != col) {menuItemReconnect.setForeground(col);}
         }
 	}
 
@@ -182,7 +197,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	    }
 	    return null;
 	}
-	
+
 	private class GameWindowUpdater implements TimedUpdateHandler, Runnable
 	{
 		private final ArrayList<ObjectInstance> tmp = new ArrayList<>();
@@ -219,7 +234,6 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
                     GameConnectionMenuItem menuItem = getMenuItem(agc.id);
                     if (menuItem == null) {menuConnection.add(menuItem = new GameConnectionMenuItem(agc));}
                     menuItem.update(agc);
-                    agc.ping(pingCallback, System.nanoTime() + 1000000000);
                 }
             }
 
@@ -234,14 +248,6 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
             ++windowUpdates;
         }
 	}
-	
-    private PingCallback pingCallback = new PingCallback() {
-        @Override
-        public void run(AsynchronousGameConnection.PingInformation pi) {
-            Color col = pi.isTimeouted() ? Color.RED : Color.BLACK;
-            if (menuItemReconnect.getForeground() != col) {menuItemReconnect.setForeground(col);}
-        }
-    };
 
 	private final GameWindowUpdater gww = new GameWindowUpdater();
 
@@ -263,7 +269,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		for (int i = 0; i < 10; ++i){
 			tableSizes[i] = i;
 		}
-		toolBar.add(new JComboBox<Integer>(tableSizes));
+		toolBar.add(new JComboBox<>(tableSizes));
 
 		//this.add(toolBar, BorderLayout.WEST);
 		menuBar.add(menuFile);
@@ -315,13 +321,13 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		lh.addLanguageChangeListener(this);
 		DataHandler.timedUpdater.add(gww);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		
+
 		gi.addChangeListener(new GameChangeListener() {
-			
+
 			@Override
 			public void changeUpdate(GameAction action) {
 				if (action instanceof PlayerRemoveAction)
-				{	
+				{
 					if (((PlayerRemoveAction)action).editedPlayer == player.id)
 					{
 						JFrameUtils.logErrorAndShow("You were removed from the game", null, logger);
@@ -373,7 +379,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 			TetrisWindow tw = new TetrisWindow();
 			TetrisGameInstance tgi = tw.getGameInstance();
 			tgi.addGameListener(new TetrisGameListener() {
-				
+
 				@Override
 				public void actionPerformed(TetrisGameEvent event) {
 					if (event.source == tgi.source){gamePanel.gameInstance.update(event);}
@@ -454,7 +460,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 		//Set Title of the window
 		StringBuilder strB = new StringBuilder();
 		strB.append(language.getString(Words.game) + ": " + gi.name);
-		
+
         Player pl = gamePanel.getPlayer();
 		if (gi.admin == gamePanel.getPlayerId()) {strB.append(" (Admin Mode)");}
 		strB.append(", ");
