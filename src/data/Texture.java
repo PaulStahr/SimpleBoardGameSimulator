@@ -18,21 +18,28 @@ import util.io.StreamUtil;
 public class Texture {
     private static final Logger logger = LoggerFactory.getLogger(Texture.class);
     private byte data[];
+    private String id;
     BufferedImage img;
     public String suffix;
     
-    public Texture(InputStream in, String suffix) throws IOException {
+    public String getId() {return id;}
+    
+    public Texture(InputStream in, String id, String suffix) throws IOException {
         this.data = in == null ? null : StreamUtil.toByteArray(in);
+        this.id = id;
         this.suffix = suffix;
     }
 
-    public Texture(byte[] data, String suffix) {
+    public Texture(byte[] data, String id, String suffix) {
+        this.id = id;
         this.data = data;
+        this.suffix = suffix;
         img = null;
     }
 
-    public Texture(BufferedImage img, String suffix) {
+    public Texture(BufferedImage img, String id, String suffix) {
         this.img = img;
+        this.id = id;
         this.suffix = suffix;
     }
 

@@ -14,7 +14,6 @@ import java.net.SocketException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.Random;
 
 import org.slf4j.Logger;
@@ -330,19 +329,19 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                 {
                     switch(gs.type)
                     {
-                        case GameStructureEditAction.EDIT_BACKGROUND:       objOut.writeUnshared(gi.game.getImageKey(gi.game.background));break;
+                        case GameStructureEditAction.EDIT_BACKGROUND:       objOut.writeUnshared(gi.game.background.getId());break;
                         case GameStructureEditAction.EDIT_TABLE_RADIUS:     objOut.writeInt(gi.tableRadius);break;
                         case GameStructureEditAction.EDIT_GAME_NAME:        objOut.writeUnshared(gi.game.name);break;
                         case GameStructureEditAction.EDIT_SESSION_NAME:     objOut.writeUnshared(gi.name);break;
                         case GameStructureEditAction.EDIT_SESSION_PASSWORD: objOut.writeUnshared(gi.password);break;
                         case AddObjectAction.ADD_IMAGE:
                         {
-                            Map.Entry<String, Texture> entry = gi.game.getImage(((AddObjectAction)gs).objectId);
+                            /*Map.Entry<String, Texture> entry = gi.game.getImage(((AddObjectAction)gs).objectId);
                             objOut.writeObject(entry.getKey());
                             GameIO.writeImageToStream(entry.getValue(), StringUtils.getFileType(entry.getKey()), byteStream);
                             objOut.writeInt(byteStream.size());
                             byteStream.writeTo(objOut);
-                            byteStream.reset();
+                            byteStream.reset();*/
                             break;
                         }
                         case GameStructureEditAction.REMOVE_OBJECT:
@@ -705,7 +704,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                                 {
                                     String name = (String)objIn.readObject();
                                     int cap = objIn.readInt();
-                                    gi.game.images.put(name, new Texture(StreamUtil.toByteArray(objIn, cap), StringUtils.getFileType(name)));
+                                    gi.game.images.add(new Texture(StreamUtil.toByteArray(objIn, cap), name, StringUtils.getFileType(name)));
                                     gi.update(action);
                                     break;
                                 }
@@ -721,7 +720,7 @@ public class AsynchronousGameConnection implements Runnable, GameChangeListener{
                         switch(action.type)
                         {
                             case GameStructureEditAction.EDIT_TABLE_RADIUS: gi.tableRadius = objIn.readInt();break;
-                            case GameStructureEditAction.EDIT_BACKGROUND:gi.game.background = gi.game.images.get(objIn.readObject());break;
+                            case GameStructureEditAction.EDIT_BACKGROUND:gi.game.background = gi.game.getImage((String)objIn.readObject());break;
                             case GameStructureEditAction.EDIT_GAME_NAME:gi.game.name = (String)objIn.readObject();break;
                             case GameStructureEditAction.EDIT_SESSION_NAME:gi.name = (String)objIn.readObject();break;
                             case GameStructureEditAction.EDIT_SESSION_PASSWORD:gi.password = (String)objIn.readObject();break;

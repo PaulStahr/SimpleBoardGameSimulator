@@ -14,7 +14,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -212,10 +211,10 @@ public class GameIO {
 	 * Creates a new GameObject. All needed information will be retrieved
 	 * from the XML-element @param elem.
 	 * @param elem the Element with all needed information
-	 * @param images a HashMap of all images saved in the game
+	 * @param game a HashMap of all images saved in the game
 	 * @return the created GameInstance
 	 */
-	public static GameObject createGameObjectFromElement(Element elem, HashMap<String, Texture> images)
+	public static GameObject createGameObjectFromElement(Element elem, Game game)
 	{
 		String objectName = elem.getAttributeValue(StringIO.UNIQUE_NAME);
 		String type = elem.getAttributeValue(StringIO.TYPE);
@@ -232,25 +231,22 @@ public class GameIO {
 		{
 			case StringIO.CARD:
 			{
-				result = new GameObjectToken(objectName, type, width, height, images.get(elem.getAttributeValue(StringIO.FRONT)), images.get(elem.getAttributeValue(StringIO.BACK)), value, sortValue, rotationStep, isFixed, inBox, boxId);
+				result = new GameObjectToken(objectName, type, width, height, game.getImage(elem.getAttributeValue(StringIO.FRONT)), game.getImage(elem.getAttributeValue(StringIO.BACK)), value, sortValue, rotationStep, isFixed, inBox, boxId);
 				break;
 			}
 			case StringIO.FIGURE:
 			{
-				result = new GameObjectFigure(objectName, type, width, height, images.get(elem.getAttributeValue(StringIO.STANDING)), value, sortValue, rotationStep, isFixed, inBox, boxId);
+				result = new GameObjectFigure(objectName, type, width, height, game.getImage(elem.getAttributeValue(StringIO.STANDING)), value, sortValue, rotationStep, isFixed, inBox, boxId);
 				break;
 			}
 			case StringIO.DICE:
 			{
 				ArrayList<DiceSide> dss = new ArrayList<>();
-				for (Element side : elem.getChildren())
+				for (Element side : elem.getChildren(StringIO.SIDE))
 				{
-					if (side.getName().equals(StringIO.SIDE))
-					{
-						Texture img = images.get(side.getValue());
-						if (img == null){logger.warn("Image not found: ", side.getValue());}
-						dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(StringIO.VALUE)), img, side.getValue()));
-					}
+					Texture img = game.getImage(side.getValue());
+					if (img == null){logger.warn("Image not found: ", side.getValue());}
+					dss.add(new DiceSide(Integer.parseInt(side.getAttributeValue(StringIO.VALUE)), img, side.getValue()));
 				}
 				result = new GameObjectDice(objectName, type, width, height, dss.toArray(new DiceSide[dss.size()]), value, sortValue, rotationStep, inBox, boxId);
 				break;
@@ -258,31 +254,25 @@ public class GameIO {
 			case StringIO.BOOK:
 			{
 				ArrayList<BookSide> bss = new ArrayList<>();
-				for (Element side : elem.getChildren())
+				for (Element side : elem.getChildren(StringIO.SIDE))
 				{
-					if (side.getName().equals(StringIO.SIDE))
-					{
-						Texture img = images.get(side.getValue());
-						if (img == null){logger.warn("Image not found: ", side.getValue());}
-						bss.add(new BookSide(Integer.parseInt(side.getAttributeValue(StringIO.VALUE)), img, side.getValue()));
-					}
+					Texture img = game.getImage(side.getValue());
+					if (img == null){logger.warn("Image not found: ", side.getValue());}
+					bss.add(new BookSide(Integer.parseInt(side.getAttributeValue(StringIO.VALUE)), img, side.getValue()));
 				}
 				result = new GameObjectBook(objectName, type, width, height, bss.toArray(new BookSide[bss.size()]), value, sortValue, rotationStep, inBox, boxId);
 				break;
 			}
 			case StringIO.BOX:
 			{
-				result = new GameObjectBox(objectName, type, width, height, images.get(elem.getAttributeValue(StringIO.FRONT)), images.get(elem.getAttributeValue(StringIO.BACK)), rotationStep, inBox, boxId);
+				result = new GameObjectBox(objectName, type, width, height, game.getImage(elem.getAttributeValue(StringIO.FRONT)), game.getImage(elem.getAttributeValue(StringIO.BACK)), rotationStep, inBox, boxId);
 				break;
 			}
 		}
-		ArrayList<String> groups = new ArrayList<String>();
-		for (Element child : elem.getChildren())
+		ArrayList<String> groups = new ArrayList<>();
+		for (Element child : elem.getChildren(StringIO.GROUP))
 		{
-			if (child.getName().equals(StringIO.GROUP))
-			{
-				groups.add(child.getText());
-			}
+			groups.add(child.getText());
 		}
 		result.groups = groups.toArray(new String[groups.size()]);
 		return result;
@@ -332,14 +322,23 @@ public class GameIO {
 		if (gameObject instanceof GameObjectToken)
 		{
 			GameObjectToken token = (GameObjectToken) gameObject;
-			elem.setAttribute(StringIO.FRONT, game.getImageKey(token.getUpsideLook()));
-			Texture downsideLook = token.getDownsideLook();
-			if (downsideLook != null) {elem.setAttribute(StringIO.BACK, game.getImageKey(downsideLook));}
+			Texture upsideLook = token.getUpsideLook();
+			if (upsideLook == null)
+			{
+                logger.error("Upsidelook  of token " + token.uniqueObjectName + " is null");
+			}
+			else {
+		        elem.setAttribute(StringIO.FRONT, upsideLook.getId());
+	    	}
+            Texture downsideLook = token.getDownsideLook();
+			if (downsideLook != null) {
+			    elem.setAttribute(StringIO.BACK, downsideLook.getId());
+			 }
 		}
 		else if (gameObject instanceof GameObjectFigure)
 		{
 			GameObjectFigure figure = (GameObjectFigure) gameObject;
-			elem.setAttribute(StringIO.STANDING, game.getImageKey(figure.getStandingLook()));
+			elem.setAttribute(StringIO.STANDING, figure.getStandingLook().getId());
 		}
 		else if (gameObject instanceof GameObjectDice)
 		{
@@ -348,7 +347,7 @@ public class GameIO {
 			{
 				Element sideElem = new Element(StringIO.SIDE);
 				sideElem.setAttribute(StringIO.VALUE, Integer.toString(side.value));
-				sideElem.setText(game.getImageKey(side.img));
+				sideElem.setText(side.img.getId());
 				elem.addContent(sideElem);
 			}
 		}
@@ -358,21 +357,21 @@ public class GameIO {
 			{
 				Element sideElem = new Element(StringIO.SIDE);
 				sideElem.setAttribute(StringIO.VALUE, Integer.toString(side.value));
-				sideElem.setText(game.getImageKey(side.img));
+				sideElem.setText(side.img.getId());
 				elem.addContent(sideElem);
 			}
 		}
 		else if (gameObject instanceof GameObjectBox){
 			GameObjectBox box = (GameObjectBox) gameObject;
-			elem.setAttribute(StringIO.FRONT, game.getImageKey(box.getUpsideLook()));
+			elem.setAttribute(StringIO.FRONT, box.getUpsideLook().getId());
 			if (box.getDownsideLook() != null)
 			{
-				elem.setAttribute(StringIO.BACK, game.getImageKey(box.getDownsideLook()));
+				elem.setAttribute(StringIO.BACK, box.getDownsideLook().getId());
 			}
 		}
 		return elem;
 	}
-	
+
 	static Element createElementFromAffineTransform(AffineTransform at)
 	{
 		Element elem = new Element(StringIO.AFFINE_TRANSFORM);
@@ -384,7 +383,7 @@ public class GameIO {
 		elem.setAttribute(StringIO.TRANSLATE_Y, Double.toString(at.getTranslateY()));
 		return elem;
 	}
-	
+
 	static Element editAffineTransformFromElement(Element elem, AffineTransform at)
 	{
 		at.setTransform(
@@ -485,7 +484,7 @@ public class GameIO {
 				password.setText(String.valueOf(gi.password));
 			}
 			root_inst.addContent(password);
-	    	
+
 	        doc_inst.addContent(root_inst);
 	    	ZipEntry xmlZipOutput = new ZipEntry(StringIO.GAME_INSTANCE_XML);
 	    	zipOutputStream.putNextEntry(xmlZipOutput);
@@ -500,7 +499,7 @@ public class GameIO {
 			}
 		}
 	}
-	
+
 	public static final void writeImageToStream(Texture img, String suffix, OutputStream out) throws IOException
 	{
 	    if (suffix.equals(img.suffix))
@@ -521,22 +520,22 @@ public class GameIO {
         	}
 	    }
     }
-	
+
 	public static void writeGameToZip(Game game, ZipOutputStream zipOutputStream) throws IOException
-	{	
+	{
 		// Save all images
-	    for (HashMap.Entry<String, Texture> pair : game.images.entrySet()) {
-	    	String key = pair.getKey();
+	    for (Texture tex : game.images) {
+	    	String key = tex.getId();
 		    ZipEntry imageZipOutput = new ZipEntry(key);
 		    zipOutputStream.putNextEntry(imageZipOutput);
 		    String filetype = StringUtils.getFileType(key);
 		    if (filetype != null && ArrayUtil.linearSearchEqual(ImageIO.getWriterFileSuffixes(), filetype) != -1)
 		    {
-	    		writeImageToStream(pair.getValue(), filetype, zipOutputStream);
+	    		writeImageToStream(tex, filetype, zipOutputStream);
 		    }
 		    zipOutputStream.closeEntry();
 	    }
-	    
+
 		Document doc_game = new Document();
     	Element root_game = new Element(StringIO.XML);
     	doc_game.addContent(root_game);
@@ -545,9 +544,9 @@ public class GameIO {
         	GameObject entry = game.getGameObjectByIndex(idx);
         	root_game.addContent(createElementFromGameObject(entry, game));
         }
-        
+
         Element elem_back = new Element(StringIO.BACKGROUND);
-        elem_back.setText(game.getImageKey(game.background));
+        elem_back.setText(game.background.getId());
         root_game.addContent(elem_back);
 
         ZipEntry gameZipOutput = new ZipEntry(StringIO.GAME_XML);
@@ -565,7 +564,7 @@ public class GameIO {
 	 * @param os the OutputStream the Game will be written to
 	 */
 	public static void writeGameToZip(Game game, OutputStream os) throws IOException
-	{	
+	{
 		ZipOutputStream zipOutputStream = null;
 		try
 		{
@@ -594,7 +593,7 @@ public class GameIO {
 
 	}
 
-    
+
 
 	/**
 	 * Reads a snapshot of a GameInstance encoded into @param in incl. the
@@ -623,8 +622,8 @@ public class GameIO {
 		private final ByteArrayOutputStream gameBuffer = new ByteArrayOutputStream();
 		private final ByteArrayOutputStream gameInstanceBuffer = new ByteArrayOutputStream();
 		private final GameInstance result;
-		private final HashMap<String, Texture> images = new HashMap<>();
-		
+		private final ArrayList<Texture> images = new ArrayList<>();
+
 		public GameSnapshotreader(GameInstance result)
 		{
 			this.result = result;
@@ -645,12 +644,11 @@ public class GameIO {
 			    String filetype = StringUtils.getFileType(name);
 			    if (filetype != null && ArrayUtil.linearSearchEqual(ImageIO.getReaderFileSuffixes(), filetype) != -1)
 			    {
-		    		Texture img = new Texture(content, filetype);
-					images.put(name, img);
+					images.add(new Texture(content, name, filetype));
 			    }
 			}
 		}
-		
+
 		private static <K, V> Map<K, V>copyMap(Map<K, V> original, Map<K, V> second_Map)
 	    {
 	        for (Map.Entry<K, V> entry : original.entrySet()) {
@@ -658,7 +656,7 @@ public class GameIO {
 	        }
 	        return second_Map;
 	    }
-		
+
 		void run() throws JDOMException, IOException
 		{
 			Document doc = new SAXBuilder().build(new ByteArrayInputStream(gameBuffer.toByteArray()));
@@ -666,7 +664,10 @@ public class GameIO {
 
 			//Control the xml version, downward compatible current version 2.0
 			result.game.images.clear();
-			copyMap(images, result.game.images);
+			for (int i = 0; i < images.size(); ++i)
+			{
+			    result.game.images.add(images.get(i));
+			}
 			for (Element elem : root.getChildren()) {
 				final String name = elem.getName();
 				if (name.equals(StringIO.OBJECT)) {
@@ -674,14 +675,14 @@ public class GameIO {
 					{
 					    int count = Integer.parseInt(elem.getAttributeValue(StringIO.NUMBER));
 						for (int i=0; i<count;++i) {
-							result.game.addObject(createGameObjectFromElement(elem, result.game.images));
+							result.game.addObject(createGameObjectFromElement(elem, result.game));
 						}
 					}
 					else {
-						result.game.addObject(createGameObjectFromElement(elem, result.game.images));
+						result.game.addObject(createGameObjectFromElement(elem, result.game));
 					}
 				} else if (name.equals(StringIO.BACKGROUND)) {
-					result.game.background = result.game.images.get(elem.getValue());
+					result.game.background = result.game.getImage(elem.getValue());
 				}
 			}
 
@@ -693,7 +694,7 @@ public class GameIO {
 			editGameInstanceFromStream(new ByteArrayInputStream(gameInstanceBuffer.toByteArray()), result);
 		}
 	}
-	
+
 	public static GameInstance readSnapshotFromFolder(File folder, GameInstance result) throws IOException, JDOMException
 	{
 		GameSnapshotreader gsr = new GameSnapshotreader(result);
@@ -706,7 +707,7 @@ public class GameIO {
 		gsr.run();
 		return gsr.result;
 	}
-	
+
 	/**
 	 * Reads a snapshot of a GameInstance encoded into @param stream incl. the
 	 * GameObject gi.game itself.
@@ -742,7 +743,7 @@ public class GameIO {
 	{
 		//Editiere nur das was in dem Stream steht
 		//rufe dabei die update funktion des games auf, um ﾃｼber die ﾃ､nderungen mitzuteilen
-		//Rufe dabei auch die update Methode auf 
+		//Rufe dabei auch die update Methode auf
 	}
 
 	// TODO Fragen
@@ -754,7 +755,7 @@ public class GameIO {
 
 	// TODO Fragen
 	public static void editObjectInstanceFromZip(ObjectInstance objectInstance, ZipInputStream in) {
-		
+
 	}
 
 
@@ -822,7 +823,7 @@ public class GameIO {
 			objOut.writeObject(box.getUpsideLookId());
 		}
 	}
-	
+
 	public static void editGameObjectFromStreamObject(ObjectInputStream objIn, GameObject object) throws IOException, ClassNotFoundException {
 		object.widthInMM = objIn.readInt();
 		object.heightInMM = objIn.readInt();
@@ -845,7 +846,7 @@ public class GameIO {
 			box.setDownsideLook((String)objIn.readObject());
 			box.setUpsideLook((String)objIn.readObject());
 		}	}
-	
+
 	public static void writeGameObjectInstanceEditActionToStreamObject(ObjectOutputStream out, GameObjectInstanceEditAction action) throws IOException
 	{
 		out.writeInt(action.source);
