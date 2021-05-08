@@ -325,7 +325,7 @@ public class GameInstance {
 	    else if (action instanceof GameTextureRemoveAction)
         {
 	        String textureName = ((GameTextureRemoveAction)action).textureName;
-	        game.images.remove(textureName);
+	        game.images.remove(game.getImage(textureName));
 	        for (int i = 0; i < game.getGameObjectCount(); ++i)
 	        {
 	            GameObject go = game.getObjectByIndex(i);
@@ -507,28 +507,24 @@ public class GameInstance {
 		}
 	}
 
-	private static void makeStack(ArrayList<ObjectInstance> tmp, int begin, int end)
+	private void makeStack(ArrayList<ObjectInstance> tmp, int begin, int end, Player player)
 	{
 		if (begin != end)
 		{
 			ObjectInstance last = tmp.get(begin);
-			last.state.belowInstanceId = -1;
+            ObjectState state = last.state.copy();
+            state.belowInstanceId = -1;
 			for (int i = begin + 1; i < end; ++i)
 			{
-				ObjectInstance current = tmp.get(i);
-				last.state.aboveInstanceId = current.id;
-				current.state.belowInstanceId = last.id;
+	            ObjectInstance current = tmp.get(i);
+                state.aboveInstanceId = current.id;
+                update(new GameObjectInstanceEditAction(-1, player, last, state));
+			    state = current.state.copy();
+			    state.belowInstanceId = last.id;
 				last = current;
 			}
-			last.state.aboveInstanceId = -1;
-		}
-	}
-
-	private void update(ArrayList<ObjectInstance> list, int begin, int end, Player player)
-	{
-		for (int i = begin; i < end; ++i)
-		{
-			update(new GameObjectInstanceEditAction(-1, player, list.get(i), list.get(i).state.copy()));
+			state.aboveInstanceId = -1;
+            update(new GameObjectInstanceEditAction(-1, player, last, state));
 		}
 	}
 
@@ -550,8 +546,7 @@ public class GameInstance {
 		{
 			if (incoming[read] == 0){CheckingFunctions.packBelongingObjects(incoming, read, tmp, output);}
 		}
-		makeStack(output, 0, output.size());
-		update(output, 0, output.size(), player);
+		makeStack(output, 0, output.size(), player);
 		output.clear();
 		tmp.clear();
 		getOwnedPrivateObjects(player_id, false, tmp);
@@ -563,8 +558,7 @@ public class GameInstance {
 			if (incoming[read] == 0)
 			{
 				CheckingFunctions.packBelongingObjects(incoming, read, tmp, output);
-				makeStack(output, 0, output.size());
-				update(output, 0, output.size(), player);
+				makeStack(output, 0, output.size(), player);
 				output.clear();
 			}
 		}

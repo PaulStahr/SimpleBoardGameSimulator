@@ -20,12 +20,18 @@ public class CheckingFunctions {
         @Override
         public String toString () {return "Multiple stack-tops " + first + ' ' + second;}
     }
-	public static class InconsistencyNotLinkedViceVersa extends GameInconsistency{
-	    public final int first; public final int second;
-	    public InconsistencyNotLinkedViceVersa(int first,int second){this.first = first; this.second = second;}
-	    @Override
+    public static class InconsistencyNotLinkedViceVersa extends GameInconsistency{
+        public final int first; public final int second;
+        public InconsistencyNotLinkedViceVersa(int first,int second){this.first = first; this.second = second;}
+        @Override
         public String toString() {return "not linked vice-versa " + first + ' ' + second;}
-	}
+    }
+    public static class InconsistencyObjectNotFound extends GameInconsistency{
+        public final int id;
+        public InconsistencyObjectNotFound(int id){this.id = id;}
+        @Override
+        public String toString() {return "object not found " + id;}
+    }
     public static class InconsistencyNostackBottom      extends GameInconsistency{
         public InconsistencyNostackBottom(){}
         @Override
@@ -61,7 +67,7 @@ public class CheckingFunctions {
 			}
 		}
 	}
-	
+
 	public static GameInconsistency checkStack(ArrayList<ObjectInstance> tmp, int begin, int end)
 	{
 		if (begin == end){return null;}
@@ -75,7 +81,7 @@ public class CheckingFunctions {
 		}
 		return last.state.aboveInstanceId == -1 ? null : new InconsistencyMultistackTop(last.id, last.state.aboveInstanceId);
 	}
-	
+
 	public static void packBelongingObjects(int incoming[], int nextIdx, ArrayList<ObjectInstance> sorted, ArrayList<ObjectInstance> output)
 	{
 		while(incoming[nextIdx] == 0){
@@ -89,7 +95,7 @@ public class CheckingFunctions {
 			--incoming[nextIdx];
 		}
 	}
-	
+
 	public static GameInconsistency checkChainingCorrectness(ArrayList<ObjectInstance> objects)
 	{
 		for (int i = 0; i < objects.size(); ++i)
@@ -98,24 +104,27 @@ public class CheckingFunctions {
 			if (current.state.aboveInstanceId != -1)
 			{
 				int index = ArrayTools.binarySearch(objects, current.state.aboveInstanceId, ObjectInstance.OBJECT_TO_ID);
-				if (index < 0){return new GameInconsistency();}
+				if (index < 0){return new InconsistencyObjectNotFound(current.state.aboveInstanceId);}
 				if (objects.get(index).state.belowInstanceId != current.id) {return new InconsistencyNotLinkedViceVersa(objects.get(index).id, current.id);}
 			}
 			if (current.state.belowInstanceId != -1)
 			{
 				int index = ArrayTools.binarySearch(objects, current.state.belowInstanceId, ObjectInstance.OBJECT_TO_ID);
-				if (index < 0){return new GameInconsistency();}
+				if (index < 0){return new InconsistencyObjectNotFound(current.state.belowInstanceId);}
 				if (objects.get(index).state.aboveInstanceId != current.id) {return new InconsistencyNotLinkedViceVersa(objects.get(index).id, current.id);}
 
 			}
 		}
 		return null;
 	}
-	
+
 	public static GameInconsistency checkPlayerConsistency(int player_id, ArrayList<ObjectInstance> sorted, ArrayList<ObjectInstance> output, GameInstance gi)
 	{
 		sorted.clear();
 		gi.getOwnedPrivateObjects(player_id, true, sorted);
+		sorted.sort(ObjectInstance.ID_COMPARATOR);
+		GameInconsistency inconsistency = checkChainingCorrectness(sorted);
+        if (inconsistency != null) {return inconsistency;}
 		if (sorted.size() != 0)
 		{
 			ObjectInstance bottom = null;
@@ -142,7 +151,6 @@ public class CheckingFunctions {
 			{
 				ObjectInstance next = gi.getObjectInstanceById(current.state.aboveInstanceId);
 				if (next == null){return new StackEndReached(current.id);}
-				if (next.state.belowInstanceId != current.id) {return new InconsistencyNotLinkedViceVersa(current.id, next.state.belowInstanceId);}
 				if (next.owner_id() != player_id) {return new InconsistencyNotOwnedArea(next.id);}
 				if (!next.state.inPrivateArea) {return new InconsistencyNotInPrivateArea(next.id);}
 				current = next;
@@ -152,7 +160,7 @@ public class CheckingFunctions {
 		}
 		gi.getOwnedPrivateObjects(player_id, false, sorted);
 		sorted.sort(ObjectInstance.ID_COMPARATOR);
-		GameInconsistency inconsistency = checkChainingCorrectness(sorted);
+		inconsistency = checkChainingCorrectness(sorted);
 		if (inconsistency != null) {return inconsistency;}
 		return null;
 	}
