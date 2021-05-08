@@ -69,9 +69,10 @@ public class CheckingFunctionTest {
         Player pl = new Player("Max", 4);
         GameInstance gi = new GameInstance(game, "Foobar");
         gi.addPlayer(new PlayerAddAction(id, pl));
-        gi.addObjectInstance(new ObjectInstance(game.getGameObjectByIndex(0), 0));
-        gi.addObjectInstance(new ObjectInstance(game.getGameObjectByIndex(0), 1));
-        gi.addObjectInstance(new ObjectInstance(game.getGameObjectByIndex(0), 2));
+        for (int i = 0; i < 3; ++i)
+        {
+            gi.addObjectInstance(new ObjectInstance(game.getGameObjectByIndex(0), i));
+        }
         IntegerArrayList ial = new IntegerArrayList(new int[] {0,1,2});
         ObjectFunctions.makeStack(id, gi, pl, ial, null, ObjectFunctions.SIDE_TO_FRONT);
         assertNull(CheckingFunctions.checkPlayerConsistency(-1, new ArrayList<>(), new ArrayList<>(), gi));
