@@ -545,9 +545,12 @@ public class GameIO {
         	root_game.addContent(createElementFromGameObject(entry, game));
         }
 
-        Element elem_back = new Element(StringIO.BACKGROUND);
-        elem_back.setText(game.background.getId());
-        root_game.addContent(elem_back);
+        if (game.background != null)
+        {
+            Element elem_back = new Element(StringIO.BACKGROUND);
+            elem_back.setText(game.background.getId());
+            root_game.addContent(elem_back);
+        }
 
         ZipEntry gameZipOutput = new ZipEntry(StringIO.GAME_XML);
     	zipOutputStream.putNextEntry(gameZipOutput);
