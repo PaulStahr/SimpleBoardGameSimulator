@@ -20,7 +20,6 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.function.Function;
 
 import javax.swing.AbstractAction;
@@ -119,7 +118,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	private final JTabbedPane tabPane = new JTabbedPane();
 	public int id = (int)(Math.random() * Integer.MAX_VALUE);
 	private boolean isUpdating = false;
-	private Entry<String, Texture>[] imageArray;
+	private Texture[] imageArray;
 	private final LanguageHandler lh;
 	private final Player player;
 
@@ -417,7 +416,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		JFrameUtils.updateTable(tableFigures, scrollPaneFigures, gi.getFigureList(), GameObjectFigure.FIGURE_ATTRIBUTES, tableModelFigures, null, resetFiguresColumn, deleteFigureColumn);
 		JFrameUtils.updateTable(tableDices, scrollPaneDices, gi.getDiceList(), GameObjectDice.DICE_ATTRIBUTES, tableModelDices, null, resetDiceColumn, deleteDiceColumn);
 		JFrameUtils.updateTable(tableBooks, scrollPaneBooks, gi.getBookList(), GameObjectBook.BOOK_ATTRIBUTES, tableModelBooks, null, resetBookColumn, deleteBookColumn);
-		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.toArray(new Entry[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, null, deleteImageColumn);
+		JFrameUtils.updateTable(tableImages, scrollPaneImages, imageArray=gi.game.images.toArray(new Texture[gi.game.images.size()]), IMAGE_TYPES, tableModelImages, null, deleteImageColumn);
 		JFrameUtils.updateTable(tablePlayer, scrollPaneImages, gi.getPlayerList(true), Player.TYPES, tableModelPlayer, null, playerSelectColorColumn, deletePlayerColumn, repairPlayerColumn);
 		panelGeneral.update();
 		isUpdating = false;
@@ -587,8 +586,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 				{
 					if (ImageColumnType.get(col) == ImageColumnType.ID)
 					{
-						gi.game.images.remove(imageArray[row].getKey());
-						gi.game.images.add(imageArray[row].getValue());
+						gi.game.images.remove(imageArray[row]);
+						gi.game.images.add(imageArray[row]);
 						//TODO update game
 					}
 				}
