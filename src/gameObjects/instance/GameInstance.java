@@ -392,17 +392,21 @@ public class GameInstance {
 					{
 						ObjectInstance oi = getObjectInstanceById(gsoea.objectId);
 						ObjectState state = oi.state;
-						if (state.aboveInstanceId != -1)
+						int above = state.aboveInstanceId;
+						int below = state.belowInstanceId;
+						if (above != -1)
 						{
-							getObjectInstanceById(state.aboveInstanceId).state.belowInstanceId = state.belowInstanceId;
+						    ObjectInstance aboveObject = getObjectInstanceById(above);
+						    if (aboveObject != null){aboveObject.state.belowInstanceId = below;}
 							state.aboveInstanceId = -1;
 						}
-						if (oi.state.belowInstanceId != -1)
+						if (below != -1)
 						{
-							getObjectInstanceById(state.belowInstanceId).state.aboveInstanceId = state.aboveInstanceId;
+						    ObjectInstance belowObject = getObjectInstanceById(below);
+                            if (belowObject != null){belowObject.state.aboveInstanceId = above;}
 							state.belowInstanceId = -1;
 						}
-						objects.remove(gsoea.objectId);
+						objects.remove(oi);
 						break;
 					}
 				}
