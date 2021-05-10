@@ -43,9 +43,25 @@ public class CheckingFunctionTest {
     public void circleInconsistencyTest() {
         GameInstance gi = createTestInstance();
         gi.getObjectInstanceByIndex(0).state.belowInstanceId = gi.getObjectInstanceByIndex(2).id;
-        gi.getObjectInstanceByIndex(2).state.belowInstanceId = gi.getObjectInstanceByIndex(0).id;
+        gi.getObjectInstanceByIndex(2).state.aboveInstanceId = gi.getObjectInstanceByIndex(0).id;
         assertNotNull(CheckingFunctions.checkPlayerConsistency(-1, new ArrayList<>(), new ArrayList<>(), gi));
         gi.repairPlayerConsistency(-1, gi.getPlayerByIndex(0), new ArrayList<>());
+        assertNull(CheckingFunctions.checkPlayerConsistency(-1, new ArrayList<>(), new ArrayList<>(), gi));
+    }
+
+    @Test
+    public void privateAreaCircleInconsistencyTest() {
+        GameInstance gi = createTestInstance();
+        for (int i = 0; i < gi.getObjectInstanceCount(); ++i)
+        {
+            gi.getObjectInstanceByIndex(i).state.owner_id = 4;
+            gi.getObjectInstanceByIndex(i).state.inPrivateArea = true;
+        }
+        assertNull(CheckingFunctions.checkPlayerConsistency(4, new ArrayList<>(), new ArrayList<>(), gi));
+        gi.getObjectInstanceByIndex(0).state.belowInstanceId = gi.getObjectInstanceByIndex(2).id;
+        gi.getObjectInstanceByIndex(2).state.aboveInstanceId = gi.getObjectInstanceByIndex(0).id;
+        assertNotNull(CheckingFunctions.checkPlayerConsistency(4, new ArrayList<>(), new ArrayList<>(), gi));
+        gi.repairPlayerConsistency(4, gi.getPlayerByIndex(0), new ArrayList<>());
         assertNull(CheckingFunctions.checkPlayerConsistency(-1, new ArrayList<>(), new ArrayList<>(), gi));
     }
 
