@@ -12,10 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gui.minigames.TetrisGameInstance.FallingObject;
+import gui.minigames.TetrisGameInstance.TetrisGameEvent;
+import gui.minigames.TetrisGameInstance.TetrisGameListener;
 
-public class TetrisPanel extends JPanel implements Runnable, KeyListener{
+public class TetrisPanel extends JPanel implements Runnable, KeyListener, TetrisGameListener{
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 9138747418672277372L;
 	private static final Logger logger = LoggerFactory.getLogger(TetrisPanel.class);
@@ -25,17 +27,18 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 	private boolean isRunning = false;
 	private final Random rand = new Random();
 	private boolean down;
-	
+
 	public TetrisGameInstance getGameInstance(){return tgi;}
-	
-	
+
+
 	public TetrisPanel(TetrisGameInstance tetrisInstance)
 	{
 		this.tgi = tetrisInstance;
 		setFocusable(true);
 		addKeyListener(this);
+		tetrisInstance.addGameListener(this);
 	}
-	
+
 	public void start()
 	{
 		if (th == null)
@@ -45,12 +48,12 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 			th.start();
 		}
 	}
-	
+
 	public void stop()
 	{
 		isRunning = false;
 	}
-	
+
 	@Override
 	public void run()
 	{
@@ -59,13 +62,13 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 			try {
 				synchronized(th)
 				{
-					th.wait(down ? 50 : (int)(1000*Math.exp(-tgi.placedObjectCount() * 0.02)));
+					th.wait(down ? 50 : (int)(1000*Math.exp(-tgi.getFinishedRows() * 0.02)));
 				}
 			} catch (InterruptedException e) {
 				logger.error("Unexpected interruption", e);
 			}
-			
-			if (tgi.fallingObject.size() == 0)
+
+			if (tgi.fallingObject.isEmpty())
 			{
 				byte successfull = tgi.add(new FallingObject((byte)rand.nextInt(18)), 4, 18);
 				if (successfull > 0)
@@ -78,11 +81,11 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 		}
 		th = null;
 	}
-	
+
 	@Override
 	public void paintComponent(Graphics g)
 	{
-		int width = getWidth();
+		int width = getWidth() - 50;
 		int height = getHeight();
 		int numRows = tgi.getRows();
 		int numCols = tgi.getCols();
@@ -103,9 +106,11 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 				}
 			}
 		}
+		g.drawString("Points " + tgi.getPoints(), width, 50);
 	}
 
-	@Override
+
+    @Override
 	public void keyPressed(KeyEvent event) {
 		switch(event.getKeyCode())
 		{
@@ -129,4 +134,10 @@ public class TetrisPanel extends JPanel implements Runnable, KeyListener{
 
 	@Override
 	public void keyTyped(KeyEvent arg0) {}
+
+
+    @Override
+    public void actionPerformed(TetrisGameEvent event) {
+        repaint();
+    }
 }

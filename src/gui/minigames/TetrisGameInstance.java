@@ -13,15 +13,15 @@ public class TetrisGameInstance implements GameChangeListener {
 	public final ArrayList<TetrisGameListener> gameListener = new ArrayList<>();
 	private final IntegerArrayList removeRowList = new IntegerArrayList();
 	public final int source = (int)System.nanoTime() * Integer.MAX_VALUE;
-	
+
 	public static interface TetrisGameListener{
 		public void actionPerformed(TetrisGameEvent event);
-	};
-	
+	}
+
 	public static class TetrisGameEvent extends GameAction
 	{
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -1533769225129432885L;
 
@@ -29,7 +29,7 @@ public class TetrisGameInstance implements GameChangeListener {
 			super(source);
 		}
 	}
-	
+
 	public static class TetrisGameResetEvent extends TetrisGameEvent{
 
 		public TetrisGameResetEvent(int source) {
@@ -37,13 +37,13 @@ public class TetrisGameInstance implements GameChangeListener {
 		}
 
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 329308199229617837L;}
-	
+
 	public static class TetrisGameStateEvent extends TetrisGameEvent{
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -5170488736137761342L;
 		private final byte values[];
@@ -53,19 +53,19 @@ public class TetrisGameInstance implements GameChangeListener {
 			this.values = values.clone();
 		}
 	}
-	
+
 	public static class TetrisRequestStateEvent extends TetrisGameEvent{
 
 		public TetrisRequestStateEvent(int source) {super(source);}
 
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = 4660642893285105594L;}
-	
+
 	public static class TetrisGameChangePixelEvent extends TetrisGameEvent{
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -8420972247190408813L;
 		private final int indices[];
@@ -80,24 +80,24 @@ public class TetrisGameInstance implements GameChangeListener {
 
 	public static class TetrisGameRemoveRowsEvent extends TetrisGameEvent{
 		/**
-		 * 
+		 *
 		 */
 		private static final long serialVersionUID = -3616384518013910773L;
 		public final int rows[];
-		
+
 		public TetrisGameRemoveRowsEvent(int source, int rows[])
 		{
 			super(source);
 			this.rows = rows;
 		}
 	}
-	
+
 	private byte gameWindow[];
 	private int rows;
 	private int cols;
 	public final ArrayList<FallingObject> fallingObject = new ArrayList<>();
-	
-	public static class FallingObject{		
+
+	public static class FallingObject{
 		byte type;
 		int x;
 		int y;
@@ -151,18 +151,18 @@ public class TetrisGameInstance implements GameChangeListener {
 			new TetrisObjectType(2,3, 3, true, true, true, false, true, false),
 			new TetrisObjectType(3,2, 3, true, false, false, true, true, true),
 			new TetrisObjectType(2,3, 3, false, true, false, true, true, true),
-			new TetrisObjectType(3,2, 4, true, true, true, true, false, false),	
-			new TetrisObjectType(2,3, 4, true, true, false, true, false, true),	
-			new TetrisObjectType(3,2, 4, false, false, true, true, true, true),	
-			new TetrisObjectType(2,3, 4, true, false, true, false, true, true),	
+			new TetrisObjectType(3,2, 4, true, true, true, true, false, false),
+			new TetrisObjectType(2,3, 4, true, true, false, true, false, true),
+			new TetrisObjectType(3,2, 4, false, false, true, true, true, true),
+			new TetrisObjectType(2,3, 4, true, false, true, false, true, true),
 			new TetrisObjectType(3,2, 5, true, true, false, false, true, true),
 			new TetrisObjectType(2,3, 5, false, true, true, true, true, false),
 			new TetrisObjectType(3,2, 6, false, true, true, true, true, false),
 			new TetrisObjectType(2,3, 6, true, false, true, true, false, true),
 	};
-	
+
 	static {
-		int first = 0;;
+		int first = 0;
 		for (int i = 0; i < objectTypes.length; ++i)
 		{
 			if (i+1 < objectTypes.length && objectTypes[i+1].id == objectTypes[i].id)
@@ -175,19 +175,19 @@ public class TetrisGameInstance implements GameChangeListener {
 				first = i+1;
 			}
 		}
-			
+
 	}
-	
+
 	public byte getPixel(int x, int y)
 	{
 		return gameWindow[x + y * cols];
 	}
-	
+
 	public void setPixel(int x, int y, byte value)
 	{
 		gameWindow[x + y * cols] = value;
 	}
-	
+
 	public TetrisGameInstance()
 	{
 		rows = 20;
@@ -195,11 +195,12 @@ public class TetrisGameInstance implements GameChangeListener {
 		gameWindow = new byte[rows * cols];
 		actionPerformed(new TetrisRequestStateEvent(source));
 	}
-	
+
 	private final ArrayList<FallingObject> toRemove = new ArrayList<>();
 	private int placedObjects;
+	private int finishedRows[] = new int[4];
 
-	
+
 	private void setPixels(FallingObject fo, byte multiply)
 	{
 		TetrisObjectType type = objectTypes[fo.type];
@@ -217,7 +218,7 @@ public class TetrisGameInstance implements GameChangeListener {
 			}
 		}
 	}
-	
+
 	private void setPixels(FallingObject fo, byte multiply, IntegerArrayList indices, ByteArrayList values)
 	{
 		TetrisObjectType type = objectTypes[fo.type];
@@ -286,12 +287,12 @@ public class TetrisGameInstance implements GameChangeListener {
 				toRemove.add(fo);
 				++placedObjects;
 				setPixels(fo, (byte)1, indices, values);
-				
+
 			}
 			else if (placeable == 0)
 			{
 				setPixels(fo, (byte)0, indices, values);
-				--fo.y; 
+				--fo.y;
 				setPixels(fo, (byte)-1, indices, values);
 			}
 		}
@@ -325,14 +326,15 @@ public class TetrisGameInstance implements GameChangeListener {
 
 	public void moveRight(int i) {
 		FallingObject fo = fallingObject.get(i);
-		if (fo.x < cols - 1)
+		TetrisObjectType type = objectTypes[fo.type];
+		if (fo.x + type.width < cols)
 		{
 			if (isPlacable(fo, fo.x + 1, fo.y, fo.type) == 0)
 			{
 				setPixels(fo, (byte)0, indices, values);
 				++fo.x;
 				setPixels(fo, (byte)-1, indices, values);
-				actionPerformed(new TetrisGameChangePixelEvent(source, indices.toArrayI(), values.toArrayB()));				
+				actionPerformed(new TetrisGameChangePixelEvent(source, indices.toArrayI(), values.toArrayB()));
 				indices.clear();
 				values.clear();
 			}
@@ -351,10 +353,10 @@ public class TetrisGameInstance implements GameChangeListener {
 				actionPerformed(new TetrisGameChangePixelEvent(source, indices.toArrayI(), values.toArrayB()));
 				indices.clear();
 				values.clear();
-			}	
+			}
 		}
 	}
-	
+
 	public void rotate(int index) {
 		FallingObject fo = fallingObject.get(index);
 		setPixels(fo, (byte)0);
@@ -362,16 +364,21 @@ public class TetrisGameInstance implements GameChangeListener {
 		for (int i = 0; i < 4; ++i)
 		{
 			type = objectTypes[type].next;
-			if (isPlacable(fo, fo.x, fo.y, type) == 0)
+			int width = objectTypes[type].width;
+			for (int x = Math.min(fo.x, cols - width), bound = Math.max(0, fo.x - width); x >= bound; --x)
 			{
-				setPixels(fo, (byte)0, indices, values);
-				fo.type = type;
-				setPixels(fo, (byte)-1, indices, values);
-				actionPerformed(new TetrisGameChangePixelEvent(source, indices.toArrayI(), values.toArrayB()));
-				indices.clear();
-				values.clear();
-				break;
-			}	
+    			if (isPlacable(fo, x, fo.y, type) == 0)
+    			{
+    				setPixels(fo, (byte)0, indices, values);
+    				fo.type = type;
+    				fo.x = x;
+    				setPixels(fo, (byte)-1, indices, values);
+    				actionPerformed(new TetrisGameChangePixelEvent(source, indices.toArrayI(), values.toArrayB()));
+    				indices.clear();
+    				values.clear();
+    				return;
+    			}
+			}
 		}
 	}
 
@@ -384,16 +391,19 @@ public class TetrisGameInstance implements GameChangeListener {
 			setPixels(fo, (byte)-1);
 			fallingObject.add(fo);
 		}
-		return placable;		
+		return placable;
 	}
-	
+
+	public int getPoints() {return finishedRows[0] + finishedRows[1] * 5 + finishedRows[2] * 20 + finishedRows[3] * 50;}
+
 	public void actionPerformed(TetrisGameEvent event)
 	{
 		if (event instanceof TetrisGameResetEvent)
 		{
 			placedObjects = 0;
+			Arrays.fill(finishedRows, 0);
 			fallingObject.clear();
-			Arrays.fill(gameWindow, (byte)0);			
+			Arrays.fill(gameWindow, (byte)0);
 		}
 		else if (event instanceof TetrisGameStateEvent)
 		{
@@ -411,6 +421,7 @@ public class TetrisGameInstance implements GameChangeListener {
 		else if (event instanceof TetrisGameRemoveRowsEvent)
 		{
 			int deletedRows[] = ((TetrisGameRemoveRowsEvent) event).rows;
+			++finishedRows[deletedRows.length];
 			int outy = 0;
 			for (int y = 0; y < rows; ++y)
 			{
@@ -441,4 +452,13 @@ public class TetrisGameInstance implements GameChangeListener {
 	}
 
 	public void reset() {actionPerformed(new TetrisGameResetEvent(source));    }
+
+    public int getFinishedRows() {
+        int sum = 0;
+        for (int i = 0; i < finishedRows.length; ++i)
+        {
+            sum += (i + 1) * finishedRows[i];
+        }
+        return sum;
+    }
 }
