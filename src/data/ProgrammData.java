@@ -1,16 +1,16 @@
 /*******************************************************************************
  * Copyright (c) 2019 Paul Stahr
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -59,7 +59,7 @@ public class ProgrammData {
 
     private static final Logger logger = LoggerFactory.getLogger(ProgrammData.class);
 	public static final String name = new String("Simple Online Board-Game Simulator");
-	private static final String version = new String("1.0.0");
+	private static final String version = new String("1.0.1");
 	public static final List<String> authors = ArrayTools.unmodifiableList(new String[]{"Paul Stahr","Florian Seiffarth"});
 	public static final String jarDirectory;
     private static WeakReference<Element> localVersion;
@@ -106,7 +106,7 @@ public class ProgrammData {
             ArrayList<Version> v = new ArrayList<>();
             parseVersionXml(elem, v);
             result = ArrayTools.unmodifiableList(v.toArray(new Version[v.size()]));
-            b.remoteVersionList = new WeakReference<List<Version>>(result);
+            b.remoteVersionList = new WeakReference<>(result);
         }
         return result;
 	}
@@ -119,7 +119,7 @@ public class ProgrammData {
 	        ArrayList<Version> v = new ArrayList<>();
 	        parseVersionXml(elem, v);
 	        result = ArrayTools.unmodifiableList(v.toArray(new Version[v.size()]));
-    	    localVersionList = new WeakReference<List<Version>>(result);
+    	    localVersionList = new WeakReference<>(result);
 	    }
 	    return result;
 	}
@@ -138,7 +138,7 @@ public class ProgrammData {
                 Document doc = new SAXBuilder().build(input);
                 input.close();
                 root = doc.getRootElement();
-                b.remoteVersion = new WeakReference<Element>(root);
+                b.remoteVersion = new WeakReference<>(root);
             } catch (JDOMException e) {
                 logger.error("Couldn't read version",e);
             } catch (IOException e) {
@@ -154,7 +154,7 @@ public class ProgrammData {
 	        try {
                 Document doc = new SAXBuilder().build(DataHandler.getResourceAsStream("version.xml"));
                 root = doc.getRootElement();
-                localVersion = new WeakReference<Element>(root);
+                localVersion = new WeakReference<>(root);
             } catch (JDOMException e) {
                 logger.error("Couldn't read version",e);
             } catch (IOException e) {
@@ -167,7 +167,7 @@ public class ProgrammData {
 	public static boolean isNewer(String version){
 		return getLongOfVersion(version) > getLongOfVersion(ProgrammData.version);
 	}
-	
+
     public static long getLongOfVersion(String version){
     	boolean beta = version.endsWith("beta");
     	if (beta)
@@ -206,5 +206,5 @@ public class ProgrammData {
             }
         }
         return result;
-    }   
+    }
 }

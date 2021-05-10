@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <versions>
+  <version date="2021.05.10" title="1 year anniversary" code="1.0.1" compatibility="1.0.0">
+    <notice>Ping is now shown correctly</notice>
+    <notice>Fixed problems with saving games</notice>
+    <notice>Consistency checking and fixing functions are much more powerful</notice>
+  </version>
   <version date="2021.04.22" title="1 year anniversary" code="1.0.0" compatibility="1.0.0">
     <notice>Different Game-objects</notice>
     <notice>Ingame chat</notice>
