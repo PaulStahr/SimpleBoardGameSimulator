@@ -62,6 +62,19 @@ public class CheckingFunctionTest {
         assertNull(CheckingFunctions.checkPlayerConsistency(pl.id, new ArrayList<>(), new ArrayList<>(), gi));
     }
 
+    @Test
+    public void privateAreaInconsistencyTest() {
+        GameInstance gi = createTestInstance();
+        Player pl = gi.getPlayerByIndex(0);
+        gi.getObjectInstanceByIndex(1).state.inPrivateArea = true;
+        assertNotNull(CheckingFunctions.checkPlayerConsistency(-1, new ArrayList<>(), new ArrayList<>(), gi));
+        assertNull(CheckingFunctions.checkPlayerConsistency(pl.id, new ArrayList<>(), new ArrayList<>(), gi));
+        gi.repairPlayerConsistency(-1, pl, new ArrayList<>());
+        assertNull(CheckingFunctions.checkPlayerConsistency(-1, new ArrayList<>(), new ArrayList<>(), gi));
+        gi.repairPlayerConsistency(pl.id, pl, new ArrayList<>());
+        assertNull(CheckingFunctions.checkPlayerConsistency(pl.id, new ArrayList<>(), new ArrayList<>(), gi));
+    }
+
     private GameInstance createTestInstance() {
         Game game = new Game("Testgame");
         game.images.add(new Texture(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB), "white.png", "png"));
