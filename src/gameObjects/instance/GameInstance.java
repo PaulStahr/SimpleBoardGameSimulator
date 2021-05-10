@@ -1,6 +1,7 @@
 package gameObjects.instance;
 
 import static java.lang.Math.max;
+import static org.junit.Assert.assertEquals;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -502,7 +503,7 @@ public class GameInstance {
 			ObjectInstance oi = objects.get(i);
 			if (oi.owner_id() == player_id && oi.state.inPrivateArea == inPrivateArea)
 			{
-				result.add(objects.get(i));
+				result.add(oi);
 			}
 		}
 	}
@@ -530,38 +531,53 @@ public class GameInstance {
 
 	/**
 	 * Collects all cards of a given player and makes a new stack out of it. Only the aboveId is considered. If there are more than one stack, then these will be merged, keeping the parial order. Circles will be put in at random order
-	 * @param player_id
-	 * @param player
-	 * @param tmp
+	 * @param correctedPlayer
+	 * @param correctingPlayer
+	 * @param sorted
 	 */
-	public void repairPlayerConsistency(int player_id, Player player, ArrayList<ObjectInstance> tmp)
+	public void repairPlayerConsistency(int correctedPlayer, Player correctingPlayer, ArrayList<ObjectInstance> sorted)
 	{
-		tmp.clear();
-		getOwnedPrivateObjects(player_id, true, tmp);
+		sorted.clear();
+		getOwnedPrivateObjects(correctedPlayer, true, sorted);
 		ArrayList<ObjectInstance> output = new ArrayList<>();
-		tmp.sort(ObjectInstance.ID_COMPARATOR);
-		int incoming[] = new int[tmp.size()];
-		CheckingFunctions.countIncoming(tmp, incoming);
-		for (int read = 0; read < incoming.length;++read)
-		{
-			if (incoming[read] == 0){CheckingFunctions.packBelongingObjects(incoming, read, tmp, output);}
-		}
-		makeStack(output, 0, output.size(), player);
+		sorted.sort(ObjectInstance.ID_COMPARATOR);
+		int incoming[] = new int[sorted.size()];
+		CheckingFunctions.countIncoming(sorted, incoming);
+        for (int read = 0; read < incoming.length;++read)
+        {
+            if (incoming[read] == 0){CheckingFunctions.packBelongingObjects(incoming, read, sorted, output);}
+        }
+        for (int read = 0; read < incoming.length;++read)
+        {
+            if (incoming[read] != -1){incoming[read] = 0; CheckingFunctions.packBelongingObjects(incoming, read, sorted, output);}
+        }
+		assertEquals(sorted.size(), output.size());
+		makeStack(output, 0, output.size(), correctingPlayer);
 		output.clear();
-		tmp.clear();
-		getOwnedPrivateObjects(player_id, false, tmp);
-		tmp.sort(ObjectInstance.ID_COMPARATOR);
-		incoming = new int[tmp.size()];
-		CheckingFunctions.countIncoming(tmp, incoming);
+		sorted.clear();
+		getOwnedPrivateObjects(correctedPlayer, false, sorted);
+		sorted.sort(ObjectInstance.ID_COMPARATOR);
+		incoming = new int[sorted.size()];
+		CheckingFunctions.countIncoming(sorted, incoming);
 		for (int read = 0; read < incoming.length;++read)
-		{
-			if (incoming[read] == 0)
-			{
-				CheckingFunctions.packBelongingObjects(incoming, read, tmp, output);
-				makeStack(output, 0, output.size(), player);
-				output.clear();
-			}
-		}
+        {
+            if (incoming[read] == 0)
+            {
+                CheckingFunctions.packBelongingObjects(incoming, read, sorted, output);
+                makeStack(output, 0, output.size(), correctingPlayer);
+                output.clear();
+            }
+        }
+		for (int read = 0; read < incoming.length;++read)
+        {
+            if (incoming[read] != -1)
+            {
+                incoming[read] = 0;
+                CheckingFunctions.packBelongingObjects(incoming, read, sorted, output);
+                makeStack(output, 0, output.size(), correctingPlayer);
+                output.clear();
+            }
+        }
 	}
 
     public void addChangeListener(GameChangeListener listener) {changeListener.add(listener);}

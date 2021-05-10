@@ -1,6 +1,7 @@
 package gameObjects.functions;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
@@ -32,14 +33,12 @@ public class CheckingFunctions {
         @Override
         public String toString() {return "object not found " + id;}
     }
-    public static class InconsistencyNostackBottom      extends GameInconsistency{
-        public InconsistencyNostackBottom(){}
+    public static class InconsistencyObjectCircle extends GameInconsistency{
+        public final int ids[];
+        public InconsistencyObjectCircle(int ids[]){this.ids = ids;}
         @Override
-        public String toString() {return "no stack-bottom";}}
-    public static class InconsistencyNostackTop         extends GameInconsistency{
-        public InconsistencyNostackTop(){}
-        @Override
-        public String toString() {return "No stack-top";}}
+        public String toString() {return "circle in game " + Arrays.toString(ids);}
+    }
 	public static class InconsistencyNotInPrivateArea 	extends GameInconsistency{
 	    public final int id;
 	    public InconsistencyNotInPrivateArea(int id){this.id = id;}
@@ -55,6 +54,12 @@ public class CheckingFunctions {
 	    public StackEndReached(int id) {this.id = id;}
 	    @Override
 	    public String toString() {return "Stackend reached " + id;}}
+    public static class InconsistencyReferredObjectNotFound   extends GameInconsistency{
+        public final int ref_id; public final int not_found_id;
+        public InconsistencyReferredObjectNotFound(int ref_id,int not_found_id) {this.ref_id = ref_id; this.not_found_id = not_found_id;}
+        @Override
+        public String toString() {return "Id not found, ref " + ref_id + " id " + not_found_id;}
+    }
 
 	public static void countIncoming(ArrayList<ObjectInstance> tmp, int incoming[]) {
 		for (int i = 0; i < tmp.size(); ++i)
@@ -82,14 +87,15 @@ public class CheckingFunctions {
 		return last.state.aboveInstanceId == -1 ? null : new InconsistencyMultistackTop(last.id, last.state.aboveInstanceId);
 	}
 
-	public static void packBelongingObjects(int incoming[], int nextIdx, ArrayList<ObjectInstance> sorted, ArrayList<ObjectInstance> output)
+	public static void packBelongingObjects(int incoming[], int startIdx, ArrayList<ObjectInstance> sorted, ArrayList<ObjectInstance> output)
 	{
+	    int nextIdx = startIdx;
 		while(incoming[nextIdx] == 0){
 			ObjectInstance current = sorted.get(nextIdx);
 			incoming[nextIdx] = -1;
 			output.add(current);
 			int aboveId = current.state.aboveInstanceId;
-			if (aboveId == -1){return;}
+			if (aboveId == -1 || aboveId == startIdx){return;}
 			nextIdx = ArrayTools.binarySearch(sorted, current.state.aboveInstanceId, ObjectInstance.OBJECT_TO_ID);
 			if (nextIdx < 0){return;}
 			--incoming[nextIdx];
@@ -101,16 +107,18 @@ public class CheckingFunctions {
 		for (int i = 0; i < objects.size(); ++i)
 		{
 			ObjectInstance current = objects.get(i);
-			if (current.state.aboveInstanceId != -1)
+			int aboveId = current.state.aboveInstanceId;
+			if (aboveId != -1)
 			{
-				int index = ArrayTools.binarySearch(objects, current.state.aboveInstanceId, ObjectInstance.OBJECT_TO_ID);
-				if (index < 0){return new InconsistencyObjectNotFound(current.state.aboveInstanceId);}
+				int index = ArrayTools.binarySearch(objects, aboveId, ObjectInstance.OBJECT_TO_ID);
+				if (index < 0){return new InconsistencyReferredObjectNotFound(current.id, aboveId);}
 				if (objects.get(index).state.belowInstanceId != current.id) {return new InconsistencyNotLinkedViceVersa(objects.get(index).id, current.id);}
 			}
-			if (current.state.belowInstanceId != -1)
+			int belowId = current.state.belowInstanceId;
+			if (belowId != -1)
 			{
-				int index = ArrayTools.binarySearch(objects, current.state.belowInstanceId, ObjectInstance.OBJECT_TO_ID);
-				if (index < 0){return new InconsistencyObjectNotFound(current.state.belowInstanceId);}
+				int index = ArrayTools.binarySearch(objects, belowId, ObjectInstance.OBJECT_TO_ID);
+				if (index < 0){return new InconsistencyReferredObjectNotFound(current.id, belowId);}
 				if (objects.get(index).state.aboveInstanceId != current.id) {return new InconsistencyNotLinkedViceVersa(objects.get(index).id, current.id);}
 
 			}
@@ -124,6 +132,8 @@ public class CheckingFunctions {
 		gi.getOwnedPrivateObjects(player_id, true, sorted);
 		sorted.sort(ObjectInstance.ID_COMPARATOR);
 		GameInconsistency inconsistency = checkChainingCorrectness(sorted);
+        if (inconsistency != null) {return inconsistency;}
+        inconsistency = checkForCircle(sorted, output);
         if (inconsistency != null) {return inconsistency;}
 		if (sorted.size() != 0)
 		{
@@ -143,8 +153,6 @@ public class CheckingFunctions {
 					top = oi;
 				}
 			}
-			if (bottom == null)  {return new InconsistencyNostackBottom();}
-			if (top == null)     {return new InconsistencyNostackTop();}
 			ObjectInstance current = bottom;
 			if (current.owner_id() != player_id || !current.state.inPrivateArea){return new InconsistencyNotInPrivateArea(current.id);}
 			for (int i = 1; i < sorted.size(); ++i)
@@ -162,6 +170,34 @@ public class CheckingFunctions {
 		sorted.sort(ObjectInstance.ID_COMPARATOR);
 		inconsistency = checkChainingCorrectness(sorted);
 		if (inconsistency != null) {return inconsistency;}
+        inconsistency = checkForCircle(sorted, output);
+        if (inconsistency != null) {return inconsistency;}
 		return null;
 	}
+
+    private static GameInconsistency checkForCircle(ArrayList<ObjectInstance> sorted, ArrayList<ObjectInstance> output) {
+        int incoming[] = new int[sorted.size()];
+        CheckingFunctions.countIncoming(sorted, incoming);
+        for (int read = 0; read < incoming.length;++read)
+        {
+            if (incoming[read] == 0)
+            {
+                CheckingFunctions.packBelongingObjects(incoming, read, sorted, output);
+                output.clear();
+            }
+        }
+        for (int read = 0; read < incoming.length;++read)
+        {
+            if (incoming[read] != -1)
+            {
+                incoming[read] = 0;
+                CheckingFunctions.packBelongingObjects(incoming, read, sorted, output);
+                int ids[] = new int[output.size()];
+                for (int i = 0; i <output.size(); ++i){ids[i] = output.get(i).id;}
+                output.clear();
+                return new InconsistencyObjectCircle(ids);
+            }
+        }
+        return null;
+    }
 }
