@@ -1,44 +1,5 @@
 package gui.server;
 
-import static test.SimpleNetworkServertest.connectAndStartGame;
-
-import java.awt.Container;
-import java.awt.EventQueue;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.function.BooleanSupplier;
-
-import javax.swing.AbstractAction;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPasswordField;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableModel;
-
-import org.jdom2.JDOMException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
 import data.Options;
@@ -60,6 +21,9 @@ import main.Player;
 import net.AsynchronousGameConnection;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
+import org.jdom2.JDOMException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import test.SimpleNetworkServertest;
 import util.JFrameUtils;
 import util.ThreadPool.RunnableObject;
@@ -67,6 +31,22 @@ import util.jframe.JFileChooserRecentFiles;
 import util.jframe.PasswordDialog;
 import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableModel;
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
+
+import static test.SimpleNetworkServertest.connectAndStartGame;
 
 public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener, LanguageChangeListener {
 	/**
@@ -77,7 +57,6 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 	public final SynchronousGameClientLobbyConnection client;
 	private final JProgressBar loadProgressBar = new JProgressBar(0, 100);
 	private final JLabel progressBarTitle = new JLabel();
-
 	private final JTextField textFieldName = new JTextField(Options.getString("last_connection.name"));
 	//private final JTextField textFieldChat = new JTextField();
 	//private final JTextArea textAreaChat = new JTextArea();

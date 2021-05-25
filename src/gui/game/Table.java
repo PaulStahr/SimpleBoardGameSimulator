@@ -1,23 +1,17 @@
 package gui.game;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Shape;
-import java.awt.Stroke;
+import gameObjects.action.GameAction;
+import gameObjects.functions.PlayerFunctions;
+import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectInstance;
+import main.Player;
+
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-
-import gameObjects.functions.PlayerFunctions;
-import gameObjects.instance.GameInstance;
-import gameObjects.instance.ObjectInstance;
-import main.Player;
 
 public class Table {
     private int diameter;
@@ -192,9 +186,9 @@ public class Table {
     }
 
     public void updatePlayers(GameInstance gameInstance){
-        for (int i =this.playerShapes.size(); i<gameInstance.getPlayerList().size(); ++i){
+        playerShapes.clear();
+        for (int i =0; i<gameInstance.getPlayerList().size(); ++i){
             Shape playerShape = new Arc2D.Double(tableScreenOrigin.getX() + this.diameter, tableScreenOrigin.getY() + this.diameter, playerDiameter, playerDiameter, 0, 180,Arc2D.OPEN);
-
             //Shape playerShape = new Ellipse2D.Double(tableScreenOrigin.getX() + this.diameter, tableScreenOrigin.getY() + this.diameter, playerDiameter, playerDiameter);
             playerShapes.add(playerShape);
         }
@@ -221,4 +215,7 @@ public class Table {
         return diameter;
     }
     public int getStackerWidth(){return this.stackerWidth;}
+
+    public void update(GameAction action) {
+    }
 }

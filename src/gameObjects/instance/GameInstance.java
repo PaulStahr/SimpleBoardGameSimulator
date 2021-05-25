@@ -1,9 +1,25 @@
 package gameObjects.instance;
 
-import static java.lang.Math.max;
-import static org.junit.Assert.assertEquals;
+import gameObjects.action.DestroyInstance;
+import gameObjects.action.GameAction;
+import gameObjects.action.GameObjectEditAction;
+import gameObjects.action.GameObjectInstanceEditAction;
+import gameObjects.action.player.*;
+import gameObjects.action.structure.GameStructureEditAction;
+import gameObjects.action.structure.GameStructureObjectEditAction;
+import gameObjects.action.structure.GameTextureRemoveAction;
+import gameObjects.columnTypes.GameInstanceColumnType;
+import gameObjects.definition.*;
+import gameObjects.functions.CheckingFunctions;
+import gameObjects.functions.ObjectFunctions;
+import main.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import util.ArrayTools;
+import util.ListTools;
+import util.jframe.table.TableColumnType;
 
-import java.awt.Color;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,33 +27,8 @@ import java.util.List;
 import java.util.concurrent.locks.StampedLock;
 import java.util.function.Predicate;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import gameObjects.action.DestroyInstance;
-import gameObjects.action.GameAction;
-import gameObjects.action.GameObjectEditAction;
-import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.player.PlayerAddAction;
-import gameObjects.action.player.PlayerCharacterPositionUpdate;
-import gameObjects.action.player.PlayerEditAction;
-import gameObjects.action.player.PlayerMousePositionUpdate;
-import gameObjects.action.player.PlayerRemoveAction;
-import gameObjects.action.structure.GameStructureEditAction;
-import gameObjects.action.structure.GameStructureObjectEditAction;
-import gameObjects.action.structure.GameTextureRemoveAction;
-import gameObjects.columnTypes.GameInstanceColumnType;
-import gameObjects.definition.GameObject;
-import gameObjects.definition.GameObjectBook;
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
-import gameObjects.functions.CheckingFunctions;
-import gameObjects.functions.ObjectFunctions;
-import main.Player;
-import util.ArrayTools;
-import util.ListTools;
-import util.jframe.table.TableColumnType;
+import static java.lang.Math.max;
+import static org.junit.Assert.assertEquals;
 
 public class GameInstance {
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new GameInstanceColumnType[]{GameInstanceColumnType.ID, GameInstanceColumnType.NAME,   GameInstanceColumnType.NUM_PLAYERS, GameInstanceColumnType.NUM_VISITORS, GameInstanceColumnType.CONNECT, GameInstanceColumnType.VISIT, GameInstanceColumnType.DELETE});
@@ -73,9 +64,9 @@ public class GameInstance {
         }
     };
 
-	public static interface GameChangeListener
+	public interface GameChangeListener
 	{
-		public void changeUpdate(GameAction action);
+		void changeUpdate(GameAction action);
 	}
 
 	public GameInstance(GameInstance other)
@@ -90,11 +81,10 @@ public class GameInstance {
 
 	public GameInstance(Game game, String name)
 	{
-	    String colors[] =  {"#e81123", "#00188f", "#009e49", "#ff8c00", "#68217a", "#00bcf2", "#ec008c", "#fff100", "#00b294", "#bad80a"};
-	    for (int i = 0; i < colors.length; ++i)
-	    {
-	        seatColors.add(Color.decode(colors[i]));
-	    }
+	    String[] colors =  {"#e81123", "#00188f", "#009e49", "#ff8c00", "#68217a", "#00bcf2", "#ec008c", "#fff100", "#00b294", "#bad80a"};
+		for (String color : colors) {
+			seatColors.add(Color.decode(color));
+		}
 		this.game = game;
 		this.name = name;
 	}
@@ -108,7 +98,7 @@ public class GameInstance {
 
 	public void begin_play() {
 		//Stack all card objects with same position and group
-		if (this.initial_mode == true) {
+		if (this.initial_mode) {
 			ObjectFunctions.loadInitialState(this);
 		}
 		this.initial_mode = false;
@@ -161,14 +151,14 @@ public class GameInstance {
             lock:{
                 try
                 {
-            		for (int i = 0; i < players.size(); ++i)
-            		{
-            			if (players.get(i).id == id)
-            			{
-                            if (!lock.validate(stamp)){break lock;}
-               				return players.get(i);
-            			}
-            		}
+					for (Player player : players) {
+						if (player.id == id) {
+							if (!lock.validate(stamp)) {
+								break lock;
+							}
+							return player;
+						}
+					}
                 	if (lock.validate(stamp)){return null;}
                 }catch (Exception e) {
                     if (tries < 5){logger.debug("Possible Read-Write Invalidation retry " + (tries++) +" of 5");}
@@ -208,15 +198,14 @@ public class GameInstance {
 	        lock:{
                 try
                 {
-            		for (int i = 0; i < players.size(); ++i)
-            		{
-            		    Player pl = players.get(i);
-            			if (name.equals(pl.getName()))
-            			{
-            			    if (lock.validate(stamp)){return pl;}
-            			    break lock;
-            			}
-            		}
+					for (Player pl : players) {
+						if (name.equals(pl.getName())) {
+							if (lock.validate(stamp)) {
+								return pl;
+							}
+							break lock;
+						}
+					}
             		if (lock.validate(stamp)){return null;}
         		}catch (Exception e) {
         		    if (tries < 5){logger.debug("Possible Read-Write Invalidation retry " + (tries++) +" of 5");}
@@ -248,15 +237,14 @@ public class GameInstance {
             lock:{
                 try
                 {
-            		for (int i = 0; i < objects.size(); ++i)
-            		{
-            		    ObjectInstance current = objects.get(i);
-            			if (current.id == id)
-            			{
-                            if (!lock.validate(stamp)){break lock;}
-            				return current;
-            			}
-            		}
+					for (ObjectInstance current : objects) {
+						if (current.id == id) {
+							if (!lock.validate(stamp)) {
+								break lock;
+							}
+							return current;
+						}
+					}
                     if (lock.validate(stamp)){return null;}
                 }catch (Exception e) {
                     if (tries < 5){logger.debug("Possible Read-Write Invalidation retry " + (tries++) +" of 5");}
@@ -276,13 +264,11 @@ public class GameInstance {
     public int hashCode()
 	{
 		int result = 0;
-		for (int i = 0; i < objects.size(); ++i)
-		{
-			result ^= objects.get(i).hashCode();
+		for (ObjectInstance object : objects) {
+			result ^= object.hashCode();
 		}
-		for (int i = 0; i < players.size(); ++i)
-		{
-			result ^= players.get(i).hashCode();
+		for (Player player : players) {
+			result ^= player.hashCode();
 		}
      	result ^= name.hashCode();
      	result ^= hidden ? 0xB : 0;
@@ -292,16 +278,13 @@ public class GameInstance {
 
 	public void update(GameAction action) {
 	    Player sourcePlayer = action.getSourcePlayer(this);
-	    for (int i = 0; i < preChangeListener.size(); ++i)
-        {
-            try
-            {
-                preChangeListener.get(i).changeUpdate(action);
-            }catch(Exception e)
-            {
-                logger.error("Error in Change Listener", e);
-            }
-        }
+		for (GameChangeListener gameChangeListener : preChangeListener) {
+			try {
+				gameChangeListener.changeUpdate(action);
+			} catch (Exception e) {
+				logger.error("Error in Change Listener", e);
+			}
+		}
         if (action instanceof DestroyInstance)
         {
             preChangeListener.clear();
@@ -364,17 +347,13 @@ public class GameInstance {
 		else if (action instanceof PlayerRemoveAction)
 		{
 			PlayerRemoveAction rpa = (PlayerRemoveAction)action;
-			for (int i = 0; i < objects.size(); ++i)
-			{
-			    ObjectInstance oi = objects.get(i);
-			    ObjectState state = oi.state;
-				if (state.owner_id == rpa.editedPlayer)
-				{
+			for (ObjectInstance oi : objects) {
+				ObjectState state = oi.state;
+				if (state.owner_id == rpa.editedPlayer) {
 					state.owner_id = -1;
 					state.inPrivateArea = false;
 				}
-				if (state.isSelected == rpa.editedPlayer)
-				{
+				if (state.isSelected == rpa.editedPlayer) {
 					state.isSelected = -1;
 					state.isActive = false;
 				}
@@ -412,13 +391,10 @@ public class GameInstance {
 				}
 			}
 		}
-		for (int i = 0; i < changeListener.size(); ++i)
-		{
-			try
-			{
-				changeListener.get(i).changeUpdate(action);
-			}catch(Exception e)
-			{
+		for (GameChangeListener gameChangeListener : changeListener) {
+			try {
+				gameChangeListener.changeUpdate(action);
+			} catch (Exception e) {
 				logger.error("Error in Change Listener", e);
 			}
 		}
@@ -429,7 +405,7 @@ public class GameInstance {
 	}
 
 	public String[] getPlayerNames() {
-		String names[] = new String[players.size()];
+		String[] names = new String[players.size()];
 		for (int i = 0; i < players.size(); ++i)
 		{
 			names[i] = players.get(i).getName();
@@ -502,11 +478,8 @@ public class GameInstance {
 
 	public void getOwnedPrivateObjects(int player_id, boolean inPrivateArea, ArrayList<ObjectInstance> result)
 	{
-		for (int i = 0; i < objects.size(); ++i)
-		{
-			ObjectInstance oi = objects.get(i);
-			if (oi.owner_id() == player_id && oi.state.inPrivateArea == inPrivateArea)
-			{
+		for (ObjectInstance oi : objects) {
+			if (oi.owner_id() == player_id && oi.state.inPrivateArea == inPrivateArea) {
 				result.add(oi);
 			}
 		}
@@ -545,7 +518,7 @@ public class GameInstance {
 		getOwnedPrivateObjects(correctedPlayer, true, sorted);
 		ArrayList<ObjectInstance> output = new ArrayList<>();
 		sorted.sort(ObjectInstance.ID_COMPARATOR);
-		int incoming[] = new int[sorted.size()];
+		int[] incoming = new int[sorted.size()];
 		CheckingFunctions.countIncoming(sorted, incoming);
         for (int read = 0; read < incoming.length;++read)
         {

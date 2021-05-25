@@ -1,15 +1,5 @@
 package test;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jdom2.JDOMException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import gameObjects.action.player.PlayerAddAction;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
@@ -20,13 +10,22 @@ import main.Player;
 import net.AsynchronousGameConnection;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
+import org.jdom2.JDOMException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.JFrameUtils;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SimpleNetworkServertest {
     private static final Logger logger = LoggerFactory.getLogger(SimpleNetworkServertest.class);
     public static List<Player> PlayerList = new ArrayList<>();
     public static List<GameWindow> GameWindowList = new ArrayList<>();
-    public static int AdditionalPlayers = 3;
+    public static int AdditionalPlayers = 0;
     public static boolean startGame = true;
     public static GameServer startNewServer(int port)
     {

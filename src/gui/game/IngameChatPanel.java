@@ -1,17 +1,29 @@
 package gui.game;
 
 
-import java.awt.Color;
-import java.awt.Dimension;
+import data.DataHandler;
+import gameObjects.action.GameAction;
+import gameObjects.action.message.*;
+import gameObjects.action.player.PlayerEditAction;
+import gameObjects.instance.GameInstance;
+import gameObjects.instance.GameInstance.GameChangeListener;
+import main.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import util.JFrameUtils;
+import util.io.StreamUtil;
+
+import javax.sound.sampled.*;
+import javax.swing.*;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.*;
+import javax.swing.text.html.HTML;
+import java.awt.*;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,50 +31,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.SourceDataLine;
-import javax.sound.sampled.TargetDataLine;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextField;
-import javax.swing.JTextPane;
-import javax.swing.SwingConstants;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-import javax.swing.text.html.HTML;
-
-import main.Player;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import data.DataHandler;
-import gameObjects.action.GameAction;
-import gameObjects.action.message.UserCombinedMessage;
-import gameObjects.action.message.UserFileMessage;
-import gameObjects.action.message.UserMessage;
-import gameObjects.action.message.UserSoundMessageAction;
-import gameObjects.action.message.UsertextMessageAction;
-import gameObjects.action.player.PlayerEditAction;
-import gameObjects.instance.GameInstance;
-import gameObjects.instance.GameInstance.GameChangeListener;
-import util.JFrameUtils;
-import util.io.StreamUtil;
 
 
 public class IngameChatPanel extends JPanel implements GameChangeListener, KeyListener {
@@ -102,8 +70,8 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 			Player current = game.getPlayerByIndex(playerIndex);
 			// copy all player names to the combobox. 
 			// Omit the own name, since you don't want to send messages to yourself.
-			if (current != player) {
-				sendToNames[++writeIndex] = current.getName();
+			if (current != player && sendToNames.length > writeIndex + 1) {
+					sendToNames[++writeIndex] = current.getName();
 			}
 		}
 		JFrameUtils.updateComboBox(sendTo, sendToNames);
@@ -183,7 +151,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-		        int     pos  = chatTextPane.viewToModel( e.getPoint() );
+		        int     pos  = chatTextPane.viewToModel2D(e.getPoint());
 		        Element elem = ((StyledDocument) chatTextPane.getDocument()).getCharacterElement(pos);
 		        if (elem != null)
 		        {

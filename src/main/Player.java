@@ -1,16 +1,16 @@
 package main;
 
-import java.awt.Color;
-import java.awt.geom.AffineTransform;
-import java.util.List;
-import java.util.Random;
-import java.util.function.Predicate;
-
 import gameObjects.columnTypes.PlayerColumnType;
 import gameObjects.instance.GameInstance;
 import gui.game.GamePanel;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
+
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.util.List;
+import java.util.Random;
+import java.util.function.Predicate;
 
 public class Player implements Comparable<Object> {
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{PlayerColumnType.ID, PlayerColumnType.NAME, PlayerColumnType.COLOR, PlayerColumnType.REPAIR, PlayerColumnType.DELETE});
@@ -31,20 +31,11 @@ public class Player implements Comparable<Object> {
 	public boolean visitor = false;
     public volatile long lastReceivedSignal;
 	
-    public final Predicate<Player> sameSeatPredicate = new Predicate<Player>() {
-        @Override
-        public boolean test(Player arg0) {return arg0.seatNum == Player.this.seatNum;}
-    };
+    public final Predicate<Player> sameSeatPredicate = arg0 -> arg0.seatNum == Player.this.seatNum;
 
-    public final Predicate<Player> sameIdPredicate = new Predicate<Player>() {
-        @Override
-        public boolean test(Player arg0) {return arg0.id == Player.this.id;}
-    };
+    public final Predicate<Player> sameIdPredicate = arg0 -> arg0.id == Player.this.id;
 
-    public final Predicate<Player> sameNamePredicate = new Predicate<Player>() {
-        @Override
-        public boolean test(Player arg0) {return arg0.name.equals(Player.this);}
-    };
+    public final Predicate<Player> sameNamePredicate = arg0 -> arg0.name.equals(Player.this.name);
 
 	public String getName()
 	{
@@ -101,6 +92,9 @@ public class Player implements Comparable<Object> {
         this.screenHeight = other.screenHeight;
         this.screenToBoardTransformation.setTransform(other.screenToBoardTransformation);
         this.playerAtTableTransform.setTransform(other.playerAtTableTransform);
+        this.visitor = other.visitor;
+        this.actionString = other.actionString;
+        this.lastReceivedSignal = other.lastReceivedSignal;
     }
 
     @Override

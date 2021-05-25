@@ -1,16 +1,4 @@
 package main;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
-
-import org.jdom2.JDOMException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import data.Options;
 import gameObjects.action.player.PlayerAddAction;
 import gameObjects.instance.Game;
@@ -25,7 +13,18 @@ import logging.LockbackUtil;
 import net.AsynchronousGameConnection;
 import net.GameServer;
 import net.SynchronousGameClientLobbyConnection;
+import org.jdom2.JDOMException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.JFrameUtils;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 
 public class Main {

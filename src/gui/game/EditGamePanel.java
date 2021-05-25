@@ -1,46 +1,5 @@
 package gui.game;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.EventQueue;
-import java.awt.Point;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
-import javax.swing.AbstractAction;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.text.Document;
-
 import data.DataHandler;
 import data.Texture;
 import gameObjects.action.AddObjectAction;
@@ -52,19 +11,8 @@ import gameObjects.action.player.PlayerEditAction;
 import gameObjects.action.player.PlayerRemoveAction;
 import gameObjects.action.structure.GameStructureEditAction;
 import gameObjects.action.structure.GameTextureRemoveAction;
-import gameObjects.columnTypes.GameObjectBooksColumnType;
-import gameObjects.columnTypes.GameObjectColumnType;
-import gameObjects.columnTypes.GameObjectDicesColumnType;
-import gameObjects.columnTypes.GameObjectFiguresColumnType;
-import gameObjects.columnTypes.GameObjectInstanceColumnType;
-import gameObjects.columnTypes.GameObjectTokenColumnType;
-import gameObjects.columnTypes.ImageColumnType;
-import gameObjects.columnTypes.PlayerColumnType;
-import gameObjects.definition.GameObject;
-import gameObjects.definition.GameObjectBook;
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
+import gameObjects.columnTypes.*;
+import gameObjects.definition.*;
 import gameObjects.functions.CheckingFunctions;
 import gameObjects.functions.ObjectFunctions;
 import gameObjects.instance.GameInstance;
@@ -83,6 +31,26 @@ import util.StringUtils;
 import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableColumnType;
 import util.jframe.table.TableModel;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.text.Document;
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.*;
+import java.io.File;
+import java.io.Serial;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 public class EditGamePanel extends JPanel implements ActionListener, GameChangeListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener {
 	public static final List<TableColumnType> IMAGE_TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{ImageColumnType.ID, ImageColumnType.WIDTH, ImageColumnType.HEIGHT, ImageColumnType.DELETE});
@@ -151,6 +119,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		    /**
 			 *
 			 */
+			@Serial
 			private static final long serialVersionUID = 8601119174600655506L;
 
 			@SuppressWarnings("unchecked")
@@ -188,7 +157,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	}
 
     private final AbstractAction tableAction = new AbstractAction() {
-    	private static final long serialVersionUID = 3980835476835695337L;
+    	@Serial
+		private static final long serialVersionUID = 3980835476835695337L;
 			@Override
 			public void actionPerformed(ActionEvent e)
  	    {
@@ -216,7 +186,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
         /**
          *
          */
-        private static final long serialVersionUID = -6972127406930221792L;
+        @Serial
+		private static final long serialVersionUID = -6972127406930221792L;
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
@@ -233,7 +204,8 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	    /**
          *
          */
-        private static final long serialVersionUID = 1L;
+        @Serial
+		private static final long serialVersionUID = 1L;
         private final ArrayList<ObjectInstance> tmp = new ArrayList<>();
         private final ArrayList<ObjectInstance> tmp2 = new ArrayList<>();
 
@@ -252,6 +224,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  		/**
 		 *
 		 */
+		@Serial
 		private static final long serialVersionUID = 3667665407550359889L;
 		private final JLabel labelName = new JLabel();
  		private final JTextField textFieldName = new JTextField();
@@ -341,7 +314,7 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 			}
 			else if (source == textFieldTableRadius.getDocument())
 			{
-				if(textFieldTableRadius.getText() != "") {
+				if(!textFieldTableRadius.getText().equals("")) {
 					gi.tableRadius = Integer.parseInt(textFieldTableRadius.getText());
 					gi.update(new GameStructureEditAction(id, GameStructureEditAction.EDIT_TABLE_RADIUS));
 				}
@@ -389,9 +362,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	/**
 	 *
 	 */
+	@Serial
 	private static final long serialVersionUID = 9089357847164495823L;
 
-	private Function<TableColumnType, String[]> comboBoxOverrides = new Function<TableColumnType, String[]>() {
+	private final Function<TableColumnType, String[]> comboBoxOverrides = new Function<TableColumnType, String[]>() {
 
         @Override
         public String[] apply(TableColumnType t) {
@@ -527,14 +501,13 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	        Point point = mouseEvent.getPoint();
 	        int row = table.rowAtPoint(point);
 	        if (mouseEvent.getClickCount() == 2 && table.getSelectedRow() != -1) {
-	            int selectedRows[] = table.getSelectedRows();
+	            int[] selectedRows = table.getSelectedRows();
 	            JFrame frame = new JFrame();
 	            frame.setLayout(JFrameUtils.SINGLE_COLUMN_LAYOUT);
 	            final ArrayList<GameObject> go = new ArrayList<>();
-	            for (int i = 0; i < selectedRows.length; ++i)
-	            {
-	                go.add(gi.game.getGameObjectByIndex(selectedRows[i]));
-	            }
+				for (int selectedRow : selectedRows) {
+					go.add(gi.game.getGameObjectByIndex(selectedRow));
+				}
 	            go.add(gi.game.getGameObjectByIndex(row));
 	            GameObject gocp = ObjectEditPanel.reduce(go);
 	            frame.add(new ObjectEditPanel(gocp, gi, lh));
@@ -543,12 +516,10 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        for (int i = 0; i < go.size(); ++i)
-                        {
-                            GameObject current = go.get(i);
-                            ObjectEditPanel.setValid(gocp, current);
-                            gi.update(new GameObjectEditAction(id, current));
-                        }
+						for (GameObject current : go) {
+							ObjectEditPanel.setValid(gocp, current);
+							gi.update(new GameObjectEditAction(id, current));
+						}
                     }
                 });
 	            frame.add(buttonOk);

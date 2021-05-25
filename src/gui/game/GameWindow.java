@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serial;
 import java.lang.ref.WeakReference;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	/**
 	 *
 	 */
+	@Serial
 	private static final long serialVersionUID = -1441104795154034811L;
 	public SynchronousGameClientLobbyConnection client;
 	private final GameInstance gi;
@@ -98,7 +100,8 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 	    /**
          *
          */
-        private static final long serialVersionUID = -4342452358873847467L;
+        @Serial
+		private static final long serialVersionUID = -4342452358873847467L;
         public final int id;
 	    public int lastUpdate = -1;
         private JMenuItem menuItemDisconnect = new JMenuItem("Disconnect");
@@ -136,8 +139,10 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 
             }else if (source == menuItemReconnect) {
                 AsynchronousGameConnection agc = ref.get();
-                agc.destroy();
-                try {
+				if (agc != null) {
+					agc.destroy();
+				}
+				try {
                     AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
                     connection.syncPull();
                     connection.start();
@@ -425,7 +430,10 @@ public class GameWindow extends JFrame implements ActionListener, LanguageChange
 					}
 				}
 				Player player = this.gamePanel.getPlayer();
-				GameInstance gi = client.getGameInstance(this.gi.name);
+				GameInstance gi = null;
+				if (client != null) {
+					gi = client.getGameInstance(this.gi.name);
+				}
 				gi.password = this.gi.password;
 				AsynchronousGameConnection connection = client.connectToGameSession(gi, gi.password);
 				player = gi.addPlayer(new PlayerAddAction(-1, player));
