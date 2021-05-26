@@ -1,18 +1,18 @@
 package gameObjects.functions;
 
-import static gameObjects.functions.ObjectFunctions.isStackBottom;
-import static gameObjects.functions.ObjectFunctions.isStackCollected;
-import static gameObjects.functions.ObjectFunctions.isStackOwned;
-import static gameObjects.functions.ObjectFunctions.isStackTop;
-import static java.lang.Integer.min;
-import static java.lang.Math.abs;
-import static java.lang.Math.sqrt;
+import data.Texture;
+import gameObjects.definition.*;
+import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.ObjectInstance.Relation;
+import geometry.Vector2d;
+import gui.game.GamePanel;
+import main.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import util.data.IntegerArrayList;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -20,22 +20,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import data.Texture;
-import gameObjects.definition.GameObjectBook;
-import gameObjects.definition.GameObjectBox;
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
-import gameObjects.instance.GameInstance;
-import gameObjects.instance.ObjectInstance;
-import gameObjects.instance.ObjectInstance.Relation;
-import geometry.Vector2d;
-import gui.game.GamePanel;
-import main.Player;
-import util.data.IntegerArrayList;
+import static gameObjects.functions.ObjectFunctions.*;
+import static java.lang.Integer.min;
+import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
 
 public class DrawFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -60,7 +48,7 @@ public class DrawFunctions {
     public static void drawPrivateArea(GamePanel gamePanel, Graphics g){
         int privateAreaHeight = 750;
         int privateAreaWidth = 750;
-        gamePanel.privateArea.setArea(gamePanel.getWidth()/2 - privateAreaWidth/2, gamePanel.getHeight()-privateAreaHeight/2, privateAreaWidth, privateAreaHeight, gamePanel.translateX, gamePanel.translateY, gamePanel.rotation, gamePanel.zooming);
+        gamePanel.privateArea.setArea((float) gamePanel.getWidth()/2 - (float) privateAreaWidth/2, gamePanel.getHeight() - (float) privateAreaHeight/2, privateAreaWidth, privateAreaHeight, gamePanel.translateX, gamePanel.translateY, gamePanel.rotation, gamePanel.zooming);
         gamePanel.privateArea.draw(g, gamePanel.getWidth()/2, gamePanel.getHeight());
     }
 
@@ -72,27 +60,22 @@ public class DrawFunctions {
     }
 
     public static void drawObjectsFromList(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, IntegerArrayList oiList, IntegerArrayList ial) {
-        for (int i = 0; i < oiList.size(); ++i){
-            ObjectInstance oi = gameInstance.getObjectInstanceById(oiList.get(i));
+        for (Integer integer : oiList) {
+            ObjectInstance oi = gameInstance.getObjectInstanceById(integer);
             if (oi.state.owner_id != player.id || !oi.state.inPrivateArea || oi.state.isActive) {
                 try {
                     if (oi.go instanceof GameObjectToken) {
                         drawTokenObjects(gamePanel, g, gameInstance, oi, player, ial);
-                    }
-                    else if (oi.go instanceof GameObjectDice) {
+                    } else if (oi.go instanceof GameObjectDice) {
                         drawDiceObjects(gamePanel, g, gameInstance, oi, player, 1);
-                    }
-                    else if (oi.go instanceof GameObjectFigure) {
+                    } else if (oi.go instanceof GameObjectFigure) {
                         drawFigureObjects(gamePanel, g, gameInstance, oi, player, 1);
-                    }
-                    else if (oi.go instanceof GameObjectBook){
+                    } else if (oi.go instanceof GameObjectBook) {
                         drawBookObjects(gamePanel, g, gameInstance, oi, player, 1);
-                    }
-                    else if (oi.go instanceof GameObjectBox){
+                    } else if (oi.go instanceof GameObjectBox) {
                         drawBoxObjects(gamePanel, g, gameInstance, oi, player, 1);
                     }
-                }catch(Exception e)
-                {
+                } catch (Exception e) {
                     logger.error("Error in drawing Tokens", e);
                 }
             }
@@ -125,6 +108,43 @@ public class DrawFunctions {
         drawObject(gamePanel, g, gameInstance, gameInstance.getObjectInstanceById(oi.id), player, zooming, 5);
     }
 
+    public static void drawPlayerIcons(GamePanel gamePanel, Graphics g, GameInstance gameInstance) {
+        Graphics2D g2 = (Graphics2D)g;
+        AffineTransform tmp = g2.getTransform();
+        BasicStroke wideStroke = new BasicStroke(4);
+        BasicStroke basicStroke = new BasicStroke();
+        double determinant = tmp.getDeterminant();
+        for(int pIdx = 0;pIdx < gameInstance.getPlayerCount(true);++pIdx) {
+            Player p = gameInstance.getPlayerByIndex(pIdx);
+            g.setColor(p.color);
+            g2.setTransform(tmp);
+            g2.transform(p.screenToBoardTransformation);
+            double playerDeterminant = p.screenToBoardTransformation.getDeterminant();
+            g2.setStroke(wideStroke);
+            //g2.drawLine(40, p.screenHeight, p.screenWidth, p.screenHeight);
+            int imageNumber = pIdx % 10;
+
+            BufferedImage img = gamePanel.playerImages[imageNumber];
+            g2.translate(p.screenWidth/2, p.screenHeight - 20);
+            double scale = 0.5 / Math.sqrt(playerDeterminant * determinant);
+            g2.scale(scale, scale);
+            g2.translate(-img.getWidth()/2, 0);
+            g2.drawImage(img, null, 0, -10);
+            g2.scale(5, 5);
+            g2.drawString(p.getName(), 5, -10);
+            g2.setTransform(tmp);
+
+            AffineTransform newTmp = g2.getTransform();
+            AffineTransform newTransform = new AffineTransform();
+            newTransform.translate(newTmp.getTranslateX(), newTmp.getTranslateY());
+            g2.setTransform(newTransform);
+            g2.fillRect(0, 0, 10, 10);
+            g2.drawString(p.getName(),  15,  5);
+        }
+        g2.setTransform(tmp);
+     }
+
+
     public static void drawPlayerPositions(GamePanel gamePanel, Graphics g, GameInstance gameInstance, Player player, String infoText) {
         Graphics2D g2 = (Graphics2D)g;
         AffineTransform tmp = g2.getTransform();
@@ -146,9 +166,7 @@ public class DrawFunctions {
             double scale = 0.5 / Math.sqrt(playerDeterminant * determinant);
             g2.scale(scale, scale);
             g2.translate(-img.getWidth()/2, 0);
-            g2.drawImage(img, null, 0, -10);
             g2.scale(5, 5);
-            g2.drawString(p.getName(), 5, -10);
             g2.setTransform(tmp);
             //draw mouse position of other players
             g2.setStroke(basicStroke);
@@ -158,8 +176,6 @@ public class DrawFunctions {
             AffineTransform newTransform = new AffineTransform();
             newTransform.translate(newTmp.getTranslateX(), newTmp.getTranslateY());
             g2.setTransform(newTransform);
-            g2.fillRect(0, 0, 10, 10);
-            g2.drawString(p.getName(),  15,  5);
 
             if(p.id == player.id) {
                 g2.drawString(player.actionString, 0, -15);
@@ -181,7 +197,7 @@ public class DrawFunctions {
                 if (gamePanel.privateArea.privateObjectsPositions.size() > index && index != -1) {
                     AffineTransform temp = g2.getTransform();
                     AffineTransform affineTransform = new AffineTransform();
-                    affineTransform.translate(gamePanel.getWidth()/2, gamePanel.getHeight()-2*gamePanel.privateArea.objects.size());
+                    affineTransform.translate((float) gamePanel.getWidth()/2, gamePanel.getHeight()-2*gamePanel.privateArea.objects.size());
                     affineTransform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));
                     affineTransform.rotate(gamePanel.privateArea.objects.indexOf(oId) * Math.PI / (gamePanel.privateArea.objects.size()));
                     affineTransform.scale(gamePanel.privateArea.zooming, gamePanel.privateArea.zooming);
@@ -286,12 +302,11 @@ public class DrawFunctions {
         g2.setTransform(tmp);
         if (activeObject != null && !activeObject.state.isActive && activeObject.state.owner_id == playerId) {
             AffineTransform transform = new AffineTransform();
-
-            transform.translate(gamePanel.getWidth()/2, gamePanel.getHeight()-2*gamePanel.privateArea.objects.size());
+            transform.translate((float) gamePanel.getWidth()/2, gamePanel.getHeight()-2*gamePanel.privateArea.objects.size());
             transform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));
             transform.rotate(gamePanel.privateArea.objects.indexOf(activeObject.id) * Math.PI / (gamePanel.privateArea.objects.size()));
             transform.scale(gamePanel.privateArea.zooming, gamePanel.privateArea.zooming);
-            transform.translate(-activeObject.getWidth(player.id) / 2, -activeObject.getHeight(player.id) / 2);
+            transform.translate((float) -activeObject.getWidth(player.id) / 2, (float) -activeObject.getHeight(player.id) / 2);
             transform.translate(0, -250);
             drawPrivateAreaBorder(g, gameInstance, player, activeObject, 5, player.color, transform);
             g2.setTransform(tmp);
@@ -327,7 +342,7 @@ public class DrawFunctions {
         Texture look = objectInstance.go.getLook(objectInstance.state, player.id);
         if (look == null)                   {throw new NullPointerException("Look is null " + objectInstance.go.getClass());}
         BufferedImage img = objectInstance.go.getLook(objectInstance.state, player.id).getImageNoExc();
-        if (objectInstance.state == null || img == null) {
+        if (img == null) {
             logger.error("Object state is null");
         }
         else {
@@ -487,9 +502,8 @@ public class DrawFunctions {
 
     public static void unfoldDice(ObjectInstance objectInstance, List<BufferedImage> bufferedImages) {
         bufferedImages.clear();
-        if (objectInstance.go instanceof GameObjectDice)
+        if (objectInstance.go instanceof GameObjectDice dice)
         {
-            GameObjectDice dice = (GameObjectDice)objectInstance.go;
             for(int i = 0; i<dice.dss.length; ++i) {
                 GameObjectDice.DiceSide diceSide = dice.dss[i];
                 bufferedImages.add(diceSide.img.getImageNoExc());
@@ -644,6 +658,5 @@ public class DrawFunctions {
         g2.drawString("Admin Id: " + gameInstance.admin, 50, yPos);
         yPos+=yStep;
         g2.drawString("Number of Pressed Keys: " + gamePanel.downKeys.size(), 50, yPos);
-        yPos+=yStep;
     }
 }

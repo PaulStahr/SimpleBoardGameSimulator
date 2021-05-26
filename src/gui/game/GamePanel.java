@@ -261,10 +261,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		if (isTableVisible) {
 			drawBackground(this, g, gameInstance);
 		}
+
 		Graphics2D g2 = (Graphics2D)g;
 		RenderingHints rh = new RenderingHints(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
 		g2.setRenderingHints(rh);
 		g2.setTransform(boardToScreenTransformation);
+		drawPlayerIcons(this, g, gameInstance);
 
 		//Draw all objects not in some private area
 		ObjectFunctions.getDrawOrder(gameInstance, ial);
