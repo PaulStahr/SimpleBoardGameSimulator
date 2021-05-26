@@ -1,5 +1,6 @@
 package logging;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,11 @@ public class LockbackUtil {
         cachedLevel = level.levelStr;
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         List<ch.qos.logback.classic.Logger> loggerList = loggerContext.getLoggerList();
-        loggerList.stream().forEach(tmpLogger -> tmpLogger.setLevel(level));
+        loggerList.stream().forEach(new Consumer<ch.qos.logback.classic.Logger>() {
+            @Override
+            public void accept(ch.qos.logback.classic.Logger tmpLogger) {
+                tmpLogger.setLevel(level);
+            }
+        });
 	}
 }

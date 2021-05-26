@@ -151,7 +151,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 			
 			@Override
 			public void mouseClicked(MouseEvent e) {
-		        int     pos  = chatTextPane.viewToModel2D(e.getPoint());
+				int pos  = chatTextPane.viewToModel( e.getPoint() );
 		        Element elem = ((StyledDocument) chatTextPane.getDocument()).getCharacterElement(pos);
 		        if (elem != null)
 		        {

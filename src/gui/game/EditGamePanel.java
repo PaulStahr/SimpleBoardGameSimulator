@@ -46,7 +46,6 @@ import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.*;
 import java.io.File;
-import java.io.Serial;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +118,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 		    /**
 			 *
 			 */
-			@Serial
 			private static final long serialVersionUID = 8601119174600655506L;
 
 			@SuppressWarnings("unchecked")
@@ -157,7 +155,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	}
 
     private final AbstractAction tableAction = new AbstractAction() {
-    	@Serial
 		private static final long serialVersionUID = 3980835476835695337L;
 			@Override
 			public void actionPerformed(ActionEvent e)
@@ -186,7 +183,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
         /**
          *
          */
-        @Serial
 		private static final long serialVersionUID = -6972127406930221792L;
 
         @Override
@@ -204,7 +200,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	    /**
          *
          */
-        @Serial
 		private static final long serialVersionUID = 1L;
         private final ArrayList<ObjectInstance> tmp = new ArrayList<>();
         private final ArrayList<ObjectInstance> tmp2 = new ArrayList<>();
@@ -224,7 +219,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
  		/**
 		 *
 		 */
-		@Serial
 		private static final long serialVersionUID = 3667665407550359889L;
 		private final JLabel labelName = new JLabel();
  		private final JTextField textFieldName = new JTextField();
@@ -362,7 +356,6 @@ public class EditGamePanel extends JPanel implements ActionListener, GameChangeL
 	/**
 	 *
 	 */
-	@Serial
 	private static final long serialVersionUID = 9089357847164495823L;
 
 	private final Function<TableColumnType, String[]> comboBoxOverrides = new Function<TableColumnType, String[]>() {

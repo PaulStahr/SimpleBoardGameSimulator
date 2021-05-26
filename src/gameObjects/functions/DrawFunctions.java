@@ -502,8 +502,9 @@ public class DrawFunctions {
 
     public static void unfoldDice(ObjectInstance objectInstance, List<BufferedImage> bufferedImages) {
         bufferedImages.clear();
-        if (objectInstance.go instanceof GameObjectDice dice)
+        if (objectInstance.go instanceof GameObjectDice)
         {
+            GameObjectDice dice = (GameObjectDice) objectInstance.go;
             for(int i = 0; i<dice.dss.length; ++i) {
                 GameObjectDice.DiceSide diceSide = dice.dss[i];
                 bufferedImages.add(diceSide.img.getImageNoExc());

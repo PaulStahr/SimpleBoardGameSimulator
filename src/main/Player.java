@@ -31,11 +31,26 @@ public class Player implements Comparable<Object> {
 	public boolean visitor = false;
     public volatile long lastReceivedSignal;
 	
-    public final Predicate<Player> sameSeatPredicate = arg0 -> arg0.seatNum == Player.this.seatNum;
+    public final Predicate<Player> sameSeatPredicate = new Predicate<Player>() {
+		@Override
+		public boolean test(Player arg0) {
+			return arg0.seatNum == Player.this.seatNum;
+		}
+	};
 
-    public final Predicate<Player> sameIdPredicate = arg0 -> arg0.id == Player.this.id;
+    public final Predicate<Player> sameIdPredicate = new Predicate<Player>() {
+		@Override
+		public boolean test(Player arg0) {
+			return arg0.id == Player.this.id;
+		}
+	};
 
-    public final Predicate<Player> sameNamePredicate = arg0 -> arg0.name.equals(Player.this.name);
+    public final Predicate<Player> sameNamePredicate = new Predicate<Player>() {
+		@Override
+		public boolean test(Player arg0) {
+			return arg0.name.equals(Player.this.name);
+		}
+	};
 
 	public String getName()
 	{

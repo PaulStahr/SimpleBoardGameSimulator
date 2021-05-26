@@ -54,7 +54,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	/**
 	 *
 	 */
-	@Serial
 	private static final long serialVersionUID = 3579141032474558913L;
 	private static final Logger logger = LoggerFactory.getLogger(GamePanel.class);
 
@@ -62,10 +61,13 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	static boolean show_ping = false;
 	public static boolean isDebug = false;
 	static {
-		Options.addModificationListener(() -> {
-			invert_rotation = Options.getBoolean("invert_rotation", false);
-			show_ping = Options.getBoolean("gui.show_ping", false);
-			isDebug = Options.getBoolean("debug", false);
+		Options.addModificationListener(new Runnable() {
+			@Override
+			public void run() {
+				invert_rotation = Options.getBoolean("invert_rotation", false);
+				show_ping = Options.getBoolean("gui.show_ping", false);
+				isDebug = Options.getBoolean("debug", false);
+			}
 		});
 	}
 
