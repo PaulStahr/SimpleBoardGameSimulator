@@ -1,16 +1,16 @@
 package main;
 
+import java.awt.Color;
+import java.awt.geom.AffineTransform;
+import java.util.List;
+import java.util.Random;
+import java.util.function.Predicate;
+
 import gameObjects.columnTypes.PlayerColumnType;
 import gameObjects.instance.GameInstance;
 import gui.game.GamePanel;
 import util.ArrayTools;
 import util.jframe.table.TableColumnType;
-
-import java.awt.*;
-import java.awt.geom.AffineTransform;
-import java.util.List;
-import java.util.Random;
-import java.util.function.Predicate;
 
 public class Player implements Comparable<Object> {
 	public static final List<TableColumnType> TYPES = ArrayTools.unmodifiableList(new TableColumnType[]{PlayerColumnType.ID, PlayerColumnType.NAME, PlayerColumnType.COLOR, PlayerColumnType.REPAIR, PlayerColumnType.DELETE});
@@ -30,20 +30,17 @@ public class Player implements Comparable<Object> {
 
 	public boolean visitor = false;
     public volatile long lastReceivedSignal;
-	
     public final Predicate<Player> sameSeatPredicate = new Predicate<Player>() {
-		@Override
-		public boolean test(Player arg0) {
-			return arg0.seatNum == Player.this.seatNum;
-		}
-	};
+        @Override
+        public boolean test(Player arg0) {return arg0.seatNum == Player.this.seatNum;}
+    };
 
     public final Predicate<Player> sameIdPredicate = new Predicate<Player>() {
-		@Override
-		public boolean test(Player arg0) {
-			return arg0.id == Player.this.id;
-		}
-	};
+        @Override
+        public boolean test(Player arg0) {
+            return arg0.id == Player.this.id;
+        }
+    };
 
     public final Predicate<Player> sameNamePredicate = new Predicate<Player>() {
 		@Override
@@ -56,21 +53,21 @@ public class Player implements Comparable<Object> {
 	{
 		return name;
 	}
-	
+
 	public int getNameModCount()
 	{
 		return nameModCount;
 	}
-	
+
 	public void setName(String name)
 	{
 		if (!this.name.equals(name))
 		{
 			++nameModCount;
+	        this.name = name;
 		}
-		this.name = name;
 	}
-	
+
 	public Player(String name, int id)
 	{
 		this.name = name;
@@ -84,7 +81,7 @@ public class Player implements Comparable<Object> {
 		this.visitor = visitor;
 		setPlayerColor(null);
 	}
-	
+
 	public Player(String name, int id, Color color, int seatNum, int trickNum, int mouseX, int mouseY) {
 		this.name = name;
 		this.id = id;

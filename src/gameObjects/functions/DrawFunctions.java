@@ -1,18 +1,18 @@
 package gameObjects.functions;
 
-import data.Texture;
-import gameObjects.definition.*;
-import gameObjects.instance.GameInstance;
-import gameObjects.instance.ObjectInstance;
-import gameObjects.instance.ObjectInstance.Relation;
-import geometry.Vector2d;
-import gui.game.GamePanel;
-import main.Player;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import util.data.IntegerArrayList;
+import static gameObjects.functions.ObjectFunctions.isStackBottom;
+import static gameObjects.functions.ObjectFunctions.isStackCollected;
+import static gameObjects.functions.ObjectFunctions.isStackOwned;
+import static gameObjects.functions.ObjectFunctions.isStackTop;
+import static java.lang.Integer.min;
+import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -20,10 +20,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static gameObjects.functions.ObjectFunctions.*;
-import static java.lang.Integer.min;
-import static java.lang.Math.abs;
-import static java.lang.Math.sqrt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import data.Texture;
+import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectBox;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
+import gameObjects.definition.GameObjectToken;
+import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.ObjectInstance.Relation;
+import geometry.Vector2d;
+import gui.game.GamePanel;
+import main.Player;
+import util.data.IntegerArrayList;
 
 public class DrawFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -272,8 +284,6 @@ public class DrawFunctions {
                 } else {
                     //TODO out ouf bound errors
                     if (i == gamePanel.privateArea.currentDragPosition) {
-                        g2.translate(0, -250);
-                        g2.translate(0, 250);
                         g2.rotate(Math.PI / (gamePanel.privateArea.objects.size() + extraSpace));
                     } else if (i>=0 && i < gamePanel.privateArea.currentDragPosition) {
                         ObjectInstance objectInstance = gameInstance.getObjectInstanceById(gamePanel.privateArea.objects.getI(i));
@@ -299,8 +309,8 @@ public class DrawFunctions {
             }
         }
 
-        g2.setTransform(tmp);
         if (activeObject != null && !activeObject.state.isActive && activeObject.state.owner_id == playerId) {
+            g2.setTransform(tmp);
             AffineTransform transform = new AffineTransform();
             transform.translate((float) gamePanel.getWidth()/2, gamePanel.getHeight()-2*gamePanel.privateArea.objects.size());
             transform.rotate(-Math.PI * 0.5 + Math.PI / (gamePanel.privateArea.objects.size() * 2));
@@ -467,7 +477,7 @@ public class DrawFunctions {
 	            g2.setColor(Color.GREEN);
 	            g2.drawArc(-5, -5, 10, 10, 0, 360);
             }
-            
+
             g2.setTransform(tmp);
             if (logger.isDebugEnabled())
             {
@@ -504,12 +514,11 @@ public class DrawFunctions {
         bufferedImages.clear();
         if (objectInstance.go instanceof GameObjectDice)
         {
-            GameObjectDice dice = (GameObjectDice) objectInstance.go;
+            GameObjectDice dice = (GameObjectDice)objectInstance.go;
             for(int i = 0; i<dice.dss.length; ++i) {
                 GameObjectDice.DiceSide diceSide = dice.dss[i];
                 bufferedImages.add(diceSide.img.getImageNoExc());
             }
-
         }
     }
 
@@ -538,22 +547,20 @@ public class DrawFunctions {
 
         for (int i = 0; i < selectedObjects.size(); ++i)
         {
-            if (i==0) {
-                stringSelectedObjects.append(selectedObjects.get(i));
+            if (i!=0) {
+                stringSelectedObjects.append("; ");
             }
-            else{
-                stringSelectedObjects.append("; ").append(selectedObjects.get(i));
-            }
+            stringSelectedObjects.append(selectedObjects.get(i));
         }
         for (int i = 0; i < gameInstance.getObjectInstanceCount(); ++i)
         {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             if (oi.state.owner_id == player.id) {
-                if (stringHandCards.length() == 0) {
-                    stringHandCards.append(oi.id);
-                } else {
-                    stringHandCards.append("; ").append(oi.id);
+                if (stringHandCards.length() != 0)
+                {
+                    stringHandCards.append("; ");
                 }
+                stringHandCards.append(oi.id);
             }
         }
 
@@ -561,11 +568,11 @@ public class DrawFunctions {
         {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             if (oi.state.isActive) {
-                if (stringActiveObjects.length() == 0) {
-                    stringActiveObjects.append(oi.id);
-                } else {
-                    stringActiveObjects.append("; ").append(oi.id);
+                if (stringActiveObjects.length() != 0)
+                {
+                    stringActiveObjects.append("; ");
                 }
+                stringActiveObjects.append(oi.id);
             }
         }
 
@@ -581,23 +588,20 @@ public class DrawFunctions {
         {
             ObjectInstance oi = gameInstance.getObjectInstanceByIndex(i);
             if (oi.state.inPrivateArea) {
-                if (stringPrivateAreaCards.length() == 0) {
-                    stringPrivateAreaCards.append(oi.id);
-                } else {
-                    stringPrivateAreaCards.append("; ").append(oi.id);
+                if (stringPrivateAreaCards.length() != 0) {
+                    stringPrivateAreaCards.append("; ");
                 }
+                stringPrivateAreaCards.append(oi.id);
             }
         }
 
         if (hoverId != -1){
             ObjectInstance objectInstance = gameInstance.getObjectInstanceById(hoverId);
             for (int i= 0; i < objectInstance.state.aboveLyingObectIds.size(); ++i){
-                if (i==0){
-                    stringAboveIds.append(objectInstance.state.aboveLyingObectIds.get(i));
+                if (i!=0){
+                    stringAboveIds.append("; ");
                 }
-                else{
-                    stringAboveIds.append("; ").append(objectInstance.state.aboveLyingObectIds.get(i));
-                }
+                stringAboveIds.append(objectInstance.state.aboveLyingObectIds.getI(i));
             }
             stringBelowId.append(objectInstance.state.liesOnId);
             stringBoxId.append(objectInstance.state.boxId);

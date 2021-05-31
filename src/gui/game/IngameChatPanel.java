@@ -1,29 +1,17 @@
 package gui.game;
 
 
-import data.DataHandler;
-import gameObjects.action.GameAction;
-import gameObjects.action.message.*;
-import gameObjects.action.player.PlayerEditAction;
-import gameObjects.instance.GameInstance;
-import gameObjects.instance.GameInstance.GameChangeListener;
-import main.Player;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import util.JFrameUtils;
-import util.io.StreamUtil;
-
-import javax.sound.sampled.*;
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-import javax.swing.text.*;
-import javax.swing.text.html.HTML;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.*;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -32,10 +20,54 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
+import javax.sound.sampled.TargetDataLine;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
+import javax.swing.event.ChangeListener;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Element;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+import javax.swing.text.html.HTML;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import data.DataHandler;
+import gameObjects.action.GameAction;
+import gameObjects.action.message.UserCombinedMessage;
+import gameObjects.action.message.UserFileMessage;
+import gameObjects.action.message.UserMessage;
+import gameObjects.action.message.UserSoundMessageAction;
+import gameObjects.action.message.UsertextMessageAction;
+import gameObjects.action.player.PlayerEditAction;
+import gameObjects.instance.GameInstance;
+import gameObjects.instance.GameInstance.GameChangeListener;
+import main.Player;
+import util.JFrameUtils;
+import util.io.StreamUtil;
+
 
 public class IngameChatPanel extends JPanel implements GameChangeListener, KeyListener {
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -8779142095973760951L;
 	private static final Logger logger = LoggerFactory.getLogger(IngameChatPanel.class);
@@ -52,10 +84,10 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 	protected final SimpleAttributeSet textStyle = new SimpleAttributeSet();
 	protected final JTextField messageInput = new JTextField();
 	protected String receiverPlayerName = "all";
-	private final JComboBox<String> sendTo = new JComboBox<String>();
+	private final JComboBox<String> sendTo = new JComboBox<>();
 	private	 int playerModCount = 0;
 	private Player receiverPlayer;
-	
+
 	void updatePlayerList()
 	{
 		int modCount = game.getPlayerCount();
@@ -68,7 +100,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 
 		for(int playerIndex=0, writeIndex = 0; playerIndex<game.getPlayerCount(); playerIndex++) {
 			Player current = game.getPlayerByIndex(playerIndex);
-			// copy all player names to the combobox. 
+			// copy all player names to the combobox.
 			// Omit the own name, since you don't want to send messages to yourself.
 			if (current != player && sendToNames.length > writeIndex + 1) {
 					sendToNames[++writeIndex] = current.getName();
@@ -107,11 +139,11 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 		messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.X_AXIS));
 		messagePanel.add(new JLabel("Message: "));
 		messagePanel.add(messageInput);
-	
+
 		this.add(messagePanel);
 		messageInput.setDropTarget(new DropTarget() {
 		    /**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 8601119174600655506L;
 
@@ -136,22 +168,22 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 	private void createChatPane(String tabName) {
 		JTextPane chatTextPane = new JTextPane();
 		chatTextPane.addMouseListener(new MouseListener() {
-			
+
 			@Override
 			public void mouseReleased(MouseEvent e) {}
-			
+
 			@Override
 			public void mousePressed(MouseEvent e) {}
-			
+
 			@Override
 			public void mouseExited(MouseEvent e) {}
-			
+
 			@Override
 			public void mouseEntered(MouseEvent e) {}
-			
+
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				int pos  = chatTextPane.viewToModel( e.getPoint() );
+				int pos = chatTextPane.viewToModel( e.getPoint() );
 		        Element elem = ((StyledDocument) chatTextPane.getDocument()).getCharacterElement(pos);
 		        if (elem != null)
 		        {
@@ -191,7 +223,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 
 		chatPanes.addTab(tabName, chatScrollPane);
 	}
-	
+
 	// add a message to the chat area in the color of the sending player
 	private void appendMessage(JTextPane chatTextPane, String message, SimpleAttributeSet style) {
 		try {
@@ -202,15 +234,15 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 			logger.error("Failed to append text in chat area.");
 		}
 	}
-	
+
 	private final Runnable updatePlayerListRunnable = new Runnable() {
-		
+
 		@Override
 		public void run() {
 			updatePlayerList();
 		}
 	};
-	
+
 	@Override
 	public void changeUpdate(GameAction action) {
 		if (action instanceof PlayerEditAction)
@@ -283,7 +315,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 			}
 		}
 	}
-	
+
 	/*
 	* When a different recipient is selected in the combo box,
 	* switch to the corresponding dialog in the tabbed pane.
@@ -331,9 +363,9 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
                                              channels, signed, bigEndian);
         return format;
     }
-	
+
     final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-    
+
     public void keyChanged(KeyEvent arg0)
     {
     	if (arg0.isControlDown() == (line != null))
@@ -343,7 +375,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 			try {
 	            AudioFormat format = getAudioFormat();
 	            DataLine.Info info = new DataLine.Info(TargetDataLine.class, format);
-	 
+
 	            // checks if system supports the data line
 	            if (!AudioSystem.isLineSupported(info)) {logger.error("Line not supported");}
 	            line = (TargetDataLine) AudioSystem.getLine(info);
@@ -375,7 +407,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 			line.drain();
 		}
     }
-    
+
     TargetDataLine line = null;
 	@Override
 	public void keyPressed(KeyEvent arg0) {keyChanged(arg0);}
@@ -390,7 +422,7 @@ public class IngameChatPanel extends JPanel implements GameChangeListener, KeyLi
 
 
 /*
- * When a tab changes, update the combobox 
+ * When a tab changes, update the combobox
  * such that the next send message will go to the dialog selected in the tabbed pane.
  */
 class TabListener implements ChangeListener {

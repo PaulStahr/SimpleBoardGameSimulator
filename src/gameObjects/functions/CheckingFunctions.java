@@ -193,7 +193,7 @@ public class CheckingFunctions {
                 incoming[read] = 0;
                 CheckingFunctions.packBelongingObjects(incoming, read, sorted, output);
                 int ids[] = new int[output.size()];
-                for (int i = 0; i <output.size(); ++i){ids[i] = output.get(i).id;}
+                for (int i = 0; i <ids.length; ++i){ids[i] = output.get(i).id;}
                 output.clear();
                 return new InconsistencyObjectCircle(ids);
             }
