@@ -432,6 +432,10 @@ public class TetrisGameInstance implements GameChangeListener {
 				}
 			}
 			Arrays.fill(gameWindow, outy * cols, gameWindow.length, (byte)0);
+			for (int i = 0; i < fallingObject.size(); ++i)
+			{
+			    fallingObject.get(i).y -= deletedRows.length;
+			}
 		}
 		for (int i = 0; i < gameListener.size(); ++i)
 		{
