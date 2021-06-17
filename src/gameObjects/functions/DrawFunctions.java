@@ -1,18 +1,18 @@
 package gameObjects.functions;
 
-import static gameObjects.functions.ObjectFunctions.isStackBottom;
-import static gameObjects.functions.ObjectFunctions.isStackCollected;
-import static gameObjects.functions.ObjectFunctions.isStackOwned;
-import static gameObjects.functions.ObjectFunctions.isStackTop;
-import static java.lang.Integer.min;
-import static java.lang.Math.abs;
-import static java.lang.Math.sqrt;
+import data.Texture;
+import gameObjects.definition.*;
+import gameObjects.instance.GameInstance;
+import gameObjects.instance.ObjectInstance;
+import gameObjects.instance.ObjectInstance.Relation;
+import geometry.Vector2d;
+import gui.game.GamePanel;
+import main.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import util.data.IntegerArrayList;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
+import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -20,22 +20,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import data.Texture;
-import gameObjects.definition.GameObjectBook;
-import gameObjects.definition.GameObjectBox;
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
-import gameObjects.instance.GameInstance;
-import gameObjects.instance.ObjectInstance;
-import gameObjects.instance.ObjectInstance.Relation;
-import geometry.Vector2d;
-import gui.game.GamePanel;
-import main.Player;
-import util.data.IntegerArrayList;
+import static gameObjects.functions.ObjectFunctions.*;
+import static java.lang.Integer.min;
+import static java.lang.Math.abs;
+import static java.lang.Math.sqrt;
 
 public class DrawFunctions {
     private static final Logger logger = LoggerFactory.getLogger(ObjectFunctions.class);
@@ -150,8 +138,6 @@ public class DrawFunctions {
             AffineTransform newTransform = new AffineTransform();
             newTransform.translate(newTmp.getTranslateX(), newTmp.getTranslateY());
             g2.setTransform(newTransform);
-            g2.fillRect(0, 0, 10, 10);
-            g2.drawString(p.getName(),  15,  5);
         }
         g2.setTransform(tmp);
      }
@@ -188,6 +174,8 @@ public class DrawFunctions {
             AffineTransform newTransform = new AffineTransform();
             newTransform.translate(newTmp.getTranslateX(), newTmp.getTranslateY());
             g2.setTransform(newTransform);
+            g2.fillRect(0, 0, 10, 10);
+            g2.drawString(p.getName(),  15,  5);
 
             if(p.id == player.id) {
                 g2.drawString(player.actionString, 0, -15);

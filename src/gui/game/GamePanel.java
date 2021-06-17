@@ -1,65 +1,5 @@
 package gui.game;
 
-import static gameObjects.functions.DrawFunctions.drawBackground;
-import static gameObjects.functions.DrawFunctions.drawObjectsFromList;
-import static gameObjects.functions.DrawFunctions.drawPlayerIcons;
-import static gameObjects.functions.DrawFunctions.drawPlayerPositions;
-import static gameObjects.functions.DrawFunctions.drawPrivateArea;
-import static gameObjects.functions.DrawFunctions.drawSelection;
-import static gameObjects.functions.DrawFunctions.drawTokensInPrivateArea;
-
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
-import java.awt.KeyEventDispatcher;
-import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import javax.imageio.ImageIO;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.DataLine;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import data.DataHandler;
 import data.Options;
 import data.SystemFileUtil;
@@ -69,22 +9,10 @@ import data.controls.UserControl;
 import gameObjects.action.GameAction;
 import gameObjects.action.GameObjectEditAction;
 import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.action.player.PlayerAddAction;
-import gameObjects.action.player.PlayerCharacterPositionUpdate;
-import gameObjects.action.player.PlayerEditAction;
-import gameObjects.action.player.PlayerMousePositionUpdate;
-import gameObjects.action.player.PlayerRemoveAction;
+import gameObjects.action.player.*;
 import gameObjects.action.structure.GameStructureEditAction;
-import gameObjects.definition.GameObjectBook;
-import gameObjects.definition.GameObjectBox;
-import gameObjects.definition.GameObjectDice;
-import gameObjects.definition.GameObjectFigure;
-import gameObjects.definition.GameObjectToken;
-import gameObjects.functions.CheckFunctions;
-import gameObjects.functions.DrawFunctions;
-import gameObjects.functions.MoveFunctions;
-import gameObjects.functions.ObjectFunctions;
-import gameObjects.functions.PlayerFunctions;
+import gameObjects.definition.*;
+import gameObjects.functions.*;
 import gameObjects.instance.GameInstance;
 import gameObjects.instance.ObjectInstance;
 import gameObjects.instance.ObjectState;
@@ -97,11 +25,32 @@ import gui.language.LanguageHandler;
 import gui.language.Words;
 import io.GameIO;
 import main.Player;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.StringUtils;
 import util.TimedUpdateHandler;
 import util.data.DoubleArrayList;
 import util.data.IntegerArrayList;
 import util.io.StreamUtil;
+
+import javax.imageio.ImageIO;
+import javax.sound.sampled.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
+
+import static gameObjects.functions.DrawFunctions.*;
 
 
 public class GamePanel extends JPanel implements MouseListener, MouseMotionListener, GameInstance.GameChangeListener, KeyListener, KeyEventDispatcher, MouseWheelListener, ActionListener, ComponentListener{
@@ -323,6 +272,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 		g2.setRenderingHints(rh);
 		g2.setTransform(boardToScreenTransformation);
 		drawPlayerIcons(this, g, gameInstance);
+		//Draw all player related information
+		drawPlayerPositions(this, g, gameInstance, player, infoText);
 
 		//Draw all objects not in some private area
 		ObjectFunctions.getDrawOrder(gameInstance, ial);
@@ -366,8 +317,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 			drawTokensInPrivateArea(this, g, gameInstance, player, hoveredObject);
 		}
 
-		//Draw all player related information
-		drawPlayerPositions(this, g, gameInstance, player, infoText);
+
 		g2.setTransform(tmp);
 
 		//Draw debug informations
