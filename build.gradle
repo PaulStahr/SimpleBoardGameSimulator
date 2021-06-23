@@ -28,3 +28,10 @@ mainClassName = 'main.Main'
 sourceSets.main.java.srcDirs = ['src']
 sourceSets.test.java.srcDirs = ['src/test']
 sourceSets.main.resources.srcDirs= ["src"]
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'main.Main'
+    }
+    from {configurations.compileClasspath.filter{ it.exists() }.collect { it.isDirectory() ? it : zipTree(it) } }
+}
