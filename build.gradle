@@ -30,6 +30,7 @@ sourceSets.test.java.srcDirs = ['src/test']
 sourceSets.main.resources.srcDirs= ["src"]
 
 jar {
+    destinationDir = file('./')
     manifest {
         attributes 'Main-Class': 'main.Main'
     }
