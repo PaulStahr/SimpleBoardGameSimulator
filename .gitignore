@@ -20,4 +20,3 @@ doc/anleitung.aux
 doc/anleitung.synctex.gz
 .project
 gradle/
-*.yml
