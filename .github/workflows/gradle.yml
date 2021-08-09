@@ -10,6 +10,11 @@ on:
     branches: [ dev, master, testing, main ]
 
 jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+    - run: sudo apt-get install xvfb
+    - run: xvfb --version
   build:
 
     runs-on: ubuntu-latest
@@ -24,4 +29,4 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew test
+      run: Xvfb :99 &;export DISPLAY=:99;./gradlew test
