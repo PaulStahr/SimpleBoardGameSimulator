@@ -29,4 +29,6 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: Xvfb :99 &;export DISPLAY=:99;./gradlew test
+      run: Xvfb :99 &
+      run: export DISPLAY=:99
+      run: ./gradlew test
