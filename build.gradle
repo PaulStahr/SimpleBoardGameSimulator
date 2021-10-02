@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    implementation 'org.slf4j:slf4j-api:1.7.25'
+    implementation 'org.jdom:jdom:2.0.2'
+    implementation 'com.hynnet:logback-core:1.1.3'
+    implementation 'com.hynnet:logback-classic:1.1.3'
+
+    testCompile 'junit:junit:4.12'
+    compile 'junit:junit:4.12'
+}
+
+test {
+    testLogging {
+        events "failed"
+        showStackTraces true
+        exceptionFormat "full"
+    }
+}
+mainClassName = 'main.Main'
+sourceSets.main.java.srcDirs = ['src']
+sourceSets.test.java.srcDirs = ['src/test']
+sourceSets.main.resources.srcDirs= ["src"]
+
+jar {
+    destinationDir = file('./')
+    manifest {
+        attributes 'Main-Class': 'main.Main'
+    }
+    from {configurations.compileClasspath.filter{ it.exists() }.collect { it.isDirectory() ? it : zipTree(it) } }
+}
