@@ -1,4 +1,4 @@
-[![Build Status](https://api.travis-ci.com/PaulStahr/SimpleBoardGameSimulator.svg?branch=master)](https://travis-ci.com/github/PaulStahr/SimpleBoardGameSimulator)
+![Gradle](https://github.com/PaulStahr/JSymMath/actions/workflows/gradle.yml/badge.svg)
 
 Zum einfachen Ausführen des Spieles bitte die Datei https://github.com/PaulStahr/SimpleBoardGameSimulator/raw/master/SimpleBoardGameSimulator.jar herunterladen und starten.
 
