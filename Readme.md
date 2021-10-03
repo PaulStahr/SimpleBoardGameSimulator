@@ -1,4 +1,4 @@
-![Gradle](https://github.com/PaulStahr/JSymMath/actions/workflows/gradle.yml/badge.svg)
+![Gradle](https://github.com/PaulStahr/SimpleBoardGameSimulator/actions/workflows/gradle.yml/badge.svg)
 
 Zum einfachen Ausführen des Spieles bitte die Datei https://github.com/PaulStahr/SimpleBoardGameSimulator/raw/master/SimpleBoardGameSimulator.jar herunterladen und starten.
 
