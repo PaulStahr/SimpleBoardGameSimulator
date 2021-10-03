@@ -1,4 +1,4 @@
-![Gradle](https://github.com/PaulStahr/SimpleBoardGameSimulator/actions/workflows/gradle.yml/badge.svg)
+![Gradle](https://github.com/PaulStahr/SimpleBoardGameSimulator/actions/workflows/gradle.yml/badge.svg)[![](https://jitpack.io/v/PaulStahr/SimpleBoardGameSimulator.svg)](https://jitpack.io/#PaulStahr/SimpleBoardGameSimulator)
 
 Zum einfachen Ausführen des Spieles bitte die Datei https://github.com/PaulStahr/SimpleBoardGameSimulator/raw/master/SimpleBoardGameSimulator.jar herunterladen und starten.
 
