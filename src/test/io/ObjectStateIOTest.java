@@ -11,6 +11,8 @@ import java.io.ObjectOutputStream;
 import org.junit.Test;
 
 import gameObjects.definition.GameObjectBook;
+import gameObjects.definition.GameObjectDice;
+import gameObjects.definition.GameObjectFigure;
 import gameObjects.definition.GameObjectToken;
 import gameObjects.instance.ObjectState;
 import io.ObjectStateIO;
@@ -27,7 +29,7 @@ public class ObjectStateIOTest {
         ObjectStateIO.simulateStateFromStreamObject(objIn, state);
         assertEquals("Stream has still bytes which were not skipped", 0, objIn.available());
     }
-    
+
     @Test
     public void testSimulateTokenRead() throws IOException {
         ObjectState state = new GameObjectToken.TokenState();
@@ -39,16 +41,16 @@ public class ObjectStateIOTest {
 
     @Test
     public void testSimulateFigureRead() throws IOException {
-        test(new GameObjectBook.BookState());
+        test(new GameObjectFigure.FigureState());
     }
-    
+
     @Test
     public void testSimulateBookRead() throws IOException {
         test(new GameObjectBook.BookState());
     }
-    
+
     @Test
     public void testSimulateDiceRead() throws IOException {
-        test(new GameObjectBook.BookState());
+        test(new GameObjectDice.DiceState());
     }
 }

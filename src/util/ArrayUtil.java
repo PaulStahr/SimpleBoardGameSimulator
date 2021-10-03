@@ -46,7 +46,7 @@ public class ArrayUtil {
         final int len1 = first.length();
         final int len2 = second.length;
         final int lim = Math.min(len1, len2);
-       
+
         for (int k = 0;k < lim; ++k) {
             final char c1 = first.charAt(k);
             final char c2 = second[k];
@@ -160,13 +160,13 @@ public class ArrayUtil {
 		}
 		return index;
 	}
-	
+
 	public void increaseMin(int array[], int begin, int end)
 	{
 		int idx = minIndex(array, begin, end);
 		++array[idx];
 	}
-	
+
 	public static final void swap(double[] data, int begin0, int begin1, int len) {
 		for (int j = 0; j < len; ++j)
 		{
@@ -254,17 +254,25 @@ public class ArrayUtil {
 		}
 		return max;
 	}
-	
 
-	public static final float max(float[] imageColorArray, int begin, int end) {
-		float max = Float.NEGATIVE_INFINITY;
-		for (;begin != end; ++begin)
-		{
-			max = Math.max(max, imageColorArray[begin]);
-		}
-		return max;
-	}
-	
+
+    public static final float max(float[] imageColorArray, int begin, int end) {
+        float max = Float.NEGATIVE_INFINITY;
+        for (;begin != end; ++begin)
+        {
+            max = Math.max(max, imageColorArray[begin]);
+        }
+        return max;
+    }
+
+    public static final float min(float[] imageColorArray, int begin, int end) {
+        float min = Float.POSITIVE_INFINITY;
+        for (;begin != end; ++begin)
+        {
+            min = Math.min(min, imageColorArray[begin]);
+        }
+        return min;
+    }
 
 	public static void addTo(int[] in, int begin, int end, int[] out, int outBegin) {
 		for (; begin < end; ++begin, ++outBegin)
@@ -272,7 +280,7 @@ public class ArrayUtil {
 			out[outBegin] += in[begin];
 		}
 	}
-	
+
 
 	public static void addTo(float[] in, int begin, int end, float[] out, int outBegin) {
 		for (; begin < end; ++begin, ++outBegin)
@@ -280,7 +288,7 @@ public class ArrayUtil {
 			out[outBegin] += in[begin];
 		}
 	}
-	
+
 	public static void addTo(int[] in, int begin, int end, int[] out, int outBegin, int mult)
 	{
 		for (; begin < end; ++begin, ++outBegin)
@@ -288,7 +296,7 @@ public class ArrayUtil {
 			out[outBegin] += in[begin] * mult;
 		}
 	}
-	
+
 	public static final void divide(int[] in, int begin, int end, int[] out, int outBegin, int div)
 	{
 		for (; begin < end; ++begin, ++outBegin)
@@ -306,7 +314,7 @@ public class ArrayUtil {
 		double mult = (double)to / max;
 		for (;begin < end; ++begin)
 		{
-			imageColorArray[begin] = (int)(imageColorArray[begin] * mult) ;			
+			imageColorArray[begin] = (int)(imageColorArray[begin] * mult) ;
 		}
 		/*long mult = ((long)to * (long)Integer.MAX_VALUE) / max;
 		for (; begin != end; ++begin)
@@ -318,7 +326,7 @@ public class ArrayUtil {
 	/*
 	 * Normalizes the array in a way, that the highest value is equal to to
 	 * Returns the scaling factor which was needed to achive this
-	 * 
+	 *
 	 */
 	public static float normalizeTo(float[] imageColorArray, int begin, int end, float to) {
 		float max = max(imageColorArray, begin, end);
@@ -347,11 +355,18 @@ public class ArrayUtil {
 		}
 	}
 
+    public static void multAdd(float[] in, int iBegin, int iEnd, float[] out, int oBegin, float mult) {
+        for (; iBegin < iEnd; ++iBegin, ++oBegin)
+        {
+            out[oBegin] += mult * in[iBegin];
+        }
+    }
+
 	public static void multAdd(double[] in, int iBegin, int iEnd, double[] out, int oBegin, double mult) {
 		for (; iBegin < iEnd; ++iBegin, ++oBegin)
 		{
 			out[oBegin] += mult * in[iBegin];
-		}	
+		}
 	}
 
 	public static int count(Object[] object, int objectBegin, int objectEnd,Object o) {
@@ -384,7 +399,7 @@ public class ArrayUtil {
 			data1[begin1] = data0[begin0] * mult;
 		}
 	}
-	
+
 	public static void setTo(float[] input, int ibegin, int oend, int[] output, int obegin, float mult) {
 		if (input == null)
 		{
@@ -643,5 +658,19 @@ public class ArrayUtil {
             }
         }
         return write;
+    }
+
+    public static void add(int[] output, int begin, int end, int value) {
+        for (; begin < end; ++begin)
+        {
+            output[begin] += value;
+        }
+    }
+
+    public static void add(float[] output, int begin, int end, float value) {
+        for (; begin < end; ++begin)
+        {
+            output[begin] += value;
+        }
     }
 }
