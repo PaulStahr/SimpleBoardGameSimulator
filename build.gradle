@@ -1,10 +1,17 @@
 plugins {
     id 'java'
+    id 'maven'
     id 'application'
 }
 
+sourceCompatibility = 8
+targetCompatibility = 1.8
+
+group = 'com.github.PaulStahr'
+
 repositories {
     jcenter()
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
