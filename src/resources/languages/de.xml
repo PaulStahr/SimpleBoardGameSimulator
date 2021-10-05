@@ -32,7 +32,8 @@
 <take_objects_to_hand>Objekte zu Handkarten machen</take_objects_to_hand>
 <flip_card>Objekt umdrehen</flip_card>
 <flip_stack>Stapel umdrehen</flip_stack>
-<collect_all_objects_from_group>Alle Objekte einer Gruppe stapeln</collect_all_objects_from_group>
+<collect_all_objects_from_group>Alle Objekte dieser Art stapeln</collect_all_objects_from_group>
+    <collect_all_objects_of_a_group_plus_hand>Alle Objekte dieser Art stapeln (mit Handkarten)</collect_all_objects_of_a_group_plus_hand>
 <count_values>Objektwerte zählen</count_values>
 <drop_active_hand_card>Aktive Handkarte ablegen</drop_active_hand_card>
 <play_active_hand_card>Aktive Handkarte ausspielen</play_active_hand_card>
@@ -67,7 +68,7 @@
 <zoom>Zoomen</zoom>
 <move_object>Objekt verschieben</move_object>
 <get_top_n_card>Die ersten n Karten abheben</get_top_n_card>
-<select_objects>Objekte auswählen</select_objects>
+<select_object>Objekt auswählen</select_object>
 <merge_objects>Objekte vereinigen</merge_objects>
 <collect_all_objects_of_a_group>Alle Objekte aus Gruppe stapeln</collect_all_objects_of_a_group>
 <flip_objects_roll_dice>Objekt umdrehen oder Würfel rollen</flip_objects_roll_dice>
@@ -90,7 +91,7 @@
     <center_board>Ansicht zentrieren</center_board>
     <fix_object>Objekt fixieren</fix_object>
     <left_double_click>Doppelklick Linke Maustaste</left_double_click>
-    <select_multiple_objects>Mehrere Objekte auswählen</select_multiple_objects>
+    <select_multiple>Mehrere Objekte auswählen</select_multiple>
     <double_click>Doppelklick</double_click>
     <unfold_dice>Würfelseiten anzeigen</unfold_dice>
     <edit_game>Spiel verändern</edit_game>
@@ -128,5 +129,20 @@
     <your_version>Ihre Version</your_version>
     <current_version>Aktuelle Version</current_version>
     <current_developement_version>Aktuelle Entwicklerversion</current_developement_version>
-    <loading>Läd</loading>
+    <loading>Laden</loading>
+    <unpack_box>Spiel auspacken</unpack_box>
+    <pack_box>Spiel einpacken</pack_box>
+    <roll_dice>Würfeln</roll_dice>
+    <previous_page>Letzte Seite</previous_page>
+    <next_page>Nächste Seite</next_page>
+    <rotate_board>Tisch rotieren</rotate_board>
+    <board_controls>Board Controls</board_controls>
+    <object_controls>Object Controls</object_controls>
+    <card_controls>Card Controls</card_controls>
+    <dice_controls>Dice Controls</dice_controls>
+    <figure_controls>Figure Controls</figure_controls>
+    <box_controls>Box Controls</box_controls>
+    <book_controls>Book Controls</book_controls>
+    <hand_card_area_controls>Hand Card Area Controls</hand_card_area_controls>
+    <sort_hand_cards>Sort Hand Cards</sort_hand_cards>
 </xml>

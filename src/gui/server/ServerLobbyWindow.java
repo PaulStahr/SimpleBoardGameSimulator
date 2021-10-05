@@ -10,7 +10,6 @@ import gameObjects.columnTypes.GameInstanceColumnType;
 import gameObjects.instance.Game;
 import gameObjects.instance.GameInstance;
 import gui.CheckVersionWindow;
-import gui.create.CreateNewGameWindow;
 import gui.game.GameWindow;
 import gui.language.Language;
 import gui.language.LanguageChangeListener;
@@ -24,13 +23,13 @@ import net.SynchronousGameClientLobbyConnection;
 import org.jdom2.JDOMException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import test.SimpleNetworkServertest;
 import util.JFrameUtils;
 import util.ThreadPool.RunnableObject;
 import util.jframe.JFileChooserRecentFiles;
 import util.jframe.PasswordDialog;
 import util.jframe.table.ButtonColumn;
 import util.jframe.table.TableModel;
+
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -44,9 +43,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.function.BooleanSupplier;
-
-import static test.SimpleNetworkServertest.connectAndStartGame;
 
 public class ServerLobbyWindow extends JFrame implements ActionListener, ListSelectionListener, TableModelListener, LanguageChangeListener {
 	/**
@@ -69,8 +65,8 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
     private final JButton buttonPoll = new JButton();
     private final JToggleButton buttonAutoPoll = new JToggleButton();
     private final JButton buttonLoadGame = new JButton();
-    private final JButton buttonStartServer = new JButton();
-	private final JButton buttonCreateGame = new JButton();
+    //private final JButton buttonStartServer = new JButton();
+	//private final JButton buttonCreateGame = new JButton();
 
     private final JTextField textFieldId = new JTextField(String.valueOf(Options.getInteger("last_connection.id")));
     private final JLabel labelAddress = new JLabel();
@@ -163,62 +159,6 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				}
 			}
 			updateCurrentGames();
-		}
-		else if (source == buttonStartServer)
-		{
-			if (gs == null) {
-				gs = new GameServer(Integer.parseUnsignedInt(textFieldPort.getText()));
-				JFrameUtils.showInfoMessage(lh.getCurrentLanguage().getString(Words.server_start_info), logger);
-				buttonStartServer.setText(lh.getCurrentLanguage().getString(Words.stop_server));
-				DataHandler.addKeepProgramPredicate(new BooleanSupplier() {
-	                @Override
-	                public boolean getAsBoolean() {
-	                    return gs.isRunning();
-	                }
-	            });
-				gs.start();
-			}
-			else{
-				buttonStartServer.setText(lh.getCurrentLanguage().getString(Words.start_server));
-				JFrameUtils.showInfoMessage(lh.getCurrentLanguage().getString(Words.server_stop_info), logger);
-				gs.stop();
-				gs = null;
-			}
-		}
-		else if (source == buttonCreateGame){
-			String address = "127.0.0.1";
-			int port = 8000 + (int)(Math.random() * 100);
-			GameServer gs = SimpleNetworkServertest.startNewServer(port);
-			Player player = new Player("NewGame", 1);
-			FileInputStream fis = null;
-			try {
-				String game_string = DataHandler.getResourceFolder() + "StartGame.zip";
-				fis = new FileInputStream("src/resources/StartGame.zip");
-			} catch (IOException fileNotFoundException) {
-				logger.error("File not Found", fileNotFoundException);
-			}
-			GameInstance gi = new GameInstance(new Game("foo"), null);
-			try {
-				GameIO.readSnapshotFromZip(fis, gi);
-			} catch (IOException ioException) {
-				ioException.printStackTrace();
-			} catch (JDOMException jdomException) {
-				jdomException.printStackTrace();
-			}
-			gi.name = "Create Game";
-			player = gi.addPlayer(new PlayerAddAction(-1, player));
-			try {
-				fis.close();
-			} catch (IOException ioException) {
-				ioException.printStackTrace();
-			}
-			try {
-				connectAndStartGame(address, port, player, gi, lh);
-			} catch (IOException ioException) {
-				ioException.printStackTrace();
-			}
-			CreateNewGameWindow ow = new CreateNewGameWindow(lh);
-			ow.setVisible(true);
 		}
 		else if (e instanceof ButtonColumn.TableButtonActionEvent)
 		{
@@ -406,9 +346,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 				.addGroup(layout.createSequentialGroup()
 						.addComponent(buttonPoll)
 						.addComponent(buttonAutoPoll)
-						.addComponent(buttonLoadGame)
-						.addComponent(buttonStartServer)
-						.addComponent(buttonCreateGame)));
+						.addComponent(buttonLoadGame)));
 		layout.setVerticalGroup(layout.createSequentialGroup()
 				.addGroup(layout
 						.createParallelGroup()
@@ -427,9 +365,7 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 						.createParallelGroup()
 						.addComponent(buttonPoll)
 						.addComponent(buttonAutoPoll)
-						.addComponent(buttonLoadGame)
-						.addComponent(buttonStartServer)
-						.addComponent(buttonCreateGame)));
+						.addComponent(buttonLoadGame)));
 		setLayout(layout);
 		buttonPoll.addActionListener(this);
 		buttonAutoPoll.addActionListener(this);
@@ -437,8 +373,6 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		tableOpenGames.getModel().addTableModelListener(this);
 		this.client = client;
 		buttonLoadGame.addActionListener(this);
-		buttonStartServer.addActionListener(this);
-		buttonCreateGame.addActionListener(this);
 		JFrameLookAndFeelUtil.addToUpdateTree(this);
 		menuItemVersion.addActionListener(CheckVersionWindow.getOpenWindowListener());
 		setMinimumSize(getPreferredSize());
@@ -471,8 +405,6 @@ public class ServerLobbyWindow extends JFrame implements ActionListener, ListSel
 		buttonPoll.setText(language.getString(Words.refresh));
 		buttonAutoPoll.setText(language.getString(Words.autorefresh));
 		buttonLoadGame.setText(language.getString(Words.load_game));
-		buttonStartServer.setText(language.getString(Words.start_server));
-		buttonCreateGame.setText(language.getString(Words.create_game));
 		labelAddress.setText(language.getString(Words.server_address));
 		labelPort.setText(language.getString(Words.port));
 		labelName.setText(language.getString(Words.player_name));

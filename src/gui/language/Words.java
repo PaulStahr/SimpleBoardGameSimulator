@@ -62,11 +62,12 @@ public enum Words {
     description,
     key,
     move_board,
+    rotate_board,
     rotate,
     zoom,
     move_object,
     get_top_n_card,
-    select_objects,
+    select_object,
     merge_objects,
     collect_all_objects_of_a_group,
     flip_objects_roll_dice,
@@ -90,7 +91,7 @@ public enum Words {
     center_board,
     fix_object,
     left_double_click,
-    select_multiple_objects,
+    select_multiple,
     sit_to_own_seat,
     double_click,
     unfold_dice,
@@ -108,5 +109,5 @@ public enum Words {
     password,
     seats,
     show_ping,
-    create_new_game, start_new_game, load_game, create_game, debug, cards, figures, dices, books, connection, loglevel, version, your_version, current_version, loading, current_developement_version;
+    create_new_game, start_new_game, load_game, create_game, debug, cards, figures, dices, books, connection, loglevel, version, your_version, current_version, loading, current_developement_version, unpack_box, pack_box, roll_dice, previous_page, next_page, collect_all_objects_of_a_group_plus_hand, hand_card_area_controls, board_controls, object_controls, card_controls, figure_controls, dice_controls, box_controls, book_controls, sort_hand_cards;
 }

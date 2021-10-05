@@ -1,26 +1,27 @@
 package gameObjects.instance;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
-
-import gameObjects.action.GameObjectInstanceEditAction;
-import gameObjects.functions.ObjectFunctions;
+import data.controls.ControlTypes;
+import gameObjects.definition.*;
+import gui.game.GameObjectActions;
 import gui.game.GamePanel;
+import gui.game.UserControlString;
+import gui.language.Language;
+import gui.language.LanguageChangeListener;
+import gui.language.LanguageHandler;
+import gui.language.Words;
 import main.Player;
+import util.data.IntegerArrayList;
 
-public class ObjectActionMenu {
+import javax.swing.*;
+import java.awt.event.*;
+
+public class ObjectActionMenu implements LanguageChangeListener {
     /*Popup menu for object actions*/
     public JPopupMenu popup = new JPopupMenu();
+    UserControlString uc = new UserControlString();
+    JTable objectControlsTable = new JTable(uc.objectControls.length, 2);
 
-    public JMenuItem flipItem = new JMenuItem("Flip Card");
-    public JMenuItem discardRecordItem = new JMenuItem("");
-    public JMenuItem shuffleCardItem = new JMenuItem("Shuffle Stack");
-    public JMenuItem flipStackItem = new JMenuItem("Flip Stack");
+
 
     public ObjectInstance gameObjectInstance;
     public GameInstance gameInstance;
@@ -29,65 +30,199 @@ public class ObjectActionMenu {
     {
         this.gameObjectInstance = objectInstance;
         this.gameInstance = gameInstance;
+        LanguageHandler lh = gamePanel.lh;
+        languageChanged(lh.getCurrentLanguage());
+        lh.addLanguageChangeListener(this);
 
-        if (objectInstance.state.owner_id != -1 && objectInstance.state.owner_id == player.id)
-        {
-            discardRecordItem.setText("Discard Card");
+        JLabel label = new JLabel(lh.getCurrentLanguage().getString(Words.object_controls));
+        popup.add(label);
+        popup.addSeparator();
+        for (UserControlString.FuncControl control : uc.objectControls) {
+            JMenuItem item = new JMenuItem(lh.getCurrentLanguage().getString(control.word));
+            item.setEnabled(control.hasAction);
+            KeyStroke keyStroke = null;
+            if (control.cc.length > 0) {
+                keyStroke = control.cc[0].toKeyStroke();
+            }
+            if (keyStroke != null) {
+                //item.setAccelerator(keyStroke);
+            }
+            item.setToolTipText(control.toString(lh.getCurrentLanguage()));
+            popup.add(item);
+            ControlTypes controlTypes = control.controlTypes;
+            if (controlTypes != null && control.hasAction) {
+                item.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        IntegerArrayList ial = new IntegerArrayList();
+                        GameObjectActions.RunAction(controlTypes, gamePanel, ial);
+                    }
+                });
+            }
         }
-        else
-        {
-            discardRecordItem.setText("Record Card");
+        
+        if (this.gameObjectInstance.go instanceof GameObjectToken) {
+            popup.addSeparator();
+            label = new JLabel(lh.getCurrentLanguage().getString(Words.card_controls));
+            popup.add(label);
+            popup.addSeparator();
+                    for (UserControlString.FuncControl control : uc.cardControls) {
+                        JMenuItem item = new JMenuItem(lh.getCurrentLanguage().getString(control.word));
+                        item.setEnabled(control.hasAction);
+                        KeyStroke keyStroke = null;
+                        if (control.cc.length > 0) {
+                            keyStroke = control.cc[0].toKeyStroke();
+                        }
+                        if (keyStroke != null) {
+                            //item.setAccelerator(keyStroke);
+                        }
+                        item.setToolTipText(control.toString(lh.getCurrentLanguage()));
+                        popup.add(item);
+                        ControlTypes controlTypes = control.controlTypes;
+                        if (controlTypes != null && control.hasAction) {
+                            item.addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    IntegerArrayList ial = new IntegerArrayList();
+                                    GameObjectActions.RunAction(controlTypes, gamePanel, ial);
+                                }
+                            });
+                        }
+                    }
         }
-
-
-        flipItem.addActionListener(new ActionListener() {
-            @Override
-			public void actionPerformed(ActionEvent e) {
-                ObjectFunctions.flipTokenObject(gamePanel.id, gameInstance, player, objectInstance);
-            }
-        });
-
-        discardRecordItem.addActionListener(new ActionListener() {
-            @Override
-			public void actionPerformed(ActionEvent e) {
-            	ObjectState state = objectInstance.state.copy();
-                if (state.owner_id != -1 && state.owner_id == player.id)
-                {
-                    state.owner_id = -1;
+        else if (this.gameObjectInstance.go instanceof GameObjectFigure){
+            popup.addSeparator();
+            label = new JLabel(lh.getCurrentLanguage().getString(Words.figure_controls));
+            popup.add(label);
+            popup.addSeparator();
+            for (UserControlString.FuncControl control : uc.figureControls) {
+                JMenuItem item = new JMenuItem(lh.getCurrentLanguage().getString(control.word));
+                item.setEnabled(control.hasAction);
+                KeyStroke keyStroke = null;
+                if (control.cc.length > 0) {
+                    keyStroke = control.cc[0].toKeyStroke();
                 }
-                else
-                {
-                    state.owner_id = player.id;
+                if (keyStroke != null) {
+                    //item.setAccelerator(keyStroke);
                 }
-
-                gameInstance.update(new GameObjectInstanceEditAction(gamePanel.id, player, objectInstance, state));
+                item.setToolTipText(control.toString(lh.getCurrentLanguage()));
+                popup.add(item);
+                ControlTypes controlTypes = control.controlTypes;
+                if (controlTypes != null && control.hasAction) {
+                    item.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            IntegerArrayList ial = new IntegerArrayList();
+                            GameObjectActions.RunAction(controlTypes, gamePanel, ial);
+                        }
+                    });
+                }
             }
-        });
-
-        shuffleCardItem.addActionListener(new ActionListener() {
-            @Override
-			public void actionPerformed(ActionEvent e) {
-                /*Shuffle objects on a stack*/
-                ObjectFunctions.shuffleStack(gamePanel.id, gameInstance, player, objectInstance);
-                gamePanel.playAudio(GamePanel.AudioClip.shuffle);
+        }
+        else if (this.gameObjectInstance.go instanceof GameObjectDice){
+            popup.addSeparator();
+            label = new JLabel(lh.getCurrentLanguage().getString(Words.dice_controls));
+            popup.add(label);
+            popup.addSeparator();
+            for (UserControlString.FuncControl control : uc.diceControls) {
+                JMenuItem item = new JMenuItem(lh.getCurrentLanguage().getString(control.word));
+                item.setEnabled(control.hasAction);
+                KeyStroke keyStroke = null;
+                if (control.cc.length > 0) {
+                    keyStroke = control.cc[0].toKeyStroke();
+                }
+                if (keyStroke != null) {
+                    //item.setAccelerator(keyStroke);
+                }
+                item.setToolTipText(control.toString(lh.getCurrentLanguage()));
+                popup.add(item);
+                ControlTypes controlTypes = control.controlTypes;
+                if (controlTypes != null && control.hasAction) {
+                    item.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            IntegerArrayList ial = new IntegerArrayList();
+                            GameObjectActions.RunAction(controlTypes, gamePanel, ial);
+                        }
+                    });
+                }
             }
-        });
-
-        flipStackItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ObjectFunctions.flipTokenStack(gamePanel.id, gameInstance, player, objectInstance, gamePanel.hoveredObject);
+        }
+        else if (this.gameObjectInstance.go instanceof GameObjectBox){
+            popup.addSeparator();
+            label = new JLabel(lh.getCurrentLanguage().getString(Words.box_controls));
+            popup.add(label);
+            popup.addSeparator();
+            for (UserControlString.FuncControl control : uc.boxControls) {
+                JMenuItem item = new JMenuItem(lh.getCurrentLanguage().getString(control.word));
+                item.setEnabled(control.hasAction);
+                KeyStroke keyStroke = null;
+                if (control.cc.length > 0) {
+                    keyStroke = control.cc[0].toKeyStroke();
+                }
+                if (keyStroke != null) {
+                    //item.setAccelerator(keyStroke);
+                }
+                item.setToolTipText(control.toString(lh.getCurrentLanguage()));
+                popup.add(item);
+                ControlTypes controlTypes = control.controlTypes;
+                if (controlTypes != null && control.hasAction) {
+                    item.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            IntegerArrayList ial = new IntegerArrayList();
+                            GameObjectActions.RunAction(controlTypes, gamePanel, ial);
+                        }
+                    });
+                }
             }
-        });
-
-        popup.add(flipItem);
-        popup.add(discardRecordItem);
-        if(ObjectFunctions.countStack(gameInstance, objectInstance) > 1) {
-            popup.add(shuffleCardItem);
-            popup.add(flipStackItem);
+        }
+        else if (this.gameObjectInstance.go instanceof GameObjectBook){
+            popup.addSeparator();
+            label = new JLabel(lh.getCurrentLanguage().getString(Words.book_controls));
+            popup.add(label);
+            popup.addSeparator();
+            for (UserControlString.FuncControl control : uc.bookControls) {
+                JMenuItem item = new JMenuItem(lh.getCurrentLanguage().getString(control.word));
+                item.setEnabled(control.hasAction);
+                KeyStroke keyStroke = null;
+                if (control.cc.length > 0) {
+                    keyStroke = control.cc[0].toKeyStroke();
+                }
+                if (keyStroke != null) {
+                    //item.setAccelerator(keyStroke);
+                }
+                item.setToolTipText(control.toString(lh.getCurrentLanguage()));
+                popup.add(item);
+                ControlTypes controlTypes = control.controlTypes;
+                if (controlTypes != null && control.hasAction) {
+                    item.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            IntegerArrayList ial = new IntegerArrayList();
+                            GameObjectActions.RunAction(controlTypes, gamePanel, ial);
+                        }
+                    });
+                }
+            }
         }
     }
 
+    @Override
+    public void languageChanged(Language lang) {
+        String[] columnNames = {lang.getString(Words.description), lang.getString(Words.key)};
+        for (int col = 0; col < 2; ++col)
+        {
+            objectControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
+        }
+        int row = 0;
+        for (UserControlString.FuncControl control : uc.objectControls)
+        {
+            objectControlsTable.getModel().setValueAt(lang.getString(control.word), row, 0);
+            objectControlsTable.getModel().setValueAt(control.toString(lang), row, 1);
+            ++row;
+        }
+    }
 
 
     public void showPopup(MouseEvent arg0) {

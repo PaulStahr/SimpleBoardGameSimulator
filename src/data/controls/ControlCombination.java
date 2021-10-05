@@ -1,10 +1,11 @@
 package data.controls;
 
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-
 import gui.language.Language;
 import gui.language.Words;
+
+import javax.swing.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 public class ControlCombination
 {
@@ -23,7 +24,7 @@ public class ControlCombination
 	
 	StringBuilder appendPlus(StringBuilder strB)
 	{
-		if (strB.length() != 0)
+		if (strB.length() != 0 && !strB.substring(strB.length() - 2).equals(", "))
 		{
 			strB.append(' ').append('+').append(' ');
 		}
@@ -31,6 +32,14 @@ public class ControlCombination
 	}
 	
 	public String toString(Language lang){return toString(new StringBuilder(), lang).toString();}
+
+	public KeyStroke toKeyStroke(){
+		int inputEvent = 0;
+		if ((keyModifier & InputEvent.SHIFT_DOWN_MASK) != 0)	{inputEvent = InputEvent.SHIFT_DOWN_MASK;}
+		if ((keyModifier & InputEvent.CTRL_DOWN_MASK) != 0)		{inputEvent = InputEvent.CTRL_DOWN_MASK;}
+		if ((keyModifier & InputEvent.ALT_DOWN_MASK) != 0)		{inputEvent = InputEvent.ALT_DOWN_MASK;}
+		return KeyStroke.getKeyStroke(keyCode, keyModifier);
+	}
 
 	public StringBuilder toString(StringBuilder strB, Language lang) {
 		if ((keyModifier & InputEvent.SHIFT_DOWN_MASK) != 0)	{appendPlus(strB).append(lang.getString(Words.shift));}

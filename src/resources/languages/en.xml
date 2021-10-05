@@ -39,7 +39,7 @@
 <take_objects_to_hand>Take Objects to Hand</take_objects_to_hand>
 <flip_card>Flip Object</flip_card>
 <flip_stack>Flip Stack</flip_stack>
-<collect_all_objects_from_group>Collect all objects of Group</collect_all_objects_from_group>
+<collect_all_objects_from_group>Collect all Objects</collect_all_objects_from_group>
 <count_values>Count Values</count_values>
 <rotate_object>Rotate Object</rotate_object>
 <settings>Settings</settings>
@@ -68,39 +68,40 @@
 <collect_all_objects>Alle Objekte einsammeln</collect_all_objects>
 <description>Description</description>
 <key>Key</key>
-<move_board>Move board</move_board>
+<move_board>Move Table</move_board>
+    <rotate_board>Rotate Table</rotate_board>
 <rotate>Rotate</rotate>
 <zoom>Zoom</zoom>
-<move_object>Move object</move_object>
-<get_top_n_card>Get Top n card</get_top_n_card>
-<select_objects>Select object</select_objects>
-<merge_objects>Merge objects</merge_objects>
-<collect_all_objects_of_a_group>Collect all objects of a group</collect_all_objects_of_a_group>
-<flip_objects_roll_dice>flip objects/roll dice</flip_objects_roll_dice>
-<take_object_to_hand>Take object to hand</take_object_to_hand>
-<take_object_to_hand_face_down>Take object to hand face down</take_object_to_hand_face_down>
-<play_card_face_up>Play card face up</play_card_face_up>
-<count_card_number>Cound card number</count_card_number>
-<count_card_value>Count card value</count_card_value>
-<drop_all_hand_cards>Drop all hand cards</drop_all_hand_cards>
-<drop_active_hand_card>Drop active hand card</drop_active_hand_card>
-<play_active_hand_card>Play active hand card</play_active_hand_card>
-<play_card_face_down>Play card face down</play_card_face_down>
-<rotate_wheel>Rotate wheel</rotate_wheel>
-<drop_on_board>Drop on board</drop_on_board>
-<sit_down>Sit to seat</sit_down>
-    <sit_to_own_seat>Sit to own seat</sit_to_own_seat>
-<arrow_keys>Arrow keys</arrow_keys>
+<move_object>Move Object</move_object>
+<get_top_n_card>Get Top n Cards</get_top_n_card>
+<select_object>Select Object</select_object>
+<merge_objects>Merge Objects</merge_objects>
+<collect_all_objects_of_a_group>Collect all Objects of a Group</collect_all_objects_of_a_group>
+<flip_objects_roll_dice>Flip Objects/Roll Dice</flip_objects_roll_dice>
+<take_object_to_hand>Take Object to Hand</take_object_to_hand>
+<take_object_to_hand_face_down>Take Object to Hand Face Down</take_object_to_hand_face_down>
+<play_card_face_up>Play Card Face Up</play_card_face_up>
+<count_card_number>Cound Card Number</count_card_number>
+<count_card_value>Count Card Value</count_card_value>
+<drop_all_hand_cards>Drop all Hand Cards</drop_all_hand_cards>
+<drop_active_hand_card>Drop active Hand Card</drop_active_hand_card>
+<play_active_hand_card>Play active Hand Card</play_active_hand_card>
+<play_card_face_down>Play Card Face Down</play_card_face_down>
+<rotate_wheel>Rotate Wheel</rotate_wheel>
+<drop_on_board>Drop on Board</drop_on_board>
+<sit_down>Sit to Seat</sit_down>
+    <sit_to_own_seat>Sit to own Seat</sit_to_own_seat>
+<arrow_keys>Arrow Keys</arrow_keys>
 <invert_rotation>Invert Rotation</invert_rotation>
-    <hide_and_show_hand_area>Hide or show hand cards</hide_and_show_hand_area>
-    <hide_show_table>Hide or show table</hide_show_table>
+    <hide_and_show_hand_area>Hide/Show Hand Cards</hide_and_show_hand_area>
+    <hide_show_table>Hide/Show Table</hide_show_table>
     <alt>Alt</alt>
-    <center_board>Center view</center_board>
-    <fix_object>Fix object</fix_object>
-    <left_double_click>Left double click</left_double_click>
-    <select_multiple_objects>Select multiple objects</select_multiple_objects>
-    <double_click>Double click</double_click>
-    <unfold_dice>Show dice sides</unfold_dice>
+    <center_board>Center View</center_board>
+    <fix_object>Fix Object</fix_object>
+    <left_double_click>Left Double Click</left_double_click>
+    <select_multiple>Select multiple Objects</select_multiple>
+    <double_click>Double Click</double_click>
+    <unfold_dice>Show Dice Sides</unfold_dice>
     <edit_game>Edit Game</edit_game>
     <control_window>Game Controls</control_window>
     <server_controls>Server Controls</server_controls>
@@ -114,9 +115,9 @@
     <server_start_info>The server was started.</server_start_info>
     <server_stop_info>The server was stopped.</server_stop_info>
     <distribute_cards_to_players>Give Cards</distribute_cards_to_players>
-    <reconnect>reconnect</reconnect>
-    <sync_pull>pull</sync_pull>
-    <status>status</status>
+    <reconnect>Reconnect</reconnect>
+    <sync_pull>Pull</sync_pull>
+    <status>Status</status>
     <background>background</background>
     <password>password</password>
     <seats>seats</seats>
@@ -137,4 +138,19 @@
     <current_version>Current version</current_version>
     <current_developement_version>Current developer version</current_developement_version>
     <loading>Loading</loading>
+    <unpack_box>Unpack Game Box</unpack_box>
+    <pack_box>Pack Game Box</pack_box>
+    <roll_dice>Roll Dice</roll_dice>
+    <previous_page>Previous Page</previous_page>
+    <next_page>Next Page</next_page>
+    <collect_all_objects_of_a_group_plus_hand>Collect all Objects plus Hand</collect_all_objects_of_a_group_plus_hand>
+    <board_controls>Board Controls</board_controls>
+    <object_controls>Object Controls</object_controls>
+    <card_controls>Card Controls</card_controls>
+    <dice_controls>Dice Controls</dice_controls>
+    <figure_controls>Figure Controls</figure_controls>
+    <box_controls>Box Controls</box_controls>
+    <book_controls>Book Controls</book_controls>
+    <hand_card_area_controls>Hand Card Area Controls</hand_card_area_controls>
+    <sort_hand_cards>Sort Hand Cards</sort_hand_cards>
 </xml>

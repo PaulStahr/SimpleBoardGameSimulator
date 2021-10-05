@@ -1,35 +1,4 @@
 package gui.game;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.net.Socket;
-import java.util.ArrayList;
-
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JSplitPane;
-import javax.swing.JTextField;
-import javax.swing.JToolBar;
-import javax.swing.SwingConstants;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import data.DataHandler;
 import data.JFrameLookAndFeelUtil;
 import data.Options;
@@ -57,8 +26,22 @@ import net.AsynchronousGameConnection;
 import net.AsynchronousGameConnection.PingCallback;
 import net.AsynchronousGameConnection.PingInformation;
 import net.SynchronousGameClientLobbyConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import util.JFrameUtils;
 import util.TimedUpdateHandler;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.net.Socket;
+import java.util.ArrayList;
 
 public class GameWindow extends JFrame implements ActionListener, LanguageChangeListener {
 	/**

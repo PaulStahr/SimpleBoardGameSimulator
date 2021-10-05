@@ -1,99 +1,60 @@
 package gui.game;
 
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
-import javax.swing.BoxLayout;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-
-import data.controls.ControlCombination;
-import data.controls.ControlTypes;
-import data.controls.UserControl;
 import gui.language.Language;
 import gui.language.LanguageChangeListener;
 import gui.language.LanguageHandler;
 import gui.language.Words;
 
+import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
 public class EditControlPanel extends JPanel implements ActionListener, Runnable, MouseListener, TableModelListener, LanguageChangeListener {
 
-    private static final UserControl uc = new UserControl();
+    private static final UserControlString uc = new UserControlString();
     /**
 	 *
 	 */
 	private static final long serialVersionUID = -1686844504581572726L;
-	private static final FuncControl[] boardControls = {
-			new FuncControl(Words.move_board, new ControlCombination(InputEvent.ALT_DOWN_MASK, 0,  -1,0), new ControlCombination(0, -1,  -1,16)),
-			new FuncControl(Words.rotate, new ControlCombination(InputEvent.ALT_DOWN_MASK, 2,  -1, 0), new ControlCombination(0, -1,  KeyEvent.VK_UP, 0), new ControlCombination(0, -1,  KeyEvent.VK_DOWN, 0)),
-			new FuncControl(Words.zoom, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
-			new FuncControl(Words.sit_down, new ControlCombination(0, 0,  -1, 32)),
-			new FuncControl(Words.sit_to_own_seat, uc.get(ControlTypes.SIT_DOWN)),
-			new FuncControl(Words.hide_show_table, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  KeyEvent.VK_T, 0)),
-			new FuncControl(Words.hide_and_show_hand_area, new ControlCombination(0, -1, KeyEvent.VK_H,0)),
-	};
 
-	private static final FuncControl[] objectControls= {
-			new FuncControl(Words.select_objects, 	new ControlCombination(0, 0,  -1,0)),
-			new FuncControl(Words.select_multiple_objects, 	new ControlCombination(InputEvent.CTRL_DOWN_MASK, 0,  -1,0)),
-			new FuncControl(Words.move_object, 		new ControlCombination(0, 0, -1, 1)),
-			new FuncControl(Words.move_stack,	 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 0, -1, 1),new ControlCombination(0, 1, -1, 1)),
-			new FuncControl(Words.get_top_n_card, 	new ControlCombination(0, 1, -1, 5)),
-			new FuncControl(Words.get_bottom_card, 	new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 2,  -1, 1)),
-			new FuncControl(Words.rotate_object, 	uc.get(ControlTypes.ROTATE)),
-			new FuncControl(Words.shuffle_stack, 	uc.get(ControlTypes.SHUFFLE)),
-			new FuncControl(Words.merge_objects, 	new ControlCombination(0, -1, KeyEvent.VK_M, 0)),
-			new FuncControl(Words.play_card_face_up, new ControlCombination(0, 0, -1, 32)),
-			new FuncControl(Words.collect_all_objects_of_a_group, new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_M, 0)),
-			new FuncControl(Words.flip_objects_roll_dice, new ControlCombination(0, -1,  KeyEvent.VK_F, 0)),
-			new FuncControl(Words.unfold_dice, new ControlCombination(0, -1,  KeyEvent.VK_V, 0)),
-			new FuncControl(Words.zoom, new ControlCombination(InputEvent.ALT_DOWN_MASK, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
-			new FuncControl(Words.fix_object, uc.get(ControlTypes.FIX)),
-
-	};
-
-	private static final FuncControl[] privateAreaControls= {
-			new FuncControl(Words.hide_and_show_hand_area, uc.get(ControlTypes.HIDE_PRIVATE_AREA)),
-			new FuncControl(Words.distribute_cards_to_players, new ControlCombination(0, -1,  KeyEvent.VK_G, 0)),
-			new FuncControl(Words.take_object_to_hand, uc.get(ControlTypes.TAKE,0), new ControlCombination(0, 0,  -1, 1)),
-			new FuncControl(Words.take_object_to_hand_face_down, new ControlCombination(0, 2,  -1,1)),
-			new FuncControl(Words.play_card_face_up, new ControlCombination(0, 1,  -1, 8)),
-			new FuncControl(Words.play_card_face_down, new ControlCombination(0, 2,  -1, 8)),
-			new FuncControl(Words.play_active_hand_card, uc.get(ControlTypes.PLAY, 0), new ControlCombination(0, 0, -1, 32)),
-			new FuncControl(Words.drop_all_hand_cards, new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1, KeyEvent.VK_D, 0)),
-			new FuncControl(Words.drop_active_hand_card, new ControlCombination(0, -1, KeyEvent.VK_D, 0)),
-			new FuncControl(Words.zoom, new ControlCombination(0, -1,  -1, 4), new ControlCombination(0, -1,  KeyEvent.VK_PLUS, 0), new ControlCombination(0, -1,  KeyEvent.VK_MINUS, 0)),
-	};
-
-	private static final FuncControl[] countControls = {
-			new FuncControl(Words.count_card_number, uc.get(ControlTypes.COUNT)),
-			new FuncControl(Words.count_card_value, uc.get(ControlTypes.COUNT_VALUES)),
-	};
 
 
 	JLabel boardControlsLabel = new JLabel("Board Controls");
-    JTable boardControlsTable = new JTable(boardControls.length, 2);
+    JTable boardControlsTable = new JTable(uc.boardControls.length, 2);
     JScrollPane boardControlPane = new JScrollPane(boardControlsTable);
 
     JLabel objectControlsLabel = new JLabel("Object Controls");
-    JTable objectControlsTable = new JTable(objectControls.length, 2);
+    JTable objectControlsTable = new JTable(uc.objectControls.length, 2);
     JScrollPane objectControlsPane = new JScrollPane(objectControlsTable);
 
+    JLabel cardControlsLabel = new JLabel("Card Controls");
+    JTable cardControlsTable = new JTable(uc.cardControls.length, 2);
+    JScrollPane cardControlsPane = new JScrollPane(cardControlsTable);
+
+    JLabel diceControlsLabel = new JLabel("Dice Controls");
+    JTable diceControlsTable = new JTable(uc.diceControls.length, 2);
+    JScrollPane diceControlsPane = new JScrollPane(diceControlsTable);
+    
+    JLabel boxControlsLabel = new JLabel("Box Controls");
+    JTable boxControlsTable = new JTable(uc.boxControls.length, 2);
+    JScrollPane boxControlsPane = new JScrollPane(boxControlsTable);
+
+    JLabel bookControlsLabel = new JLabel("Box Controls");
+    JTable bookControlsTable = new JTable(uc.bookControls.length, 2);
+    JScrollPane bookControlsPane = new JScrollPane(bookControlsTable);
+
     JLabel privateAreaControlsLabel = new JLabel("Hand Card Area");
-    JTable privateAreaControlsTable = new JTable(privateAreaControls.length, 2);
+    JTable privateAreaControlsTable = new JTable(uc.privateAreaControls.length, 2);
     JScrollPane privateAreaControlsPane = new JScrollPane(privateAreaControlsTable);
 
 
     JLabel countControlsLabel = new JLabel("Control Hand Cards");
-    JTable countControlsTable = new JTable(countControls.length, 2);
+    JTable countControlsTable = new JTable(uc.countControls.length, 2);
     JScrollPane countControlsPane = new JScrollPane(countControlsTable);
     //keyAssignmentTable.setFillsViewportHeight(true);
 
@@ -103,38 +64,22 @@ public class EditControlPanel extends JPanel implements ActionListener, Runnable
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         this.add(boardControlsLabel);
         this.add(boardControlPane);
-        this.add(objectControlsLabel);
-        this.add(objectControlsPane);
         this.add(privateAreaControlsLabel);
         this.add(privateAreaControlsPane);
+        this.add(objectControlsLabel);
+        this.add(objectControlsPane);
+        this.add(cardControlsLabel);
+        this.add(cardControlsPane);
+        this.add(diceControlsLabel);
+        this.add(diceControlsPane);
+        this.add(boxControlsLabel);
+        this.add(boxControlsPane);
+        this.add(bookControlsLabel);
+        this.add(bookControlsPane);
         this.add(countControlsLabel);
         this.add(countControlsPane);
     }
 
-
-	private static class FuncControl
-	{
-		Words word;
-		ControlCombination cc[];
-
-		public FuncControl(Words word, ControlCombination... cc){
-			this.word = word;
-			this.cc = cc;
-		}
-
-		public String toString(Language lang) {
-			StringBuilder strB = new StringBuilder();
-			for (int i = 0; i < cc.length; ++i)
-			{
-				if (i != 0)
-				{
-					strB.append(',');
-				}
-				cc[i].toString(strB, lang);
-			}
-			return strB.toString();
-		}
-	}
 
 
     @Override
@@ -143,29 +88,53 @@ public class EditControlPanel extends JPanel implements ActionListener, Runnable
 		for (int col = 0; col < 2; ++col)
 		{
 		 	boardControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
-		 	privateAreaControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
-     		objectControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
+            privateAreaControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
+            objectControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
+            cardControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
+            diceControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
+            boxControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
+            bookControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
 		 	countControlsTable.getColumnModel().getColumn(col).setHeaderValue(columnNames[col]);
 		}
-        for (int row = 0; row < boardControls.length; ++row)
+        for (int row = 0; row < uc.boxControls.length; ++row)
  		{
-            boardControlsTable.getModel().setValueAt(lang.getString(boardControls[row].word), row, 0);
-            boardControlsTable.getModel().setValueAt(boardControls[row].toString(lang), row, 1);
+            boardControlsTable.getModel().setValueAt(lang.getString(uc.boardControls[row].word), row, 0);
+            boardControlsTable.getModel().setValueAt(uc.boardControls[row].toString(lang), row, 1);
  		}
- 		for (int row = 0; row < objectControls.length; ++row)
+        for (int row = 0; row < uc.privateAreaControls.length; ++row)
+        {
+            privateAreaControlsTable.getModel().setValueAt(lang.getString(uc.privateAreaControls[row].word), row, 0);
+            privateAreaControlsTable.getModel().setValueAt(uc.privateAreaControls[row].toString(lang), row, 1);
+        }
+ 		for (int row = 0; row < uc.objectControls.length; ++row)
  		{
- 			objectControlsTable.getModel().setValueAt(lang.getString(objectControls[row].word), row, 0);
-            objectControlsTable.getModel().setValueAt(objectControls[row].toString(lang), row, 1);
+ 			objectControlsTable.getModel().setValueAt(lang.getString(uc.objectControls[row].word), row, 0);
+            objectControlsTable.getModel().setValueAt(uc.objectControls[row].toString(lang), row, 1);
  		}
- 		for (int row = 0; row < privateAreaControls.length; ++row)
+        for (int row = 0; row < uc.cardControls.length; ++row)
+        {
+            cardControlsTable.getModel().setValueAt(lang.getString(uc.cardControls[row].word), row, 0);
+            cardControlsTable.getModel().setValueAt(uc.cardControls[row].toString(lang), row, 1);
+        }
+        for (int row = 0; row < uc.diceControls.length; ++row)
+        {
+            diceControlsTable.getModel().setValueAt(lang.getString(uc.diceControls[row].word), row, 0);
+            diceControlsTable.getModel().setValueAt(uc.diceControls[row].toString(lang), row, 1);
+        }
+        for (int row = 0; row < uc.boxControls.length; ++row)
+        {
+            boxControlsTable.getModel().setValueAt(lang.getString(uc.boxControls[row].word), row, 0);
+            boxControlsTable.getModel().setValueAt(uc.boxControls[row].toString(lang), row, 1);
+        }
+        for (int row = 0; row < uc.bookControls.length; ++row)
+        {
+            bookControlsTable.getModel().setValueAt(lang.getString(uc.bookControls[row].word), row, 0);
+            bookControlsTable.getModel().setValueAt(uc.bookControls[row].toString(lang), row, 1);
+        }
+ 		for (int row = 0; row < uc.countControls.length; ++row)
  		{
- 			privateAreaControlsTable.getModel().setValueAt(lang.getString(privateAreaControls[row].word), row, 0);
-            privateAreaControlsTable.getModel().setValueAt(privateAreaControls[row].toString(lang), row, 1);
- 		}
- 		for (int row = 0; row < countControls.length; ++row)
- 		{
- 			countControlsTable.getModel().setValueAt(lang.getString(countControls[row].word), row, 0);
-            countControlsTable.getModel().setValueAt(countControls[row].toString(lang), row, 1);
+ 			countControlsTable.getModel().setValueAt(lang.getString(uc.countControls[row].word), row, 0);
+            countControlsTable.getModel().setValueAt(uc.countControls[row].toString(lang), row, 1);
  		}
     }
 

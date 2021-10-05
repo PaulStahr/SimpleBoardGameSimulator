@@ -41,7 +41,7 @@ public class Main {
 		{
 			return;
 		}*/
-		LanguageHandler lh = new LanguageHandler(new LanguageSummary("de", "de"));
+		LanguageHandler lh = new LanguageHandler(new LanguageSummary("en", "en"));
 		CheckVersionWindow.setLanguageHandler(lh);
 		for (int i = 0; i < args.length; ++i)
     	{
