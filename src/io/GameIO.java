@@ -744,9 +744,8 @@ public class GameIO {
 	// TODO Fragen
 	public static void editGameInstanceFromZip(ZipInputStream stream, GameInstance game, Object source)
 	{
-		//Editiere nur das was in dem Stream steht
-		//rufe dabei die update funktion des games auf, um ﾃｼber die ﾃ､nderungen mitzuteilen
-		//Rufe dabei auch die update Methode auf
+		//Edit only things contained in the stream
+		//call game-update function to signal changes
 	}
 
 	// TODO Fragen

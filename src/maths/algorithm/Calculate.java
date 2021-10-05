@@ -1,16 +1,16 @@
 /*******************************************************************************
  * Copyright (c) 2019 Paul Stahr
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -22,12 +22,16 @@
 package maths.algorithm;
 
 import java.util.Arrays;
+import java.util.Random;
 
 import util.ArrayUtil;
+import util.DoubleFunctionDouble;
+import util.DoubleMatrixUtil;
+import util.data.DoubleList;
 
 /**
  * Write a description of class Math here.
- * 
+ *
  * @author Paul Stahr, Yakup Ates
  * @version (a version number or a date)
  */
@@ -48,7 +52,7 @@ public abstract class Calculate
     //private static final double TWO_PI_INV=1/TWO_PI;
     //private static final double TWO_PI_TO_LONG_RANGE = TWO_PI_INV*Long.MAX_VALUE;
     //private static final double LONG_TO_TWO_PI_RANGE = 1/TWO_PI_TO_LONG_RANGE;
-    
+
     public synchronized static void init(){
     	final double step = Math.PI/(sinCache.length*2);
         for (int i=0;i<sinCache.length;i++)
@@ -59,16 +63,16 @@ public abstract class Calculate
             	if (count<primeCache.length)
             		primeCache[count++] = i;
             	for (int j=i+i;j<length;j+=i)
-            		primeCacheBoolean[j>>4]|=(0x8000>>(j&15));	            		
+            		primeCacheBoolean[j>>4]|=(0x8000>>(j&15));
         	}
         }
-        
+
         fibunacciCache[0] = 0;
         fibunacciCache[1] = 1;
         for (int i=2;i<fibunacciCache.length;++i){
         	fibunacciCache[i] = fibunacciCache[i - 1] + fibunacciCache[i - 2];
         }
-        
+
         for (int i=3, j=0; j<divisorCacheForSin.length;i+=2, j++)
         	divisorCacheForSin[j] = Long.MAX_VALUE / (i * (i - 1));
         {
@@ -80,11 +84,11 @@ public abstract class Calculate
 	        for (double d = l;i<fakCacheDouble.length;++i)
 	            fakCacheDouble[i] = (d*=i);
         }
-        inited = true;  
+        inited = true;
     }
 
     private Calculate(){}
-    
+
     public static final long[] getFacLongs(){
     	if (!inited)
     		init();
@@ -96,12 +100,24 @@ public abstract class Calculate
     		init();
     	return fakCacheDouble.clone();
     }
-    
+
     public static final boolean isFibunacci(long number){
     	int index = Arrays.binarySearch(fibunacciCache, number);
     	if (index >= 0)
     		return true;
     	return false;
+    }
+
+    public static int getPoissonRandom(double mean) {
+        Random r = new Random();
+        double L = Math.exp(-mean);
+        int k = 0;
+        double p = 1.0;
+        do {
+            p = p * r.nextDouble();
+            k++;
+        } while (p > L);
+        return k - 1;
     }
 
     public static final boolean isPrime(long number){
@@ -118,7 +134,7 @@ public abstract class Calculate
 	            return false;
 	    return true;
 	}
-    
+
     public static final double sin(final double x){
         switch (method){
             case FAST  : return fastSin(x);
@@ -136,7 +152,7 @@ public abstract class Calculate
         System.out.println(System.nanoTime()-time);
         return value;
     }
-    
+
     public static final double fastSin(final double x){
     	if (!inited)
     		init();
@@ -159,7 +175,7 @@ public abstract class Calculate
         double erg=x,exp=x;
         for (int i=0;i<10;i++)
         	erg += (exp *= xq * divisorCacheForSin[i]);
-        return negative ? -erg : erg;       
+        return negative ? -erg : erg;
     }
 
     public static final double cos(final double x){
@@ -201,7 +217,7 @@ public abstract class Calculate
     public static final double codeTan(final double x){
         return codeSin(x)/codeCos(x);
     }
-    
+
     public static final long phi(long n){
     	if (n<1)
     		return 0;
@@ -223,11 +239,11 @@ public abstract class Calculate
     		return x;
     	return ggtUnchecked(x,y);
 	}
-	
+
 	/**
 	 * Ggt ohne Sonderbehandlung
 	 * Warning: Make sure that x>0 and y>0
-	 * @param x 
+	 * @param x
 	 * @param y
 	 * @return
 	 */
@@ -252,7 +268,7 @@ public abstract class Calculate
 			}
 		}
 	}
-    
+
     public static final long ggt2 (long a, long b){
     	if (a < 0)
     		a = -a;
@@ -265,8 +281,8 @@ public abstract class Calculate
                 return b;
         return a;
     }
-    
-    
+
+
     public static final long kgv (long x, long y){
     	if (x == 0 || y == 0)
     		return 0;
@@ -276,7 +292,7 @@ public abstract class Calculate
     		y = -y;
     	return kgvUnchecked(x, y);
     }
-    
+
     /**
      * Warning: Make sure that x>0 and y>0
      * @param x
@@ -286,11 +302,11 @@ public abstract class Calculate
     public static final long kgvUnchecked(final long x, final long y){
     	final long c = x/ggtUnchecked(x, y);
     	final long kgv = c * y;
-    	return kgv / y == c ? kgv: -1;    	
+    	return kgv / y == c ? kgv: -1;
     }
 
     /**
-     * 
+     *
      * @param n
      * @param probability
      * @param k
@@ -301,12 +317,12 @@ public abstract class Calculate
     	double leftP=1;
     	for (long i=0;i<=k;i++){
         	final long ncr = ncr(n,i);
-        	erg+= (ncr == -1 ? ncrd(n,i) : ncr)*(leftP*=probability)*pow(1-probability, n-i);    	
+        	erg+= (ncr == -1 ? ncrd(n,i) : ncr)*(leftP*=probability)*pow(1-probability, n-i);
     	}
     	return erg;
     }
     /**
-     * 
+     *
      * @param n
      * @param probability
      * @param k
@@ -314,9 +330,9 @@ public abstract class Calculate
      */
     public static final double binomPdf(long n, double probability, long k){
     	final long ncr = ncr(n,k);
-    	return (ncr == -1 ? ncrd(n,k) : ncr)*pow(probability, k)*pow(1-probability, n-k);    	
+    	return (ncr == -1 ? ncrd(n,k) : ncr)*pow(probability, k)*pow(1-probability, n-k);
     }
-    
+
     /**
      * Berechnet den Binomialkoeffizient von zwei Zahlen
      * Gibt bei \u00DCberlauf -1 und bei falscher Eingabe -2 zur\u00FCck
@@ -404,9 +420,9 @@ public abstract class Calculate
         double erg=n;
         for(int i=1;i!=11;i++)
             erg=(erg*erg+n)/(erg+erg);
-        return erg;        
+        return erg;
     }
-    
+
     public static final long sqrt(final long n){
     	if(n<0)
     		return -1;
@@ -420,7 +436,7 @@ public abstract class Calculate
         }while(erg < oldErg);
     	return erg*erg == n ? erg : -1;
     }
-    
+
     public static double rt(double y, int n){
     	if(n<=0)
     		return Double.NaN;
@@ -437,7 +453,7 @@ public abstract class Calculate
     		return -1;
     	return fakCacheLong[(int)n];
     }
-        
+
     public static final Number fak (final long n){
     	if (n<0)
     		return Double.NaN;
@@ -450,19 +466,19 @@ public abstract class Calculate
             return fakCacheDouble[value];
         return Double.POSITIVE_INFINITY;
     }
-    
+
     public static final boolean additionOverflowTest(final long a, final long b, final long erg){
     	return (a<=0||b<=0||erg>=a)&&(a>=0||b>=0||erg<=a);
     }
-    
+
     public static final boolean subtractionOverflowTest(final long a, final long b, final long erg){
     	return (a<=0||b>=0||erg>=a)&&(a>=0||b<=0||erg<=a);
     }
-    
+
     public static final boolean multiplicationOverflowTest(final long a, final long b, final long erg){
     	return b==0 ? true : erg / b == a;
     }
-    
+
     public static final Number pow2(long x, long exp){
     	if (exp < 3){
         	if (exp < 0)
@@ -485,7 +501,7 @@ public abstract class Calculate
     		if ((exp & 1) == 1)
         		res = -1;
     	}
-    	
+
     	while (true){
     		long nextErg;
     		if ((exp & 1) == 1){
@@ -512,7 +528,7 @@ public abstract class Calculate
     	}
     	return ergd;
     }
-    
+
     public static final Number pow(final long x, final long exp){
     	if (exp < 3){
         	if (exp < 0)
@@ -549,9 +565,9 @@ public abstract class Calculate
     	do
     		ergd*=(exp&stelle)==0 ? ergd : ergd*x;
     	while ((stelle>>=1)!=0);
-    	return ergd;    	
+    	return ergd;
     }
-        
+
     public static final double pow (double x, long exp){
     	if (exp < 0){
     		exp = -exp;
@@ -575,7 +591,7 @@ public abstract class Calculate
     		erg*=(exp&stelle)==0 ? erg : erg*x;
     	return erg;
     }
-    
+
     public static final float pow (float x, long exp){
     	if (exp < 0){
     		exp = -exp;
@@ -599,73 +615,57 @@ public abstract class Calculate
     		res*=(exp&stelle)==0 ? res : res*x;
     	return res;
     }
-    
-    public static boolean toRREF(double[][] m) {
+
+    public static int toRREF(double[][] m) {
         if (m.length == 0)
-        	return true;
+        	return 0;
         final int rowCount = m.length, columnCount = m[0].length;
 
         for (int r = 0, lead = 0, i=0; r < rowCount && lead < columnCount; i=++r, lead++) {
             while (m[i][lead] == 0) {
                 if (++i == rowCount) {
                     if (++lead == columnCount)
-                        return true;
+                        return m.length;
                     i = r;
                 }
             }
-            final double rowr[] = m[i], rowi[] = (m[i] = m[r]);
+            final double rowr[] = m[i];
+            m[i] = m[r];
             m[r] = rowr;
-            
-            if (rowr[lead] != 0){
-            	final double lv1 = 1/rowr[lead];
-                for (int j = 0; j < columnCount; j++)
-                    rowr[j] *= lv1;            	
-            }
-            
+
+            if (rowr[lead] != 0){ArrayUtil.mult(rowr, 0, columnCount, 1/rowr[lead]);}
             for (int k = 0; k < rowCount; k++) {
-                if (k != r){
-	                final double rowk[] = m[k], lv = rowk[lead];
-	                for (int j = 0; j < columnCount; j++)
-	                    rowk[j] -= lv * rowi[j];
-                }
+                if (k != r){ArrayUtil.multAdd(rowr, 0, columnCount, m[k], 0, -m[k][lead]);}
             }
         }
-        return true;
+        return m.length;
     }
-    
-    public static boolean toRREF(float[][] m) {
+
+    public static int toRREF(float[][] m) {
         if (m.length == 0)
-        	return true;
+        	return 0;
         final int rowCount = m.length, columnCount = m[0].length;
 
         for (int r = 0, lead = 0, i=0; r < rowCount && lead < columnCount; i=++r, lead++) {
             while (m[i][lead] == 0) {
                 if (++i == rowCount) {
                     if (++lead == columnCount)
-                        return true;
+                        return m.length;
                     i = r;
                 }
             }
-            final float rowr[] = m[i], rowi[] = (m[i] = m[r]);
+            final float rowr[] = m[i];
+            m[i] = m[r];
             m[r] = rowr;
-            
-            if (rowr[lead] != 0){
-            	final double lv1 = 1/rowr[lead];
-                for (int j = 0; j < columnCount; j++)
-                    rowr[j] *= lv1;            	
-            }
-            
+
+            if (rowr[lead] != 0){ArrayUtil.mult(rowr, 0, columnCount, 1/rowr[lead]);}
             for (int k = 0; k < rowCount; k++) {
-                if (k != r){
-	                final float rowk[] = m[k], lv = rowk[lead];
-	                for (int j = 0; j < columnCount; j++)
-	                    rowk[j] -= lv * rowi[j];
-                }
+                if (k != r){ArrayUtil.multAdd(rowr, 0, columnCount, m[k], 0, -m[k][lead]);}
             }
         }
-        return true;
+        return m.length;
     }
-    
+
     public static int toRREF(double[] m, int numRows) {
         if (m.length == 0) {return 0;}
         final int columnCount = m.length / numRows;
@@ -680,12 +680,12 @@ public abstract class Calculate
             ArrayUtil.swap(m, i, r, columnCount);
             if (m[r + lead] != 0){ArrayUtil.mult(m, r, r + columnCount, 1./m[r + lead]);}
             for (int k = 0; k < m.length; k+=columnCount) {
-                if (k != r){ArrayUtil.multAdd(m, i, i + columnCount, m, k, -m[k + lead]);}
+                if (k != r){ArrayUtil.multAdd(m, r, r + columnCount, m, k, -m[k + lead]);}
             }
         }
         return numRows;
     }
-    
+
     public static final long powMod (long x, long exp, long mod){
         if(exp<=0)
             return 1;
@@ -703,7 +703,7 @@ public abstract class Calculate
     public static final double abs(double x){return x > 0 ? x : -x;}
 
     public static final long abs(long x){return x > 0 ? x : -x;}
-    
+
     public static final long[] primeFactors(long n){
     	long erg[] = new long[1];
     	int count = 0;
@@ -719,9 +719,9 @@ public abstract class Calculate
     	}
     	return Arrays.copyOf(erg, count);
     }
-    
+
     public static final double ln(final double x){
-        if(x<=0) 
+        if(x<=0)
         	return Double.NaN;
         double add = (x-1)/(x+1), erg = add;
         final double xx = add*add;
@@ -730,7 +730,7 @@ public abstract class Calculate
             erg += (add *= xx) / i;
         return erg * 2;
     }
-    
+
     public static long getFibunacciNumber(int index){
     	return fibunacciCache[index];
     }
@@ -750,7 +750,7 @@ public abstract class Calculate
 		}
 		return max;
 	}
-	public static int min(float[] positions) {
+	public static int argMin(float[] positions) {
 		int min = 0;
 		for (int i = 1; i < positions.length; ++i)
 		{
@@ -760,6 +760,230 @@ public abstract class Calculate
 			}
 		}
 		return min;
+	}
+
+	public static abstract class Optimizer implements Runnable, DoubleList
+	{
+		private double lowerBound[];
+		private double upperBound[];
+		private double data[];
+		private double tmp[];
+		private double diff[];
+		private final int length;
+		private int maxIter = 20;
+		double eps = 1e-10;
+		boolean multithreaded = true;
+		int randomEvaluations = 1000;
+
+		public void setRandomEvaluations(int randomEvaluations)
+		{
+			this.randomEvaluations = randomEvaluations;
+		}
+
+		public void setMultithreaded(boolean multithreaded)
+		{
+			this.multithreaded = multithreaded;
+		}
+
+		public Optimizer(int length)
+		{
+			lowerBound = new double[length];
+			upperBound = new double[length];
+			data = new double[length];
+			tmp = data.clone();
+			diff = new double[tmp.length];
+			this.length = tmp.length;
+		}
+
+		public Optimizer(double init[])
+		{
+			data = init.clone();
+			tmp = data.clone();
+			diff = new double[tmp.length];
+			lowerBound = new double[tmp.length];
+			upperBound = new double[tmp.length];
+			Arrays.fill(lowerBound, Double.NEGATIVE_INFINITY);
+			Arrays.fill(upperBound, Double.POSITIVE_INFINITY);
+			this.length = tmp.length;
+		}
+
+		public void setBound(int index, double low, double up)
+		{
+			lowerBound[index] = low;
+			upperBound[index] = up;
+		}
+
+		@Override
+		public int size()
+		{
+			return length;
+		}
+
+		@Override
+		public double getD(int index)
+		{
+			return data[index];
+		}
+
+		@Override
+		public void setElem(int index, double value)
+		{
+			data[index] = value;
+		}
+
+		public abstract double func(double data[]);
+
+		volatile double min;
+		@Override
+		public void run()
+		{
+			min = func(data);
+			if (Double.isNaN(min))
+			{
+				throw new RuntimeException("NaN occured");
+			}
+			/*if (multithreaded)
+			{
+				final ThreadPool.ThreadLocal<double[]> tmpdat = DataHandler.runnableRunner.new ThreadLocal<>();
+				DataHandler.runnableRunner.runParallel(new ThreadPool.ParallelRangeRunnable(){
+
+					@Override
+					public void run(int from, int to) {
+						double tmp[] = tmpdat.get();
+						if (tmp == null)
+						{
+							tmpdat.set(tmp = new double[length]);
+						}
+						for (int attempt= from; attempt < to; ++attempt)
+						{
+							for (int i = 0; i < length; ++i)
+							{
+								tmp[i] = Math.random() * (upperBound[i] - lowerBound[i]) + lowerBound[i];
+							}
+							double current = func(tmp);
+							synchronized(Optimizer.this)
+							{
+								if (current < min)
+								{
+									min = current;
+									System.arraycopy(tmp, 0, data, 0, length);
+								}
+							}
+						}
+					}
+
+					@Override
+					public void finished() {}
+				}, "Optimize", null, 0, randomEvaluations, 10, true);
+			}
+			else
+			{*/
+				for (int attempt= 0; attempt < randomEvaluations; ++attempt)
+				{
+					for (int i = 0; i < length; ++i)
+					{
+						tmp[i] = Math.random() * (upperBound[i] - lowerBound[i]) + lowerBound[i];
+					}
+					double current = func(tmp);
+					synchronized(Optimizer.this)
+					{
+						if (current < min)
+						{
+							min = current;
+							System.arraycopy(tmp, 0, data, 0, length);
+						}
+					}
+				}
+			//}
+			System.out.println("Premin :" + min);
+			min = func(data);
+			if (Double.isNaN(min))
+			{
+				throw new RuntimeException("NaN occured");
+			}
+			System.out.println("Premin2:" + min);
+			for(int iteration = 0; iteration < maxIter; ++iteration)
+			{
+				double scalar = 0.001;
+				System.arraycopy(data, 0, tmp, 0, length);
+				double diffSum = 0;
+				for (int i = 0; i < data.length; ++i)
+				{
+					tmp[i] = data[i] - scalar;
+					diff[i] = func(tmp) - min;
+					diffSum += diff[i] * diff[i];
+					tmp[i] = data[i];
+				}
+				scalar /= Math.sqrt(diffSum);
+				if (diffSum < eps)
+				{
+					break;
+				}
+				while(true)
+				{
+					DoubleMatrixUtil.addTo(data, diff, scalar, tmp);
+					double current = func(tmp);
+					if (Double.isNaN(current))
+					{
+						throw new RuntimeException("NaN occured");
+					}
+					if(current <= min)
+					{
+						min = current;
+						break;
+					}
+					if (scalar == 0)
+					{
+						throw new RuntimeException("Wrong minimum value : " + current + '<' + '=' + min);
+					}
+					scalar /= 2;
+				}
+				while (true)
+				{
+					DoubleMatrixUtil.addTo(data, diff, scalar * 2, tmp);
+					double current = func(tmp);
+					if (Double.isNaN(current))
+					{
+						throw new RuntimeException("NaN occured");
+					}
+					if (current > min)
+					{
+						DoubleMatrixUtil.addTo(data, diff, scalar, data);
+						break;
+					}
+					scalar *= 2;
+					min = current;
+				}
+			}
+			System.out.println(min);
+		}
+	}
+
+	/**
+	 * Searches a value in a monotone increasing function
+	 * @param min
+	 * @param max
+	 * @param value
+	 * @param eps
+	 * @param df
+	 * @return
+	 */
+	public static final double binarySearch(double min, double max, double value, double eps, DoubleFunctionDouble df)
+	{
+		while (Math.abs(max - min) > eps)
+		{
+			double arg = (min + max) * 0.5;
+			double res = df.apply(arg);
+			if (res < value)
+			{
+				min = arg;
+			}
+			else if (res > value)
+			{
+				max = arg;
+			}
+		}
+		return (min + max) * 0.5;
 	}
 
 	public static final int propabilityRound(double density)
@@ -777,7 +1001,7 @@ public abstract class Calculate
 			if (Math.random() < result - density)
 			{
 				--result;
-			}	
+			}
 		}
 		return result;
 	}
