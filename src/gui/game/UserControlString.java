@@ -35,7 +35,7 @@ public class UserControlString {
             new UserControlString.FuncControl(Words.move_stack,	 	ControlTypes.MOVE_STACK, false),
             new UserControlString.FuncControl(Words.shuffle_stack, 	ControlTypes.SHUFFLE, true),
             new UserControlString.FuncControl(Words.merge_objects, 	ControlTypes.COLLECT_SELECTED, true),
-            new UserControlString.FuncControl(Words.distribute_cards_to_players, ControlTypes.GIVE, true),
+            new UserControlString.FuncControl(Words.distribute_cards_to_players, ControlTypes.DEAL_OBJECTS, true),
             new UserControlString.FuncControl(Words.take_object_to_hand, ControlTypes.TAKE, true, uc.get(ControlTypes.TAKE,0), new ControlCombination(0, 0,  -1, 1)),
             new UserControlString.FuncControl(Words.take_object_to_hand_face_down, ControlTypes.TAKE_FACE_DOWN, true),
             new UserControlString.FuncControl(Words.play_card_face_up, ControlTypes.PLAY, true),
@@ -66,7 +66,7 @@ public class UserControlString {
 
     public final UserControlString.FuncControl[] privateAreaControls= {
             new UserControlString.FuncControl(Words.hide_and_show_hand_area, ControlTypes.HIDE_PRIVATE_AREA, true),
-            new UserControlString.FuncControl(Words.distribute_cards_to_players, ControlTypes.GIVE, false),
+            new UserControlString.FuncControl(Words.distribute_cards_to_players, ControlTypes.DEAL_OBJECTS, false),
             new UserControlString.FuncControl(Words.take_object_to_hand, ControlTypes.TAKE, false, uc.get(ControlTypes.TAKE,0), new ControlCombination(0, 0,  -1, 1)),
             new UserControlString.FuncControl(Words.take_object_to_hand_face_down, null, false, new ControlCombination(0, 2,  -1,1)),
             new UserControlString.FuncControl(Words.play_card_face_up, null, false, new ControlCombination(0, 1,  -1, 8)),

@@ -158,14 +158,16 @@ public class GameObjectActions {
                 }
                 ObjectFunctions.deselectAllSelected(gamePanel.id, gamePanel.gameInstance, gamePanel.getPlayer(), ial, gamePanel.hoveredObject);
                 break;
-            case GIVE:
+            case DEAL_OBJECTS:
                 ObjectFunctions.getSelectedObjects(gamePanel.gameInstance, gamePanel.getPlayer(), ial);
                 for (int oId : ObjectFunctions.getObjectRepresentatives(gamePanel.gameInstance, ial)) {
                     IntegerArrayList stackList = new IntegerArrayList();
                     ObjectInstance oi = gamePanel.gameInstance.getObjectInstanceById(oId);
                     ObjectFunctions.getStack(gamePanel.gameInstance, oi, stackList);
                     ObjectFunctions.removeStackRelations(gamePanel.id, gamePanel.gameInstance, gamePanel.getPlayer(), oi);
-                    ial2.add(stackList);
+                    for (int id : stackList) {
+                        ial2.add(id);
+                    }
                 }
                 ObjectFunctions.giveObjects(gamePanel, gamePanel.gameInstance, gamePanel.table.getTableCenter(new Point2D.Double()), gamePanel.table.getTableOffset(gamePanel.getPlayer(), gamePanel.gameInstance.getObjectInstanceById(ial.get(0))), ial2, gamePanel.objectInstanceList, gamePanel.hoveredObject);
                 break;

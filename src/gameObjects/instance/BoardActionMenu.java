@@ -1,6 +1,7 @@
 package gameObjects.instance;
 
 import data.controls.ControlTypes;
+import geometry.Vector2d;
 import gui.game.GameObjectActions;
 import gui.game.GamePanel;
 import gui.game.UserControlString;
@@ -11,6 +12,7 @@ import gui.language.Words;
 import util.data.IntegerArrayList;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -24,7 +26,9 @@ public class BoardActionMenu  implements LanguageChangeListener {
 
     public ObjectInstance gameObjectInstance;
     public GameInstance gameInstance;
-    
+    public Vector2d menuPosition = new Vector2d();
+    private Component invoker;
+
     public BoardActionMenu(GamePanel gamePanel){
         LanguageHandler lh = gamePanel.lh;
         languageChanged(lh.getCurrentLanguage());
@@ -52,6 +56,7 @@ public class BoardActionMenu  implements LanguageChangeListener {
                     public void actionPerformed(ActionEvent e) {
                         IntegerArrayList ial = new IntegerArrayList();
                         GameObjectActions.RunAction(controlTypes, gamePanel, ial);
+                        popup.show(invoker, menuPosition.getXI(), menuPosition.getYI());
                     }
                 });
             }
@@ -79,6 +84,7 @@ public class BoardActionMenu  implements LanguageChangeListener {
                     public void actionPerformed(ActionEvent e) {
                         IntegerArrayList ial = new IntegerArrayList();
                         GameObjectActions.RunAction(controlTypes, gamePanel, ial);
+                        popup.show(invoker, menuPosition.getXI(), menuPosition.getYI());
                     }
                 });
             }
@@ -93,9 +99,11 @@ public class BoardActionMenu  implements LanguageChangeListener {
 
     public void showPopup(MouseEvent arg0) {
         if(SwingUtilities.isRightMouseButton(arg0)) {
-            popup.show(arg0.getComponent(),
-                    arg0.getX(), arg0.getY());
+            menuPosition.set(arg0.getX(), arg0.getY());
+            invoker = arg0.getComponent();
+            popup.show(invoker, menuPosition.getXI(), menuPosition.getYI());
         }
     }
+
 
 }

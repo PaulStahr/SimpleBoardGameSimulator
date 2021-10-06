@@ -130,19 +130,19 @@
     <current_version>Aktuelle Version</current_version>
     <current_developement_version>Aktuelle Entwicklerversion</current_developement_version>
     <loading>Laden</loading>
-    <unpack_box>Spiel auspacken</unpack_box>
-    <pack_box>Spiel einpacken</pack_box>
+    <unpack_box>Box auspacken</unpack_box>
+    <pack_box>Box einpacken</pack_box>
     <roll_dice>Würfeln</roll_dice>
-    <previous_page>Letzte Seite</previous_page>
+    <previous_page>Vorherige Seite</previous_page>
     <next_page>Nächste Seite</next_page>
     <rotate_board>Tisch rotieren</rotate_board>
-    <board_controls>Board Controls</board_controls>
-    <object_controls>Object Controls</object_controls>
-    <card_controls>Card Controls</card_controls>
-    <dice_controls>Dice Controls</dice_controls>
-    <figure_controls>Figure Controls</figure_controls>
-    <box_controls>Box Controls</box_controls>
-    <book_controls>Book Controls</book_controls>
-    <hand_card_area_controls>Hand Card Area Controls</hand_card_area_controls>
-    <sort_hand_cards>Sort Hand Cards</sort_hand_cards>
+    <board_controls>Tisch Steuerung</board_controls>
+    <object_controls>Objekt Steuerung</object_controls>
+    <card_controls>Karten Steuerung</card_controls>
+    <dice_controls>Würfel Steuerung</dice_controls>
+    <figure_controls>Figur Steuerung</figure_controls>
+    <box_controls>Box Steuerung</box_controls>
+    <book_controls>Bücher Steuerung</book_controls>
+    <hand_card_area_controls>Steuerung Handkartenbereich</hand_card_area_controls>
+    <sort_hand_cards>Handkarten sortieren</sort_hand_cards>
 </xml>

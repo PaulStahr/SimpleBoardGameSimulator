@@ -25,7 +25,7 @@ public class UserControl {
         controlCombinations[ControlTypes.COLLECT_ALL_WITH_HANDS.ordinal()] = new ControlCombination[] {new ControlCombination(InputEvent.SHIFT_DOWN_MASK | InputEvent.ALT_DOWN_MASK, -1, KeyEvent.VK_M, 0)};
         controlCombinations[ControlTypes.DISSOLVE_STACK.ordinal()]  = new ControlCombination[] {new ControlCombination(InputEvent.SHIFT_DOWN_MASK, -1,  KeyEvent.VK_R, 0)};
         controlCombinations[ControlTypes.TAKE.ordinal()]            = new ControlCombination[] {new ControlCombination(0, -1, KeyEvent.VK_T, 0)};
-        controlCombinations[ControlTypes.GIVE.ordinal()]            = new ControlCombination[] {new ControlCombination(0, -1, KeyEvent.VK_G, 0)};
+        controlCombinations[ControlTypes.DEAL_OBJECTS.ordinal()]            = new ControlCombination[] {new ControlCombination(0, -1, KeyEvent.VK_D, 0)};
         controlCombinations[ControlTypes.SORT.ordinal()]            = new ControlCombination[] {new ControlCombination(0, -1, KeyEvent.VK_S, 0)};
         controlCombinations[ControlTypes.VIEW_COLLECT_STACK.ordinal()] = new ControlCombination[] {new ControlCombination(0, -1,  KeyEvent.VK_V, 0)};
         controlCombinations[ControlTypes.GET_BOTTOM_CARD.ordinal()] = new ControlCombination[] {new ControlCombination(InputEvent.SHIFT_DOWN_MASK, 2,  -1, 2)};

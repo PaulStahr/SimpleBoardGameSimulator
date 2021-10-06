@@ -1,17 +1,5 @@
 package gameObjects.functions;
 
-import java.awt.Shape;
-import java.awt.event.MouseEvent;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Random;
-import java.util.function.Predicate;
-
-import javax.swing.SwingUtilities;
-
 import gameObjects.action.GameObjectInstanceEditAction;
 import gameObjects.action.player.PlayerEditAction;
 import gameObjects.definition.GameObjectBook;
@@ -31,6 +19,17 @@ import util.ArrayUtil;
 import util.AwtGeometry;
 import util.Pair;
 import util.data.IntegerArrayList;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Random;
+import java.util.function.Predicate;
 
 public class ObjectFunctions {
     public static final int SIDE_TO_FRONT = 1;
@@ -1120,7 +1119,17 @@ public class ObjectFunctions {
         }
     }
 
-    static public void sortSelectedObjectsByDrawValue(GameInstance gameInstance, Player player, IntegerArrayList ial, IntegerArrayList objOrigPosX, IntegerArrayList objOrigPosY){
+    static public void sortObjectsByDrawValue(GameInstance gameInstance, Player player, IntegerArrayList ial){
+        ial.sort(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                return gameInstance.getObjectInstanceById(o1).state.drawValue - gameInstance.getObjectInstanceById(o2).state.drawValue;
+            }
+        });
+    }
+
+
+        static public void sortSelectedObjectsByDrawValue(GameInstance gameInstance, Player player, IntegerArrayList ial, IntegerArrayList objOrigPosX, IntegerArrayList objOrigPosY){
         IntegerArrayList selectedObjects = new IntegerArrayList();
         ObjectFunctions.getSelectedObjects(gameInstance, player, selectedObjects);
         IntegerArrayList sortedObjPosX = new IntegerArrayList();
@@ -1134,7 +1143,7 @@ public class ObjectFunctions {
         ial.sort(new Comparator<Integer>() {
             @Override
             public int compare(Integer o1, Integer o2) {
-                return gameInstance.getObjectInstanceById(o1).state.drawValue - gameInstance.getObjectInstanceById(o2).state.drawValue;
+                return gameInstance.getObjectInstanceById(o2).state.drawValue - gameInstance.getObjectInstanceById(o1).state.drawValue;
             }
         });
         if (objOrigPosX.size() > 0) {
@@ -1813,7 +1822,6 @@ public class ObjectFunctions {
         Collections.shuffle(ial);
         int playerNum = gameInstance.getPlayerCount();
         int numElements = ial.size()/playerNum;
-        int modElements = ial.size() & playerNum;
 
         int counter = 0;
         int playerCounter = 0;
@@ -1826,11 +1834,6 @@ public class ObjectFunctions {
             for (int currentElementIndex = 0; currentElementIndex < numElements; ++currentElementIndex){
                 int Pos = numElements*playerCounter + currentElementIndex;
                 takeObjects(gamePanel.id,gameInstance,player, point, offset, gameInstance.getObjectInstanceById(ial.getI(Pos)), hoveredObject);
-            }
-            if(counter < modElements){
-                int Pos = numElements*playerNum + counter;
-                takeObjects(gamePanel.id,gameInstance,player, point, offset, gameInstance.getObjectInstanceById(ial.getI(Pos)), hoveredObject);
-                counter+= 1;
             }
             sortHandCardsByValue(gamePanel, gameInstance, player, point, offset, integerList, oiList, hoveredObject, false);
             integerList.clear();

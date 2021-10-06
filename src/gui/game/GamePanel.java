@@ -98,6 +98,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 	//Table settings
 	boolean isTableVisible;
 	boolean isPutDownAreaVisible;
+	boolean mouseDragging = false;
 
 	int keyPressed = 0;
 
@@ -445,14 +446,9 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				activeObject.newObjectActionMenu(gameInstance, player, this).showPopup(arg0);
 			}
 			//Show popup menu of board
-			else if (!mouseInPrivateArea) {
+			else{
 				BoardActionMenu boardActionMenu = new BoardActionMenu(this);
 				boardActionMenu.showPopup(arg0);
-			}
-			//Show popup menu of private area
-			else{
-				PrivateAreaMenu privateAreaMenu = new PrivateAreaMenu(this);
-				privateAreaMenu.showPopup(arg0);
 			}
 		}
 	}
@@ -617,7 +613,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 						}
 					}
 					//Handle all drags of Objects
-					ObjectFunctions.sortSelectedObjectsByDrawValue(gameInstance, player, ial, objOrigPosX, objOrigPosY);
+					//ObjectFunctions.sortSelectedObjectsByDrawValue(gameInstance, player, ial, objOrigPosX, objOrigPosY);
 					MoveFunctions.dragObjects(this, gameInstance, player, arg0, ial, objOrigPosX, objOrigPosY, mousePressedGamePos, mouseBoardPos, mouseWheelValue);
 				}
 				if (this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)) {
@@ -632,14 +628,12 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 
 	@Override
 	public void mouseDragged(MouseEvent arg0) {
-
 		/*Translate the board if alt is down*/
 		if ((arg0.isAltDown() && SwingUtilities.isLeftMouseButton(arg0)) || (arg0.isAltDown() && SwingUtilities.isRightMouseButton(arg0)) ) {
 			//updatePlayerMousePos(arg0);
 			translateBoard(arg0);
 			boardTranslation = true;
 		} else {
-
 			if (player != null) {
 				updatePlayerMousePos(arg0);
 				if (!player.visitor) {
@@ -647,11 +641,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					StringBuilder strB = new StringBuilder();
 					StringUtils.toString(ial, ' ', strB).append(' ');
 					outText = strB.toString();
-
-
 					if (!isSelectStarted) {
 						ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
-						ObjectFunctions.sortSelectedObjectsByDrawValue(gameInstance, player, ial, objOrigPosX, objOrigPosY);
 						MoveFunctions.dragObjects(this, gameInstance, player, arg0, ial, objOrigPosX, objOrigPosY, mousePressedGamePos, mouseBoardPos, mouseWheelValue);
 						/*Handle all drags of Token Objects*/
 						if (this.privateArea.containsScreenCoordinates(mouseScreenX, mouseScreenY)) {
@@ -685,6 +676,7 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				return;
 			}
 			ObjectFunctions.getSelectedObjects(gameInstance, player, ial);
+			ObjectFunctions.sortObjectsByDrawValue(gameInstance, player, ial);
 			if (!isSelectStarted && ial.size() > 0 && (SwingUtilities.isLeftMouseButton(arg0) || SwingUtilities.isRightMouseButton(arg0) || SwingUtilities.isMiddleMouseButton(arg0))) {
 				for (int id : ObjectFunctions.getObjectRepresentatives(gameInstance, ial)) {
 					ObjectInstance oi = gameInstance.getObjectInstanceById(id);
@@ -795,10 +787,6 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 				}
 				else if (control.check(ControlTypes.VIEW, keyCode, keyModifier)) {
 					GameObjectActions.RunAction(ControlTypes.VIEW, this, ial);
-				} else if (control.check(ControlTypes.DROP_ALL, keyCode, keyModifier)) {
-					GameObjectActions.RunAction(ControlTypes.DROP_ALL, this, ial);
-				} else if (control.check(ControlTypes.DROP, keyCode, keyModifier)) {
-					GameObjectActions.RunAction(ControlTypes.DROP, this, ial);
 				} else if (control.check(ControlTypes.PLAY, keyCode, keyModifier)) {
 					GameObjectActions.RunAction(ControlTypes.PLAY, this, ial);
 				} else if (control.check(ControlTypes.SIT_DOWN, keyCode, keyModifier)) {
@@ -834,8 +822,8 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					} else if (control.check(ControlTypes.FIX, keyCode, keyModifier)) {
 						GameObjectActions.RunAction(ControlTypes.FIX, this, ial);
 					}
-					else if (control.check(ControlTypes.GIVE, keyCode, keyModifier)){
-						GameObjectActions.RunAction(ControlTypes.GIVE, this, ial);
+					else if (control.check(ControlTypes.DEAL_OBJECTS, keyCode, keyModifier)){
+						GameObjectActions.RunAction(ControlTypes.DEAL_OBJECTS, this, ial);
 					}
 					else if (keyCode == KeyEvent.VK_PLUS || keyCode == KeyEvent.VK_ADD) {
 						//Scale hovered Object
@@ -882,6 +870,11 @@ public class GamePanel extends JPanel implements MouseListener, MouseMotionListe
 					}
 					else if (control.check(ControlTypes.SORT, keyCode, keyModifier)){
 						GameObjectActions.RunAction(ControlTypes.SORT, this, ial);
+					}
+					else if (control.check(ControlTypes.DROP_ALL, keyCode, keyModifier)) {
+						GameObjectActions.RunAction(ControlTypes.DROP_ALL, this, ial);
+					} else if (control.check(ControlTypes.DROP, keyCode, keyModifier)) {
+						GameObjectActions.RunAction(ControlTypes.DROP, this, ial);
 					}
 				}
 			}
